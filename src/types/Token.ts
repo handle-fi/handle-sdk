@@ -2,7 +2,8 @@
 
 /** ERC20 token */
 export type Token = {
-  name: string;
-  symbol: string;
-  decimals: ethers.BigNumber;
+  address: string,
+  name: string,
+  symbol: string,
+  decimals: ethers.BigNumber
 };
