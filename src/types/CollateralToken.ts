@@ -2,9 +2,10 @@
 import { ethers } from "ethers";
 
 export type CollateralToken = Token & {
-  mintCollateralRatio: ethers.BigNumber;
+  mintCollateralRatio: ethers.BigNumber,
   /** The token liquidation fee ratio */
-  liquidationFee: ethers.BigNumber;
-  totalBalance: ethers.BigNumber;
-  isValid: boolean;
+  liquidationFee: ethers.BigNumber,
+  interestRate: ethers.BigNumber,
+  totalBalance: ethers.BigNumber,
+  isValid: boolean
 };
