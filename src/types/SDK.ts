@@ -50,6 +50,8 @@ export class SDK {
 
   /** Sets all contracts for the SDK object */
   private static async loadContracts(sdk: SDK, handle: string) {
+    // @ts-ignore
+    sdk.contracts = {};
     /** Type for local config of contracts to load */
     type ContractObj = { name: string; abi: Abi; addressGetter: () => string };
     const contractsToLoad: ContractObj[] = [
