@@ -10,11 +10,12 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      uses: mattallty/jest-github-action@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        NETWORK: ${{ secrets.NETWORK }}
-        INFURA_KEY: ${{ secrets.INFURA_KEY }}
-        PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
-      with:
-        test-command: "yarn test"
+      - name: "Test"
+        uses: mattallty/jest-github-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NETWORK: ${{ secrets.NETWORK }}
+          INFURA_KEY: ${{ secrets.INFURA_KEY }}
+          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+        with:
+          test-command: "yarn test"
