@@ -15,3 +15,5 @@ dist/
 *.tsbuildinfo
 # JetBrains
 .idea/
+# Jest
+coverage/
