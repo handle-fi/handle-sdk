@@ -1,0 +1,9 @@
+﻿{
+  "abiPath": "./abi",
+  "networks": [
+    {
+      "name": "kovan",
+      "handleAddress": "0xC3de41f0010fEa38FC18FBbcbA7A5Cf8aA6ab22c"
+    }
+  ]
+}
