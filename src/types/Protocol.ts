@@ -2,7 +2,6 @@
 import { ethers } from "ethers";
 import { CollateralToken } from "./CollateralToken";
 import { SDK } from "./SDK";
-import { fxTokens } from "./ProtocolTokens";
 
 /** Holds protocol data */
 export class Protocol {
@@ -38,10 +37,15 @@ export class Protocol {
     return protocol;
   }
 
-  /** Returns the fxToken object from symbol */
-  public getFxToken(symbol: fxTokens): fxToken {
-    const token = this.fxTokens.find((x) => x.symbol === symbol);
-    if (!token) throw new Error(`Token "${symbol}" not found`);
+  public getFxTokenByAddress(address: string): fxToken {
+    const token = this.fxTokens.find((x) => x.address === address);
+    if (!token) throw new Error(`fxToken "${address}" not found`);
+    return token;
+  }
+
+  public getCollateralTokenByAddress(address: string): CollateralToken {
+    const token = this.collateralTokens.find((x) => x.address === address);
+    if (!token) throw new Error(`Collateral token "${address}" not found`);
     return token;
   }
 }
