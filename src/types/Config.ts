@@ -15,7 +15,7 @@ export enum Abi {
 
 export class Config {
   static getNetworkHandleAddress(network: string): string {
-    let address = config.networks.find((x) => x.name == network)?.handleAddress;
+    const address = config.networks.find((x) => x.name === network)?.handleAddress;
     if (!address) throw new Error(`Network "${network}" is not supported`);
     return address;
   }
