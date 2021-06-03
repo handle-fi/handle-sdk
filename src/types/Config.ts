@@ -21,9 +21,10 @@ export class Config {
   }
 
   static async getAbi(abi: Abi): Promise<ethers.ContractInterface> {
-    const filePath = path.join(config.abiPath, abi, ".json");
+    const filePath = path.join(config.abiPath, `${abi}.json`);
     const file = await util.promisify(fs.readFile)(filePath, { encoding: "utf-8" });
     if (file == null) throw new Error(`Could not find ABI file at path "${filePath}"`);
-    return file;
+    const json = JSON.parse(file);
+    return Array.isArray(json) ? json : json.abi;
   }
 }
