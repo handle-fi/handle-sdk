@@ -53,13 +53,17 @@ export class Protocol {
     const indexedTokens = await readFxTokens(this.sdk.isKovan);
     this.fxTokens = [];
     for (let indexed of indexedTokens) {
+      const [decimals, rate] = await Promise.all([
+        // @ts-ignore TODO: index these
+        this.sdk.contracts[indexed.symbol].decimals(),
+        this.sdk.contracts.handle.getTokenPrice(indexed.address)
+      ]);
       this.fxTokens.push({
         address: indexed.address,
         symbol: indexed.symbol,
         name: indexed.name,
-        // @ts-ignore TODO: index this
-        decimals: await this.sdk.contracts[indexed.symbol].decimals(),
-        rate: await this.sdk.contracts.handle.getTokenPrice(indexed.address),
+        decimals,
+        rate,
         rewardRatio: indexed.rewardRatio,
         totalSupply: indexed.totalSupply,
         isValid: indexed.isValid
