@@ -1,15 +1,14 @@
 ﻿import { describe, it } from "@jest/globals";
 import { SDK } from "../../src/types/SDK";
-import { getSigner } from "../setupTests";
+import { getSDK } from "../setupTests";
 import { ethers } from "ethers";
 import { CollateralTokens, fxTokens } from "../../src/types/ProtocolTokens";
 
 let sdk: SDK;
 
 describe("SDK: loadContracts", () => {
-  it("Should create new SDK", async () => {
-    // @ts-ignore
-    sdk = await SDK.from(getSigner());
+  beforeAll(() => {
+    sdk = getSDK();
   });
   it("Should have loaded SDK provider and signer", async () => {
     const networkExpected = process.env.NETWORK;

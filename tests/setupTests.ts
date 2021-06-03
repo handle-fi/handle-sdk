@@ -1,18 +1,23 @@
-﻿import { ethers } from "ethers";
-import dotenv from "dotenv";
+﻿import dotenv from "dotenv";
+dotenv.config();
+import { ethers } from "ethers";
+import { SDK } from "../src/types/SDK";
+
+jest.setTimeout(60000);
 
 let signer: ethers.Signer;
+let sdk: SDK;
 
-export const getSigner = () => signer;
+export const getSDK = () => sdk;
 
-global.beforeAll(() => {
-  dotenv.config();
+global.beforeAll(async () => {
   // @ts-config
   signer = new ethers.Wallet(
     // @ts-ignore
     process.env.PRIVATE_KEY,
     new ethers.providers.InfuraWebSocketProvider(process.env.NETWORK, process.env.INFURA_KEY)
   );
+  sdk = await SDK.from(signer);
 });
 
 global.afterAll(() => {

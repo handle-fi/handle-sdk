@@ -36,7 +36,9 @@ export class Vault {
 
   public static async from(account: string, token: string, sdk: SDK): Promise<Vault> {
     const vault = new Vault(account, token, sdk);
-    // TODO: load vault data via SDK
+    await vault.update();
     return vault;
   }
+
+  public async update() {}
 }
