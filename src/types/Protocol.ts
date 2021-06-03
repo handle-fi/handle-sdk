@@ -46,7 +46,6 @@ export class Protocol {
     const indexedTokens = await readFxTokens(this.sdk.isKovan);
     this.fxTokens = [];
     for (let indexed of indexedTokens) {
-      console.log("loading fx token", indexed);
       this.fxTokens.push({
         address: indexed.address,
         symbol: indexed.symbol,
