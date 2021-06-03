@@ -5,7 +5,7 @@
 }
 
 export enum CollateralTokens {
-  wETH = "wETH",
-  wBTC = "wBTC",
+  WETH = "WETH",
+  WBTC = "WBTC",
   DAI = "DAI"
 }
