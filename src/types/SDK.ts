@@ -28,7 +28,8 @@ export class SDK {
   private constructor(providerOrSigner: ethers.providers.Provider | ethers.Signer) {
     if (ethers.Signer.isSigner(providerOrSigner)) {
       this.signer = providerOrSigner;
-      this.provider = this.signer.provider as ethers.providers.Provider;
+      if (!this.signer.provider) throw new Error("Signer must have provider");
+      this.provider = this.signer.provider;
     } else {
       this.provider = providerOrSigner;
     }
