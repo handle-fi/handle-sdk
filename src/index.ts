@@ -1,9 +1,2 @@
-﻿import packageJson from "../package.json";
-
-type SDK = {
-  version: string;
-};
-
-export default {
-  version: packageJson.version
-} as SDK;
+﻿import { SDK } from "./types/SDK";
+export default SDK;
