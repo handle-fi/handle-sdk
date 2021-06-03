@@ -3,6 +3,8 @@ import { ethers } from "ethers";
 import { VaultCollateral } from "./VaultCollateral";
 
 export type Vault = {
+  /** Address for the owner of the vault */
+  account: string,
   token: fxToken,
   debt: ethers.BigNumber,
   collateral: VaultCollateral[],
