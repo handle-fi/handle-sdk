@@ -2,6 +2,7 @@
 import { ethers } from "ethers";
 import { CollateralToken } from "./CollateralToken";
 import { SDK } from "./SDK";
+import { fxTokens } from "./ProtocolTokens";
 
 /** Holds protocol data */
 export class Protocol {
@@ -35,5 +36,12 @@ export class Protocol {
       deposit: ethers.BigNumber.from(0)
     };
     return protocol;
+  }
+
+  /** Returns the fxToken object from symbol */
+  public getFxToken(symbol: fxTokens): fxToken {
+    const token = this.fxTokens.find((x) => x.symbol === symbol);
+    if (!token) throw new Error(`Token "${symbol}" not found`);
+    return token;
   }
 }
