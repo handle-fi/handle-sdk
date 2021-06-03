@@ -1,12 +1,12 @@
 ﻿import { describe, it } from "@jest/globals";
 import { SDK } from "../../src/types/SDK";
-import { getSDK } from "../setupTests";
 import { ethers } from "ethers";
 import { CollateralTokens, fxTokens } from "../../src/types/ProtocolTokens";
+import { getSDK } from "../setupTests";
 
 let sdk: SDK;
 
-describe("SDK: loadContracts", () => {
+describe("SDK: load/constructor", function () {
   beforeAll(() => {
     sdk = getSDK();
   });
@@ -15,6 +15,13 @@ describe("SDK: loadContracts", () => {
     const network = await sdk.signer?.provider?.getNetwork();
     if (!network) throw "invalid network";
     expect(network.name).toEqual(networkExpected);
+  });
+  it("Should load all vaults for wallet", async () => {
+    await sdk.loadVaults();
+    expect(sdk.vaults.length > 0).toBeTruthy();
+    expect(sdk.vaults.find((x) => x.token.symbol === fxTokens.fxAUD)).not.toBeNull();
+    expect(sdk.vaults.find((x) => x.token.symbol === fxTokens.fxEUR)).not.toBeNull();
+    expect(sdk.vaults.find((x) => x.token.symbol === fxTokens.fxKRW)).not.toBeNull();
   });
   it("Should have loaded Handle contract", async () => {
     const address = await sdk.contracts.handle.address;

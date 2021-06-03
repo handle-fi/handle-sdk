@@ -1,13 +1,13 @@
 ﻿import { describe, it } from "@jest/globals";
 import { SDK } from "../../src/types/SDK";
-import { getSDK } from "../setupTests";
 import { IndexedVaultData, readIndexedVaultData } from "../../src/readers/vault";
 import { fxTokens } from "../../src/types/ProtocolTokens";
 import { ethers } from "ethers";
+import { getSDK } from "../setupTests";
 
 let sdk: SDK;
 
-describe("Readers: vault", () => {
+describe("Readers: vault", function () {
   beforeAll(() => {
     sdk = getSDK();
   });

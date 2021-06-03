@@ -2,7 +2,7 @@
 import { ethers } from "ethers";
 import { VaultCollateral } from "./VaultCollateral";
 import { SDK } from "./SDK";
-import { IndexedVaultData, readIndexedVaultData } from "../readers/vault";
+import { readIndexedVaultData } from "../readers/vault";
 import { CollateralTokens, fxTokens } from "./ProtocolTokens";
 
 export class Vault {
@@ -47,12 +47,7 @@ export class Vault {
   }
 
   public async update() {
-    const data = (await readIndexedVaultData(
-      this.account,
-      this.token.address,
-      this.sdk.isKovan
-    )) as IndexedVaultData;
-    if (!data) throw new Error("Could not read indexed vault data");
+    const data = await readIndexedVaultData(this.account, this.token.address, this.sdk.isKovan);
     // Update debt.
     this.debt = data.debt;
     this.debtAsEth = this.debt.mul(this.token.rate).div(ethers.constants.WeiPerEther);
@@ -69,6 +64,7 @@ export class Vault {
         token.amount.mul(collateralToken.rate.div(ethers.constants.WeiPerEther))
       );
     }
+    if (this.collateralAsEth.eq(0)) return;
     // Set minting ratio.
     this.ratios.minting = await this.sdk.contracts.vaultLibrary.getMinimumRatio(
       this.account,

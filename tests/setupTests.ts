@@ -3,7 +3,7 @@ dotenv.config();
 import { ethers } from "ethers";
 import { SDK } from "../src/types/SDK";
 
-jest.setTimeout(60000);
+jest.setTimeout(240000);
 
 let signer: ethers.Signer;
 let sdk: SDK;

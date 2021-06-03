@@ -3,6 +3,7 @@ import { ethers } from "ethers";
 import { Protocol } from "./Protocol";
 import { Abi, Config } from "./Config";
 import { CollateralTokens, fxTokens } from "./ProtocolTokens";
+import { Vault } from "./Vault";
 
 /** Handle SDK object */
 export class SDK {
@@ -12,6 +13,7 @@ export class SDK {
   /** Optional Signer for writing to contracts */
   public signer?: ethers.Signer;
   public protocol!: Protocol;
+  public vaults: Vault[];
   public contracts!: {
     handle: ethers.Contract;
     comptroller: ethers.Contract;
@@ -35,6 +37,7 @@ export class SDK {
       this.provider = providerOrSigner;
     }
     this.version = packageJson.version;
+    this.vaults = [];
   }
 
   public get isKovan() {
@@ -49,15 +52,14 @@ export class SDK {
     const sdk = new SDK(providerOrSigner);
     sdk.network = (await sdk.provider.getNetwork()).name;
     handle = handle ?? Config.getNetworkHandleAddress(sdk.network);
-    await SDK.loadContracts(sdk, handle);
+    await sdk.loadContracts(handle);
     sdk.protocol = await Protocol.from(sdk);
     return sdk;
   }
 
-  /** Sets all contracts for the SDK object */
-  private static async loadContracts(sdk: SDK, handle: string) {
+  private async loadContracts(handle: string) {
     // @ts-ignore
-    sdk.contracts = {};
+    this.contracts = {};
     /** Type for local config of contracts to load */
     type ContractObj = { name: string; abi: Abi; addressGetter: () => string };
     const contractsToLoad: ContractObj[] = [
@@ -71,33 +73,33 @@ export class SDK {
         name: "comptroller",
         abi: Abi.Comptroller,
         // @ts-ignore
-        addressGetter: async () => await sdk.contracts.handle.comptroller()
+        addressGetter: async () => await this.contracts.handle.comptroller()
       },
       {
         name: "treasury",
         abi: Abi.Treasury,
         // @ts-ignore
-        addressGetter: async () => await sdk.contracts.handle.treasury()
+        addressGetter: async () => await this.contracts.handle.treasury()
       },
       {
         name: "vaultLibrary",
         abi: Abi.VaultLibrary,
         // @ts-ignore
-        addressGetter: async () => await sdk.contracts.handle.vaultLibrary()
+        addressGetter: async () => await this.contracts.handle.vaultLibrary()
       },
       {
         name: "fxKeeperPool",
         abi: Abi.fxKeeperPool,
         // @ts-ignore
-        addressGetter: async () => await sdk.contracts.handle.fxKeeperPool()
+        addressGetter: async () => await this.contracts.handle.fxKeeperPool()
       }
     ];
     const setContract = async (obj: ContractObj) => {
       // @ts-ignore
-      sdk.contracts[obj.name] = new ethers.Contract(
+      this.contracts[obj.name] = new ethers.Contract(
         await obj.addressGetter(),
         await Config.getAbi(obj.abi),
-        sdk.signer ?? sdk.provider
+        this.signer ?? this.provider
       );
     };
     // Load handle contract.
@@ -110,20 +112,38 @@ export class SDK {
     }
     // Load ERC20s for fxTokens and collateral tokens.
     const [fxTokens, collateralTokens] = await Promise.all([
-      sdk.contracts.handle.getAllFxTokens(),
-      sdk.contracts.handle.getAllCollateralTypes()
+      this.contracts.handle.getAllFxTokens(),
+      this.contracts.handle.getAllCollateralTypes()
     ]);
     const erc20s = [...fxTokens, ...collateralTokens];
     for (let erc20 of erc20s) {
       const contract = new ethers.Contract(
         erc20,
         await Config.getAbi(Abi.ERC20),
-        sdk.signer ?? sdk.provider
+        this.signer ?? this.provider
       );
       const symbol = await contract.symbol();
       // IMPORTANT NOTE: If the ERC20 symbol does not match the enum property name, this will fail.
       // @ts-ignore
-      sdk.contracts[symbol] = contract;
+      this.contracts[symbol] = contract;
+    }
+    await Promise.all(promises);
+  }
+
+  public async loadVaults() {
+    // Can't load vaults without signer.
+    if (!this.signer) return;
+    const account = await this.signer.getAddress();
+    const fxTokens = this.protocol.fxTokens;
+    const promises = [];
+    this.vaults = [];
+    for (let fxToken of fxTokens) {
+      promises.push(
+        new Promise(async (resolve) => {
+          this.vaults.push(await Vault.from(account, fxToken.symbol as fxTokens, this));
+          resolve(undefined);
+        })
+      );
     }
     await Promise.all(promises);
   }
