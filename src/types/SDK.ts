@@ -7,6 +7,7 @@ import { CollateralTokens, fxTokens } from "./ProtocolTokens";
 /** Handle SDK object */
 export class SDK {
   public version: string;
+  public network!: string;
   public provider: ethers.providers.Provider;
   /** Optional Signer for writing to contracts */
   public signer?: ethers.Signer;
@@ -42,8 +43,8 @@ export class SDK {
     handle?: string
   ): Promise<SDK> {
     const sdk = new SDK(providerOrSigner);
-    const network = (await sdk.provider.getNetwork()).name;
-    handle = handle ?? Config.getNetworkHandleAddress(network);
+    sdk.network = (await sdk.provider.getNetwork()).name;
+    handle = handle ?? Config.getNetworkHandleAddress(sdk.network);
     await SDK.loadContracts(sdk, handle);
     sdk.protocol = await Protocol.from(sdk);
     return sdk;
