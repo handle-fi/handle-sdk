@@ -7,17 +7,16 @@ import { ethers } from "ethers";
 
 let sdk: SDK;
 
-describe("Vault: read indexed data", () => {
+describe("Readers: vault", () => {
   beforeAll(() => {
     sdk = getSDK();
   });
   it("Should return indexed vault data", async () => {
     const signer = sdk.signer as ethers.Signer;
-    console.log("signer addr: " + (await signer.getAddress()));
-    console.log("fxaud addr: " + sdk.contracts[fxTokens.fxAUD].address);
     const data = (await readIndexedVaultData(
       await signer.getAddress(),
-      sdk.contracts[fxTokens.fxAUD].address
+      sdk.contracts[fxTokens.fxAUD].address,
+      process.env.NETWORK === "kovan"
     )) as IndexedVaultData;
     expect(data).toBeTruthy();
     expect(data.debt.gt(0));
