@@ -4,6 +4,7 @@ import { CollateralToken } from "./CollateralToken";
 import { SDK } from "./SDK";
 import { readFxTokens } from "../readers/fxTokens";
 import { readCollateralTokens } from "../readers/collateralTokens";
+import { CollateralTokens, fxTokens } from "./ProtocolTokens";
 
 /** Holds protocol data */
 export class Protocol {
@@ -81,9 +82,15 @@ export class Protocol {
     }
   }
 
-  public getFxTokenByAddress(address: string): fxToken {
-    const token = this.fxTokens.find((x) => x.address === address);
-    if (!token) throw new Error(`fxToken "${address}" not found`);
+  public getFxTokenBySymbol(symbol: fxTokens): fxToken {
+    const token = this.fxTokens.find((x) => x.symbol === symbol);
+    if (!token) throw new Error(`fxToken "${symbol}" not found`);
+    return token;
+  }
+
+  public getCollateralTokenBySymbol(symbol: CollateralTokens): CollateralToken {
+    const token = this.collateralTokens.find((x) => x.symbol === symbol);
+    if (!token) throw new Error(`fxToken "${symbol}" not found`);
     return token;
   }
 
