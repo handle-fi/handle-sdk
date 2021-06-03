@@ -3,7 +3,7 @@ import { ethers } from "ethers";
 import { CollateralToken } from "./CollateralToken";
 
 /** Holds protocol data */
-export type Handle = {
+export type Protocol = {
   fxTokens: fxToken[],
   collateralTokens: CollateralToken[],
   feeRecipient: string,
