@@ -1,5 +1,5 @@
 ﻿import query from "./query";
-import { mainneGqltClient, kovanGqlClient } from "../graphqlClient";
+import { mainnetGqlClient, kovanGqlClient } from "../graphqlClient";
 import { ethers } from "ethers";
 
 export type IndexedVaultData = {
@@ -15,7 +15,7 @@ export const readIndexedVaultData = async (
 ): Promise<IndexedVaultData> => {
   account = account.toLowerCase();
   fxToken = fxToken.toLowerCase();
-  const client = isKovan ? kovanGqlClient : mainneGqltClient;
+  const client = isKovan ? kovanGqlClient : mainnetGqlClient;
   const data = await client.request(query, { account, fxToken });
   // If the array is not present, there was an error in the request.
   if (!Array.isArray(data?.vaults)) throw new Error("Could not load indexed vault data");
