@@ -34,11 +34,17 @@ export class Protocol {
     await protocol.loadFxTokens();
     await protocol.loadCollateralTokens();
     protocol.feeRecipient = await sdk.contracts.handle.FeeRecipient();
+    const [mint, burn, withdraw, deposit] = await Promise.all([
+      sdk.contracts.handle.mintFeePerMille(),
+      sdk.contracts.handle.burnFeePerMille(),
+      sdk.contracts.handle.withdrawFeePerMille(),
+      sdk.contracts.handle.depositFeePerMille()
+    ]);
     protocol.fees = {
-      mint: await sdk.contracts.handle.mintFeePerMille(),
-      burn: await sdk.contracts.handle.burnFeePerMille(),
-      withdraw: await sdk.contracts.handle.withdrawFeePerMille(),
-      deposit: await sdk.contracts.handle.depositFeePerMille()
+      mint,
+      burn,
+      withdraw,
+      deposit
     };
     return protocol;
   }
