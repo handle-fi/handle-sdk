@@ -37,6 +37,10 @@ export class SDK {
     this.version = packageJson.version;
   }
 
+  public get isKovan() {
+    return this.network === "kovan";
+  }
+
   /** Loads a new SDK from a provider or signer and optional alternative handle contract address */
   public static async from(
     providerOrSigner: ethers.providers.Provider | ethers.Signer,

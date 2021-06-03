@@ -2,8 +2,10 @@
 import { ethers } from "ethers";
 import { VaultCollateral } from "./VaultCollateral";
 import { SDK } from "./SDK";
+import { IndexedVaultData, readIndexedVaultData } from "../readers/vault";
 
 export class Vault {
+  private sdk: SDK;
   /** Address for the owner of the vault */
   public account: string;
   public token: fxToken;
@@ -21,6 +23,7 @@ export class Vault {
   private constructor(account: string, token: string, sdk: SDK) {
     const fxToken = sdk.protocol.fxTokens.find((x) => x.address === token);
     if (!fxToken) throw new Error(`Invalid fxToken address provided "${token}"`);
+    this.sdk = sdk;
     this.token = fxToken;
     this.account = account;
     this.debt = ethers.BigNumber.from(0);
@@ -40,5 +43,13 @@ export class Vault {
     return vault;
   }
 
-  public async update() {}
+  public async update() {
+    const data = (await readIndexedVaultData(
+      this.account,
+      this.token.address,
+      this.sdk.isKovan
+    )) as IndexedVaultData;
+    if (!data) throw new Error("Could not read indexed vault data");
+    this.debt = data.debt;
+  }
 }
