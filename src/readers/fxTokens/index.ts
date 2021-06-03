@@ -3,6 +3,7 @@ import { mainneGqltClient, kovanGqlClient } from "../graphqlClient";
 import { ethers } from "ethers";
 
 export type IndexedFxlTokenData = {
+  address: string;
   name: string;
   symbol: string;
   rewardRatio: ethers.BigNumber;
@@ -18,6 +19,8 @@ export const readFxTokens = async (isKovan: boolean): Promise<IndexedFxlTokenDat
   if (tokens == null) throw new Error("Could not read fxTokens");
   // Parse numbers.
   for (let token of tokens) {
+    token.address = token.id;
+    delete token.id;
     token.rewardRatio = ethers.BigNumber.from(token.rewardRatio);
     token.totalSupply = ethers.BigNumber.from(token.totalSupply);
   }

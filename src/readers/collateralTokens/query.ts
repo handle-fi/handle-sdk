@@ -3,6 +3,7 @@
 export default gql`
   query {
     collateralTokens {
+      id
       name
       symbol
       mintCollateralRatio

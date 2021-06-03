@@ -3,6 +3,7 @@ import { mainneGqltClient, kovanGqlClient } from "../graphqlClient";
 import { ethers } from "ethers";
 
 export type IndexedCollateralTokenData = {
+  address: string;
   name: string;
   symbol: string;
   mintCollateralRatio: ethers.BigNumber;
@@ -21,6 +22,8 @@ export const readCollateralTokens = async (
   if (tokens == null) throw new Error("Could not read collateral tokens");
   // Parse numbers.
   for (let token of tokens) {
+    token.address = token.id;
+    delete token.id;
     token.mintCollateralRatio = ethers.BigNumber.from(token.mintCollateralRatio);
     token.liquidationFee = ethers.BigNumber.from(token.liquidationFee);
     token.totalBalance = ethers.BigNumber.from(token.totalBalance);

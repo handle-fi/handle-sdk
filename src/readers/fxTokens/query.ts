@@ -3,6 +3,7 @@
 export default gql`
   query {
     fxTokens {
+      id
       name
       symbol
       rewardRatio
