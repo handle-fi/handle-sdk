@@ -59,7 +59,6 @@ describe("SDK: loadContracts", () => {
   });
   it("Should have loaded DAI contract", async () => {
     const address = await sdk.contracts[CollateralTokens.DAI].address;
-    console.log("address dai: ", address);
     expect(ethers.utils.isAddress(address)).toBeTruthy();
   });
 });
