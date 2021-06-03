@@ -11,7 +11,7 @@ export type IndexedVaultData = {
 export const readIndexedVaultData = async (
   account: string,
   fxToken: string,
-  isKovan = true
+  isKovan: boolean
 ): Promise<IndexedVaultData | null> => {
   account = account.toLowerCase();
   fxToken = fxToken.toLowerCase();
