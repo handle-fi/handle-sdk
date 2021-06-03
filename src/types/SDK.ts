@@ -20,8 +20,8 @@ export class SDK {
     [fxTokens.fxAUD]: ethers.Contract;
     [fxTokens.fxEUR]: ethers.Contract;
     [fxTokens.fxKRW]: ethers.Contract;
-    [CollateralTokens.wETH]: ethers.Contract;
-    [CollateralTokens.wBTC]: ethers.Contract;
+    [CollateralTokens.WETH]: ethers.Contract;
+    [CollateralTokens.WBTC]: ethers.Contract;
     [CollateralTokens.DAI]: ethers.Contract;
   };
 
@@ -66,6 +66,24 @@ export class SDK {
         abi: Abi.Comptroller,
         // @ts-ignore
         addressGetter: async () => await sdk.contracts.handle.comptroller()
+      },
+      {
+        name: "treasury",
+        abi: Abi.Treasury,
+        // @ts-ignore
+        addressGetter: async () => await sdk.contracts.handle.treasury()
+      },
+      {
+        name: "vaultLibrary",
+        abi: Abi.VaultLibrary,
+        // @ts-ignore
+        addressGetter: async () => await sdk.contracts.handle.vaultLibrary()
+      },
+      {
+        name: "fxKeeperPool",
+        abi: Abi.fxKeeperPool,
+        // @ts-ignore
+        addressGetter: async () => await sdk.contracts.handle.fxKeeperPool()
       }
     ];
     const setContract = async (obj: ContractObj) => {
@@ -79,9 +97,27 @@ export class SDK {
     // Load handle contract.
     await setContract(contractsToLoad[0]);
     // Build concurrent promises after having loaded Handle dependency contract.
+    // This is only used here because of the address getters.
     const promises = [];
     for (let i = 1; i < contractsToLoad.length; i++) {
       promises.push(setContract(contractsToLoad[i]));
+    }
+    // Load ERC20s for fxTokens and collateral tokens.
+    const [fxTokens, collateralTokens] = await Promise.all([
+      sdk.contracts.handle.getAllFxTokens(),
+      sdk.contracts.handle.getAllCollateralTypes()
+    ]);
+    const erc20s = [...fxTokens, ...collateralTokens];
+    for (let erc20 of erc20s) {
+      const contract = new ethers.Contract(
+        erc20,
+        await Config.getAbi(Abi.ERC20),
+        sdk.signer ?? sdk.provider
+      );
+      const symbol = await contract.symbol();
+      // IMPORTANT NOTE: If the ERC20 symbol does not match the enum property name, this will fail.
+      // @ts-ignore
+      sdk.contracts[symbol] = contract;
     }
     await Promise.all(promises);
   }
