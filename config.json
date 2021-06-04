@@ -1,5 +1,4 @@
 ﻿{
-  "abiPath": "./abi",
   "networks": [
     {
       "name": "kovan",

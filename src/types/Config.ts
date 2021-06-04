@@ -1,8 +1,11 @@
-﻿import fs from "fs";
-import path from "path";
-import util from "util";
-import config from "../../config.json";
+﻿import config from "../../config.json";
 import { ethers } from "ethers";
+import Comptroller from "../../abi/Comptroller.json";
+import ERC20 from "../../abi/ERC20.json";
+import fxKeeperPool from "../../abi/fxKeeperPool.json";
+import Handle from "../../abi/Handle.json";
+import Treasury from "../../abi/Treasury.json";
+import VaultLibrary from "../../abi/VaultLibrary.json";
 
 export enum Abi {
   Handle = "Handle",
@@ -13,6 +16,15 @@ export enum Abi {
   VaultLibrary = "VaultLibrary"
 }
 
+const abi = {
+  [Abi.Comptroller]: Comptroller,
+  [Abi.ERC20]: ERC20,
+  [Abi.fxKeeperPool]: fxKeeperPool,
+  [Abi.Handle]: Handle,
+  [Abi.Treasury]: Treasury,
+  [Abi.VaultLibrary]: VaultLibrary
+};
+
 export class Config {
   static getNetworkHandleAddress(network: string): string {
     const address = config.networks.find((x) => x.name === network)?.handleAddress;
@@ -20,11 +32,7 @@ export class Config {
     return address;
   }
 
-  static async getAbi(abi: Abi): Promise<ethers.ContractInterface> {
-    const filePath = path.join(config.abiPath, `${abi}.json`);
-    const file = await util.promisify(fs.readFile)(filePath, { encoding: "utf-8" });
-    if (file == null) throw new Error(`Could not find ABI file at path "${filePath}"`);
-    const json = JSON.parse(file);
-    return Array.isArray(json) ? json : json.abi;
+  static async getAbi(option: Abi): Promise<ethers.ContractInterface> {
+    return abi[option].abi;
   }
 }
