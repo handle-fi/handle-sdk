@@ -6,7 +6,6 @@ export type IndexedFxlTokenData = {
   address: string;
   name: string;
   symbol: string;
-  rewardRatio: ethers.BigNumber;
   totalSupply: ethers.BigNumber;
   isValid: boolean;
 };
@@ -21,7 +20,6 @@ export const readFxTokens = async (isKovan: boolean): Promise<IndexedFxlTokenDat
   for (let token of tokens) {
     token.address = token.id;
     delete token.id;
-    token.rewardRatio = ethers.BigNumber.from(token.rewardRatio);
     token.totalSupply = ethers.BigNumber.from(token.totalSupply);
   }
   return tokens;

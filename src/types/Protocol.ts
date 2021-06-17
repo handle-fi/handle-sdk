@@ -64,7 +64,6 @@ export class Protocol {
         name: indexed.name,
         decimals,
         rate,
-        rewardRatio: indexed.rewardRatio,
         totalSupply: indexed.totalSupply,
         isValid: indexed.isValid
       });
