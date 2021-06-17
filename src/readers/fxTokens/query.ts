@@ -6,7 +6,6 @@ export default gql`
       id
       name
       symbol
-      rewardRatio
       totalSupply
       isValid
     }
