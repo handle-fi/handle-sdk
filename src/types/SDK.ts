@@ -43,10 +43,6 @@ export class SDK {
     this.gqlClient = new GraphQLClient(gqlUrl);
   }
 
-  public get isKovan() {
-    return this.network === "kovan";
-  }
-
   /** Loads a new SDK from a provider or signer and optional alternative handle contract address */
   public static async from(
     providerOrSigner: ethers.providers.Provider | ethers.Signer,

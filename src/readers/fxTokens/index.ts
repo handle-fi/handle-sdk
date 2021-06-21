@@ -1,6 +1,6 @@
 ﻿import query from "./query";
-import { mainnetGqlClient, kovanGqlClient } from "../graphqlClient";
 import { ethers } from "ethers";
+import { GraphQLClient } from "graphql-request/dist";
 
 export type IndexedFxlTokenData = {
   address: string;
@@ -11,8 +11,7 @@ export type IndexedFxlTokenData = {
 };
 
 /** Returns indexed vault data. */
-export const readFxTokens = async (isKovan: boolean): Promise<IndexedFxlTokenData[]> => {
-  const client = isKovan ? kovanGqlClient : mainnetGqlClient;
+export const readFxTokens = async (client: GraphQLClient): Promise<IndexedFxlTokenData[]> => {
   const data = await client.request(query);
   const tokens = data?.fxTokens;
   if (tokens == null) throw new Error("Could not read fxTokens");

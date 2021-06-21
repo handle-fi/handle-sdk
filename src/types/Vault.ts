@@ -47,7 +47,7 @@ export class Vault {
   }
 
   public async update() {
-    const data = await readIndexedVaultData(this.account, this.token.address, this.sdk.isKovan);
+    const data = await readIndexedVaultData(this.sdk.gqlClient, this.account, this.token.address);
     // Update debt.
     this.debt = data.debt;
     this.debtAsEth = this.debt.mul(this.token.rate).div(ethers.constants.WeiPerEther);

@@ -50,7 +50,7 @@ export class Protocol {
   }
 
   public async loadFxTokens() {
-    const indexedTokens = await readFxTokens(this.sdk.isKovan);
+    const indexedTokens = await readFxTokens(this.sdk.gqlClient);
     this.fxTokens = [];
     for (let indexed of indexedTokens) {
       const [decimals, rate] = await Promise.all([
@@ -71,7 +71,7 @@ export class Protocol {
   }
 
   public async loadCollateralTokens() {
-    const indexedTokens = await readCollateralTokens(this.sdk.isKovan);
+    const indexedTokens = await readCollateralTokens(this.sdk.gqlClient);
     this.collateralTokens = [];
     const promises = [];
     for (let indexed of indexedTokens) {

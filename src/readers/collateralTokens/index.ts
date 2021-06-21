@@ -1,6 +1,6 @@
 ﻿import query from "./query";
-import { mainnetGqlClient, kovanGqlClient } from "../graphqlClient";
 import { ethers } from "ethers";
+import { GraphQLClient } from "graphql-request/dist";
 
 export type IndexedCollateralTokenData = {
   address: string;
@@ -15,9 +15,8 @@ export type IndexedCollateralTokenData = {
 
 /** Returns indexed vault data. */
 export const readCollateralTokens = async (
-  isKovan: boolean
+  client: GraphQLClient
 ): Promise<IndexedCollateralTokenData[]> => {
-  const client = isKovan ? kovanGqlClient : mainnetGqlClient;
   const data = await client.request(query);
   const tokens = data?.collateralTokens;
   if (tokens == null) throw new Error("Could not read collateral tokens");
