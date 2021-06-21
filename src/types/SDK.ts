@@ -4,6 +4,7 @@ import { Protocol } from "./Protocol";
 import { Abi, Config } from "./Config";
 import { CollateralTokens, fxTokens } from "./ProtocolTokens";
 import { Vault } from "./Vault";
+import { GraphQLClient } from "graphql-request/dist";
 
 /** Handle SDK object */
 export class SDK {
@@ -27,8 +28,9 @@ export class SDK {
     [CollateralTokens.WBTC]: ethers.Contract;
     [CollateralTokens.DAI]: ethers.Contract;
   };
+  public gqlClient: GraphQLClient;
 
-  private constructor(providerOrSigner: ethers.providers.Provider | ethers.Signer) {
+  private constructor(providerOrSigner: ethers.providers.Provider | ethers.Signer, gqlUrl: string) {
     if (ethers.Signer.isSigner(providerOrSigner)) {
       this.signer = providerOrSigner;
       if (!this.signer.provider) throw new Error("Signer must have provider");
@@ -38,6 +40,7 @@ export class SDK {
     }
     this.version = packageJson.version;
     this.vaults = [];
+    this.gqlClient = new GraphQLClient(gqlUrl);
   }
 
   public get isKovan() {
@@ -47,14 +50,55 @@ export class SDK {
   /** Loads a new SDK from a provider or signer and optional alternative handle contract address */
   public static async from(
     providerOrSigner: ethers.providers.Provider | ethers.Signer,
-    handle?: string
+    handle?: string,
+    subgraphEndpoint?: string
   ): Promise<SDK> {
-    const sdk = new SDK(providerOrSigner);
+    let network: string;
+    // Validate provider/signer object.
+    const provider: ethers.providers.Provider | undefined = ethers.Signer.isSigner(providerOrSigner)
+      ? providerOrSigner.provider
+      : providerOrSigner;
+    if (!ethers.providers.Provider.isProvider(provider))
+      throw new Error("Could not fetch provider object from signer/provider object");
+    network = (await provider.getNetwork()).name;
+    // Validate that network is supported.
+    const networkConfig = SDK.getValidatedNetworkConfig(network, handle, subgraphEndpoint);
+    const sdk = new SDK(providerOrSigner, networkConfig.theGraphEndpoint);
     sdk.network = (await sdk.provider.getNetwork()).name;
-    handle = handle ?? Config.getNetworkHandleAddress(sdk.network);
-    await sdk.loadContracts(handle);
+    await sdk.loadContracts(networkConfig.handleAddress);
     sdk.protocol = await Protocol.from(sdk);
     return sdk;
+  }
+
+  /**
+   * Ensures all the correct parameters are passed to the SDK via the NetworkConfig object before initialisation.
+   * @param network The network name.
+   * @param handle The handle contract address.
+   * @param subgraphEndpoint The subgraph endpoint URL.
+   */
+  private static getValidatedNetworkConfig(
+    network: string,
+    handle?: string,
+    subgraphEndpoint?: string
+  ) {
+    const defaultConfig = Config.getNetworkConfigByName(network);
+    const handleAddress = handle ?? defaultConfig.handleAddress;
+    if (handleAddress == null)
+      throw new Error(
+        "Could not load handle contract address from default config object." +
+          " Please pass this (otherwise optional) parameter when creating the SDK object."
+      );
+    const theGraphEndpoint = subgraphEndpoint ?? defaultConfig.theGraphEndpoint;
+    if (theGraphEndpoint == null)
+      throw new Error(
+        "Could not load subgraph endpoint URL from default config object." +
+          " Please pass this (otherwise optional) parameter when creating the SDK object."
+      );
+    return {
+      networkName: network,
+      handleAddress,
+      theGraphEndpoint
+    };
   }
 
   private async loadContracts(handle: string) {
