@@ -8,6 +8,7 @@ export default gql`
       symbol
       mintCollateralRatio
       liquidationFee
+      interestRate
       totalBalance
       isValid
     }

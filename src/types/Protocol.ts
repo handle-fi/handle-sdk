@@ -84,9 +84,7 @@ export class Protocol {
             // @ts-ignore TODO: index this
             decimals: await this.sdk.contracts[indexed.symbol].decimals(),
             rate: await this.sdk.contracts.handle.getTokenPrice(indexed.address),
-            // TODO: index this
-            interestRate: (await this.sdk.contracts.handle.getCollateralDetails(indexed.address))
-              .interestRate,
+            interestRate: indexed.interestRate,
             mintCollateralRatio: indexed.mintCollateralRatio,
             liquidationFee: indexed.liquidationFee,
             totalBalance: indexed.totalBalance,

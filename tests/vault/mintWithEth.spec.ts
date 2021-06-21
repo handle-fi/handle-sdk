@@ -16,7 +16,6 @@ describe("Vault: mintWithEth", function () {
     // @ts-ignore
     const account = await sdk.signer.getAddress();
     vault = await Vault.from(account, fxTokens.fxAUD, sdk);
-    expect(vault.debt.gt(0)).toBeTruthy();
   });
   it("Should mint with ether as collateral", async () => {
     await vault.mintWithEth(
@@ -24,5 +23,6 @@ describe("Vault: mintWithEth", function () {
       ethers.utils.parseEther("0.00000027"), // approximately  0.001 AUD in Ether
       false
     );
+    expect(vault.debt.gt(0)).toBeTruthy();
   });
 });

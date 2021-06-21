@@ -7,6 +7,7 @@ export type IndexedCollateralTokenData = {
   name: string;
   symbol: string;
   mintCollateralRatio: ethers.BigNumber;
+  interestRate: ethers.BigNumber;
   liquidationFee: ethers.BigNumber;
   totalBalance: ethers.BigNumber;
   isValid: boolean;
@@ -27,6 +28,7 @@ export const readCollateralTokens = async (
     token.mintCollateralRatio = ethers.BigNumber.from(token.mintCollateralRatio);
     token.liquidationFee = ethers.BigNumber.from(token.liquidationFee);
     token.totalBalance = ethers.BigNumber.from(token.totalBalance);
+    token.interestRate = ethers.BigNumber.from(token.interestRate);
   }
   return tokens;
 };
