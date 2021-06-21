@@ -1,8 +1,17 @@
 ﻿{
   "networks": [
     {
+      "name": "homestead",
+      "theGraphEndpoint": "https://api.thegraph.com/subgraphs/name/handle-fi/handle"
+    },
+    {
       "name": "kovan",
+      "theGraphEndpoint": "https://api.thegraph.com/subgraphs/name/handle-fi/handle-kovan",
       "handleAddress": "0x4cc22AB2d7D0159ee2F98245B1BbA6AAa471DCef"
+    },
+    {
+      "name": "unknown",
+      "theGraphEndpoint": "http://127.0.0.1:8000/subgraphs/name/handle-fi/handle-local"
     }
   ]
 }
