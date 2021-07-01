@@ -25,11 +25,17 @@ const abi = {
   [Abi.VaultLibrary]: VaultLibrary
 };
 
+type NetworkConfig = {
+  name: string;
+  theGraphEndpoint?: string;
+  handleAddress?: string;
+};
+
 export class Config {
-  static getNetworkHandleAddress(network: string): string {
-    const address = config.networks.find((x) => x.name === network)?.handleAddress;
-    if (!address) throw new Error(`Network "${network}" is not supported`);
-    return address;
+  static getNetworkConfigByName(network: string): NetworkConfig {
+    const configObject = config.networks.find((x) => x.name === network);
+    if (!configObject) throw new Error(`Network "${network}" is not supported`);
+    return configObject;
   }
 
   static async getAbi(option: Abi): Promise<ethers.ContractInterface> {

@@ -7,7 +7,7 @@
     {
       "name": "kovan",
       "theGraphEndpoint": "https://api.thegraph.com/subgraphs/name/handle-fi/handle-kovan",
-      "handleAddress": "0x4cc22AB2d7D0159ee2F98245B1BbA6AAa471DCef"
+      "handleAddress": "0xBe9fa6c460702862bDc436f28fe594858E90B6A3"
     },
     {
       "name": "unknown",
