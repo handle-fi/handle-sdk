@@ -8,6 +8,8 @@ export default gql`
       symbol
       totalSupply
       isValid
+      decimals
+      rate
     }
   }
 `;
