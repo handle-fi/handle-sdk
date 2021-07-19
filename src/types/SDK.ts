@@ -25,6 +25,7 @@ export class SDK {
     [fxTokens.fxAUD]: ethers.Contract;
     [fxTokens.fxEUR]: ethers.Contract;
     [fxTokens.fxKRW]: ethers.Contract;
+    [fxTokens.fxCNY]: ethers.Contract;
     [CollateralTokens.WETH]: ethers.Contract;
     [CollateralTokens.WBTC]: ethers.Contract;
     [CollateralTokens.DAI]: ethers.Contract;
