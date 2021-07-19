@@ -10,6 +10,8 @@ export type IndexedCollateralTokenData = {
   interestRate: ethers.BigNumber;
   liquidationFee: ethers.BigNumber;
   totalBalance: ethers.BigNumber;
+  rate: ethers.BigNumber;
+  decimals: number;
   isValid: boolean;
 };
 
@@ -28,6 +30,7 @@ export const readCollateralTokens = async (
     token.liquidationFee = ethers.BigNumber.from(token.liquidationFee);
     token.totalBalance = ethers.BigNumber.from(token.totalBalance);
     token.interestRate = ethers.BigNumber.from(token.interestRate);
+    token.rate = ethers.BigNumber.from(token.rate);
   }
   return tokens;
 };
