@@ -53,20 +53,7 @@ export class Protocol {
     const indexedTokens = await readFxTokens(this.sdk.gqlClient);
     this.fxTokens = [];
     for (let indexed of indexedTokens) {
-      const [decimals, rate] = await Promise.all([
-        // @ts-ignore TODO: index these
-        this.sdk.contracts[indexed.symbol].decimals(),
-        this.sdk.contracts.handle.getTokenPrice(indexed.address)
-      ]);
-      this.fxTokens.push({
-        address: indexed.address,
-        symbol: indexed.symbol,
-        name: indexed.name,
-        decimals,
-        rate,
-        totalSupply: indexed.totalSupply,
-        isValid: indexed.isValid
-      });
+      this.fxTokens.push(indexed);
     }
   }
 
@@ -77,19 +64,7 @@ export class Protocol {
     for (let indexed of indexedTokens) {
       promises.push(
         new Promise(async (resolve) => {
-          this.collateralTokens.push({
-            address: indexed.address,
-            symbol: indexed.symbol,
-            name: indexed.name,
-            // @ts-ignore TODO: index this
-            decimals: await this.sdk.contracts[indexed.symbol].decimals(),
-            rate: await this.sdk.contracts.handle.getTokenPrice(indexed.address),
-            interestRate: indexed.interestRate,
-            mintCollateralRatio: indexed.mintCollateralRatio,
-            liquidationFee: indexed.liquidationFee,
-            totalBalance: indexed.totalBalance,
-            isValid: indexed.isValid
-          });
+          this.collateralTokens.push(indexed);
           resolve(null);
         })
       );
