@@ -1,9 +1,11 @@
 ﻿import { gql } from "graphql-request/dist";
 
-export default gql`
-  query ($account: String!, $fxToken: String!) {
-    vaults(where: { account: $account, fxToken: $fxToken }, first: 1) {
+export default (filter: string) => gql`
+  query {
+    vaults(${filter}) {
+      account
       debt
+      fxToken
       collateralTokens {
         address
         amount

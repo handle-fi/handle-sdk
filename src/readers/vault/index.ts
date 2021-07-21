@@ -4,30 +4,59 @@ import { GraphQLClient } from "graphql-request/dist";
 
 export type IndexedVaultData = {
   debt: ethers.BigNumber;
+  fxToken: string;
+  account: string;
   collateralTokens: { address: string; amount: ethers.BigNumber }[];
 };
 
-/** Returns indexed vault data. */
-export const readIndexedVaultData = async (
+type QueryResponse = {
+  vaults: {
+    account: string;
+    debt: string;
+    fxToken: string;
+    collateralTokens: {
+      address: string;
+      amount: string;
+    }[];
+  }[];
+};
+
+type Args = {
+  account: string;
+  fxToken: string;
+};
+
+export const getVault = async (client: GraphQLClient, args: Args): Promise<IndexedVaultData> => {
+  const data = await queryVaults(client, args);
+  return data[0];
+};
+
+export const queryVaults = async (
   client: GraphQLClient,
-  account: string,
-  fxToken: string
-): Promise<IndexedVaultData> => {
-  account = account.toLowerCase();
-  fxToken = fxToken.toLowerCase();
-  const data = await client.request(query, { account, fxToken });
+  whereArgs: Partial<Args>
+): Promise<IndexedVaultData[]> => {
+  const filter = buildFilter({
+    account: whereArgs.account?.toLowerCase(),
+    fxToken: whereArgs.fxToken?.toLowerCase()
+  });
+
+  const data = await client.request<QueryResponse>(query(filter));
   // If the array is not present, there was an error in the request.
   if (!Array.isArray(data?.vaults)) throw new Error("Could not load indexed vault data");
-  const vault = data?.vaults[0];
-  if (vault == null)
-    return {
-      debt: ethers.BigNumber.from(0),
-      collateralTokens: []
-    };
-  // Parse vault numbers.
-  vault.debt = ethers.BigNumber.from(vault.debt);
-  for (let collateralToken of vault.collateralTokens) {
-    collateralToken.amount = ethers.BigNumber.from(collateralToken.amount);
-  }
-  return vault;
+
+  return data.vaults.map((vault) => ({
+    debt: ethers.BigNumber.from(vault.debt),
+    account: vault.account,
+    fxToken: vault.fxToken,
+    collateralTokens: vault.collateralTokens.map((ct) => ({
+      ...ct,
+      amount: ethers.BigNumber.from(ct.amount)
+    }))
+  }));
+};
+
+// there below assumes all values are strings
+const buildFilter = (whereArgs: any) => {
+  const keys = Object.keys(whereArgs);
+  return `where: { ${keys.map((k) => `${k}: "${whereArgs[k]}"`)} }`;
 };

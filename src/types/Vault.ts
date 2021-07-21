@@ -2,7 +2,7 @@
 import { ethers } from "ethers";
 import { VaultCollateral } from "./VaultCollateral";
 import { SDK } from "./SDK";
-import { readIndexedVaultData } from "../readers/vault";
+import { getVault } from "../readers/vault";
 import { CollateralTokens, fxTokens } from "./ProtocolTokens";
 
 export class Vault {
@@ -47,7 +47,11 @@ export class Vault {
   }
 
   public async update() {
-    const data = await readIndexedVaultData(this.sdk.gqlClient, this.account, this.token.address);
+    const data = await getVault(this.sdk.gqlClient, {
+      account: this.account,
+      fxToken: this.token.address
+    });
+
     // Update debt.
     this.debt = data.debt;
     this.debtAsEth = this.debt.mul(this.token.rate).div(ethers.constants.WeiPerEther);
