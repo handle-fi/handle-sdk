@@ -182,18 +182,8 @@ export class SDK {
     // Can't load vaults without signer.
     if (!this.signer) return;
     const account = await this.signer.getAddress();
-    const fxTokens = this.protocol.fxTokens;
-    const promises = [];
-    this.vaults = [];
-    for (let fxToken of fxTokens) {
-      promises.push(
-        new Promise(async (resolve) => {
-          this.vaults.push(await Vault.from(account, fxToken.symbol as fxTokens, this));
-          resolve(undefined);
-        })
-      );
-    }
-    await Promise.all(promises);
+
+    this.vaults = await Vault.getUsersVaults(account, this);
   }
 
   private initialiseKeeperPools() {

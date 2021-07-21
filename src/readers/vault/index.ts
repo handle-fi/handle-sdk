@@ -1,10 +1,11 @@
 ﻿import query from "./query";
 import { ethers } from "ethers";
 import { GraphQLClient } from "graphql-request/dist";
+import { fxTokens } from "../../types/ProtocolTokens";
 
 export type IndexedVaultData = {
   debt: ethers.BigNumber;
-  fxToken: string;
+  fxToken: fxTokens;
   account: string;
   collateralTokens: { address: string; amount: ethers.BigNumber }[];
 };
@@ -47,7 +48,7 @@ export const queryVaults = async (
   return data.vaults.map((vault) => ({
     debt: ethers.BigNumber.from(vault.debt),
     account: vault.account,
-    fxToken: vault.fxToken,
+    fxToken: vault.fxToken as fxTokens, //  todo - map from token address to token type
     collateralTokens: vault.collateralTokens.map((ct) => ({
       ...ct,
       amount: ethers.BigNumber.from(ct.amount)
@@ -57,6 +58,7 @@ export const queryVaults = async (
 
 // there below assumes all values are strings
 const buildFilter = (whereArgs: any) => {
-  const keys = Object.keys(whereArgs);
+  const keys = Object.keys(whereArgs).filter((k) => whereArgs[k]);
+
   return `where: { ${keys.map((k) => `${k}: "${whereArgs[k]}"`)} }`;
 };

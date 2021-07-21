@@ -28,7 +28,7 @@ describe("Readers: vault", function () {
 
   it("Should return multiple indexed vaults", async () => {
     const signer = sdk.signer as ethers.Signer;
-    const account = await signer.getAddress();
+    const account = (await signer.getAddress()).toLowerCase();
     const fxToken = sdk.contracts[fxTokens.fxAUD].address;
 
     const accountVaults = await queryVaults(gql, { account });
