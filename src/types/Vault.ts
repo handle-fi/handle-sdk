@@ -22,7 +22,7 @@ export class Vault {
     liquidation: ethers.BigNumber;
   };
 
-  private constructor(account: string, token: fxTokens, sdk: SDK) {
+  constructor(account: string, token: fxTokens, sdk: SDK) {
     const fxToken = sdk.protocol.getFxTokenBySymbol(token);
     if (!fxToken) throw new Error(`Invalid fxToken address provided "${token}"`);
     this.sdk = sdk;
@@ -40,6 +40,12 @@ export class Vault {
     };
   }
 
+  public static async query(sdk: SDK, filter: any): Promise<Vault[]> {
+    const vaultData = await queryVaults(sdk.gqlClient, filter);
+
+    return indexedVaultDataToVaults(vaultData, sdk);
+  }
+
   public static async getUsersVaults(account: string, sdk: SDK): Promise<Vault[]> {
     const vaultData = await queryVaults(sdk.gqlClient, {
       where: {
@@ -47,15 +53,7 @@ export class Vault {
       }
     });
 
-    const vaults = [];
-
-    for (const vd of vaultData) {
-      const v = new Vault(account, this.tokenAddressToFxToken(vd.fxToken, sdk), sdk);
-      await v.update(vd);
-      vaults.push(v);
-    }
-
-    return vaults;
+    return indexedVaultDataToVaults(vaultData, sdk);
   }
 
   public static async from(account: string, token: fxTokens, sdk: SDK): Promise<Vault> {
@@ -175,14 +173,26 @@ export class Vault {
       gasLimit: gasLimit
     });
   }
-
-  static tokenAddressToFxToken = (address: string, sdk: SDK): fxTokens => {
-    const token = Object.keys(sdk.contracts).find((key) => {
-      const typedKey = key as keyof SDK["contracts"];
-
-      return sdk.contracts[typedKey].address.toLowerCase() === address;
-    });
-
-    return token as fxTokens;
-  };
 }
+
+const indexedVaultDataToVaults = async (vaultData: IndexedVaultData[], sdk: SDK) => {
+  const vaults = [];
+
+  for (const vd of vaultData) {
+    const v = new Vault(vd.account, tokenAddressToFxToken(vd.fxToken, sdk), sdk);
+    await v.update(vd);
+    vaults.push(v);
+  }
+
+  return vaults;
+};
+
+const tokenAddressToFxToken = (address: string, sdk: SDK): fxTokens => {
+  const token = Object.keys(sdk.contracts).find((key) => {
+    const typedKey = key as keyof SDK["contracts"];
+
+    return sdk.contracts[typedKey].address.toLowerCase() === address;
+  });
+
+  return token as fxTokens;
+};
