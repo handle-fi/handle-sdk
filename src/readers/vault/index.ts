@@ -22,26 +22,16 @@ type QueryResponse = {
   }[];
 };
 
-type Args = {
-  account: string;
-  fxToken: string;
-};
-
-export const getVault = async (client: GraphQLClient, args: Args): Promise<IndexedVaultData> => {
-  const data = await queryVaults(client, args);
-  return data[0];
+export const queryVault = async (client: GraphQLClient, filter: any): Promise<IndexedVaultData> => {
+  const response = await queryVaults(client, { ...filter, first: 1 });
+  return response[0];
 };
 
 export const queryVaults = async (
   client: GraphQLClient,
-  whereArgs: Partial<Args>
+  filter: any
 ): Promise<IndexedVaultData[]> => {
-  const filter = buildFilter({
-    account: whereArgs.account?.toLowerCase(),
-    fxToken: whereArgs.fxToken?.toLowerCase()
-  });
-
-  const data = await client.request<QueryResponse>(query(filter));
+  const data = await client.request<QueryResponse>(query(buildFilter(filter)));
   // If the array is not present, there was an error in the request.
   if (!Array.isArray(data?.vaults)) throw new Error("Could not load indexed vault data");
 
@@ -56,9 +46,24 @@ export const queryVaults = async (
   }));
 };
 
-// there below assumes all values are strings
-const buildFilter = (whereArgs: any) => {
-  const keys = Object.keys(whereArgs).filter((k) => whereArgs[k]);
+const buildFilter = (value: any, depth = 0): string => {
+  const type = typeof value;
 
-  return `where: { ${keys.map((k) => `${k}: "${whereArgs[k]}"`)} }`;
+  if (type === "string") {
+    return `"${value}"`;
+  }
+
+  if (type === "object") {
+    const propertiesAndValues = Object.keys(value).map(
+      (k) => `${k}: ${buildFilter(value[k], depth + 1)}`
+    );
+
+    if (depth === 0) {
+      return `${propertiesAndValues}`;
+    }
+
+    return `{ ${propertiesAndValues} }`;
+  }
+
+  return value;
 };

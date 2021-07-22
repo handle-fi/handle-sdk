@@ -2,7 +2,7 @@
 import { ethers } from "ethers";
 import { VaultCollateral } from "./VaultCollateral";
 import { SDK } from "./SDK";
-import { getVault, IndexedVaultData, queryVaults } from "../readers/vault";
+import { IndexedVaultData, queryVaults } from "../readers/vault";
 import { CollateralTokens, fxTokens } from "./ProtocolTokens";
 
 export class Vault {
@@ -42,13 +42,15 @@ export class Vault {
 
   public static async getUsersVaults(account: string, sdk: SDK): Promise<Vault[]> {
     const vaultData = await queryVaults(sdk.gqlClient, {
-      account
+      where: {
+        account: account.toLowerCase()
+      }
     });
 
     const vaults = [];
 
     for (const vd of vaultData) {
-      const v = new Vault(account, vd.fxToken, sdk);
+      const v = new Vault(account, this.tokenAddressToFxToken(vd.fxToken, sdk), sdk);
       await v.update(vd);
       vaults.push(v);
     }
@@ -65,10 +67,12 @@ export class Vault {
   public async update(vaultData?: IndexedVaultData) {
     const data =
       vaultData ||
-      (await getVault(this.sdk.gqlClient, {
-        account: this.account,
-        fxToken: this.token.address
-      }));
+      (
+        await queryVaults(this.sdk.gqlClient, {
+          account: this.account,
+          fxToken: this.token.address
+        })
+      )[0];
 
     // Update debt.
     this.debt = data.debt;
@@ -171,4 +175,14 @@ export class Vault {
       gasLimit: gasLimit
     });
   }
+
+  static tokenAddressToFxToken = (address: string, sdk: SDK): fxTokens => {
+    const token = Object.keys(sdk.contracts).find((key) => {
+      const typedKey = key as keyof SDK["contracts"];
+
+      return sdk.contracts[typedKey].address.toLowerCase() === address;
+    });
+
+    return token as fxTokens;
+  };
 }

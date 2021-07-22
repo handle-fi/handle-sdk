@@ -1,6 +1,6 @@
 ﻿import { describe, it } from "@jest/globals";
 import { SDK } from "../../src/types/SDK";
-import { getVault, queryVaults } from "../../src/readers/vault";
+import { queryVaults, queryVault } from "../../src/readers/vault";
 import { fxTokens } from "../../src/types/ProtocolTokens";
 import { ethers } from "ethers";
 import { getSDK } from "../setupTests";
@@ -15,9 +15,11 @@ describe("Readers: vault", function () {
   });
   it("Should return a single indexed vault", async () => {
     const signer = sdk.signer as ethers.Signer;
-    const data = await getVault(gql, {
-      account: await signer.getAddress(),
-      fxToken: sdk.contracts[fxTokens.fxAUD].address
+    const data = await queryVault(gql, {
+      where: {
+        account: (await signer.getAddress()).toLowerCase(),
+        fxToken: sdk.contracts[fxTokens.fxAUD].address.toLowerCase()
+      }
     });
 
     expect(data).toBeTruthy();
@@ -29,12 +31,12 @@ describe("Readers: vault", function () {
   it("Should return multiple indexed vaults", async () => {
     const signer = sdk.signer as ethers.Signer;
     const account = (await signer.getAddress()).toLowerCase();
-    const fxToken = sdk.contracts[fxTokens.fxAUD].address;
+    const fxToken = sdk.contracts[fxTokens.fxAUD].address.toLowerCase();
 
-    const accountVaults = await queryVaults(gql, { account });
+    const accountVaults = await queryVaults(gql, { where: { account } });
     accountVaults.forEach((v) => expect(v.account).toEqual(account));
 
-    const tokenVaults = await queryVaults(gql, { fxToken });
+    const tokenVaults = await queryVaults(gql, { where: { fxToken } });
     tokenVaults.forEach((v) => expect(v.fxToken).toEqual(fxToken));
   });
 });
