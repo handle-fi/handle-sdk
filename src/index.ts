@@ -18,5 +18,5 @@ export {
   Vault,
   VaultCollateral,
   Token,
-  fxKeeperPool,
+  fxKeeperPool
 };

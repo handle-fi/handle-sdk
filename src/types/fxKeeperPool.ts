@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
-import {CollateralToken} from "./CollateralToken";
-import {SDK} from "./SDK";
-import {fxTokens} from "./ProtocolTokens";
+import { CollateralToken } from "./CollateralToken";
+import { SDK } from "./SDK";
+import { fxTokens } from "./ProtocolTokens";
 
 /**
  * Class to interact with a fxKeeperPool for a specific fxToken.
@@ -33,61 +33,57 @@ export class fxKeeperPool {
    * Requires erc20 contract to be connected to signer.
    */
   private async ensureAllowance(amount: ethers.BigNumber) {
-    const allowance: ethers.BigNumber = await this.erc20
-      .allowance(await this.erc20.signer.getAddress(), this.contract.address);
-    if (allowance.gte(amount))
-      return;
+    const allowance: ethers.BigNumber = await this.erc20.allowance(
+      await this.erc20.signer.getAddress(),
+      this.contract.address
+    );
+    if (allowance.gte(amount)) return;
     await (await this.erc20.approve(this.contract.address, amount)).wait(1);
   }
-  
+
   public async stake(amount: ethers.BigNumber) {
-    if (amount.lt(0))
-      throw new Error("Amount must be greater than 0");
+    if (amount.lt(0)) throw new Error("Amount must be greater than 0");
     await this.ensureAllowance(amount);
     return await this.contract.stake(amount, this.token, {
       gasLimit: this.gasLimit
     });
   }
-  
+
   public async unstake(amount: ethers.BigNumber) {
-    if (amount.lt(0))
-      throw new Error("Amount must be greater than 0");
+    if (amount.lt(0)) throw new Error("Amount must be greater than 0");
     return await this.contract.unstake(amount, this.token, {
       gasLimit: this.gasLimit
     });
   }
-  
+
   public async withdrawCollateralReward() {
     return await this.contract.withdrawCollateralReward(this.token, {
       gasLimit: this.gasLimit
     });
   }
-  
+
   public async balanceOfStake(account: string): Promise<ethers.BigNumber> {
     return await this.contract.balanceOfStake(account, this.token);
   }
-  
+
   public async balanceOfRewards(account: string): Promise<ethers.BigNumber> {
     return await this.contract.balanceOfRewards(account, this.token);
   }
-  
+
   public async shareOf(account: string): Promise<ethers.BigNumber> {
     return await this.contract.shareOf(account, this.token);
   }
-  
+
   public async liquidate(account: string) {
     return await this.contract.liquidate(account, this.token, {
       gasLimit: this.gasLimit
     });
   }
-  
+
   public async getPoolCollateralBalance(collateral: CollateralToken): Promise<ethers.BigNumber> {
-    return await this.contract.getPoolCollateralBalance(
-      this.token,
-      collateral.address
-    );
+    return await this.contract.getPoolCollateralBalance(this.token, collateral.address);
   }
-  
+
   public async getPoolTotalDeposit() {
     return await this.contract.getPoolTotalDeposit(this.token);
   }

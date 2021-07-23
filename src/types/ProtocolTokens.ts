@@ -1,7 +1,8 @@
 ﻿export enum fxTokens {
   fxAUD = "fxAUD",
   fxEUR = "fxEUR",
-  fxKRW = "fxKRW"
+  fxKRW = "fxKRW",
+  fxCNY = "fxCNY"
 }
 
 export enum CollateralTokens {
@@ -15,7 +16,7 @@ export const fxTokensArray = (() => {
   // therefore the number of keys is duplicated.
   const keys = Object.keys(fxTokens);
   const values = [];
-  for (let i = 0; i < keys.length/2; i++) {
+  for (let i = 0; i < keys.length / 2; i++) {
     values.push(keys[i]);
   }
   return values;
@@ -26,7 +27,7 @@ export const collateralTokensArray = (() => {
   // therefore the number of keys is duplicated.
   const keys = Object.keys(CollateralTokens);
   const values = [];
-  for (let i = 0; i < keys.length/2; i++) {
+  for (let i = 0; i < keys.length / 2; i++) {
     values.push(keys[i]);
   }
   return values;

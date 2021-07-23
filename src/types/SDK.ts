@@ -7,6 +7,7 @@ import { Vault } from "./Vault";
 import { GraphQLClient } from "graphql-request/dist";
 import { fxKeeperPool } from "./fxKeeperPool";
 import { readTokenRegistry } from "../readers/tokenRegistry";
+import { fxKeeperPool } from "./fxKeeperPool";
 
 /** Handle SDK object */
 export class SDK {
@@ -26,11 +27,12 @@ export class SDK {
     [fxTokens.fxAUD]: ethers.Contract;
     [fxTokens.fxEUR]: ethers.Contract;
     [fxTokens.fxKRW]: ethers.Contract;
+    [fxTokens.fxCNY]: ethers.Contract;
     [CollateralTokens.WETH]: ethers.Contract;
     [CollateralTokens.WBTC]: ethers.Contract;
     [CollateralTokens.DAI]: ethers.Contract;
   };
-  public keeperPools: {[fxTokenSymbol: string]: fxKeeperPool};
+  public keeperPools: { [fxTokenSymbol: string]: fxKeeperPool };
   public gqlClient: GraphQLClient;
 
   private constructor(providerOrSigner: ethers.providers.Provider | ethers.Signer, gqlUrl: string) {
@@ -194,15 +196,11 @@ export class SDK {
     }
     await Promise.all(promises);
   }
-  
+
   private initialiseKeeperPools() {
     for (let fxTokenSymbol of fxTokensArray) {
       const token = fxTokenSymbol as fxTokens;
-      this.keeperPools[token] = new fxKeeperPool(
-        this,
-        token,
-        this.contracts.fxKeeperPool
-      );
+      this.keeperPools[token] = new fxKeeperPool(this, token, this.contracts.fxKeeperPool);
     }
   }
 }

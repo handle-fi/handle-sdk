@@ -2,12 +2,12 @@
 
 /** ERC20 token with relevant protocol properties */
 export type Token = {
-  address: string,
-  name: string,
-  symbol: string,
-  decimals: ethers.BigNumber,
+  address: string;
+  name: string;
+  symbol: string;
+  decimals: number;
   /** Token rate in ETH */
-  rate: ethers.BigNumber,
+  rate: ethers.BigNumber;
   /** Whether the token can be used in the protocol */
-  isValid: boolean
+  isValid: boolean;
 };

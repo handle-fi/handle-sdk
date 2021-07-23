@@ -7,6 +7,8 @@ export type IndexedFxlTokenData = {
   name: string;
   symbol: string;
   totalSupply: ethers.BigNumber;
+  rate: ethers.BigNumber;
+  decimals: number;
   isValid: boolean;
 };
 
@@ -20,6 +22,7 @@ export const readFxTokens = async (client: GraphQLClient): Promise<IndexedFxlTok
     token.address = token.id;
     delete token.id;
     token.totalSupply = ethers.BigNumber.from(token.totalSupply);
+    token.rate = ethers.BigNumber.from(token.rate);
   }
   return tokens;
 };
