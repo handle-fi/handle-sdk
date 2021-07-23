@@ -2,6 +2,7 @@
 import { ethers } from "ethers";
 import { GraphQLClient } from "graphql-request/dist";
 import { fxTokens } from "../../types/ProtocolTokens";
+import { buildFilter } from "../utils";
 
 export type IndexedVaultData = {
   debt: ethers.BigNumber;
@@ -44,26 +45,4 @@ export const queryVaults = async (
       amount: ethers.BigNumber.from(ct.amount)
     }))
   }));
-};
-
-const buildFilter = (value: any, depth = 0): string => {
-  const type = typeof value;
-
-  if (type === "string") {
-    return `"${value}"`;
-  }
-
-  if (type === "object") {
-    const propertiesAndValues = Object.keys(value).map(
-      (k) => `${k}: ${buildFilter(value[k], depth + 1)}`
-    );
-
-    if (depth === 0) {
-      return `${propertiesAndValues}`;
-    }
-
-    return `{ ${propertiesAndValues} }`;
-  }
-
-  return value;
 };
