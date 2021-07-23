@@ -1,6 +1,7 @@
 ﻿import query from "./query";
 import { ethers } from "ethers";
 import { GraphQLClient } from "graphql-request/dist";
+import { buildFilter } from "../utils";
 
 export type IndexedCollateralTokenData = {
   address: string;
@@ -15,22 +16,37 @@ export type IndexedCollateralTokenData = {
   isValid: boolean;
 };
 
+type QueryResponse = {
+  collateralTokens: {
+    id: string;
+    name: string;
+    symbol: string;
+    mintCollateralRatio: string;
+    interestRate: string;
+    liquidationFee: string;
+    totalBalance: string;
+    rate: string;
+    decimals: number;
+    isValid: boolean;
+  }[];
+};
+
 /** Returns indexed vault data. */
-export const readCollateralTokens = async (
-  client: GraphQLClient
+export const queryCollateralTokens = async (
+  client: GraphQLClient,
+  filter?: any
 ): Promise<IndexedCollateralTokenData[]> => {
-  const data = await client.request(query);
+  const data = await client.request<QueryResponse>(query(buildFilter(filter)));
   const tokens = data?.collateralTokens;
   if (tokens == null) throw new Error("Could not read collateral tokens");
-  // Parse numbers.
-  for (let token of tokens) {
-    token.address = token.id;
-    delete token.id;
-    token.mintCollateralRatio = ethers.BigNumber.from(token.mintCollateralRatio);
-    token.liquidationFee = ethers.BigNumber.from(token.liquidationFee);
-    token.totalBalance = ethers.BigNumber.from(token.totalBalance);
-    token.interestRate = ethers.BigNumber.from(token.interestRate);
-    token.rate = ethers.BigNumber.from(token.rate);
-  }
-  return tokens;
+
+  return tokens.map((t) => ({
+    ...t,
+    address: t.id,
+    mintCollateralRatio: ethers.BigNumber.from(t.mintCollateralRatio),
+    interestRate: ethers.BigNumber.from(t.interestRate),
+    liquidationFee: ethers.BigNumber.from(t.liquidationFee),
+    totalBalance: ethers.BigNumber.from(t.totalBalance),
+    rate: ethers.BigNumber.from(t.rate)
+  }));
 };
