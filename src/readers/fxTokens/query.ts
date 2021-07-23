@@ -2,7 +2,7 @@
 
 export default (filter: string) => gql`
   query {
-    fxTokens(${filter}) {
+    fxTokens${filter} {
       id
       name
       symbol

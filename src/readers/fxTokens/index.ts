@@ -28,7 +28,7 @@ type QueryResponse = {
 /** Returns indexed vault data. */
 export const queryFxTokens = async (
   client: GraphQLClient,
-  filter?: any
+  filter: any
 ): Promise<IndexedFxlTokenData[]> => {
   const data = await client.request<QueryResponse>(query(buildFilter(filter)));
   const tokens = data?.fxTokens;

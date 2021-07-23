@@ -2,7 +2,7 @@
 
 export default (filter: string) => gql`
   query {
-    vaults(${filter}) {
+    vaults${filter} {
       account
       debt
       fxToken
