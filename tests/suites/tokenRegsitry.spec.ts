@@ -13,6 +13,6 @@ describe("Readers: tokenRegistry", () => {
     expect(typeof handleAddress).toBe("string");
     const registry = await readTokenRegistry(gql, handleAddress);
     expect(registry.fxTokens.length).toBeGreaterThan(0);
-    expect(registry.collateralTokens).toBeGreaterThan(0);
+    expect(registry.collateralTokens.length).toBeGreaterThan(0);
   });
 });
