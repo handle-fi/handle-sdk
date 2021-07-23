@@ -7,7 +7,6 @@ import { Vault } from "./Vault";
 import { GraphQLClient } from "graphql-request/dist";
 import { fxKeeperPool } from "./fxKeeperPool";
 import { readTokenRegistry } from "../readers/tokenRegistry";
-import { fxKeeperPool } from "./fxKeeperPool";
 
 /** Handle SDK object */
 export class SDK {
