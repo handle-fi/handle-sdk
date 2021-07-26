@@ -1,4 +1,4 @@
-﻿import { describe, it } from "@jest/globals";
+﻿import { xdescribe, it } from "@jest/globals";
 import { SDK } from "../../src/types/SDK";
 import { Vault } from "../../src/types/Vault";
 import { fxTokens } from "../../src/types/ProtocolTokens";
@@ -10,7 +10,7 @@ let sdk: SDK;
 let vault: Vault;
 let keeperPool: fxKeeperPool;
 
-describe("Vault: mintWithEth, fxKeeperPool", function () {
+xdescribe("Vault: mintWithEth, fxKeeperPool", function () {
   beforeAll(() => {
     sdk = getSDK();
   });
