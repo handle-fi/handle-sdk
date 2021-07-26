@@ -100,7 +100,7 @@ export class SDK {
     // Re-connect all contracts.
     Object.keys(this.contracts).forEach(key =>
       // @ts-ignore
-      (this.contracts[key] as ethers.Contract).connect(signer)
+      (this.contracts[key] as ethers.Contract).connect(signerOrProvider)
     );
     // Re-connect all keeper pools.
     Object.keys(this.keeperPools).forEach(key => 
