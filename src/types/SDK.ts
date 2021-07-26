@@ -13,6 +13,9 @@ export enum Events {
   Connect = "connect"
 }
 
+const providerError =
+  "Could not fetch provider object from signer/provider object";
+
 /** Handle SDK object */
 export class SDK {
   private eventListeners: {[key: string]: Function[]} = {};
@@ -56,38 +59,44 @@ export class SDK {
 
   /** Loads a new SDK from a provider or signer and optional alternative handle contract address */
   public static async from(
-    providerOrSigner: ethers.providers.Provider | ethers.Signer,
+    signerOrProvider: ethers.providers.Provider | ethers.Signer,
     handle?: string,
     subgraphEndpoint?: string
   ): Promise<SDK> {
     let network: string;
     // Validate provider/signer object.
-    const isSigner = ethers.Signer.isSigner(providerOrSigner);
+    const isSigner = ethers.Signer.isSigner(signerOrProvider);
     const provider: ethers.providers.Provider | undefined = isSigner
-      ? (providerOrSigner as ethers.Signer).provider
-      : providerOrSigner as ethers.providers.Provider;
+      ? (signerOrProvider as ethers.Signer).provider
+      : signerOrProvider as ethers.providers.Provider;
     if (!ethers.providers.Provider.isProvider(provider))
-      throw new Error("Could not fetch provider object from signer/provider object");
+      throw new Error(providerError);
     network = (await provider.getNetwork()).name;
     // Validate that network is supported.
     const networkConfig = SDK.getValidatedNetworkConfig(network, handle, subgraphEndpoint);
-    const sdk = new SDK(providerOrSigner, networkConfig.theGraphEndpoint);
+    const sdk = new SDK(signerOrProvider, networkConfig.theGraphEndpoint);
     sdk.network = (await sdk.provider.getNetwork()).name;
     await sdk.loadContracts(networkConfig.handleAddress);
     sdk.initialiseKeeperPools();
     sdk.protocol = await Protocol.from(sdk);
-    sdk.trigger(Events.Load, providerOrSigner);
+    sdk.trigger(Events.Load, signerOrProvider);
     return sdk;
   }
 
-  /** Connects a new Signer to this SDK instance */
+  /** Connects a new signer/provider to this SDK instance */
   public connect(
-    signer: ethers.Signer,
-    connectProvider = true
+    signerOrProvider: ethers.Signer | ethers.providers.Provider
   ): SDK {
-    this.signer = signer;
-    if (connectProvider)
-      this.signer.connect(this.provider);
+    const isSigner = ethers.Signer.isSigner(signerOrProvider);
+    if (isSigner) {
+      this.signer = signerOrProvider as ethers.Signer;
+      if (!ethers.providers.Provider.isProvider(this.signer.provider))
+        throw new Error(providerError);
+      this.provider = this.signer.provider;
+    } else {
+      this.signer = undefined;
+      this.provider = signerOrProvider as ethers.providers.Provider;
+    }
     // Re-connect all contracts.
     Object.keys(this.contracts).forEach(key =>
       // @ts-ignore
@@ -95,10 +104,10 @@ export class SDK {
     );
     // Re-connect all keeper pools.
     Object.keys(this.keeperPools).forEach(key => 
-      this.keeperPools[key].contract.connect(signer)
+      this.keeperPools[key].contract.connect(signerOrProvider)
     );
     // Trigger connection event.
-    this.trigger(Events.Connect, signer);
+    this.trigger(Events.Connect, signerOrProvider);
     return this;
   }
 
