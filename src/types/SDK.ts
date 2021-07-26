@@ -7,7 +7,6 @@ import { Vault } from "./Vault";
 import { GraphQLClient } from "graphql-request/dist";
 import { fxKeeperPool } from "./fxKeeperPool";
 import { readTokenRegistry } from "../readers/tokenRegistry";
-import { readTokenRegistry } from "../readers/tokenRegistry";
 
 export enum Events {
   Load = "load",
