@@ -32,7 +32,7 @@ describe("SDK: persistentProvider", function () {
       // @ts-ignore
       process.env.PRIVATE_KEY,
     );
-    sdk.connect(signer);
+    sdk.connect(signer.connect(provider));
   });
   it("Should have loaded vaults signer", async () => {
     await sdk.loadVaults();
@@ -46,7 +46,7 @@ describe("SDK: persistentProvider", function () {
     if (typeof process.env.PRIVATE_KEY !== "string")
       throw "private key not defined";
     signer = new ethers.Wallet(secondaryPrivateKey);
-    sdk.connect(signer);
+    sdk.connect(signer.connect(provider));
   });
   it("Should have loaded new vaults signer", async () => {
     await sdk.loadVaults();
