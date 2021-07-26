@@ -10,7 +10,7 @@ import { fxTokens } from "./ProtocolTokens";
  * parameters with the instance token.
  */
 export class fxKeeperPool {
-  private contract: ethers.Contract;
+  public contract: ethers.Contract;
   /** fxToken contract */
   private erc20: ethers.Contract;
   public token: string;

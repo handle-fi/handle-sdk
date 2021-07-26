@@ -8,8 +8,13 @@ import { GraphQLClient } from "graphql-request/dist";
 import { fxKeeperPool } from "./fxKeeperPool";
 import { readTokenRegistry } from "../readers/tokenRegistry";
 
+export enum Events {
+  Connect = "connect"
+}
+
 /** Handle SDK object */
 export class SDK {
+  private eventListeners: {[key: string]: Function[]} = {};
   public version: string;
   public network!: string;
   public provider: ethers.providers.Provider;
@@ -56,9 +61,10 @@ export class SDK {
   ): Promise<SDK> {
     let network: string;
     // Validate provider/signer object.
-    const provider: ethers.providers.Provider | undefined = ethers.Signer.isSigner(providerOrSigner)
-      ? providerOrSigner.provider
-      : providerOrSigner;
+    const isSigner = ethers.Signer.isSigner(providerOrSigner);
+    const provider: ethers.providers.Provider | undefined = isSigner
+      ? (providerOrSigner as ethers.Signer).provider
+      : providerOrSigner as ethers.providers.Provider;
     if (!ethers.providers.Provider.isProvider(provider))
       throw new Error("Could not fetch provider object from signer/provider object");
     network = (await provider.getNetwork()).name;
@@ -70,6 +76,28 @@ export class SDK {
     sdk.initialiseKeeperPools();
     sdk.protocol = await Protocol.from(sdk);
     return sdk;
+  }
+
+  /** Connects a new Signer to this SDK instance */
+  public connect(
+    signer: ethers.Signer,
+    connectProvider = true
+  ): SDK {
+    this.signer = signer;
+    if (connectProvider)
+      this.signer.connect(this.provider);
+    // Trigger connection event.
+    this.trigger(Events.Connect, signer);
+    // Re-connect all contracts.
+    Object.keys(this.contracts).forEach(key =>
+      // @ts-ignore
+      (this.contracts[key] as ethers.Contract).connect(signer)
+    );
+    // Re-connect all keeper pools.
+    Object.keys(this.keeperPools).forEach(key => 
+      this.keeperPools[key].contract.connect(signer)
+    );
+    return this;
   }
 
   /**
@@ -201,5 +229,16 @@ export class SDK {
       const token = fxTokenSymbol as fxTokens;
       this.keeperPools[token] = new fxKeeperPool(this, token, this.contracts.fxKeeperPool);
     }
+  }
+
+  public on(event: string, callback: Function): void {
+    if (!this.eventListeners[event])
+      this.eventListeners[event] = [];
+    this.eventListeners[event].push(callback);
+  }
+
+  private trigger(event: string, ...data: any[]): void {
+    if (!this.eventListeners[event]) return;
+    this.eventListeners[event].forEach(callback => callback(...data));
   }
 }
