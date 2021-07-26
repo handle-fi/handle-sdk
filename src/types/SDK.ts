@@ -9,6 +9,7 @@ import { fxKeeperPool } from "./fxKeeperPool";
 import { readTokenRegistry } from "../readers/tokenRegistry";
 
 export enum Events {
+  Load = "load",
   Connect = "connect"
 }
 
@@ -75,6 +76,7 @@ export class SDK {
     await sdk.loadContracts(networkConfig.handleAddress);
     sdk.initialiseKeeperPools();
     sdk.protocol = await Protocol.from(sdk);
+    sdk.trigger(Events.Load, providerOrSigner);
     return sdk;
   }
 
@@ -86,8 +88,6 @@ export class SDK {
     this.signer = signer;
     if (connectProvider)
       this.signer.connect(this.provider);
-    // Trigger connection event.
-    this.trigger(Events.Connect, signer);
     // Re-connect all contracts.
     Object.keys(this.contracts).forEach(key =>
       // @ts-ignore
@@ -97,6 +97,8 @@ export class SDK {
     Object.keys(this.keeperPools).forEach(key => 
       this.keeperPools[key].contract.connect(signer)
     );
+    // Trigger connection event.
+    this.trigger(Events.Connect, signer);
     return this;
   }
 
