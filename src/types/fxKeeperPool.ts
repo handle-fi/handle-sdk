@@ -41,12 +41,17 @@ export class fxKeeperPool {
     await (await this.erc20.approve(this.contract.address, amount)).wait(1);
   }
 
-  public async stake(amount: ethers.BigNumber) {
+  public async stake(amount: ethers.BigNumber, referral?: string) {
     if (amount.lt(0)) throw new Error("Amount must be greater than 0");
     await this.ensureAllowance(amount);
-    return await this.contract.stake(amount, this.token, {
-      gasLimit: this.gasLimit
-    });
+    return await this.contract.stake(
+      amount,
+      this.token,
+      referral ?? ethers.constants.AddressZero,
+      {
+        gasLimit: this.gasLimit
+      }
+    );
   }
 
   public async unstake(amount: ethers.BigNumber) {
