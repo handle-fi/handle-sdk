@@ -28,11 +28,11 @@ describe("SDK: persistentProvider", function () {
     expect(network.name).toEqual(networkExpected);
   });
   it("Should connect signer to SDK loaded with provider", async () => {
-    signer = new ethers.Wallet(
+    signer = (new ethers.Wallet(
       // @ts-ignore
       process.env.PRIVATE_KEY,
-    );
-    sdk.connect(signer.connect(provider));
+    )).connect(provider);
+    sdk.connect(signer);
   });
   it("Should have loaded vaults signer", async () => {
     await sdk.loadVaults();
@@ -45,8 +45,8 @@ describe("SDK: persistentProvider", function () {
   it("Should connect signer to SDK loaded with an existing signer", async () => {
     if (typeof process.env.PRIVATE_KEY !== "string")
       throw "private key not defined";
-    signer = new ethers.Wallet(secondaryPrivateKey);
-    sdk.connect(signer.connect(provider));
+    signer = (new ethers.Wallet(secondaryPrivateKey)).connect(provider);
+    sdk.connect(signer);
   });
   it("Should have loaded new vaults signer", async () => {
     await sdk.loadVaults();
@@ -55,5 +55,11 @@ describe("SDK: persistentProvider", function () {
     expect(vaultFxAUD).not.toBeNull();
     if (!vaultFxAUD) throw "vaultFxAUD is undefined";
     expect(vaultFxAUD.account).toBe(await signer.getAddress());
+  });
+  afterAll(() => {
+    // @ts-ignore
+    signer.provider._websocket.terminate();
+    // @ts-ignore
+    signer = null;
   });
 });
