@@ -24,9 +24,10 @@ xdescribe("Vault: mintWithEth, fxKeeperPool", function () {
   it("Should mint with ether as collateral", async () => {
     await (
       await vault.mintWithEth(
-        ethers.utils.parseEther("0.000001"), // .00001 cent of fxAUD
-        ethers.utils.parseEther("0.00000027"), // approximately  0.001 AUD in Ether
-        false
+        ethers.utils.parseEther("0.0000000000000001"),
+        ethers.utils.parseEther("0.000027"),
+        false,
+        ethers.BigNumber.from("1500000")
       )
     ).wait(1);
     expect(vault.debt.gt(0)).toBeTruthy();
