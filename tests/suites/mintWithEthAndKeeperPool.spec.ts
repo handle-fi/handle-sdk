@@ -27,7 +27,7 @@ xdescribe("Vault: mintWithEth, fxKeeperPool", function () {
         ethers.utils.parseEther("0.0000000000000001"),
         ethers.utils.parseEther("0.000027"),
         false,
-        ethers.BigNumber.from("1500000")
+        ethers.BigNumber.from("2500000")
       )
     ).wait(1);
     expect(vault.debt.gt(0)).toBeTruthy();
