@@ -2,7 +2,7 @@
 
 export default (filter: string) => gql`
   query {
-    collateralTokens(${filter}) {
+    collateralTokens${filter} {
       id
       name
       symbol
