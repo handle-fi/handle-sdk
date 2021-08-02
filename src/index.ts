@@ -7,6 +7,7 @@ import { CollateralToken } from "./types/CollateralToken";
 import { Vault } from "./types/Vault";
 import { VaultCollateral } from "./types/VaultCollateral";
 import { fxKeeperPool } from "./types/fxKeeperPool";
+import { Convert } from "./types/Convert";
 
 export {
   HandleSDK,
@@ -18,5 +19,6 @@ export {
   Vault,
   VaultCollateral,
   Token,
-  fxKeeperPool
+  fxKeeperPool,
+  Convert
 };

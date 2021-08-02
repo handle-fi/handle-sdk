@@ -15,6 +15,7 @@ let signer: ethers.Signer;
 let sdk: SDK;
 
 export const getSDK = () => sdk;
+export const getSigner = () => signer;
 
 global.beforeAll(async () => {
   // @ts-config
