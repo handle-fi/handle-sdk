@@ -6,9 +6,19 @@ import { CollateralTokens, fxTokens, fxTokensArray } from "./ProtocolTokens";
 import { Vault } from "./Vault";
 import { GraphQLClient } from "graphql-request/dist";
 import { fxKeeperPool } from "./fxKeeperPool";
+import { readTokenRegistry } from "../readers/tokenRegistry";
+
+export enum Events {
+  Load = "load",
+  Connect = "connect"
+}
+
+const providerError =
+  "Could not fetch provider object from signer/provider object";
 
 /** Handle SDK object */
 export class SDK {
+  private eventListeners: {[key: string]: Function[]} = {};
   public version: string;
   public network!: string;
   public provider: ethers.providers.Provider;
@@ -49,26 +59,56 @@ export class SDK {
 
   /** Loads a new SDK from a provider or signer and optional alternative handle contract address */
   public static async from(
-    providerOrSigner: ethers.providers.Provider | ethers.Signer,
+    signerOrProvider: ethers.providers.Provider | ethers.Signer,
     handle?: string,
     subgraphEndpoint?: string
   ): Promise<SDK> {
     let network: string;
     // Validate provider/signer object.
-    const provider: ethers.providers.Provider | undefined = ethers.Signer.isSigner(providerOrSigner)
-      ? providerOrSigner.provider
-      : providerOrSigner;
+    const isSigner = ethers.Signer.isSigner(signerOrProvider);
+    const provider: ethers.providers.Provider | undefined = isSigner
+      ? (signerOrProvider as ethers.Signer).provider
+      : signerOrProvider as ethers.providers.Provider;
     if (!ethers.providers.Provider.isProvider(provider))
-      throw new Error("Could not fetch provider object from signer/provider object");
+      throw new Error(providerError);
     network = (await provider.getNetwork()).name;
     // Validate that network is supported.
     const networkConfig = SDK.getValidatedNetworkConfig(network, handle, subgraphEndpoint);
-    const sdk = new SDK(providerOrSigner, networkConfig.theGraphEndpoint);
+    const sdk = new SDK(signerOrProvider, networkConfig.theGraphEndpoint);
     sdk.network = (await sdk.provider.getNetwork()).name;
     await sdk.loadContracts(networkConfig.handleAddress);
     sdk.initialiseKeeperPools();
     sdk.protocol = await Protocol.from(sdk);
+    sdk.trigger(Events.Load, signerOrProvider);
     return sdk;
+  }
+
+  /** Connects a new signer/provider to this SDK instance */
+  public connect(
+    signerOrProvider: ethers.Signer | ethers.providers.Provider
+  ): SDK {
+    const isSigner = ethers.Signer.isSigner(signerOrProvider);
+    if (isSigner) {
+      this.signer = signerOrProvider as ethers.Signer;
+      if (!ethers.providers.Provider.isProvider(this.signer.provider))
+        throw new Error(providerError);
+      this.provider = this.signer.provider;
+    } else {
+      this.signer = undefined;
+      this.provider = signerOrProvider as ethers.providers.Provider;
+    }
+    // Re-connect all contracts.
+    Object.keys(this.contracts).forEach(key =>
+      // @ts-ignore
+      (this.contracts[key] as ethers.Contract).connect(signerOrProvider)
+    );
+    // Re-connect all keeper pools.
+    Object.keys(this.keeperPools).forEach(key => 
+      this.keeperPools[key].contract.connect(signerOrProvider)
+    );
+    // Trigger connection event.
+    this.trigger(Events.Connect, signerOrProvider);
+    return this;
   }
 
   /**
@@ -156,10 +196,12 @@ export class SDK {
       promises.push(setContract(contractsToLoad[i]));
     }
     // Load ERC20s for fxTokens and collateral tokens.
-    const [fxTokens, collateralTokens] = await Promise.all([
-      this.contracts.handle.getAllFxTokens(),
-      this.contracts.handle.getAllCollateralTypes()
-    ]);
+    const { fxTokens, collateralTokens } = await readTokenRegistry(
+      this.gqlClient,
+      handle
+    );
+    if (!(fxTokens?.length > 0))
+      throw new Error("Could not fetch fxTokens from Handle subgraph");
     const erc20s = [...fxTokens, ...collateralTokens];
     for (let erc20 of erc20s) {
       const contract = new ethers.Contract(
@@ -198,5 +240,16 @@ export class SDK {
       const token = fxTokenSymbol as fxTokens;
       this.keeperPools[token] = new fxKeeperPool(this, token, this.contracts.fxKeeperPool);
     }
+  }
+
+  public on(event: string, callback: Function): void {
+    if (!this.eventListeners[event])
+      this.eventListeners[event] = [];
+    this.eventListeners[event].push(callback);
+  }
+
+  private trigger(event: string, ...data: any[]): void {
+    if (!this.eventListeners[event]) return;
+    this.eventListeners[event].forEach(callback => callback(...data));
   }
 }

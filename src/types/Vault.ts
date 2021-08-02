@@ -71,9 +71,9 @@ export class Vault {
       this.token.address
     );
     // Set current and liquidation ratios.
-    this.ratios.current = this.collateralAsEth
-      .mul(ethers.constants.WeiPerEther)
-      .div(this.debtAsEth);
+    this.ratios.current = this.debtAsEth.gt(0)
+      ? this.collateralAsEth.mul(ethers.constants.WeiPerEther).div(this.debtAsEth)
+      : ethers.constants.Zero;
     this.ratios.liquidation = this.ratios.current.mul("80").div("100");
     const minLiquidationRatio = ethers.utils.parseEther("1.1");
     if (this.ratios.liquidation.lt(minLiquidationRatio))
@@ -87,18 +87,25 @@ export class Vault {
     returnTxData: boolean = false,
     gasLimit?: ethers.BigNumber,
     gasPrice?: ethers.BigNumber,
-    deadline?: number
+    deadline?: number,
+    referral?: string
   ) {
     if (!this.sdk.signer) throw new Error("This function requires a signer");
     deadline = deadline ?? Math.floor(Date.now() / 1000) + 300;
     const func = !returnTxData
       ? this.sdk.contracts.comptroller
       : this.sdk.contracts.comptroller.populateTransaction;
-    return await func.mintWithEth(tokenAmount, this.token.address, deadline, {
+    return await func.mintWithEth(
+      tokenAmount,
+      this.token.address,
+      deadline,
+      referral ?? ethers.constants.AddressZero,
+      {
       value: etherAmount,
       gasPrice: gasPrice,
       gasLimit: gasLimit
-    });
+      }
+    );
   }
 
   /** Mints using an ERC20 as collateral */
@@ -109,7 +116,8 @@ export class Vault {
     returnTxData: boolean = false,
     gasLimit?: ethers.BigNumber,
     gasPrice?: ethers.BigNumber,
-    deadline?: number
+    deadline?: number,
+    referral?: string
   ) {
     if (!this.sdk.signer) throw new Error("This function requires a signer");
     deadline = deadline ?? Math.floor(Date.now() / 1000) + 300;
@@ -124,6 +132,7 @@ export class Vault {
       collateralTokenAddress,
       collateralAmount,
       deadline,
+      referral ?? ethers.constants.AddressZero,
       {
         gasPrice: gasPrice,
         gasLimit: gasLimit
@@ -137,16 +146,23 @@ export class Vault {
     returnTxData: boolean = false,
     gasLimit?: ethers.BigNumber,
     gasPrice?: ethers.BigNumber,
-    deadline?: number
+    deadline?: number,
+    referral?: string
   ) {
     if (!this.sdk.signer) throw new Error("This function requires a signer");
     deadline = deadline ?? Math.floor(Date.now() / 1000) + 300;
     const func = !returnTxData
       ? this.sdk.contracts.comptroller
       : this.sdk.contracts.comptroller.populateTransaction;
-    return await func.mintWithoutCollateral(tokenAmount, this.token.address, deadline, {
-      gasPrice: gasPrice,
-      gasLimit: gasLimit
-    });
+    return await func.mintWithoutCollateral(
+      tokenAmount,
+      this.token.address,
+      deadline,
+      referral ?? ethers.constants.AddressZero,
+      {
+        gasPrice: gasPrice,
+        gasLimit: gasLimit
+      }
+    );
   }
 }

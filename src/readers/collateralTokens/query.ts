@@ -11,6 +11,8 @@ export default gql`
       interestRate
       totalBalance
       isValid
+      decimals
+      rate
     }
   }
 `;
