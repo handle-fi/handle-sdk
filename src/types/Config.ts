@@ -33,9 +33,7 @@ type NetworkConfig = {
 
 export class Config {
   static getNetworkConfig(network: ethers.providers.Network): NetworkConfig {
-    const configObject = config.networks.find(
-      (x) => x.name === network.name || x.chainId === network.chainId
-    );
+    const configObject = config.networks.find((x) => x.chainId === network.chainId);
     if (!configObject) throw new Error(`Network "${network}" is not supported`);
     return configObject;
   }
