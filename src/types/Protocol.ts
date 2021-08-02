@@ -62,7 +62,7 @@ export class Protocol {
   }
 
   public async loadCollateralTokens() {
-    this.collateralTokens = await queryCollateralTokens(this.sdk.gqlClient);
+    this.collateralTokens = await queryCollateralTokens(this.sdk.gqlClient, {});
   }
 
   public getFxTokenBySymbol(symbol: fxTokens): fxToken {
