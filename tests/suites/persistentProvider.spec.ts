@@ -47,7 +47,7 @@ describe("SDK: persistentProvider", function () {
     sdk.connect(signer);
   });
   it("Should have loaded new vaults signer", async () => {
-    const address = (await signer.getAddress()).toLowerCase();
+    const address = await signer.getAddress();
     await sdk.loadVaults();
     expect(sdk.vaults.length > 0).toBeTruthy();
     const vaultFxAUD = sdk.vaults.find((x) => x.token.symbol === fxTokens.fxAUD);

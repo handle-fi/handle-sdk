@@ -214,7 +214,12 @@ export class SDK {
     if (!this.signer) return;
     const account = await this.signer.getAddress();
 
-    this.vaults = await Vault.getUsersVaults(account, this);
+    const usersActiveVaults = await Vault.getUsersVaults(account, this);
+    const usersInactiveVaults = fxTokensArray
+      .filter((fxToken) => !usersActiveVaults.find((v) => v.token === fxToken))
+      .map((fxToken) => new Vault(account, fxToken as fxTokens, this));
+
+    this.vaults = [...usersActiveVaults, ...usersInactiveVaults];
   }
 
   private initialiseKeeperPools() {
