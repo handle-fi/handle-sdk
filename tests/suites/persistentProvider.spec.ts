@@ -2,13 +2,13 @@
 import { SDK } from "../../src/types/SDK";
 import { ethers } from "ethers";
 import { fxTokens } from "../../src/types/ProtocolTokens";
+import { Vault } from "../../src/types/Vault";
 
 let sdk: SDK;
 let signer: ethers.Signer;
 let provider: ethers.providers.Provider;
 
-const secondaryPrivateKey =
-  "0000000000000000000000000000000000000000000000000000000000001234";
+const secondaryPrivateKey = "0000000000000000000000000000000000000000000000000000000000001234";
 
 describe("SDK: persistentProvider", function () {
   beforeAll(async () => {
@@ -28,33 +28,44 @@ describe("SDK: persistentProvider", function () {
     expect(network.name).toEqual(networkExpected);
   });
   it("Should connect signer to SDK loaded with provider", async () => {
-    signer = (new ethers.Wallet(
+    signer = new ethers.Wallet(
       // @ts-ignore
-      process.env.PRIVATE_KEY,
-    )).connect(provider);
+      process.env.PRIVATE_KEY
+    ).connect(provider);
     sdk.connect(signer);
   });
   it("Should have loaded vaults signer", async () => {
     await sdk.loadVaults();
     expect(sdk.vaults.length > 0).toBeTruthy();
-    const vaultFxAUD = sdk.vaults.find(x => x.token.symbol === fxTokens.fxAUD);
+    const vaultFxAUD = sdk.vaults.find((x) => x.token.symbol === fxTokens.fxAUD);
     expect(vaultFxAUD).not.toBeNull();
     if (!vaultFxAUD) throw "vaultFxAUD is undefined";
-    expect(vaultFxAUD.account).toBe(await signer.getAddress());
+    expect(vaultFxAUD.account).toBe((await signer.getAddress()).toLowerCase());
   });
   it("Should connect signer to SDK loaded with an existing signer", async () => {
-    if (typeof process.env.PRIVATE_KEY !== "string")
-      throw "private key not defined";
-    signer = (new ethers.Wallet(secondaryPrivateKey)).connect(provider);
+    if (typeof process.env.PRIVATE_KEY !== "string") throw "private key not defined";
+    signer = new ethers.Wallet(secondaryPrivateKey).connect(provider);
     sdk.connect(signer);
   });
   it("Should have loaded new vaults signer", async () => {
+    const address = (await signer.getAddress()).toLowerCase();
+    const vault = await Vault.from(address, fxTokens.fxAUD, sdk);
+
+    await (
+      await vault.mintWithEth(
+        ethers.utils.parseEther("0.0000000000000001"),
+        ethers.utils.parseEther("0.000027"),
+        false,
+        ethers.BigNumber.from("2500000")
+      )
+    ).wait(1);
+
     await sdk.loadVaults();
     expect(sdk.vaults.length > 0).toBeTruthy();
-    const vaultFxAUD = sdk.vaults.find(x => x.token.symbol === fxTokens.fxAUD);
+    const vaultFxAUD = sdk.vaults.find((x) => x.token.symbol === fxTokens.fxAUD);
     expect(vaultFxAUD).not.toBeNull();
     if (!vaultFxAUD) throw "vaultFxAUD is undefined";
-    expect(vaultFxAUD.account).toBe(await signer.getAddress());
+    expect(vaultFxAUD.account).toBe(address);
   });
   afterAll(() => {
     // @ts-ignore
