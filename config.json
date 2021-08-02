@@ -2,16 +2,25 @@
   "networks": [
     {
       "name": "homestead",
+      "chainId": 1,
       "theGraphEndpoint": "https://api.thegraph.com/subgraphs/name/handle-fi/handle"
     },
     {
       "name": "kovan",
+      "chainId": 42,
       "theGraphEndpoint": "https://api.thegraph.com/subgraphs/name/handle-fi/handle-kovan",
       "handleAddress": "0xe213aa9c0B6875c17BDbCe050862161e58E64D06"
     },
     {
-      "name": "unknown",
+      "name": "hardhat",
+      "chainId": 1337,
       "theGraphEndpoint": "http://127.0.0.1:8000/subgraphs/name/handle-fi/handle-local"
+    },
+    {
+      "name": "rinkebyarbitrum",
+      "chainId": 421611,
+      "theGraphEndpoint": "https://api.thegraph.com/subgraphs/name/handle-fi/handle-rinkebyarbitrum",
+      "handleAddress": "0x1AB6f82c7774d1C2A00970c836bFd4C7b47e512f"
     }
   ]
 }
