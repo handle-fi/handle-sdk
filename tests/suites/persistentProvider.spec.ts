@@ -2,7 +2,6 @@
 import { SDK } from "../../src/types/SDK";
 import { ethers } from "ethers";
 import { fxTokens } from "../../src/types/ProtocolTokens";
-import { Vault } from "../../src/types/Vault";
 
 let sdk: SDK;
 let signer: ethers.Signer;
@@ -49,17 +48,6 @@ describe("SDK: persistentProvider", function () {
   });
   it("Should have loaded new vaults signer", async () => {
     const address = (await signer.getAddress()).toLowerCase();
-    const vault = await Vault.from(address, fxTokens.fxAUD, sdk);
-
-    await (
-      await vault.mintWithEth(
-        ethers.utils.parseEther("0.0000000000000001"),
-        ethers.utils.parseEther("0.000027"),
-        false,
-        ethers.BigNumber.from("2500000")
-      )
-    ).wait(1);
-
     await sdk.loadVaults();
     expect(sdk.vaults.length > 0).toBeTruthy();
     const vaultFxAUD = sdk.vaults.find((x) => x.token.symbol === fxTokens.fxAUD);
