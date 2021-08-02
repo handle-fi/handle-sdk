@@ -4,6 +4,7 @@ import { VaultCollateral } from "./VaultCollateral";
 import { SDK } from "./SDK";
 import { IndexedVaultData, queryVaults } from "../readers/vault";
 import { CollateralTokens, fxTokens } from "./ProtocolTokens";
+import { tokenAddressToFxToken } from "./utils";
 
 export class Vault {
   private sdk: SDK;
@@ -125,9 +126,9 @@ export class Vault {
       deadline,
       referral ?? ethers.constants.AddressZero,
       {
-      value: etherAmount,
-      gasPrice: gasPrice,
-      gasLimit: gasLimit
+        value: etherAmount,
+        gasPrice: gasPrice,
+        gasLimit: gasLimit
       }
     );
   }
@@ -201,14 +202,4 @@ const indexedVaultDataToVaults = async (vaultData: IndexedVaultData[], sdk: SDK)
   }
 
   return vaults;
-};
-
-const tokenAddressToFxToken = (address: string, sdk: SDK): fxTokens => {
-  const token = Object.keys(sdk.contracts).find((key) => {
-    const typedKey = key as keyof SDK["contracts"];
-
-    return sdk.contracts[typedKey].address.toLowerCase() === address;
-  });
-
-  return token as fxTokens;
 };

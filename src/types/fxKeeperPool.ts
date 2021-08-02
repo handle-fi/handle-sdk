@@ -2,6 +2,8 @@ import { ethers } from "ethers";
 import { CollateralToken } from "./CollateralToken";
 import { SDK } from "./SDK";
 import { fxTokens } from "./ProtocolTokens";
+import { queryFxKeeperPools } from "../readers/fxKeeperPool";
+import { tokenAddressToFxToken } from "./utils";
 
 /**
  * Class to interact with a fxKeeperPool for a specific fxToken.
@@ -44,14 +46,9 @@ export class fxKeeperPool {
   public async stake(amount: ethers.BigNumber, referral?: string) {
     if (amount.lt(0)) throw new Error("Amount must be greater than 0");
     await this.ensureAllowance(amount);
-    return await this.contract.stake(
-      amount,
-      this.token,
-      referral ?? ethers.constants.AddressZero,
-      {
-        gasLimit: this.gasLimit
-      }
-    );
+    return await this.contract.stake(amount, this.token, referral ?? ethers.constants.AddressZero, {
+      gasLimit: this.gasLimit
+    });
   }
 
   public async unstake(amount: ethers.BigNumber) {
@@ -89,7 +86,16 @@ export class fxKeeperPool {
     return await this.contract.getPoolCollateralBalance(this.token, collateral.address);
   }
 
-  public async getPoolTotalDeposit() {
+  public async getPoolTotalDeposit(): Promise<ethers.BigNumber> {
     return await this.contract.getPoolTotalDeposit(this.token);
+  }
+
+  public static async query(sdk: SDK, filter: any): Promise<fxKeeperPool[]> {
+    const indexedData = await queryFxKeeperPools(sdk.gqlClient, filter);
+
+    return indexedData.map(
+      (id) =>
+        new fxKeeperPool(sdk, tokenAddressToFxToken(id.fxToken, sdk), sdk.contracts.fxKeeperPool)
+    );
   }
 }
