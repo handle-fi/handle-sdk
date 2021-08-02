@@ -1,4 +1,4 @@
-﻿import packageJson from "../../package.json";
+import packageJson from "../../package.json";
 import { ethers } from "ethers";
 import { Protocol } from "./Protocol";
 import { Abi, Config } from "./Config";
@@ -215,18 +215,13 @@ export class SDK {
     // Can't load vaults without signer.
     if (!this.signer) return;
     const account = await this.signer.getAddress();
-    const fxTokens = this.protocol.fxTokens;
-    const promises = [];
-    this.vaults = [];
-    for (let fxToken of fxTokens) {
-      promises.push(
-        new Promise(async (resolve) => {
-          this.vaults.push(await Vault.from(account, fxToken.symbol as fxTokens, this));
-          resolve(undefined);
-        })
-      );
-    }
-    await Promise.all(promises);
+
+    const usersActiveVaults = await Vault.getUsersVaults(account, this);
+    const usersInactiveVaults = fxTokensArray
+      .filter((fxToken) => !usersActiveVaults.find((v) => v.token === fxToken))
+      .map((fxToken) => new Vault(account, fxToken as fxTokens, this));
+
+    this.vaults = [...usersActiveVaults, ...usersInactiveVaults];
   }
 
   private initialiseKeeperPools() {

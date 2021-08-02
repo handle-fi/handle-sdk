@@ -2,8 +2,8 @@
 import { ethers } from "ethers";
 import { CollateralToken } from "./CollateralToken";
 import { SDK } from "./SDK";
-import { readFxTokens } from "../readers/fxTokens";
-import { readCollateralTokens } from "../readers/collateralTokens";
+import { queryFxTokens } from "../readers/fxTokens";
+import { queryCollateralTokens } from "../readers/collateralTokens";
 import { CollateralTokens, fxTokens } from "./ProtocolTokens";
 
 /** Holds protocol data */
@@ -49,27 +49,20 @@ export class Protocol {
     return protocol;
   }
 
+  public static async queryFxTokens(sdk: SDK, filter: any): Promise<fxToken[]> {
+    return queryFxTokens(sdk.gqlClient, filter);
+  }
+
+  public static async queryCollateralTokens(sdk: SDK, filter: any): Promise<CollateralToken[]> {
+    return queryCollateralTokens(sdk.gqlClient, filter);
+  }
+
   public async loadFxTokens() {
-    const indexedTokens = await readFxTokens(this.sdk.gqlClient);
-    this.fxTokens = [];
-    for (let indexed of indexedTokens) {
-      this.fxTokens.push(indexed);
-    }
+    this.fxTokens = await queryFxTokens(this.sdk.gqlClient, {});
   }
 
   public async loadCollateralTokens() {
-    const indexedTokens = await readCollateralTokens(this.sdk.gqlClient);
-    this.collateralTokens = [];
-    const promises = [];
-    for (let indexed of indexedTokens) {
-      promises.push(
-        new Promise(async (resolve) => {
-          this.collateralTokens.push(indexed);
-          resolve(null);
-        })
-      );
-    }
-    await Promise.all(promises);
+    this.collateralTokens = await queryCollateralTokens(this.sdk.gqlClient, {});
   }
 
   public getFxTokenBySymbol(symbol: fxTokens): fxToken {

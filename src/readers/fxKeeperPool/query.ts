@@ -2,14 +2,17 @@
 
 export default (filter: string) => gql`
   query {
-    vaults${filter} {
-      account
-      debt
+    fxKeeperPools${filter} {
+      id
       fxToken
+      totalDeposits
+      depositorCount
+      liquidationsExecuted
       collateralTokens {
         address
         amount
       }
+      collateralAddresses
     }
   }
 `;

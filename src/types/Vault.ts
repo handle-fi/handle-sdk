@@ -2,8 +2,9 @@
 import { ethers } from "ethers";
 import { VaultCollateral } from "./VaultCollateral";
 import { SDK } from "./SDK";
-import { readIndexedVaultData } from "../readers/vault";
+import { IndexedVaultData, queryVaults } from "../readers/vault";
 import { CollateralTokens, fxTokens } from "./ProtocolTokens";
+import { tokenAddressToFxToken } from "./utils";
 
 export class Vault {
   private sdk: SDK;
@@ -22,7 +23,7 @@ export class Vault {
     liquidation: ethers.BigNumber;
   };
 
-  private constructor(account: string, token: fxTokens, sdk: SDK) {
+  constructor(account: string, token: fxTokens, sdk: SDK) {
     const fxToken = sdk.protocol.getFxTokenBySymbol(token);
     if (!fxToken) throw new Error(`Invalid fxToken address provided "${token}"`);
     this.sdk = sdk;
@@ -40,14 +41,38 @@ export class Vault {
     };
   }
 
+  public static async query(sdk: SDK, filter: any): Promise<Vault[]> {
+    const vaultData = await queryVaults(sdk.gqlClient, filter);
+
+    return indexedVaultDataToVaults(vaultData, sdk);
+  }
+
+  public static async getUsersVaults(account: string, sdk: SDK): Promise<Vault[]> {
+    const vaultData = await queryVaults(sdk.gqlClient, {
+      where: {
+        account: account.toLowerCase()
+      }
+    });
+
+    return indexedVaultDataToVaults(vaultData, sdk);
+  }
+
   public static async from(account: string, token: fxTokens, sdk: SDK): Promise<Vault> {
     const vault = new Vault(account, token, sdk);
     await vault.update();
     return vault;
   }
 
-  public async update() {
-    const data = await readIndexedVaultData(this.sdk.gqlClient, this.account, this.token.address);
+  public async update(vaultData?: IndexedVaultData) {
+    const data =
+      vaultData ||
+      (
+        await queryVaults(this.sdk.gqlClient, {
+          account: this.account,
+          fxToken: this.token.address
+        })
+      )[0];
+
     // Update debt.
     this.debt = data.debt;
     this.debtAsEth = this.debt.mul(this.token.rate).div(ethers.constants.WeiPerEther);
@@ -101,9 +126,9 @@ export class Vault {
       deadline,
       referral ?? ethers.constants.AddressZero,
       {
-      value: etherAmount,
-      gasPrice: gasPrice,
-      gasLimit: gasLimit
+        value: etherAmount,
+        gasPrice: gasPrice,
+        gasLimit: gasLimit
       }
     );
   }
@@ -166,3 +191,15 @@ export class Vault {
     );
   }
 }
+
+const indexedVaultDataToVaults = async (vaultData: IndexedVaultData[], sdk: SDK) => {
+  const vaults = [];
+
+  for (const vd of vaultData) {
+    const v = new Vault(vd.account, tokenAddressToFxToken(vd.fxToken, sdk), sdk);
+    await v.update(vd);
+    vaults.push(v);
+  }
+
+  return vaults;
+};

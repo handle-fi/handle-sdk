@@ -1,8 +1,8 @@
 ﻿import { gql } from "graphql-request/dist";
 
-export default gql`
+export default (filter: string) => gql`
   query {
-    fxTokens {
+    fxTokens${filter} {
       id
       name
       symbol
