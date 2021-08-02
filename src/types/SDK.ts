@@ -13,12 +13,11 @@ export enum Events {
   Connect = "connect"
 }
 
-const providerError =
-  "Could not fetch provider object from signer/provider object";
+const providerError = "Could not fetch provider object from signer/provider object";
 
 /** Handle SDK object */
 export class SDK {
-  private eventListeners: {[key: string]: Function[]} = {};
+  private eventListeners: { [key: string]: Function[] } = {};
   public version: string;
   public network!: string;
   public provider: ethers.providers.Provider;
@@ -63,17 +62,18 @@ export class SDK {
     handle?: string,
     subgraphEndpoint?: string
   ): Promise<SDK> {
-    let network: string;
     // Validate provider/signer object.
     const isSigner = ethers.Signer.isSigner(signerOrProvider);
     const provider: ethers.providers.Provider | undefined = isSigner
       ? (signerOrProvider as ethers.Signer).provider
-      : signerOrProvider as ethers.providers.Provider;
-    if (!ethers.providers.Provider.isProvider(provider))
-      throw new Error(providerError);
-    network = (await provider.getNetwork()).name;
+      : (signerOrProvider as ethers.providers.Provider);
+    if (!ethers.providers.Provider.isProvider(provider)) throw new Error(providerError);
     // Validate that network is supported.
-    const networkConfig = SDK.getValidatedNetworkConfig(network, handle, subgraphEndpoint);
+    const networkConfig = SDK.getValidatedNetworkConfig(
+      await provider.getNetwork(),
+      handle,
+      subgraphEndpoint
+    );
     const sdk = new SDK(signerOrProvider, networkConfig.theGraphEndpoint);
     sdk.network = (await sdk.provider.getNetwork()).name;
     await sdk.loadContracts(networkConfig.handleAddress);
@@ -84,9 +84,7 @@ export class SDK {
   }
 
   /** Connects a new signer/provider to this SDK instance */
-  public connect(
-    signerOrProvider: ethers.Signer | ethers.providers.Provider
-  ): SDK {
+  public connect(signerOrProvider: ethers.Signer | ethers.providers.Provider): SDK {
     const isSigner = ethers.Signer.isSigner(signerOrProvider);
     if (isSigner) {
       this.signer = signerOrProvider as ethers.Signer;
@@ -98,12 +96,12 @@ export class SDK {
       this.provider = signerOrProvider as ethers.providers.Provider;
     }
     // Re-connect all contracts.
-    Object.keys(this.contracts).forEach(key =>
+    Object.keys(this.contracts).forEach((key) =>
       // @ts-ignore
       (this.contracts[key] as ethers.Contract).connect(signerOrProvider)
     );
     // Re-connect all keeper pools.
-    Object.keys(this.keeperPools).forEach(key => 
+    Object.keys(this.keeperPools).forEach((key) =>
       this.keeperPools[key].contract.connect(signerOrProvider)
     );
     // Trigger connection event.
@@ -113,16 +111,16 @@ export class SDK {
 
   /**
    * Ensures all the correct parameters are passed to the SDK via the NetworkConfig object before initialisation.
-   * @param network The network name.
+   * @param network The network object.
    * @param handle The handle contract address.
    * @param subgraphEndpoint The subgraph endpoint URL.
    */
   private static getValidatedNetworkConfig(
-    network: string,
+    network: ethers.providers.Network,
     handle?: string,
     subgraphEndpoint?: string
   ) {
-    const defaultConfig = Config.getNetworkConfigByName(network);
+    const defaultConfig = Config.getNetworkConfig(network);
     const handleAddress = handle ?? defaultConfig.handleAddress;
     if (handleAddress == null)
       throw new Error(
@@ -136,7 +134,7 @@ export class SDK {
           " Please pass this (otherwise optional) parameter when creating the SDK object."
       );
     return {
-      networkName: network,
+      networkName: network.name,
       handleAddress,
       theGraphEndpoint
     };
@@ -196,12 +194,8 @@ export class SDK {
       promises.push(setContract(contractsToLoad[i]));
     }
     // Load ERC20s for fxTokens and collateral tokens.
-    const { fxTokens, collateralTokens } = await readTokenRegistry(
-      this.gqlClient,
-      handle
-    );
-    if (!(fxTokens?.length > 0))
-      throw new Error("Could not fetch fxTokens from Handle subgraph");
+    const { fxTokens, collateralTokens } = await readTokenRegistry(this.gqlClient, handle);
+    if (!(fxTokens?.length > 0)) throw new Error("Could not fetch fxTokens from Handle subgraph");
     const erc20s = [...fxTokens, ...collateralTokens];
     for (let erc20 of erc20s) {
       const contract = new ethers.Contract(
@@ -243,13 +237,12 @@ export class SDK {
   }
 
   public on(event: string, callback: Function): void {
-    if (!this.eventListeners[event])
-      this.eventListeners[event] = [];
+    if (!this.eventListeners[event]) this.eventListeners[event] = [];
     this.eventListeners[event].push(callback);
   }
 
   private trigger(event: string, ...data: any[]): void {
     if (!this.eventListeners[event]) return;
-    this.eventListeners[event].forEach(callback => callback(...data));
+    this.eventListeners[event].forEach((callback) => callback(...data));
   }
 }
