@@ -1,4 +1,5 @@
 import axios, { AxiosInstance } from "axios";
+import { BigNumber } from "ethers";
 
 type Token = {
   symbol: string;
@@ -49,8 +50,8 @@ export class Convert {
   public getQuote = async (
     sellToken: string,
     buyToken: string,
-    sellAmount: string | undefined,
-    buyAmount: string | undefined,
+    sellAmount: BigNumber | undefined,
+    buyAmount: BigNumber | undefined,
     slippagePercentage: string,
     gasPriceInWei: string
   ) => {
@@ -66,8 +67,8 @@ export class Convert {
       params: {
         buyToken,
         sellToken,
-        sellAmount,
-        buyAmount,
+        sellAmount: sellAmount?.toString(),
+        buyAmount: buyAmount?.toString(),
         feeRecipient: "0x19835c8126d1c56c83A746DfDc9738Bb4a987B9B",
         buyTokenPercentageFee: this.getFees(buyToken, sellToken),
         slippagePercentage: Number(slippagePercentage) / 100,
