@@ -195,7 +195,6 @@ export class Vault {
     amount: ethers.BigNumber,
     collateralToken: CollateralTokens,
     returnTxData: boolean = false,
-    approveTransfer: boolean = true,
     gasLimit?: ethers.BigNumber,
     gasPrice?: ethers.BigNumber,
     referral?: string
@@ -218,7 +217,12 @@ export class Vault {
         }
       );
     } else {
-      if (approveTransfer) {
+      const allowance = await this.sdk.contracts[collateralToken].allowance(
+        this.account,
+        this.sdk.contracts.treasury.address
+      );
+
+      if (allowance.lt(amount)) {
         await this.sdk.contracts[collateralToken].approve(
           this.sdk.contracts.treasury.address,
           amount

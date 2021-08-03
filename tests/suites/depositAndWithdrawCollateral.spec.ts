@@ -19,12 +19,12 @@ xdescribe("Vault: depositCollateral, withdrawCollateral", function () {
   });
   it("Should deposit eth", async () => {
     await (
-      await vault.depositCollateral(DEPOSIT_AMOUNT, CollateralTokens.WETH, false, false, GAS_PRICE)
+      await vault.depositCollateral(DEPOSIT_AMOUNT, CollateralTokens.WETH, false, GAS_PRICE)
     ).wait(1);
   });
   it("Should deposit dai", async () => {
     await (
-      await vault.depositCollateral(DEPOSIT_AMOUNT, CollateralTokens.DAI, false, true, GAS_PRICE)
+      await vault.depositCollateral(DEPOSIT_AMOUNT, CollateralTokens.DAI, false, GAS_PRICE)
     ).wait(1);
   });
   it("Should withdraw eth", async () => {
