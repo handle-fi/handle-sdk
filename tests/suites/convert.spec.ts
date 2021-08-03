@@ -34,7 +34,7 @@ describe("Convert", function () {
     const priceResult = await convert.getQuote(
       "ETH",
       "0x4f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa",
-      ethers.utils.parseEther("1").toString(),
+      ethers.utils.parseEther("1"),
       undefined,
       "1",
       "1"
