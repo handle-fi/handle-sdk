@@ -216,34 +216,36 @@ export class Vault {
           gasLimit: gasLimit
         }
       );
-    } else {
-      const allowance = await this.sdk.contracts[collateralToken].allowance(
-        this.account,
-        this.sdk.contracts.treasury.address
-      );
+    }
 
-      if (allowance.lt(amount)) {
+    const allowance = await this.sdk.contracts[collateralToken].allowance(
+      this.account,
+      this.sdk.contracts.treasury.address
+    );
+
+    if (allowance.lt(amount)) {
+      await (
         await this.sdk.contracts[collateralToken].approve(
           this.sdk.contracts.treasury.address,
           amount
-        );
-      }
-
-      const collateralTokenAddress =
-        this.sdk.protocol.getCollateralTokenBySymbol(collateralToken).address;
-
-      return await func.depositCollateral(
-        this.account,
-        amount,
-        collateralTokenAddress,
-        this.token.address,
-        referral ?? ethers.constants.AddressZero,
-        {
-          gasPrice: gasPrice,
-          gasLimit: gasLimit
-        }
-      );
+        )
+      ).wait(2);
     }
+
+    const collateralTokenAddress =
+      this.sdk.protocol.getCollateralTokenBySymbol(collateralToken).address;
+
+    return await func.depositCollateral(
+      this.account,
+      amount,
+      collateralTokenAddress,
+      this.token.address,
+      referral ?? ethers.constants.AddressZero,
+      {
+        gasPrice: gasPrice,
+        gasLimit: gasLimit
+      }
+    );
   }
 
   public async withdrawCollateral(
@@ -264,21 +266,20 @@ export class Vault {
         gasPrice: gasPrice,
         gasLimit: gasLimit
       });
-    } else {
-      const collateralTokenAddress =
-        this.sdk.protocol.getCollateralTokenBySymbol(collateralToken).address;
-
-      return await func.withdrawCollateral(
-        collateralTokenAddress,
-        this.account,
-        amount,
-        this.token.address,
-        {
-          gasPrice: gasPrice,
-          gasLimit: gasLimit
-        }
-      );
     }
+    const collateralTokenAddress =
+      this.sdk.protocol.getCollateralTokenBySymbol(collateralToken).address;
+
+    return await func.withdrawCollateral(
+      collateralTokenAddress,
+      this.account,
+      amount,
+      this.token.address,
+      {
+        gasPrice: gasPrice,
+        gasLimit: gasLimit
+      }
+    );
   }
 }
 
