@@ -6,6 +6,7 @@ import fxKeeperPool from "../../abi/fxKeeperPool.json";
 import Handle from "../../abi/Handle.json";
 import Treasury from "../../abi/Treasury.json";
 import VaultLibrary from "../../abi/VaultLibrary.json";
+import Liquidator from "../../abi/Liquidator.json";
 
 export enum Abi {
   Handle = "Handle",
@@ -13,7 +14,8 @@ export enum Abi {
   ERC20 = "ERC20",
   fxKeeperPool = "fxKeeperPool",
   Treasury = "Treasury",
-  VaultLibrary = "VaultLibrary"
+  VaultLibrary = "VaultLibrary",
+  Liquidator = "Liquidator"
 }
 
 const abi = {
@@ -22,7 +24,8 @@ const abi = {
   [Abi.fxKeeperPool]: fxKeeperPool,
   [Abi.Handle]: Handle,
   [Abi.Treasury]: Treasury,
-  [Abi.VaultLibrary]: VaultLibrary
+  [Abi.VaultLibrary]: VaultLibrary,
+  [Abi.Liquidator]: Liquidator
 };
 
 type NetworkConfig = {

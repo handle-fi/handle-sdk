@@ -31,6 +31,7 @@ export class SDK {
     treasury: ethers.Contract;
     fxKeeperPool: ethers.Contract;
     vaultLibrary: ethers.Contract;
+    liquidator: ethers.Contract;
     [fxTokens.fxAUD]: ethers.Contract;
     [fxTokens.fxEUR]: ethers.Contract;
     [fxTokens.fxKRW]: ethers.Contract;
@@ -175,6 +176,12 @@ export class SDK {
         abi: Abi.fxKeeperPool,
         // @ts-ignore
         addressGetter: async () => await this.contracts.handle.fxKeeperPool()
+      },
+      {
+        name: "Liquidator",
+        abi: Abi.Liquidator,
+        // @ts-ignore
+        addressGetter: async () => await this.contracts.handle.liquidator()
       }
     ];
     const setContract = async (obj: ContractObj) => {
