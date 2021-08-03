@@ -190,6 +190,92 @@ export class Vault {
       }
     );
   }
+
+  public async depositCollateral(
+    amount: ethers.BigNumber,
+    collateralToken: CollateralTokens,
+    returnTxData: boolean = false,
+    approveTransfer: boolean = true,
+    gasLimit?: ethers.BigNumber,
+    gasPrice?: ethers.BigNumber,
+    referral?: string
+  ) {
+    if (!this.sdk.signer) throw new Error("This function requires a signer");
+
+    const func = !returnTxData
+      ? this.sdk.contracts.treasury
+      : this.sdk.contracts.treasury.populateTransaction;
+
+    if (collateralToken === CollateralTokens.WETH) {
+      return await func.depositCollateralETH(
+        this.account,
+        this.token.address,
+        referral ?? ethers.constants.AddressZero,
+        {
+          value: amount,
+          gasPrice: gasPrice,
+          gasLimit: gasLimit
+        }
+      );
+    } else {
+      if (approveTransfer) {
+        await this.sdk.contracts[collateralToken].approve(
+          this.sdk.contracts.treasury.address,
+          amount
+        );
+      }
+
+      const collateralTokenAddress =
+        this.sdk.protocol.getCollateralTokenBySymbol(collateralToken).address;
+
+      return await func.depositCollateral(
+        this.account,
+        amount,
+        collateralTokenAddress,
+        this.token.address,
+        referral ?? ethers.constants.AddressZero,
+        {
+          gasPrice: gasPrice,
+          gasLimit: gasLimit
+        }
+      );
+    }
+  }
+
+  public async withdrawCollateral(
+    amount: ethers.BigNumber,
+    collateralToken: CollateralTokens,
+    returnTxData: boolean = false,
+    gasLimit?: ethers.BigNumber,
+    gasPrice?: ethers.BigNumber
+  ) {
+    if (!this.sdk.signer) throw new Error("This function requires a signer");
+
+    const func = !returnTxData
+      ? this.sdk.contracts.treasury
+      : this.sdk.contracts.treasury.populateTransaction;
+
+    if (collateralToken === CollateralTokens.WETH) {
+      return await func.withdrawCollateralETH(this.account, amount, this.token.address, {
+        gasPrice: gasPrice,
+        gasLimit: gasLimit
+      });
+    } else {
+      const collateralTokenAddress =
+        this.sdk.protocol.getCollateralTokenBySymbol(collateralToken).address;
+
+      return await func.withdrawCollateral(
+        collateralTokenAddress,
+        this.account,
+        amount,
+        this.token.address,
+        {
+          gasPrice: gasPrice,
+          gasLimit: gasLimit
+        }
+      );
+    }
+  }
 }
 
 const indexedVaultDataToVaults = async (vaultData: IndexedVaultData[], sdk: SDK) => {
