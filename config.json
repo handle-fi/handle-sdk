@@ -19,7 +19,7 @@
     {
       "name": "rinkebyarbitrum",
       "chainId": 421611,
-      "theGraphEndpoint": "http://128.199.198.163:8000/subgraphs/name/handle-fi/handle-rinkebyarbitrum/graphql",
+      "theGraphEndpoint": "https://rinkebyarbitrum.subgraph.handle.fi/subgraphs/name/handle-fi/handle-rinkebyarbitrum",
       "handleAddress": "0x1AB6f82c7774d1C2A00970c836bFd4C7b47e512f"
     }
   ]
