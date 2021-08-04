@@ -12,7 +12,9 @@
     "build": "npx tsc",
     "prepublish": "tsc",
     "test": "jest --env=node --colors --coverage test",
-    "watch": "npx copy-and-watch --watch dist/** ../handle-vue/node_modules/handle-sdk/dist"
+    "watch-build": "tsc-watch",
+    "watch-dist": "copy-and-watch --watch dist/** ../handle-vue/node_modules/handle-sdk/dist",
+    "watch": "npm-run-all -p -r watch-build watch-dist"
   },
   "dependencies": {
     "axios": "^0.21.1",
@@ -31,8 +33,10 @@
     "husky": "^6.0.0",
     "jest": "^27.0.3",
     "jest-environment-node": "^27.0.3",
+    "npm-run-all": "^4.1.5",
     "prettier": "^2.3.0",
     "pretty-quick": "^3.1.0",
-    "ts-jest": "^27.0.2"
+    "ts-jest": "^27.0.2",
+    "tsc-watch": "^4.4.0"
   }
 }
