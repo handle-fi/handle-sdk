@@ -145,7 +145,6 @@ export class Vault {
     referral?: string
   ) {
     if (!this.sdk.signer) throw new Error("This function requires a signer");
-    deadline = deadline ?? Math.floor(Date.now() / 1000) + 300;
     const func = !returnTxData
       ? this.sdk.contracts.comptroller
       : this.sdk.contracts.comptroller.populateTransaction;
@@ -156,7 +155,7 @@ export class Vault {
       this.token.address,
       collateralTokenAddress,
       collateralAmount,
-      deadline,
+      getDeadline(deadline),
       referral ?? ethers.constants.AddressZero,
       {
         gasPrice: gasPrice,
@@ -175,14 +174,13 @@ export class Vault {
     referral?: string
   ) {
     if (!this.sdk.signer) throw new Error("This function requires a signer");
-    deadline = deadline ?? Math.floor(Date.now() / 1000) + 300;
     const func = !returnTxData
       ? this.sdk.contracts.comptroller
       : this.sdk.contracts.comptroller.populateTransaction;
     return await func.mintWithoutCollateral(
       tokenAmount,
       this.token.address,
-      deadline,
+      getDeadline(deadline),
       referral ?? ethers.constants.AddressZero,
       {
         gasPrice: gasPrice,
@@ -281,6 +279,25 @@ export class Vault {
       }
     );
   }
+
+  public async burn(
+    amount: ethers.BigNumber,
+    returnTxData: boolean = false,
+    gasLimit?: ethers.BigNumber,
+    gasPrice?: ethers.BigNumber,
+    deadline?: number
+  ) {
+    if (!this.sdk.signer) throw new Error("This function requires a signer");
+
+    const func = !returnTxData
+      ? this.sdk.contracts.comptroller
+      : this.sdk.contracts.comptroller.populateTransaction;
+
+    return await func.burn(amount, this.token.address, getDeadline(deadline), {
+      gasPrice,
+      gasLimit
+    });
+  }
 }
 
 const indexedVaultDataToVaults = async (vaultData: IndexedVaultData[], sdk: SDK) => {
@@ -294,3 +311,5 @@ const indexedVaultDataToVaults = async (vaultData: IndexedVaultData[], sdk: SDK)
 
   return vaults;
 };
+
+const getDeadline = (deadline?: number) => deadline ?? Math.floor(Date.now() / 1000) + 300;
