@@ -119,14 +119,13 @@ export class Vault {
     referral?: string
   ) {
     if (!this.sdk.signer) throw new Error("This function requires a signer");
-    deadline = deadline ?? Math.floor(Date.now() / 1000) + 300;
     const func = !returnTxData
       ? this.sdk.contracts.comptroller
       : this.sdk.contracts.comptroller.populateTransaction;
     return await func.mintWithEth(
       tokenAmount,
       this.token.address,
-      deadline,
+      getDeadline(deadline),
       referral ?? ethers.constants.AddressZero,
       {
         value: etherAmount,
@@ -148,7 +147,6 @@ export class Vault {
     referral?: string
   ) {
     if (!this.sdk.signer) throw new Error("This function requires a signer");
-    deadline = deadline ?? Math.floor(Date.now() / 1000) + 300;
     const func = !returnTxData
       ? this.sdk.contracts.comptroller
       : this.sdk.contracts.comptroller.populateTransaction;
@@ -159,7 +157,7 @@ export class Vault {
       this.token.address,
       collateralTokenAddress,
       collateralAmount,
-      deadline,
+      getDeadline(deadline),
       referral ?? ethers.constants.AddressZero,
       {
         gasPrice: gasPrice,
@@ -178,14 +176,13 @@ export class Vault {
     referral?: string
   ) {
     if (!this.sdk.signer) throw new Error("This function requires a signer");
-    deadline = deadline ?? Math.floor(Date.now() / 1000) + 300;
     const func = !returnTxData
       ? this.sdk.contracts.comptroller
       : this.sdk.contracts.comptroller.populateTransaction;
     return await func.mintWithoutCollateral(
       tokenAmount,
       this.token.address,
-      deadline,
+      getDeadline(deadline),
       referral ?? ethers.constants.AddressZero,
       {
         gasPrice: gasPrice,
@@ -297,7 +294,6 @@ export class Vault {
       (vault) => vault.account
     );
     if (accounts.length == 0) throw new Error("No vaults available for redemption");
-    deadline = deadline ?? Math.floor(Date.now() / 1000) + 300;
     // @ts-ignore
     const func: ethers.Contract = !returnTxData
       ? sdk.contracts.liquidator
@@ -306,7 +302,7 @@ export class Vault {
       amount,
       sdk.protocol.getFxTokenAddress(fxToken),
       accounts,
-      deadline,
+      getDeadline(deadline),
       referral ?? ethers.constants.AddressZero
     );
   }
@@ -343,6 +339,25 @@ export class Vault {
     }
     return redeemableVaults;
   }
+
+  public async burn(
+    amount: ethers.BigNumber,
+    returnTxData: boolean = false,
+    gasLimit?: ethers.BigNumber,
+    gasPrice?: ethers.BigNumber,
+    deadline?: number
+  ) {
+    if (!this.sdk.signer) throw new Error("This function requires a signer");
+
+    const func = !returnTxData
+      ? this.sdk.contracts.comptroller
+      : this.sdk.contracts.comptroller.populateTransaction;
+
+    return await func.burn(amount, this.token.address, getDeadline(deadline), {
+      gasPrice,
+      gasLimit
+    });
+  }
 }
 
 const indexedVaultDataToVaults = async (vaultData: IndexedVaultData[], sdk: SDK) => {
@@ -356,3 +371,5 @@ const indexedVaultDataToVaults = async (vaultData: IndexedVaultData[], sdk: SDK)
 
   return vaults;
 };
+
+const getDeadline = (deadline?: number) => deadline ?? Math.floor(Date.now() / 1000) + 300;

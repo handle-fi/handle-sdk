@@ -9,7 +9,7 @@ let sdk: SDK;
 let vault: Vault;
 
 const DEPOSIT_AMOUNT = ethers.utils.parseEther("0.0000000000000001");
-const GAS_PRICE = ethers.BigNumber.from("2500000");
+const GAS_LIMIT = ethers.BigNumber.from("2500000");
 
 xdescribe("Vault: depositCollateral, withdrawCollateral", function () {
   beforeAll(async () => {
@@ -19,22 +19,22 @@ xdescribe("Vault: depositCollateral, withdrawCollateral", function () {
   });
   it("Should deposit eth", async () => {
     await (
-      await vault.depositCollateral(DEPOSIT_AMOUNT, CollateralTokens.WETH, false, GAS_PRICE)
+      await vault.depositCollateral(DEPOSIT_AMOUNT, CollateralTokens.WETH, false, GAS_LIMIT)
     ).wait(1);
   });
   it("Should deposit dai", async () => {
     await (
-      await vault.depositCollateral(DEPOSIT_AMOUNT, CollateralTokens.DAI, false, GAS_PRICE)
+      await vault.depositCollateral(DEPOSIT_AMOUNT, CollateralTokens.DAI, false, GAS_LIMIT)
     ).wait(1);
   });
   it("Should withdraw eth", async () => {
     await (
-      await vault.withdrawCollateral(DEPOSIT_AMOUNT, CollateralTokens.WETH, false, GAS_PRICE)
+      await vault.withdrawCollateral(DEPOSIT_AMOUNT, CollateralTokens.WETH, false, GAS_LIMIT)
     ).wait(1);
   });
   it("Should withdraw dai", async () => {
     await (
-      await vault.withdrawCollateral(DEPOSIT_AMOUNT, CollateralTokens.DAI, false, GAS_PRICE)
+      await vault.withdrawCollateral(DEPOSIT_AMOUNT, CollateralTokens.DAI, false, GAS_LIMIT)
     ).wait(1);
   });
 });
