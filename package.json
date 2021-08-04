@@ -11,7 +11,8 @@
     "prepare": "husky install",
     "build": "npx tsc",
     "prepublish": "tsc",
-    "test": "jest --env=node --colors --coverage test"
+    "test": "jest --env=node --colors --coverage test",
+    "watch": "npx copy-and-watch --watch dist/** ../handle-vue/node_modules/handle-sdk/dist"
   },
   "dependencies": {
     "axios": "^0.21.1",
@@ -25,6 +26,7 @@
     "@types/dotenv": "^8.2.0",
     "@types/jest": "^26.0.23",
     "@types/node": "^15.9.0",
+    "copy-and-watch": "^0.1.5",
     "dotenv": "^10.0.0",
     "husky": "^6.0.0",
     "jest": "^27.0.3",
