@@ -178,7 +178,7 @@ export class SDK {
         addressGetter: async () => await this.contracts.handle.fxKeeperPool()
       },
       {
-        name: "Liquidator",
+        name: "liquidator",
         abi: Abi.Liquidator,
         // @ts-ignore
         addressGetter: async () => await this.contracts.handle.liquidator()
