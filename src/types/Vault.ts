@@ -324,7 +324,7 @@ export class Vault {
     const vaults: Vault[] = await Vault.query(sdk, {
       first: maxSearchCount,
       orderBy: "redeemableTokens",
-      orderDirection: "asc",
+      orderDirection: "desc",
       where: {
         fxToken: sdk.protocol.getFxTokenAddress(fxToken),
         isRedeemable: true
