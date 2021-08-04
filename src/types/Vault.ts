@@ -298,15 +298,10 @@ export class Vault {
     );
     if (accounts.length == 0) throw new Error("No vaults available for redemption");
     deadline = deadline ?? Math.floor(Date.now() / 1000) + 300;
-    console.log("accounts: ", accounts);
-    console.log("accounts length: ", accounts.length);
     // @ts-ignore
     const func: ethers.Contract = !returnTxData
       ? sdk.contracts.liquidator
       : sdk.contracts.liquidator.populateTransaction;
-    console.log("amount: ", amount);
-    console.log("token: ", sdk.protocol.getFxTokenAddress(fxToken));
-    console.log("deadline: ", deadline);
     return await func.buyCollateralFromManyVaults(
       amount,
       sdk.protocol.getFxTokenAddress(fxToken),
