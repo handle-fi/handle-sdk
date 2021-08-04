@@ -16,6 +16,7 @@ export class Vault {
   public collateral: VaultCollateral[];
   public collateralAsEth: ethers.BigNumber;
   public freeCollateralAsEth: ethers.BigNumber;
+  public redeemableTokens: ethers.BigNumber;
   public ratios: {
     current: ethers.BigNumber;
     minting: ethers.BigNumber;
@@ -29,15 +30,16 @@ export class Vault {
     this.sdk = sdk;
     this.token = fxToken;
     this.account = account;
-    this.debt = ethers.BigNumber.from(0);
-    this.debtAsEth = ethers.BigNumber.from(0);
+    this.debt = ethers.constants.Zero;
+    this.debtAsEth = ethers.constants.Zero;
     this.collateral = [];
-    this.collateralAsEth = ethers.BigNumber.from(0);
-    this.freeCollateralAsEth = ethers.BigNumber.from(0);
+    this.collateralAsEth = ethers.constants.Zero;
+    this.freeCollateralAsEth = ethers.constants.Zero;
+    this.redeemableTokens = ethers.constants.Zero;
     this.ratios = {
-      current: ethers.BigNumber.from(0),
-      minting: ethers.BigNumber.from(0),
-      liquidation: ethers.BigNumber.from(0)
+      current: ethers.constants.Zero,
+      minting: ethers.constants.Zero,
+      liquidation: ethers.constants.Zero
     };
   }
 
@@ -79,6 +81,7 @@ export class Vault {
     // Update collateral tokens.
     this.collateral = [];
     this.collateralAsEth = ethers.BigNumber.from(0);
+    this.redeemableTokens = data.redeemableTokens;
     for (let token of data.collateralTokens) {
       const collateralToken = this.sdk.protocol.getCollateralTokenByAddress(token.address);
       this.collateral.push({
@@ -190,15 +193,79 @@ export class Vault {
       }
     );
   }
+
+  public static async redeem(
+    fxToken: fxTokens,
+    amount: ethers.BigNumber,
+    sdk: SDK,
+    referral?: string,
+    returnTxData: boolean = false,
+    deadline?: number
+  ) {
+    const accounts: string[] = (await Vault.getRedeemableVaultsForAmount(fxToken, amount, sdk)).map(
+      (vault) => vault.account
+    );
+    if (accounts.length == 0) throw new Error("No vaults available for redemption");
+    deadline = deadline ?? Math.floor(Date.now() / 1000) + 300;
+    console.log("accounts: ", accounts);
+    console.log("accounts length: ", accounts.length);
+    // @ts-ignore
+    const func: ethers.Contract = !returnTxData
+      ? sdk.contracts.liquidator
+      : sdk.contracts.liquidator.populateTransaction;
+    console.log("amount: ", amount);
+    console.log("token: ", sdk.protocol.getFxTokenAddress(fxToken));
+    console.log("deadline: ", deadline);
+    return await func.buyCollateralFromManyVaults(
+      amount,
+      sdk.protocol.getFxTokenAddress(fxToken),
+      accounts,
+      deadline,
+      referral ?? ethers.constants.AddressZero
+    );
+  }
+
+  /**
+   * Finds an array of redeemable vaults which may be used to redeem up to
+   * the redeemableAmount input provided.
+   * @param fxToken The vault fxToken
+   * @param redeemableAmount The amount to redeem
+   * @param sdk The SDK instance
+   * @param maxSearchCount The max. number of vaults to find for redemption
+   */
+  public static async getRedeemableVaultsForAmount(
+    fxToken: fxTokens,
+    redeemableAmount: ethers.BigNumber,
+    sdk: SDK,
+    maxSearchCount: number = 100
+  ): Promise<Vault[]> {
+    const vaults: Vault[] = await Vault.query(sdk, {
+      first: maxSearchCount,
+      orderBy: "redeemableTokens",
+      orderDirection: "asc",
+      where: {
+        fxToken: sdk.protocol.getFxTokenAddress(fxToken),
+        isRedeemable: true
+      }
+    });
+    let redeemableCount = ethers.constants.Zero;
+    let redeemableVaults = [];
+    for (let vault of vaults) {
+      redeemableCount = redeemableCount.add(vault.redeemableTokens);
+      redeemableVaults.push(vault);
+      if (redeemableCount.gte(redeemableAmount)) break;
+    }
+    return redeemableVaults;
+  }
 }
 
 const indexedVaultDataToVaults = async (vaultData: IndexedVaultData[], sdk: SDK) => {
   const vaults = [];
 
-  for (const vd of vaultData) {
-    const v = new Vault(vd.account, tokenAddressToFxToken(vd.fxToken, sdk), sdk);
-    await v.update(vd);
-    vaults.push(v);
+  for (const data of vaultData) {
+    const vault = new Vault(data.account, tokenAddressToFxToken(data.fxToken, sdk), sdk);
+    await vault.update(data);
+    vaults.push(vault);
   }
 
   return vaults;

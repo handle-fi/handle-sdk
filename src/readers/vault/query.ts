@@ -10,6 +10,7 @@ export default (filter: string) => gql`
         address
         amount
       }
+      redeemableTokens
     }
   }
 `;

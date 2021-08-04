@@ -9,6 +9,7 @@ export type IndexedVaultData = {
   fxToken: fxTokens;
   account: string;
   collateralTokens: { address: string; amount: ethers.BigNumber }[];
+  redeemableTokens: ethers.BigNumber;
 };
 
 type QueryResponse = {
@@ -20,6 +21,7 @@ type QueryResponse = {
       address: string;
       amount: string;
     }[];
+    redeemableTokens: string;
   }[];
 };
 
@@ -40,6 +42,7 @@ export const queryVaults = async (
     debt: ethers.BigNumber.from(vault.debt),
     account: vault.account,
     fxToken: vault.fxToken as fxTokens, //  todo - map from token address to token type
+    redeemableTokens: ethers.BigNumber.from(vault.redeemableTokens),
     collateralTokens: vault.collateralTokens.map((ct) => ({
       ...ct,
       amount: ethers.BigNumber.from(ct.amount)
