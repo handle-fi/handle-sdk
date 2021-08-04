@@ -36,7 +36,7 @@ export const queryFxTokens = async (
 
   return tokens.map((t) => ({
     ...t,
-    address: t.id,
+    address: t.id.toLowerCase(),
     totalSupply: ethers.BigNumber.from(t.totalSupply),
     rate: ethers.BigNumber.from(t.rate)
   }));
