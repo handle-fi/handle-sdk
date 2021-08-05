@@ -23,6 +23,11 @@ export class Vault {
     /** Always 80% of the minting ratio, or the minimum possible value of 110% */
     liquidation: ethers.BigNumber;
   };
+  public collateralAsEther: ethers.BigNumber;
+  public collateralRatio: ethers.BigNumber;
+  public minimumRatio: ethers.BigNumber;
+  public isRedeemable: boolean;
+  public isLiquidatable: boolean;
 
   constructor(account: string, token: fxTokens, sdk: SDK) {
     const fxToken = sdk.protocol.getFxTokenBySymbol(token);
@@ -36,6 +41,11 @@ export class Vault {
     this.collateralAsEth = ethers.constants.Zero;
     this.freeCollateralAsEth = ethers.constants.Zero;
     this.redeemableTokens = ethers.constants.Zero;
+    this.collateralAsEther = ethers.constants.Zero;
+    this.collateralRatio = ethers.constants.Zero;
+    this.minimumRatio = ethers.constants.Zero;
+    this.isRedeemable = false;
+    this.isLiquidatable = false;
     this.ratios = {
       current: ethers.constants.Zero,
       minting: ethers.constants.Zero,
@@ -92,6 +102,11 @@ export class Vault {
         token.amount.mul(collateralToken.rate.div(ethers.constants.WeiPerEther))
       );
     }
+    this.collateralAsEther = data.collateralAsEther;
+    this.collateralRatio = data.collateralRatio;
+    this.minimumRatio = data.minimumRatio;
+    this.isRedeemable = data.isRedeemable;
+    this.isLiquidatable = data.isLiquidatable;
     if (this.collateralAsEth.eq(0)) return;
     // Set minting ratio.
     this.ratios.minting = await this.sdk.contracts.vaultLibrary.getMinimumRatio(

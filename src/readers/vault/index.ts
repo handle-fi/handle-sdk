@@ -1,15 +1,20 @@
 ﻿import query from "./query";
 import { ethers } from "ethers";
 import { GraphQLClient } from "graphql-request/dist";
-import { fxTokens } from "../../types/ProtocolTokens";
 import { buildFilter } from "../utils";
 
 export type IndexedVaultData = {
   debt: ethers.BigNumber;
-  fxToken: fxTokens;
+  /** fxToken address */
+  fxToken: string;
   account: string;
   collateralTokens: { address: string; amount: ethers.BigNumber }[];
   redeemableTokens: ethers.BigNumber;
+  collateralAsEther: ethers.BigNumber;
+  collateralRatio: ethers.BigNumber;
+  minimumRatio: ethers.BigNumber;
+  isRedeemable: boolean;
+  isLiquidatable: boolean;
 };
 
 type QueryResponse = {
@@ -22,6 +27,11 @@ type QueryResponse = {
       amount: string;
     }[];
     redeemableTokens: string;
+    collateralAsEther: string;
+    collateralRatio: string;
+    minimumRatio: string;
+    isRedeemable: string;
+    isLiquidatable: string;
   }[];
 };
 
@@ -41,11 +51,16 @@ export const queryVaults = async (
   return data.vaults.map((vault) => ({
     debt: ethers.BigNumber.from(vault.debt),
     account: vault.account,
-    fxToken: vault.fxToken as fxTokens, //  todo - map from token address to token type
-    redeemableTokens: ethers.BigNumber.from(vault.redeemableTokens),
+    fxToken: vault.fxToken,
     collateralTokens: vault.collateralTokens.map((ct) => ({
       ...ct,
       amount: ethers.BigNumber.from(ct.amount)
-    }))
+    })),
+    redeemableTokens: ethers.BigNumber.from(vault.redeemableTokens),
+    collateralAsEther: ethers.BigNumber.from(vault.collateralAsEther),
+    collateralRatio: ethers.BigNumber.from(vault.collateralRatio),
+    minimumRatio: ethers.BigNumber.from(vault.minimumRatio),
+    isRedeemable: JSON.parse(vault.isRedeemable),
+    isLiquidatable: JSON.parse(vault.isLiquidatable)
   }));
 };

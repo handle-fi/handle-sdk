@@ -11,6 +11,11 @@ export default (filter: string) => gql`
         amount
       }
       redeemableTokens
+      collateralAsEther
+      collateralRatio
+      minimumRatio
+      isRedeemable
+      isLiquidatable
     }
   }
 `;
