@@ -22,10 +22,16 @@ describe("Readers: vault", function () {
       }
     });
 
+    // Schema validation.
     expect(data).toBeTruthy();
-    expect(data.debt.gt(0));
-    expect(data.collateralTokens.length > 0);
-    expect(data.collateralTokens[0].amount.gt(0));
+    expect(data.debt._isBigNumber).toBeTruthy();
+    expect(typeof data.collateralTokens.length).toBe("number");
+    expect(Array.isArray(data.collateralTokens)).toBeTruthy();
+    expect(data.collateralAsEther._isBigNumber).toBeTruthy();
+    expect(data.collateralRatio._isBigNumber).toBeTruthy();
+    expect(data.minimumRatio._isBigNumber).toBeTruthy();
+    expect(data.isLiquidatable).not.toBeNull();
+    expect(data.isRedeemable).not.toBeNull();
   });
 
   it("Should return multiple indexed vaults", async () => {
