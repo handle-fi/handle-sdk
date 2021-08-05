@@ -1,4 +1,4 @@
-import { describe, it } from "@jest/globals";
+import { xdescribe, it } from "@jest/globals";
 import { SDK } from "../../src/types/SDK";
 import { Vault } from "../../src/types/Vault";
 import { fxTokens } from "../../src/types/ProtocolTokens";
@@ -11,7 +11,7 @@ let vault: Vault;
 const BURN_AMOUNT = ethers.utils.parseEther("0.0000000000000001");
 const GAS_LIMIT = ethers.BigNumber.from("2500000");
 
-describe("Vault: burn", function () {
+xdescribe("Vault: burn", function () {
   beforeAll(async () => {
     sdk = getSDK();
     const account = await sdk.signer?.getAddress()!;
