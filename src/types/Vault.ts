@@ -6,6 +6,8 @@ import { IndexedVaultData, queryVaults } from "../readers/vault";
 import { CollateralTokens, fxTokens } from "./ProtocolTokens";
 import { tokenAddressToFxToken } from "./utils";
 
+// TODO: A WebSocket connection to the graph node must be maintained so that whenever
+// a vault instance has a state change it can be properly updated.
 export class Vault {
   private sdk: SDK;
   /** Address for the owner of the vault */
