@@ -25,7 +25,6 @@ export class Vault {
     /** Always 80% of the minting ratio, or the minimum possible value of 110% */
     liquidation: ethers.BigNumber;
   };
-  public collateralAsEther: ethers.BigNumber;
   public collateralRatio: ethers.BigNumber;
   public minimumRatio: ethers.BigNumber;
   public isRedeemable: boolean;
@@ -43,7 +42,6 @@ export class Vault {
     this.collateralAsEth = ethers.constants.Zero;
     this.freeCollateralAsEth = ethers.constants.Zero;
     this.redeemableTokens = ethers.constants.Zero;
-    this.collateralAsEther = ethers.constants.Zero;
     this.collateralRatio = ethers.constants.Zero;
     this.minimumRatio = ethers.constants.Zero;
     this.isRedeemable = false;
@@ -100,11 +98,8 @@ export class Vault {
         token: collateralToken,
         amount: token.amount
       });
-      this.collateralAsEth = this.collateralAsEth.add(
-        token.amount.mul(collateralToken.rate.div(ethers.constants.WeiPerEther))
-      );
     }
-    this.collateralAsEther = data.collateralAsEther;
+    this.collateralAsEth = data.collateralAsEther;
     this.collateralRatio = data.collateralRatio;
     this.minimumRatio = data.minimumRatio;
     this.isRedeemable = data.isRedeemable;
