@@ -80,8 +80,10 @@ export class Vault {
       vaultData ||
       (
         await queryVaults(this.sdk.gqlClient, {
-          account: this.account,
-          fxToken: this.token.address
+          where: {
+            account: this.account,
+            fxToken: this.token.address
+          }
         })
       )[0];
 
