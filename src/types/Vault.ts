@@ -87,6 +87,8 @@ export class Vault {
         })
       )[0];
 
+    if (data == null) return;
+
     // Update debt.
     this.debt = data.debt;
     this.debtAsEth = this.debt.mul(this.token.rate).div(ethers.constants.WeiPerEther);
