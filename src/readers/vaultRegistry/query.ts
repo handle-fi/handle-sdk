@@ -3,6 +3,7 @@
 export default gql`
   query {
     vaultRegistries {
+      id
       owners
     }
   }
