@@ -77,7 +77,7 @@ export class Protocol {
 
   public getCollateralTokenBySymbol(symbol: CollateralTokens): CollateralToken {
     const token = this.collateralTokens.find((x) => x.symbol === symbol);
-    if (!token) throw new Error(`fxToken "${symbol}" not found`);
+    if (!token) throw new Error(`Collateral token "${symbol}" not found`);
     return token;
   }
 
