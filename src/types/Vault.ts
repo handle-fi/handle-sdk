@@ -118,7 +118,7 @@ export class Vault {
     this.ratios.current = this.debtAsEth.gt(0)
       ? this.collateralAsEth.mul(ethers.constants.WeiPerEther).div(this.debtAsEth)
       : ethers.constants.Zero;
-    this.ratios.liquidation = this.ratios.current.mul("80").div("100");
+    this.ratios.liquidation = this.ratios.minting.mul("80").div("100");
     const minLiquidationRatio = ethers.utils.parseEther("1.1");
     if (this.ratios.liquidation.lt(minLiquidationRatio))
       this.ratios.liquidation = minLiquidationRatio;
