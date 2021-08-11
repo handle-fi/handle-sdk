@@ -29,6 +29,7 @@ export class Vault {
   public minimumRatio: ethers.BigNumber;
   public isRedeemable: boolean;
   public isLiquidatable: boolean;
+  public liquidationFee: ethers.BigNumber;
 
   constructor(account: string, token: fxTokens, sdk: SDK) {
     const fxToken = sdk.protocol.getFxTokenBySymbol(token);
@@ -51,6 +52,7 @@ export class Vault {
       minting: ethers.constants.Zero,
       liquidation: ethers.constants.Zero
     };
+    this.liquidationFee = ethers.constants.Zero;
   }
 
   public static async query(sdk: SDK, filter: any): Promise<Vault[]> {
@@ -109,6 +111,11 @@ export class Vault {
     this.isRedeemable = data.isRedeemable;
     this.isLiquidatable = data.isLiquidatable;
     if (this.collateralAsEth.eq(0)) return;
+    // TODO: calculate collateral shares locally to remove contract calls
+    this.liquidationFee = await this.sdk.contracts.vaultLibrary.getLiquidationFee(
+      this.account,
+      this.token.address
+    );
     // Set minting ratio.
     this.ratios.minting = await this.sdk.contracts.vaultLibrary.getMinimumRatio(
       this.account,
