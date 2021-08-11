@@ -209,7 +209,7 @@ export class Vault {
 
   public async depositCollateral(
     amount: ethers.BigNumber,
-    collateralToken: CollateralTokens,
+    collateralToken: CollateralTokens | "ETH",
     returnTxData: boolean = false,
     gasLimit?: ethers.BigNumber,
     gasPrice?: ethers.BigNumber,
@@ -221,7 +221,7 @@ export class Vault {
       ? this.sdk.contracts.treasury
       : this.sdk.contracts.treasury.populateTransaction;
 
-    if (collateralToken === CollateralTokens.WETH) {
+    if (collateralToken === "ETH") {
       return await func.depositCollateralETH(
         this.account,
         this.token.address,
