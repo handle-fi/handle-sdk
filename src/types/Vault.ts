@@ -241,27 +241,22 @@ export class Vault {
       );
     }
 
-    const allowance = await this.sdk.contracts[collateralToken].allowance(
+    const collateral = this.sdk.contracts[collateralToken];
+    const allowance = await collateral.allowance(
       this.account,
       this.sdk.contracts.treasury.address
     );
 
     if (allowance.lt(amount)) {
       await (
-        await this.sdk.contracts[collateralToken].approve(
-          this.sdk.contracts.treasury.address,
-          amount
-        )
+        await collateral.approve(this.sdk.contracts.treasury.address, amount)
       ).wait(2);
     }
-
-    const collateralTokenAddress =
-      this.sdk.protocol.getCollateralTokenBySymbol(collateralToken).address;
 
     return await func.depositCollateral(
       this.account,
       amount,
-      collateralTokenAddress,
+      collateral.address,
       this.token.address,
       referral ?? ethers.constants.AddressZero,
       {
@@ -273,7 +268,7 @@ export class Vault {
 
   public async withdrawCollateral(
     amount: ethers.BigNumber,
-    collateralToken: CollateralTokens,
+    collateralToken: CollateralTokens | "ETH",
     returnTxData: boolean = false,
     gasLimit?: ethers.BigNumber,
     gasPrice?: ethers.BigNumber
@@ -284,7 +279,7 @@ export class Vault {
       ? this.sdk.contracts.treasury
       : this.sdk.contracts.treasury.populateTransaction;
 
-    if (collateralToken === CollateralTokens.WETH) {
+    if (collateralToken === "ETH") {
       return await func.withdrawCollateralETH(this.account, amount, this.token.address, {
         gasPrice: gasPrice,
         gasLimit: gasLimit
