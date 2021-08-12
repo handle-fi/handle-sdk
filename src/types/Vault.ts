@@ -111,6 +111,9 @@ export class Vault {
     this.isRedeemable = data.isRedeemable;
     this.isLiquidatable = data.isLiquidatable;
     if (this.collateralAsEth.eq(0)) return;
+    this.freeCollateralAsEth = this.collateralAsEth.sub(
+      this.debtAsEth.mul(this.minimumRatio).div(ethers.constants.WeiPerEther)
+    );
     // TODO: calculate collateral shares locally to remove contract calls
     this.liquidationFee = await this.sdk.contracts.vaultLibrary.getLiquidationFee(
       this.account,
