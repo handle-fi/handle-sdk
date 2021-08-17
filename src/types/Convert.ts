@@ -20,6 +20,8 @@ const HANDLE_TOKEN_TYPES: { [key: string]: string } = {
   EURS: "EURO"
 };
 
+const HANDLE_FEE_ADDRESS = "0x19835c8126d1c56c83A746DfDc9738Bb4a987B9B";
+
 export class Convert {
   private client: AxiosInstance;
   private tokenAddressToType: { [key: string]: string } | undefined;
@@ -69,7 +71,8 @@ export class Convert {
         sellToken,
         sellAmount: sellAmount?.toString(),
         buyAmount: buyAmount?.toString(),
-        feeRecipient: "0x19835c8126d1c56c83A746DfDc9738Bb4a987B9B",
+        feeRecipient: HANDLE_FEE_ADDRESS,
+        affiliateAddress: HANDLE_FEE_ADDRESS,
         buyTokenPercentageFee: this.getFees(buyToken, sellToken),
         slippagePercentage: Number(slippagePercentage) / 100,
         gasPrice: gasPriceInWei
