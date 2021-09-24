@@ -25,7 +25,7 @@ const HANDLE_TOKEN_TYPES: { [key: string]: string } = {
   EURS: "EURO"
 };
 
-const HANDLE_FEE_ADDRESS = "0x19835c8126d1c56c83A746DfDc9738Bb4a987B9B";
+const HANDLE_FEE_ADDRESS = "0xFa2c1bE677BE4BEc8851D1577B343F7060B51E3A";
 
 export class Convert {
   private client: AxiosInstance;
