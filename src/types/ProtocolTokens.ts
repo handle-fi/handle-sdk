@@ -2,7 +2,8 @@
   fxAUD = "fxAUD",
   fxEUR = "fxEUR",
   fxKRW = "fxKRW",
-  fxCNY = "fxCNY"
+  fxCNY = "fxCNY",
+  fxPHP = "fxPHP"
 }
 
 export enum CollateralTokens {

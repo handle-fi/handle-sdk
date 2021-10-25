@@ -33,6 +33,7 @@ export class SDK {
     vaultLibrary: ethers.Contract;
     liquidator: ethers.Contract;
     [fxTokens.fxAUD]: ethers.Contract;
+    [fxTokens.fxPHP]: ethers.Contract;
     [fxTokens.fxEUR]: ethers.Contract;
     [fxTokens.fxKRW]: ethers.Contract;
     [fxTokens.fxCNY]: ethers.Contract;
@@ -225,7 +226,10 @@ export class SDK {
 
     const usersActiveVaults = await Vault.getUsersVaults(account, this);
     const usersInactiveVaults = fxTokensArray
-      .filter((fxToken) => !usersActiveVaults.find((v) => v.token === fxToken))
+      .filter((fxToken) =>
+        !usersActiveVaults.find((v) => v.token === fxToken) &&
+        this.contracts[fxToken as fxTokens] != null 
+      )
       .map((fxToken) => new Vault(account, fxToken as fxTokens, this));
 
     this.vaults = [...usersActiveVaults, ...usersInactiveVaults];
@@ -234,6 +238,7 @@ export class SDK {
   private initialiseKeeperPools() {
     for (let fxTokenSymbol of fxTokensArray) {
       const token = fxTokenSymbol as fxTokens;
+      if (this.contracts[token] == null) continue;
       this.keeperPools[token] = new fxKeeperPool(this, token, this.contracts.fxKeeperPool);
     }
   }
