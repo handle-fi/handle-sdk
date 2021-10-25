@@ -35,6 +35,9 @@ type NetworkConfig = {
 };
 
 export class Config {
+  static feeAddress = "0xFa2c1bE677BE4BEc8851D1577B343F7060B51E3A";
+  static forexTokenAddress = "0xDb298285FE4C5410B05390cA80e8Fbe9DE1F259B";
+
   static getNetworkConfig(network: ethers.providers.Network): NetworkConfig {
     const configObject = config.networks.find((x) => x.chainId === network.chainId);
     if (!configObject) throw new Error(`Network "${network}" is not supported`);
