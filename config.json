@@ -1,8 +1,9 @@
 ﻿{
   "networks": [
     {
-      "name": "homestead",
-      "chainId": 1,
+      "name": "arbitrum",
+      "chainId": 42161,
+      "handleAddress": "0xA112D1bFd43fcFbF2bE2eBFcaebD6B6DB73aaD8B",
       "theGraphEndpoint": "https://api.thegraph.com/subgraphs/name/handle-fi/handle"
     },
     {
