@@ -120,6 +120,14 @@
     "displayDecimals": 4
   },
   {
+    "symbol": "FOREX",
+    "name": "handle.fi",
+    "address": "0xdb298285fe4c5410b05390ca80e8fbe9de1f259b",
+    "decimals": 18,
+    "icon": "https://handle.fi/images/handle.fiFOREXLogoLight200x200.png",
+    "displayDecimals": 4
+  },
+  {
     "symbol": "FUSE",
     "name": "Fuse Token",
     "decimals": 18,
