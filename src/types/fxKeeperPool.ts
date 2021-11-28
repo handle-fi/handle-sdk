@@ -16,7 +16,6 @@ export class fxKeeperPool {
   /** fxToken contract */
   private erc20: ethers.Contract;
   public token: string;
-  public gasLimit: ethers.BigNumber;
 
   /**
    * @param sdk The SDK instance.
@@ -27,7 +26,6 @@ export class fxKeeperPool {
     this.erc20 = sdk.contracts[token];
     this.token = this.erc20.address;
     this.contract = contract;
-    this.gasLimit = ethers.BigNumber.from("750000");
   }
 
   /**
@@ -40,28 +38,22 @@ export class fxKeeperPool {
       this.contract.address
     );
     if (allowance.gte(amount)) return;
-    await (await this.erc20.approve(this.contract.address, amount)).wait(1);
+    await (await this.erc20.approve(this.contract.address, ethers.constants.MaxUint256)).wait(1);
   }
 
   public async stake(amount: ethers.BigNumber, referral?: string) {
     if (amount.lt(0)) throw new Error("Amount must be greater than 0");
     await this.ensureAllowance(amount);
-    return await this.contract.stake(amount, this.token, referral ?? ethers.constants.AddressZero, {
-      gasLimit: this.gasLimit
-    });
+    return await this.contract.stake(amount, this.token, referral ?? ethers.constants.AddressZero);
   }
 
   public async unstake(amount: ethers.BigNumber) {
     if (amount.lt(0)) throw new Error("Amount must be greater than 0");
-    return await this.contract.unstake(amount, this.token, {
-      gasLimit: this.gasLimit
-    });
+    return await this.contract.unstake(amount, this.token);
   }
 
   public async withdrawCollateralReward() {
-    return await this.contract.withdrawCollateralReward(this.token, {
-      gasLimit: this.gasLimit
-    });
+    return await this.contract.withdrawCollateralReward(this.token);
   }
 
   public async balanceOfStake(account: string): Promise<ethers.BigNumber> {
@@ -77,9 +69,7 @@ export class fxKeeperPool {
   }
 
   public async liquidate(account: string) {
-    return await this.contract.liquidate(account, this.token, {
-      gasLimit: this.gasLimit
-    });
+    return await this.contract.liquidate(account, this.token);
   }
 
   public async getPoolCollateralBalance(collateral: CollateralToken): Promise<ethers.BigNumber> {

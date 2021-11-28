@@ -226,9 +226,10 @@ export class SDK {
 
     const usersActiveVaults = await Vault.getUsersVaults(account, this);
     const usersInactiveVaults = fxTokensArray
-      .filter((fxToken) =>
-        !usersActiveVaults.find((v) => v.token === fxToken) &&
-        this.contracts[fxToken as fxTokens] != null 
+      .filter(
+        (fxToken) =>
+          !usersActiveVaults.find((v) => v.token.symbol === fxToken) &&
+          this.contracts[fxToken as fxTokens] != null
       )
       .map((fxToken) => new Vault(account, fxToken as fxTokens, this));
 

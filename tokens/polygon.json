@@ -344,6 +344,70 @@
     "displayDecimals": 4
   },
   {
+    "symbol": "FOREX",
+    "name": "handle.fi",
+    "address": "0xDb298285FE4C5410B05390cA80e8Fbe9DE1F259B",
+    "decimals": 18,
+    "icon": "https://handle.fi/images/handle.fiFOREXLogoLight200x200.png",
+    "displayDecimals": 4
+  },
+  {
+    "symbol": "fxAUD",
+    "name": "fxAUD",
+    "address": "0x7E141940932E3D13bfa54B224cb4a16510519308",
+    "decimals": 18,
+    "icon": "https://app.handle.fi/fxAUDDarkLogo.png",
+    "displayDecimals": 4
+  },
+  {
+    "symbol": "fxPHP",
+    "name": "fxPHP",
+    "address": "0x3d147cD9aC957B2a5F968dE9d1c6B9d0872286a0",
+    "decimals": 18,
+    "icon": "https://app.handle.fi/fxPHPDarkLogo.png",
+    "displayDecimals": 4
+  },
+  {
+    "symbol": "fxUSD",
+    "name": "fxUSD",
+    "address": "0x8616E8EA83f048ab9A5eC513c9412Dd2993bcE3F",
+    "decimals": 18,
+    "icon": "https://app.handle.fi/fxUSDDarkLogo.png",
+    "displayDecimals": 4
+  },
+  {
+    "symbol": "fxEUR",
+    "name": "fxEUR",
+    "address": "0x116172B2482c5dC3E6f445C16Ac13367aC3FCd35",
+    "decimals": 18,
+    "icon": "https://app.handle.fi/fxEURDarkLogo.png",
+    "displayDecimals": 4
+  },
+  {
+    "symbol": "fxCNY",
+    "name": "fxCNY",
+    "address": "0x2C29daAce6Aa05e3b65743EFd61f8A2C448302a3",
+    "decimals": 18,
+    "icon": "https://app.handle.fi/fxCNYDarkLogo.png",
+    "displayDecimals": 4
+  },
+  {
+    "symbol": "fxCHF",
+    "name": "fxCHF",
+    "address": "0x8C414cB8A9Af9F7B03673e93DF73c23C1aa05b4e",
+    "decimals": 18,
+    "icon": "https://app.handle.fi/fxCHFDarkLogo.png",
+    "displayDecimals": 4
+  },
+  {
+    "symbol": "fxKRW",
+    "name": "fxKRW",
+    "address": "0xF4E8BA79d058fFf263Fd043Ef50e1010c1BdF991",
+    "decimals": 18,
+    "icon": "https://app.handle.fi/fxKRWDarkLogo.png",
+    "displayDecimals": 4
+  },
+  {
     "symbol": "FRAX",
     "name": "Frax",
     "address": "0x104592a158490a9228070e0a8e5343b499e125d0",

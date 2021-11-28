@@ -6,6 +6,8 @@ import { IndexedVaultData, queryVaults } from "../readers/vault";
 import { CollateralTokens, fxTokens } from "./ProtocolTokens";
 import { tokenAddressToFxToken } from "./utils";
 
+const oneEth = ethers.utils.parseEther("1");
+
 // TODO: A WebSocket connection to the graph node must be maintained so that whenever
 // a vault instance has a state change it can be properly updated.
 export class Vault {
@@ -134,6 +136,143 @@ export class Vault {
       this.ratios.liquidation = minLiquidationRatio;
   }
 
+  private calculateTokensRequiredForCrIncrease(
+    crTarget: ethers.BigNumber,
+    debtAsEther: ethers.BigNumber,
+    collateralAsEther: ethers.BigNumber,
+    collateralReturnRatio: ethers.BigNumber
+  ) {
+    const nominator = crTarget.mul(debtAsEther).sub(collateralAsEther.mul(oneEth));
+    const denominator = crTarget.sub(collateralReturnRatio);
+    return nominator.div(denominator);
+  }
+
+  public async updateFromChain() {
+    const promises = [];
+
+    // Get debt.
+    promises.push(
+      new Promise<void>(async (resolve) => {
+        this.debt = await this.sdk.contracts.handle.getDebt(this.account, this.token.address);
+        resolve();
+      })
+    );
+
+    // Get total collateral
+    promises.push(
+      new Promise<void>(async (resolve) => {
+        this.collateralAsEth = await this.sdk.contracts.vaultLibrary.getTotalCollateralBalanceAsEth(
+          this.account,
+          this.token.address
+        );
+        resolve();
+      })
+    );
+
+    // Get min CR
+    promises.push(
+      new Promise<void>(async (resolve) => {
+        this.minimumRatio = this.ratios.minting =
+          await this.sdk.contracts.vaultLibrary.getMinimumRatio(this.account, this.token.address);
+        resolve();
+      })
+    );
+
+    // Get liquidation fee
+    promises.push(
+      new Promise<void>(async (resolve) => {
+        this.liquidationFee = await this.sdk.contracts.vaultLibrary.getLiquidationFee(
+          this.account,
+          this.token.address
+        );
+        resolve();
+      })
+    );
+
+    // Get token price
+    let tokenPrice = ethers.constants.Zero;
+    promises.push(
+      new Promise<void>(async (resolve) => {
+        tokenPrice = await this.sdk.contracts.handle.getTokenPrice(this.token.address);
+        resolve();
+      })
+    );
+
+    // Update collateral tokens.
+    this.collateral = [];
+
+    for (let coll of this.sdk.protocol.collateralTokens) {
+      promises.push(
+        new Promise<void>(async (resolve) => {
+          const collateralAmount = await this.sdk.contracts.handle.getCollateralBalance(
+            this.account,
+            coll.address,
+            this.token.address
+          );
+
+          this.collateral.push({
+            token: coll,
+            amount: collateralAmount
+          });
+
+          resolve();
+        })
+      );
+    }
+
+    await Promise.all(promises);
+
+    // Update debt as ETH
+    this.debtAsEth = this.debt.mul(this.token.rate).div(ethers.constants.WeiPerEther);
+
+    // Get CR
+    this.collateralRatio = this.debtAsEth.gt(0)
+      ? this.collateralAsEth.mul(oneEth).div(this.debtAsEth)
+      : ethers.constants.Zero;
+
+    // Determine if redeemable
+    this.isRedeemable =
+      this.collateralRatio.lt(this.minimumRatio) &&
+      this.collateralRatio.gte(oneEth) &&
+      this.collateralAsEth.gt(ethers.constants.Zero) &&
+      this.debt.gt(ethers.constants.Zero);
+
+    if (this.isRedeemable) {
+      const redeemableAsEth = this.calculateTokensRequiredForCrIncrease(
+        this.minimumRatio,
+        this.debtAsEth,
+        this.collateralAsEth,
+        oneEth
+      );
+
+      this.redeemableTokens = this.isRedeemable
+        ? redeemableAsEth.mul(oneEth).div(tokenPrice)
+        : ethers.constants.Zero;
+
+      if (this.redeemableTokens.gt(this.debt)) this.redeemableTokens = this.debt;
+    } else if (this.redeemableTokens.gt(ethers.constants.Zero))
+      this.redeemableTokens = ethers.constants.Zero;
+
+    // Determine if liquidatable
+    const liquidationRatio = this.ratios.minting.mul("80").div("100");
+    this.isLiquidatable = this.isRedeemable && this.collateralRatio.lt(liquidationRatio);
+
+    // If no collateral, no need to set/update the below
+    if (this.collateralAsEth.eq(0)) return;
+
+    // Calculate free collateral
+    this.freeCollateralAsEth = this.collateralAsEth.sub(
+      this.debtAsEth.mul(this.minimumRatio).div(ethers.constants.WeiPerEther)
+    );
+
+    // Set current and liquidation ratios.
+    this.ratios.current = this.collateralRatio;
+    const minLiquidationRatio = ethers.utils.parseEther("1.1");
+    if (this.ratios.liquidation.lt(minLiquidationRatio))
+      this.ratios.liquidation = minLiquidationRatio;
+    console.log("Liquidation:", ethers.utils.formatEther(this.ratios.liquidation));
+  }
+
   /** Mints using Ether as collateral */
   public async mintWithEth(
     tokenAmount: ethers.BigNumber,
@@ -245,15 +384,10 @@ export class Vault {
     }
 
     const collateral = this.sdk.contracts[collateralToken];
-    const allowance = await collateral.allowance(
-      this.account,
-      this.sdk.contracts.treasury.address
-    );
+    const allowance = await collateral.allowance(this.account, this.sdk.contracts.treasury.address);
 
     if (allowance.lt(amount)) {
-      await (
-        await collateral.approve(this.sdk.contracts.treasury.address, amount)
-      ).wait(2);
+      await (await collateral.approve(this.sdk.contracts.treasury.address, amount)).wait(2);
     }
 
     return await func.depositCollateral(
