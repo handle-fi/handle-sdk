@@ -8,6 +8,7 @@ import Treasury from "../../abi/Treasury.json";
 import VaultLibrary from "../../abi/VaultLibrary.json";
 import Liquidator from "../../abi/Liquidator.json";
 import GovernanceLock from "../../abi/GovernanceLock.json";
+import RewardPool from "../../abi/RewardPool.json";
 
 export enum Abi {
   Handle = "Handle",
@@ -17,7 +18,8 @@ export enum Abi {
   Treasury = "Treasury",
   VaultLibrary = "VaultLibrary",
   Liquidator = "Liquidator",
-  GovernanceLock = "GovernanceLock"
+  GovernanceLock = "GovernanceLock",
+  RewardPool = "RewardPool"
 }
 
 const abi = {
@@ -28,7 +30,8 @@ const abi = {
   [Abi.Treasury]: Treasury,
   [Abi.VaultLibrary]: VaultLibrary,
   [Abi.Liquidator]: Liquidator,
-  [Abi.GovernanceLock]: GovernanceLock
+  [Abi.GovernanceLock]: GovernanceLock,
+  [Abi.RewardPool]: RewardPool
 };
 
 export type NetworkConfig = {

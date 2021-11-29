@@ -32,6 +32,7 @@ export class SDK {
     fxKeeperPool: ethers.Contract;
     vaultLibrary: ethers.Contract;
     liquidator: ethers.Contract;
+    rewardPool: ethers.Contract;
     governanceLock: ethers.Contract;
     [fxTokens.fxAUD]: ethers.Contract;
     [fxTokens.fxPHP]: ethers.Contract;
@@ -186,6 +187,12 @@ export class SDK {
         abi: Abi.Liquidator,
         // @ts-ignore
         addressGetter: async () => await this.contracts.handle.liquidator()
+      },
+      {
+        name: "rewardPool",
+        abi: Abi.RewardPool,
+        // @ts-ignore
+        addressGetter: async () => await this.contracts.handle.rewards() 
       },
       {
         name: "governanceLock",
