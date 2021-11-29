@@ -34,6 +34,7 @@ export class SDK {
     liquidator: ethers.Contract;
     rewardPool: ethers.Contract;
     governanceLock: ethers.Contract;
+    forex: ethers.Contract;
     [fxTokens.fxAUD]: ethers.Contract;
     [fxTokens.fxPHP]: ethers.Contract;
     [fxTokens.fxEUR]: ethers.Contract;
@@ -193,6 +194,12 @@ export class SDK {
         abi: Abi.RewardPool,
         // @ts-ignore
         addressGetter: async () => await this.contracts.handle.rewards() 
+      },
+      {
+        name: "forex",
+        abi: Abi.ERC20,
+        // @ts-ignore
+        addressGetter: async () => await this.contracts.handle.forex() 
       },
       {
         name: "governanceLock",
