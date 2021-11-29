@@ -1,6 +1,6 @@
 {
   "name": "handle-sdk",
-  "version": "0.1.30",
+  "version": "0.1.31",
   "description": "handle.fi sdk",
   "main": "dist/src/index.js",
   "repository": "https://github.com/handle-fi/handle-sdk",
