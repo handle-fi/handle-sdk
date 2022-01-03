@@ -608,6 +608,14 @@
     "displayDecimals": 4
   },
   {
+    "symbol": "MIM",
+    "name": "Magic Internet Money",
+    "decimals": 18,
+    "address": "0x947ce96ce904a6c441a06d43895b753792e5f2d8",
+    "icon": "https://tokens.1inch.exchange/0xfea7a6a0b346362bf88a9e4a88416b77a57d6c2a.png",
+    "displayDecimals": 4
+  },
+  {
     "symbol": "miMATIC",
     "name": "miMATIC",
     "address": "0xa3fa99a148fa48d14ed51d610c367c61876997f1",
