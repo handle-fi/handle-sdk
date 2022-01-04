@@ -240,6 +240,14 @@
     "displayDecimals": 4
   },
   {
+    "symbol": "MIM",
+    "name": "Magic Internet Money",
+    "decimals": 18,
+    "address": "0xfea7a6a0b346362bf88a9e4a88416b77a57d6c2a",
+    "icon": "https://tokens.1inch.exchange/0xfea7a6a0b346362bf88a9e4a88416b77a57d6c2a.png",
+    "displayDecimals": 4
+  },
+  {
     "symbol": "MKR",
     "name": "Maker",
     "decimals": 18,
