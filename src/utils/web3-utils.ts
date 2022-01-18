@@ -3,11 +3,9 @@ import config from "../config";
 import { Network } from "../types/web3";
 
 export const getNetworkName = (network: ethers.providers.Network): Network => {
-  const result = Object.entries(config.networkNameToId).find(
-    ([_networkName, networkId]) => {
-      return network.chainId === networkId;
-    },
-  );
+  const result = Object.entries(config.networkNameToId).find(([_networkName, networkId]) => {
+    return network.chainId === networkId;
+  });
 
   return (result ? result[0] : network.name) as Network;
 };

@@ -1,52 +1,92 @@
 import { ethers } from "ethers";
-import { FxTokenSymbol, FxTokenSymbolMap } from "..";
+import { FxTokenSymbolMap, FxTokenSymbol } from "../types/fxTokens";
 import config, { ChainlinkFeeds } from "../config";
-import { ChainlinkAggregator__factory } from "../types/abi";
+import { ChainlinkAggregator__factory, ChainlinkAggregator } from "../contracts";
+import { createMultiCallContract } from "../utils/contract-utils";
+import { ContractCall, Provider as MultiCallProvider } from "ethers-multicall";
+import chainlinkAggregatorAbi from "../abis/chainlink-aggregator.json";
 
-type SupportedNetwork = "arbitrum";
+export type Price = {
+  bn: ethers.BigNumber;
+  number: number;
+};
 
-const SUPPORTED_NETWORKS: SupportedNetwork[] = ["arbitrum"];
-
+type PricesConfig = {
+  feeds: ChainlinkFeeds;
+  chainId: number;
+};
 export default class Prices {
-  private config: ChainlinkFeeds;
+  private config: PricesConfig;
 
-  constructor(
-    network: SupportedNetwork,
-    private signerOrProvider: ethers.providers.Provider | ethers.Signer
-  ) {
-    if (!SUPPORTED_NETWORKS.includes(network)) {
-      throw new Error(`Prices - Unsupported network: ${network}`);
-    }
-    this.config = config.byNetwork[network].addresses.chainlinkFeeds;
+  constructor(c?: PricesConfig) {
+    this.config = c || {
+      feeds: config.byNetwork.arbitrum.addresses.chainlinkFeeds,
+      chainId: config.networkNameToId.arbitrum
+    };
   }
 
-  public getEthUsdPrice = (): Promise<ethers.BigNumber> => {
-    return this.getPrice(this.config.eth_usd, this.signerOrProvider);
+  public getEthUsdPrice = async (signer: ethers.Signer): Promise<Price> => {
+    const aggregator = ChainlinkAggregator__factory.connect(this.config.feeds.eth_usd, signer);
+    const bn = await aggregator.latestAnswer();
+    const number = this.chainlinkPriceToNumber(bn);
+
+    return {
+      bn,
+      number
+    };
   };
 
-  public getFxTokenTargetUsdPrice = (token: FxTokenSymbol) => {
-    if (token === "fxUSD") {
-      return ethers.utils.parseUnits("1", 8);
-    }
+  public getFxTokenTargetUsdPrices = async (
+    signer: ethers.Signer
+  ): Promise<FxTokenSymbolMap<Price>> => {
+    const provider = new MultiCallProvider(signer.provider!, this.config.chainId);
 
     const fxTokenSymbolToFeedAddressMap: FxTokenSymbolMap<string> = {
-      fxAUD: this.config.aud_usd,
-      fxPHP: this.config.php_usd,
-      fxUSD: this.config.usd_usd,
-      fxEUR: this.config.eur_usd,
-      fxKRW: this.config.krw_usd,
-      fxCNY: this.config.cny_usd
+      fxAUD: this.config.feeds.aud_usd,
+      fxPHP: this.config.feeds.php_usd,
+      fxEUR: this.config.feeds.eur_usd,
+      fxKRW: this.config.feeds.krw_usd,
+      fxCNY: this.config.feeds.cny_usd,
+      fxUSD: ""
     };
 
-    return this.getPrice(fxTokenSymbolToFeedAddressMap[token], this.signerOrProvider);
+    const fxTokenSymbols = Object.keys(fxTokenSymbolToFeedAddressMap);
+
+    // we remove usd as it will always be one
+    const calls = fxTokenSymbols
+      .filter((fx) => fx !== "fxUSD")
+      .map((fx) => {
+        const fxSymbol = fx as FxTokenSymbol;
+        const multicall = createMultiCallContract<ChainlinkAggregator>(
+          fxTokenSymbolToFeedAddressMap[fxSymbol],
+          chainlinkAggregatorAbi
+        );
+
+        return multicall.latestAnswer() as unknown as ContractCall;
+      });
+
+    const response: ethers.BigNumber[] = await provider.all(calls);
+
+    const result = response.reduce((progress, bn: ethers.BigNumber, index) => {
+      return {
+        ...progress,
+        [fxTokenSymbols[index]]: {
+          bn,
+          number: this.chainlinkPriceToNumber(bn)
+        }
+      };
+    }, {} as FxTokenSymbolMap<Price>);
+
+    return {
+      ...result,
+      fxUSD: {
+        bn: ethers.utils.parseUnits("1", 8),
+        number: 1
+      }
+    };
   };
 
-  private getPrice = (
-    feedAddress: string,
-    arbitrumProviderOrSigner: ethers.providers.Provider | ethers.Signer
-  ): Promise<ethers.BigNumber> => {
-    const aggregator = ChainlinkAggregator__factory.connect(feedAddress, arbitrumProviderOrSigner);
-
-    return aggregator.latestAnswer();
+  private chainlinkPriceToNumber = (price: ethers.BigNumber): number => {
+    return Number(ethers.utils.formatUnits(price, 8));
   };
 }

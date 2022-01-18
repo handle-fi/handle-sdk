@@ -18,4 +18,4 @@ dist/
 # Jest
 coverage/
 
-/src/types/abi
+/src/contracts

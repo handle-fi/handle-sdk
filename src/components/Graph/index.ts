@@ -1,31 +1,25 @@
 import config from "../../config";
 import { GraphQLClient } from "graphql-request/dist";
-import FxTokenGraphClient, { IndexedFxTokenData } from "./clients/FxTokenGraphClient";
-import VaultGraphClient, { IndexedVaultData } from "./clients/VaultGraphClient";
-import FxKeeperPoolClient, { IndexedFxKeeperPoolData } from "./clients/FxKeeperPoolClient";
-
-type SupportedNetwork = "arbitrum";
-const SUPPORTED_NETWORKS: SupportedNetwork[] = ["arbitrum"];
+import FxTokenGraphClient, { IndexedFxToken } from "./clients/FxTokenGraphClient";
+import VaultGraphClient, { IndexedVault } from "./clients/VaultGraphClient";
+import FxKeeperPoolGraphClient, { IndexedFxKeeperPool } from "./clients/FxKeeperPoolGraphClient";
+import CollateralGraphClient, { IndexedCollateral } from "./clients/CollateralGraphClient";
 
 export default class Graph {
-  static isSupportedNetwork = (network: SupportedNetwork) => SUPPORTED_NETWORKS.includes(network);
-
   public fxTokens: FxTokenGraphClient;
   public vaults: VaultGraphClient;
-  public fxKeeperPools: FxKeeperPoolClient;
+  public fxKeeperPools: FxKeeperPoolGraphClient;
+  public collateralGraphClient: CollateralGraphClient;
 
-  constructor(network: SupportedNetwork) {
-    if (!SUPPORTED_NETWORKS.includes(network)) {
-      throw new Error(`fxTokens - Unsupported network: ${network}`);
-    }
-
-    const url = config.byNetwork[network].theGraphEndpoint;
+  constructor(endpoint?: string) {
+    const url = endpoint || config.byNetwork.arbitrum.theGraphEndpoint;
     const client = new GraphQLClient(url);
 
     this.fxTokens = new FxTokenGraphClient(client);
     this.vaults = new VaultGraphClient(client, this.fxTokens);
-    this.fxKeeperPools = new FxKeeperPoolClient(client);
+    this.fxKeeperPools = new FxKeeperPoolGraphClient(client);
+    this.collateralGraphClient = new CollateralGraphClient(client);
   }
 }
 
-export type { IndexedFxTokenData, IndexedVaultData, IndexedFxKeeperPoolData };
+export type { IndexedFxToken, IndexedVault, IndexedFxKeeperPool, IndexedCollateral };

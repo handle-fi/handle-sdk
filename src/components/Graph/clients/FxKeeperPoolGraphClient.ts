@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import { GraphQLClient, gql } from "graphql-request/dist";
 import { buildFilter } from "../utils";
 
-export type IndexedFxKeeperPoolData = {
+export type IndexedFxKeeperPool = {
   address: string;
   fxToken: string;
   totalDeposits: ethers.BigNumber;
@@ -27,7 +27,7 @@ type QueryResponse = {
 export default class FxKeeperPoolGraphClient {
   constructor(private client: GraphQLClient) {}
 
-  public query = async (filter: any): Promise<IndexedFxKeeperPoolData[]> => {
+  public query = async (filter: any): Promise<IndexedFxKeeperPool[]> => {
     const data = await this.client.request<QueryResponse>(this.getQueryString(filter));
     const pools = data?.fxKeeperPools;
     if (pools == null) throw new Error("Could not read fxTokens");
