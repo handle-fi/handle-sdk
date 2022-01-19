@@ -1,11 +1,7 @@
 import { ethers } from "ethers";
 import { ProtocolAddresses } from "../config";
 import sdkConfig from "../config";
-import {
-  createMulticallData,
-  createMulticallProtocolContracts,
-  multicallResponsesToObjects
-} from "../utils/contract-utils";
+import { callMulticallObject, createMulticallProtocolContracts } from "../utils/contract-utils";
 import { Promisified } from "../types/general";
 
 export type ProtocolConfig = {
@@ -46,10 +42,6 @@ export default class Vaults {
       minimumMintingAmountAsEth: contracts.comptroller.minimumMintingAmount()
     };
 
-    const { calls, properties } = createMulticallData(multicall);
-
-    const response = await provider.all(calls);
-
-    return multicallResponsesToObjects<ProtocolParameters>(properties, response)[0];
+    return callMulticallObject(multicall, provider);
   };
 }

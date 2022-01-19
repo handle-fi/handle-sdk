@@ -2,15 +2,10 @@ import { ethers } from "ethers";
 import { FxTokenAddresses, ProtocolAddresses } from "../config";
 import { ERC20, ERC20__factory } from "../contracts";
 import { FxToken, FxTokenSymbol, FxTokenSymbolMap } from "../types/fxTokens";
-import {
-  createMulticallProtocolContracts,
-  createMulticallData,
-  multicallResponsesToObjects
-} from "../utils/contract-utils";
+import { callMulticallObjects, createMulticallProtocolContracts } from "../utils/contract-utils";
 import { getAvailableAddresses } from "../utils/fxToken-utils";
 import sdkConfig from "../config";
 import { Promisified } from "../types/general";
-import { ContractCall } from "ethers-multicall";
 import Graph, { IndexedFxToken } from "./Graph";
 
 export type FxTokensConfig = {
@@ -20,7 +15,7 @@ export type FxTokensConfig = {
   graphEndpoint: string;
 };
 
-type FxTokenMulticallRequestAndResponse = {
+type FxTokenMulticallMulticall = {
   price: ethers.BigNumber;
 };
 
@@ -52,20 +47,8 @@ export default class FxTokens {
       signer
     );
 
-    const multicallData = this.available.map((a) => this.getMulticallsForFxToken(a.symbol, signer));
-
-    const calls = multicallData.reduce(
-      (progress, cd) => [...progress, ...cd.calls],
-      [] as ContractCall[]
-    );
-
-    const response = await provider.all(calls);
-
-    const raw = multicallResponsesToObjects<FxTokenMulticallRequestAndResponse>(
-      multicallData[0].properties,
-      response
-    );
-
+    const multicalls = this.available.map((a) => this.getFxTokenMulticall(a.symbol, signer));
+    const raw = await callMulticallObjects(multicalls, provider);
     return raw.map((t, index) => this.onChainToFxToken(this.available[index], t));
   };
 
@@ -84,10 +67,10 @@ export default class FxTokens {
     }, {} as FxTokenSymbolMap<ERC20>);
   };
 
-  private getMulticallsForFxToken = (
+  private getFxTokenMulticall = (
     fxToken: FxTokenSymbol,
     signer: ethers.Signer
-  ): { calls: ContractCall[]; properties: (keyof FxTokenMulticallRequestAndResponse)[] } => {
+  ): Promisified<FxTokenMulticallMulticall> => {
     const fxAddress = this.config.fxTokenAddresses[fxToken];
 
     if (!fxAddress) {
@@ -100,16 +83,14 @@ export default class FxTokens {
       signer
     );
 
-    const calls: Promisified<FxTokenMulticallRequestAndResponse> = {
+    return {
       price: contracts.handle.getTokenPrice(fxAddress)
     };
-
-    return createMulticallData(calls);
   };
 
   private onChainToFxToken = (
     addressAndSymbol: Available,
-    fxToken: FxTokenMulticallRequestAndResponse
+    fxToken: FxTokenMulticallMulticall
   ): FxToken => {
     const { price } = fxToken;
 

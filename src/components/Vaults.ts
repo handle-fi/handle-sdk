@@ -1,5 +1,4 @@
 import { ethers } from "ethers";
-import { ContractCall } from "ethers-multicall";
 import Graph, { IndexedVault } from "./Graph";
 import { FxToken, FxTokenSymbol } from "../types/fxTokens";
 import { Collateral, CollateralSymbolWithNative } from "../types/collaterals";
@@ -7,9 +6,9 @@ import { Vault } from "../types/vaults";
 import { ProtocolAddresses, FxTokenAddresses, CollateralAddresses } from "../config";
 import {
   createMulticallProtocolContracts,
-  createMulticallData,
-  multicallResponsesToObjects,
-  createProtocolContracts
+  createProtocolContracts,
+  callMulticallObject,
+  callMulticallObjects
 } from "../utils/contract-utils";
 import { Promisified } from "../types/general";
 import { CollateralSymbol, CollateralSymbolMap } from "../types/collaterals";
@@ -30,9 +29,11 @@ export type VaultsConfig = {
   graphEndpoint: string;
 };
 
-type VaultMulticallRequestAndResponse = {
+type VaultMulticall = {
   debt: ethers.BigNumber;
 };
+
+type vaultCollateralMulticall = Promisified<CollateralSymbolMap<ethers.BigNumber>>;
 
 type MintArguments = {
   fxToken: FxTokenSymbol;
@@ -129,48 +130,21 @@ export default class Vaults {
       signer
     );
 
-    const vaultCallData = this.fxTokens.map((t) =>
-      this.getMulticallsForVault(account, t.address, signer)
+    const vaultMulticalls = this.fxTokens.map((t) =>
+      this.getVaultMulitcall(account, t.address, signer)
     );
 
-    const vaultCalls = vaultCallData.reduce(
-      (progress, vaultCalls) => [...progress, ...vaultCalls.calls],
-      [] as ContractCall[]
+    const collateralBalancesMulticalls = this.fxTokens.map((fxToken) =>
+      this.createMulticallObjectForVaultCollateralBalance(account, fxToken.address, signer)
     );
 
-    const collateralCalls = this.fxTokens
-      .map((fxToken) =>
-        this.createMulticallsForVaultsCollateralBalances(account, fxToken.address, signer)
-      )
-      .reduce((progress, collateralCallsForVault) => [...progress, ...collateralCallsForVault]);
+    const vaultsPromise = callMulticallObjects(vaultMulticalls, provider);
+    const collateralsPromise = callMulticallObjects(collateralBalancesMulticalls, provider);
 
-    const vaultMulticallResponsePromise = provider.all(vaultCalls);
-    const collateralMultiCallResponsePromise = provider.all(collateralCalls);
+    const [vaultData, collaterals] = await Promise.all([vaultsPromise, collateralsPromise]);
 
-    const [vaultMulticallResponse, collateralMultiCallResponse] = await Promise.all([
-      vaultMulticallResponsePromise,
-      collateralMultiCallResponsePromise
-    ]);
-
-    const rawVaultData = multicallResponsesToObjects<VaultMulticallRequestAndResponse>(
-      vaultCallData[0].properties,
-      vaultMulticallResponse
-    );
-
-    const rawVaultsCollateralData = multicallResponsesToObjects<
-      CollateralSymbolMap<ethers.BigNumber>
-    >(
-      this.collaterals.map((collateral) => collateral.symbol),
-      collateralMultiCallResponse
-    );
-
-    return rawVaultData.map((vault, index) =>
-      this.chainDataToVaultData(
-        account,
-        this.fxTokens[index].address,
-        vault,
-        rawVaultsCollateralData[index]
-      )
+    return vaultData.map((vault, index) =>
+      this.chainDataToVaultData(account, this.fxTokens[index].address, vault, collaterals[index])
     );
   };
 
@@ -192,39 +166,25 @@ export default class Vaults {
       throw new Error(`Could not find fxToken with symbol: ${fxTokenSymbol}`);
     }
 
-    const vaultCalls = this.getMulticallsForVault(account, fxToken.address, signer);
-    const collateralBalanceCalls = this.createMulticallsForVaultsCollateralBalances(
+    const vaultMulticall = this.getVaultMulitcall(account, fxToken.address, signer);
+    const collateralBalanceMulticall = this.createMulticallObjectForVaultCollateralBalance(
       account,
       fxToken.address,
       signer
     );
+    const vaultMulticallPromise = callMulticallObject(vaultMulticall, provider);
 
-    const vaultMulticallResponsePromise = provider.all(vaultCalls.calls);
-    const collateralMulticallResponsePromise = provider.all(collateralBalanceCalls);
-
-    const [vaultMulticallResponse, collateralMulticallResponse] = (await Promise.all([
-      vaultMulticallResponsePromise,
-      collateralMulticallResponsePromise
-    ])) as [ethers.BigNumber[], ethers.BigNumber[]];
-
-    const rawVaultData = multicallResponsesToObjects<VaultMulticallRequestAndResponse>(
-      vaultCalls.properties,
-      vaultMulticallResponse
-    )[0];
-
-    const rawVaultsCollateralData = multicallResponsesToObjects<
-      CollateralSymbolMap<ethers.BigNumber>
-    >(
-      this.collaterals.map((collateral) => collateral.symbol),
-      collateralMulticallResponse
-    )[0];
-
-    return this.chainDataToVaultData(
-      account,
-      fxToken.address,
-      rawVaultData,
-      rawVaultsCollateralData
+    const collateralMulticallResponsePromise = callMulticallObject(
+      collateralBalanceMulticall,
+      provider
     );
+
+    const [vaultData, collateralData] = await Promise.all([
+      vaultMulticallPromise,
+      collateralMulticallResponsePromise
+    ]);
+
+    return this.chainDataToVaultData(account, fxToken.address, vaultData, collateralData);
   };
 
   public getIndexedVault = async (
@@ -471,44 +431,49 @@ export default class Vaults {
     );
   };
 
-  private getMulticallsForVault = (
+  private getVaultMulitcall = (
     account: string,
     fxTokenAddress: string,
     signer: ethers.Signer
-  ): { calls: ContractCall[]; properties: (keyof VaultMulticallRequestAndResponse)[] } => {
+  ): Promisified<VaultMulticall> => {
     const { contracts } = createMulticallProtocolContracts(
       this.config.protocolAddresses,
       this.config.chainId,
       signer
     );
 
-    const calls: Promisified<VaultMulticallRequestAndResponse> = {
+    return {
       debt: contracts.handle.getDebt(account, fxTokenAddress)
     };
-
-    return createMulticallData(calls);
   };
 
-  private createMulticallsForVaultsCollateralBalances = (
+  private createMulticallObjectForVaultCollateralBalance = (
     account: string,
     fxTokenAddress: string,
     signer: ethers.Signer
-  ): ContractCall[] => {
+  ): vaultCollateralMulticall => {
     const { contracts } = createMulticallProtocolContracts(
       this.config.protocolAddresses,
       this.config.chainId,
       signer
     );
 
-    return this.collaterals.map((collateral) => {
-      return contracts.handle.getCollateralBalance(account, collateral.address, fxTokenAddress);
-    }) as unknown as ContractCall[];
+    return this.collaterals.reduce((progress, collateral) => {
+      return {
+        ...progress,
+        [collateral.symbol]: contracts.handle.getCollateralBalance(
+          account,
+          collateral.address,
+          fxTokenAddress
+        )
+      };
+    }, {} as vaultCollateralMulticall);
   };
 
   private chainDataToVaultData = (
     account: string,
     fxTokenAddress: string,
-    vault: VaultMulticallRequestAndResponse,
+    vault: VaultMulticall,
     collateralMap: CollateralSymbolMap<ethers.BigNumber>
   ): Vault => {
     const { debt } = vault;

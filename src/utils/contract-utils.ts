@@ -19,6 +19,7 @@ import vaultLibraryAbi from "../abis/handle/VaultLibrary.json";
 import comptrollerAbi from "../abis/handle/Comptroller.json";
 import erc20Abi from "../abis/ERC20.json";
 import { ProtocolAddresses } from "../config";
+import { Promisified } from "../types/general";
 
 type ProtocolContracts = {
   handle: Handle;
@@ -63,16 +64,33 @@ export const createProtocolContracts = (
   };
 };
 
-export const createMulticallData = <T>(
-  obj: T
-): { calls: ContractCall[]; properties: (keyof T)[] } => {
-  const properties = Object.keys(obj) as unknown as (keyof T)[];
-  const calls = properties.map((key) => obj[key as keyof T]) as unknown as ContractCall[];
+export const callMulticallObject = async <T>(
+  callObject: Promisified<T>,
+  provider: MultiCallProvider
+): Promise<T> => {
+  const properties = Object.keys(callObject);
+  const calls = Object.values(callObject) as ContractCall[];
+  const response = await provider.all(calls);
 
-  return {
-    properties,
-    calls
-  };
+  return properties.reduce((progress, property, index) => {
+    return {
+      ...progress,
+      [property]: response[index]
+    };
+  }, {} as T);
+};
+
+export const callMulticallObjects = async <T>(
+  callObjects: Promisified<T>[],
+  provider: MultiCallProvider
+): Promise<T[]> => {
+  const calls = callObjects.reduce(
+    (progress, callObject) => [...progress, ...(Object.values(callObject) as ContractCall[])],
+    [] as ContractCall[]
+  );
+
+  const response = await provider.all(calls);
+  return multicallResponsesToObjects(Object.keys(callObjects[0]), response);
 };
 
 export const multicallResponsesToObjects = <T>(properties: string[], results: any[]): T[] => {

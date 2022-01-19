@@ -1,5 +1,4 @@
 import { ethers } from "ethers";
-import { ContractCall } from "ethers-multicall";
 import { CollateralAddresses, ProtocolAddresses } from "../config";
 import { getAvailableAddresses } from "../utils/fxToken-utils";
 import { Promisified } from "../types/general";
@@ -8,8 +7,8 @@ import sdkConfig from "../config";
 import {
   createERC20MulticallContract,
   createMulticallProtocolContracts,
-  createMulticallData,
-  multicallResponsesToObjects
+  callMulticallObject,
+  callMulticallObjects
 } from "../utils/contract-utils";
 import Graph, { IndexedCollateral } from "./Graph";
 import { ERC20__factory } from "../contracts";
@@ -21,7 +20,7 @@ export type CollateralsConfig = {
   graphEndpoint: string;
 };
 
-type CollateralMulticallRequestAndResponse = {
+type CollateralMulticall = {
   decimals: number;
   collateralDetails: {
     mintCR: ethers.BigNumber;
@@ -61,18 +60,10 @@ export default class Collaterals {
       this.config.chainId,
       signer
     );
-
-    const multicalldata = this.getMulticallsForCollateral(collateralSymbol, signer);
-    const response = await provider.all(multicalldata.calls);
-
-    const raw = multicallResponsesToObjects<CollateralMulticallRequestAndResponse>(
-      multicalldata.properties,
-      response
-    )[0];
-
-    const avail = this.findAvailable(collateralSymbol);
-
-    return this.toCollateral(avail, raw);
+    const collateral = this.findAvailable(collateralSymbol);
+    const collateralMulticall = this.getCollateralMulticall(collateralSymbol, signer);
+    const rawCollateral = await callMulticallObject(collateralMulticall, provider);
+    return this.toCollateral(collateral, rawCollateral);
   };
 
   public getCollaterals = async (signer: ethers.Signer): Promise<Collateral[]> => {
@@ -82,22 +73,10 @@ export default class Collaterals {
       signer
     );
 
-    const multicallData = this.available.map((a) =>
-      this.getMulticallsForCollateral(a.symbol, signer)
+    const collateralMulticalls = this.available.map((a) =>
+      this.getCollateralMulticall(a.symbol, signer)
     );
-
-    const calls = multicallData.reduce(
-      (progress, cd) => [...progress, ...cd.calls],
-      [] as ContractCall[]
-    );
-
-    const response = await provider.all(calls);
-
-    const raw = multicallResponsesToObjects<CollateralMulticallRequestAndResponse>(
-      multicallData[0].properties,
-      response
-    );
-
+    const raw = await callMulticallObjects(collateralMulticalls, provider);
     return raw.map((c, index) => this.toCollateral(this.available[index], c));
   };
 
@@ -159,10 +138,10 @@ export default class Collaterals {
     return ERC20__factory.connect(avail.address, signer);
   };
 
-  private getMulticallsForCollateral = (
+  private getCollateralMulticall = (
     collateral: CollateralSymbol,
     signer: ethers.Signer
-  ): { calls: ContractCall[]; properties: (keyof CollateralMulticallRequestAndResponse)[] } => {
+  ): Promisified<CollateralMulticall> => {
     const collateralAddress = this.config.collateralAddresses[collateral];
 
     if (!collateralAddress) {
@@ -177,18 +156,16 @@ export default class Collaterals {
 
     const erc20MulticallContract = createERC20MulticallContract(collateralAddress);
 
-    const calls: Promisified<CollateralMulticallRequestAndResponse> = {
+    return {
       decimals: erc20MulticallContract.decimals(),
       collateralDetails: contracts.handle.getCollateralDetails(collateralAddress),
       price: contracts.handle.getTokenPrice(collateralAddress)
     };
-
-    return createMulticallData(calls);
   };
 
   private toCollateral = (
     addressAndSymbol: Available,
-    collateral: CollateralMulticallRequestAndResponse
+    collateral: CollateralMulticall
   ): Collateral => {
     const { decimals, collateralDetails, price } = collateral;
 

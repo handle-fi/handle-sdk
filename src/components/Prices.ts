@@ -4,7 +4,7 @@ import config, { ChainlinkFeeds } from "../config";
 import { ChainlinkAggregator__factory, ChainlinkAggregator } from "../contracts";
 import { createMultiCallContract } from "../utils/contract-utils";
 import { ContractCall, Provider as MultiCallProvider } from "ethers-multicall";
-import chainlinkAggregatorAbi from "../abis/chainlink-aggregator.json";
+import chainlinkAggregatorAbi from "../abis/ChainlinkAggregator.json";
 
 export type Price = {
   bn: ethers.BigNumber;
