@@ -43,8 +43,7 @@ describe("Convert", function () {
       "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
       ethers.utils.parseEther("1"),
       undefined,
-      "1",
-      "0x924CF7da1ecec313471ea16E8C58a3141f094546"
+      "1"
     );
     expect(priceResult.buyAmount).toBeTruthy();
   });
