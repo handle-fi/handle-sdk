@@ -3,7 +3,7 @@ import { GraphQLClient, gql } from "graphql-request/dist";
 import { FxTokenSymbol } from "../../..";
 import { buildFilter } from "../utils";
 
-export type IndexedFxTokenData = {
+export type IndexedFxToken = {
   address: string;
   name: string;
   symbol: FxTokenSymbol;
@@ -28,7 +28,7 @@ type QueryResponse = {
 export default class FxTokenGraphClient {
   constructor(private client: GraphQLClient) {}
 
-  public query = async (filter: any): Promise<IndexedFxTokenData[]> => {
+  public query = async (filter: any): Promise<IndexedFxToken[]> => {
     const data = await this.client.request<QueryResponse>(this.getQueryString(filter));
     const tokens = data?.fxTokens;
     if (tokens == null) throw new Error("Could not read fxTokens");
