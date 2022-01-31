@@ -1,5 +1,6 @@
 import { ethers } from "ethers";
 import Graph, { IndexedVault } from "./Graph";
+import { Provider as MultiCallProvider } from "ethers-multicall";
 import { FxToken, FxTokenSymbol } from "../types/fxTokens";
 import { Collateral, CollateralSymbolWithNative } from "../types/collaterals";
 import {
@@ -26,7 +27,10 @@ import { getFxTokenByAddress, getFxTokenBySymbol } from "../utils/fxToken-utils"
 import { getCollateralByAddress, getCollateralBySymbol } from "../utils/collateral-utils";
 import { ProtocolSDK } from "..";
 import { ProtocolParameters } from "./Protocol";
-import { getKashiPair } from "../utils/sushiswap-utils";
+import {
+  getKashiPoolMulticall,
+  kashiMulticallResultToSingleCollateralVaultData
+} from "../utils/sushiswap-utils";
 import KashiCooker from "../utils/KashiCooker";
 import { SingleCollateralVaultNetwork } from "../types/web3";
 
@@ -186,11 +190,8 @@ export default class Vaults {
     signer: ethers.Signer
   ): Promise<Vault> => {
     this.initialisationCheck();
-    const { provider } = createMulticallProtocolContracts(
-      this.config.protocolAddresses,
-      this.config.chainId,
-      signer
-    );
+
+    const provider = new MultiCallProvider(signer.provider!, this.config.chainId);
 
     const fxToken = this.fxTokens.find((t) => t.symbol === fxTokenSymbol);
 
@@ -225,14 +226,25 @@ export default class Vaults {
     network: SingleCollateralVaultNetwork,
     signer: ethers.Signer
   ): Promise<SingleCollateralVault> => {
+    this.initialisationCheck();
+    const chainId = sdkConfig.networkNameToId[network];
+
+    const provider = new MultiCallProvider(signer.provider!, chainId);
+
     const pool = this.config.singleCollateralVaults[network][vaultSymbol];
 
     if (!pool) {
       throw new Error(`Unable to find vault: ${network}-${vaultSymbol}`);
     }
+
     const fxToken = getFxTokenBySymbol(this.fxTokens, pool.fxToken);
-    const kashiPair = await getKashiPair({ account, network, pool }, signer);
-    return createSingleCollateralVault(kashiPair, fxToken);
+    const multicall = getKashiPoolMulticall(account, pool, chainId);
+    const result = await callMulticallObject(multicall, provider);
+
+    return createSingleCollateralVault(
+      kashiMulticallResultToSingleCollateralVaultData(account, pool, result),
+      fxToken
+    );
   };
 
   public getIndexedVault = async (
@@ -265,6 +277,38 @@ export default class Vaults {
       return existingVault || this.createEmptyIndexedVault(account, fxToken.address);
     });
     return allVaults.map(this.indexedDataToVault);
+  };
+
+  public getSingleCollateralVaults = async (
+    account: string,
+    network: SingleCollateralVaultNetwork,
+    signer: ethers.Signer
+  ): Promise<SingleCollateralVault[]> => {
+    this.initialisationCheck();
+    const chainId = sdkConfig.networkNameToId[network];
+
+    const provider = new MultiCallProvider(signer.provider!, chainId);
+
+    const poolConfigs = this.config.singleCollateralVaults[network];
+
+    const vaultsSymbols = Object.keys(poolConfigs) as SingleCollateralVaultSymbol[];
+
+    const multicalls = vaultsSymbols.map((symbol) =>
+      getKashiPoolMulticall(account, poolConfigs[symbol], chainId)
+    );
+
+    const results = await callMulticallObjects(multicalls, provider);
+
+    return results.map((r, index) => {
+      const poolConfig = poolConfigs[vaultsSymbols[index]];
+
+      const fxToken = getFxTokenBySymbol(this.fxTokens, poolConfig.fxToken);
+
+      return createSingleCollateralVault(
+        kashiMulticallResultToSingleCollateralVaultData(account, poolConfig, r),
+        fxToken
+      );
+    });
   };
 
   public mint = async (

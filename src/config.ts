@@ -1,12 +1,13 @@
 import { ethers } from "ethers";
 import { CollateralSymbolMap } from "./types/collaterals";
 import { FxTokenSymbolMap, FxTokenSymbol } from "./types/fxTokens";
-import { SingleCollateralVaultSymbol } from "./types/vaults";
+
 import { Token } from "./types/general";
-import { NetworkMap, SingleCollateralVaultNetwork } from "./types/web3";
+import { NetworkMap } from "./types/web3";
 
 export type FxTokenAddresses = FxTokenSymbolMap<string>;
 export type CollateralAddresses = CollateralSymbolMap<string>;
+
 export type KashiPoolConfig = {
   address: string;
   fxToken: FxTokenSymbol;
@@ -14,9 +15,8 @@ export type KashiPoolConfig = {
 };
 
 export type SingleCollateralVaults = {
-  [key in SingleCollateralVaultNetwork]: {
-    [key in SingleCollateralVaultSymbol]: KashiPoolConfig;
-  };
+  polygon: { [key: string]: KashiPoolConfig };
+  arbitrum: { [key: string]: KashiPoolConfig };
 };
 
 const FX_AUD_ADDRESS = "0x7E141940932E3D13bfa54B224cb4a16510519308";
@@ -99,6 +99,17 @@ const config: Config = {
           address: "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619",
           symbol: "WETH",
           decimals: 18
+        }
+      }
+    },
+    arbitrum: {
+      "fxAUD-WBTC": {
+        address: "0x5b5906ba677f32075b3dd478d730c46eaaa48c3e",
+        fxToken: "fxAUD",
+        collateral: {
+          address: "0x2f2a2543b76a4166549f7aab2e75bef0aefc5b0f",
+          symbol: "WBTC",
+          decimals: 8
         }
       }
     }

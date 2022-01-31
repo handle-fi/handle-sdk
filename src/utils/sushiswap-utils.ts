@@ -1,14 +1,13 @@
 import { ethers } from "ethers";
-import { SECONDS_IN_A_YEAR_BN } from "./constants";
+import { SECONDS_IN_A_YEAR_BN } from "../constants";
 import { BENTOBOX_ADDRESS } from "@sushiswap/core-sdk";
-import { Provider as MultiCallProvider } from "ethers-multicall";
-import { createMultiCallContract, callMulticallObject } from "./contract-utils";
+import { createMultiCallContract } from "./contract-utils";
 import { SushiBento, SushiKashi } from "../contracts";
 import sushiKashiAbi from "../abis/sushi/SushiKashi.json";
 import sushiBentoAbi from "../abis/sushi/SushiBento.json";
 import { Promisified, Token } from "../types/general";
-import { FxTokenSymbol, SingleCollateralVaultNetwork } from "..";
-import config, { KashiPoolConfig } from "../config";
+import { FxTokenSymbol } from "..";
+import { KashiPoolConfig } from "../config";
 import { SingleCollateralVaultData } from "../types/vaults";
 
 export type KashiPair = {
@@ -32,12 +31,6 @@ export type AccureInfo = {
 };
 
 export type ElasticBase = { elastic: ethers.BigNumber; base: ethers.BigNumber };
-
-type GetKashiPairArgs = {
-  account: string;
-  network: SingleCollateralVaultNetwork;
-  pool: KashiPoolConfig;
-};
 
 type KashiMulticallRequestAndResponse = {
   accureInfo: AccureInfo;
@@ -68,16 +61,14 @@ const accrue = (
     .add(includePrincipal ? amount : ethers.constants.Zero);
 };
 
-export const getKashiPair = async (
-  args: GetKashiPairArgs,
-  signer: ethers.Signer
-): Promise<SingleCollateralVaultData> => {
-  const chainId = config.networkNameToId[args.network];
+export const getKashiPoolMulticall = (
+  account: string,
+  pool: KashiPoolConfig,
+  chainId: number
+): Promisified<KashiMulticallRequestAndResponse> => {
   const bentoBoxAddress = BENTOBOX_ADDRESS[chainId];
 
-  const multiCallProvider = new MultiCallProvider(signer.provider!);
-  await multiCallProvider.init();
-  const kashiMultiCall = createMultiCallContract<SushiKashi>(args.pool.address, sushiKashiAbi);
+  const kashiMultiCall = createMultiCallContract<SushiKashi>(pool.address, sushiKashiAbi);
   const bentoBoxMutiCall = createMultiCallContract<SushiBento>(bentoBoxAddress, sushiBentoAbi);
 
   const kashiCalls: Promisified<KashiMulticallRequestAndResponse> = {
@@ -85,12 +76,20 @@ export const getKashiPair = async (
     totalAsset: kashiMultiCall.totalAsset(),
     totalBorrow: kashiMultiCall.totalBorrow(),
     totalCollateralShare: kashiMultiCall.totalCollateralShare(),
-    userBorrowPart: kashiMultiCall.userBorrowPart(args.account),
-    userCollateralShare: kashiMultiCall.userCollateralShare(args.account),
+    userBorrowPart: kashiMultiCall.userBorrowPart(account),
+    userCollateralShare: kashiMultiCall.userCollateralShare(account),
     exchangeRate: kashiMultiCall.exchangeRate(),
-    collateralTotals: bentoBoxMutiCall.totals(args.pool.collateral.address)
+    collateralTotals: bentoBoxMutiCall.totals(pool.collateral.address)
   };
 
+  return kashiCalls;
+};
+
+export const kashiMulticallResultToSingleCollateralVaultData = (
+  account: string,
+  config: KashiPoolConfig,
+  data: KashiMulticallRequestAndResponse
+): SingleCollateralVaultData => {
   const {
     accureInfo,
     totalAsset,
@@ -100,7 +99,7 @@ export const getKashiPair = async (
     userCollateralShare,
     exchangeRate,
     collateralTotals
-  } = await callMulticallObject<KashiMulticallRequestAndResponse>(kashiCalls, multiCallProvider);
+  } = data;
 
   const interestPerYear = accureInfo.interestPerSecond.mul(SECONDS_IN_A_YEAR_BN);
 
@@ -115,10 +114,10 @@ export const getKashiPair = async (
     : userBorrowPart?.mul(currentBorrowAmount).div(totalBorrow.base);
 
   return {
-    account: args.account,
+    account,
     debt,
     collateral: {
-      ...args.pool.collateral,
+      ...config.collateral,
       amount: userCollateralAmount
     },
     interestPerYear,

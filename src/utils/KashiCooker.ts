@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import { ChainId, WNATIVE } from "@sushiswap/core-sdk";
+import { ChainId, WNATIVE, KASHI_ADDRESS } from "@sushiswap/core-sdk";
 import { SushiKashi__factory } from "../contracts";
 import { KashiPoolConfig } from "../config";
 import { FxToken } from "../types/fxTokens";
@@ -154,14 +154,7 @@ export default class KashiCooker {
       Action.BENTO_SETAPPROVAL,
       ethers.utils.defaultAbiCoder.encode(
         ["address", "address", "bool", "uint8", "bytes32", "bytes32"],
-        [
-          this.account,
-          "0xB527C5295c4Bc348cBb3a2E96B2494fD292075a7",
-          true,
-          signature.v,
-          signature.r,
-          signature.s
-        ]
+        [this.account, KASHI_ADDRESS[this.chainId], true, signature.v, signature.r, signature.s]
       ),
       ethers.constants.Zero
     );

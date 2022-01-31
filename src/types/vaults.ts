@@ -3,7 +3,7 @@ import { FxTokenSymbol } from "..";
 import { CollateralSymbol } from "./collaterals";
 import { Token } from "./general";
 
-export type SingleCollateralVaultSymbol = "fxAUD-WETH";
+export type SingleCollateralVaultSymbol = "fxAUD-WETH" | "fxAUD-WBTC";
 
 type VaultFxToken = Token<FxTokenSymbol>;
 
