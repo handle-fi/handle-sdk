@@ -50,10 +50,10 @@ type ZeroXQuoteParams = {
   buyTokenPercentageFee: string;
   feeRecipient: string;
   gasPrice: string;
-  takerAddress: string;
 };
 
 type ZeroXSwapParams = ZeroXQuoteParams & {
+  takerAddress: string;
   affiliateAddress: string;
   slippagePercentage: string;
 };
@@ -105,8 +105,7 @@ export class Convert {
     buyToken: string,
     sellAmount: BigNumber | undefined,
     buyAmount: BigNumber | undefined,
-    gasPriceInWei: string,
-    fromAddress: string
+    gasPriceInWei: string
   ): Promise<Quote> => {
     if (this.network === "arbitrum") {
       if (!sellAmount) {
@@ -115,7 +114,7 @@ export class Convert {
       return this.get1InchQuote(sellToken, buyToken, sellAmount, gasPriceInWei);
     }
 
-    return this.get0xQuote(sellToken, buyToken, sellAmount, buyAmount, gasPriceInWei, fromAddress);
+    return this.get0xQuote(sellToken, buyToken, sellAmount, buyAmount, gasPriceInWei);
   };
 
   public getSwap = async (
@@ -162,8 +161,7 @@ export class Convert {
     buyToken: string,
     sellAmount: BigNumber | undefined,
     buyAmount: BigNumber | undefined,
-    gasPriceInWei: string,
-    takerAddress: string
+    gasPriceInWei: string
   ): Promise<Quote> => {
     const fee = await this.getFeeAsPercentage(sellToken, buyToken);
 
@@ -174,8 +172,7 @@ export class Convert {
       buyAmount: buyAmount?.toString(),
       buyTokenPercentageFee: (fee / 100).toString(),
       feeRecipient: Config.feeAddress,
-      gasPrice: gasPriceInWei,
-      takerAddress
+      gasPrice: gasPriceInWei
     };
 
     const { data } = await axios.get(`${this.get0xBaseUrl()}/price`, {
@@ -368,6 +365,6 @@ export class Convert {
       polygon: 137,
       arbitrum: 42161
     };
-    return `https://api.1inch.exchange/v3.0/${networkNameToIdMap[this.network]}`;
+    return `https://api.1inch.exchange/v4.0/${networkNameToIdMap[this.network]}`;
   };
 }

@@ -1,8 +1,8 @@
 # handle.fi SDK
 
 Read the docs [here](https://github.com/handle-fi/handle-sdk/tree/master/docs).  
-Please note that this SDK is still a work in progress.  
-Currently, only the Kovan testnet is supported.
+Please note that this SDK is a work in progress until version 1.0.0.
+The handle.fi protocol is deployed on Arbitrum One.
 
 ## Getting started
 

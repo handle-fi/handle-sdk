@@ -3512,62 +3512,6 @@
     "displayDecimals": 4
   },
   {
-    "symbol": "fxAUD",
-    "name": "fxAUD",
-    "address": "0x7E141940932E3D13bfa54B224cb4a16510519308",
-    "decimals": 18,
-    "icon": "https://app.handle.fi/fxAUDDarkLogo.png",
-    "displayDecimals": 4
-  },
-  {
-    "symbol": "fxPHP",
-    "name": "fxPHP",
-    "address": "0x3d147cD9aC957B2a5F968dE9d1c6B9d0872286a0",
-    "decimals": 18,
-    "icon": "https://app.handle.fi/fxPHPDarkLogo.png",
-    "displayDecimals": 4
-  },
-  {
-    "symbol": "fxUSD",
-    "name": "fxUSD",
-    "address": "0x8616E8EA83f048ab9A5eC513c9412Dd2993bcE3F",
-    "decimals": 18,
-    "icon": "https://app.handle.fi/fxUSDDarkLogo.png",
-    "displayDecimals": 4
-  },
-  {
-    "symbol": "fxEUR",
-    "name": "fxEUR",
-    "address": "0x116172B2482c5dC3E6f445C16Ac13367aC3FCd35",
-    "decimals": 18,
-    "icon": "https://app.handle.fi/fxEURDarkLogo.png",
-    "displayDecimals": 4
-  },
-  {
-    "symbol": "fxCNY",
-    "name": "fxCNY",
-    "address": "0x2C29daAce6Aa05e3b65743EFd61f8A2C448302a3",
-    "decimals": 18,
-    "icon": "https://app.handle.fi/fxCNYDarkLogo.png",
-    "displayDecimals": 4
-  },
-  {
-    "symbol": "fxCHF",
-    "name": "fxCHF",
-    "address": "0x8C414cB8A9Af9F7B03673e93DF73c23C1aa05b4e",
-    "decimals": 18,
-    "icon": "https://app.handle.fi/fxCHFDarkLogo.png",
-    "displayDecimals": 4
-  },
-  {
-    "symbol": "fxKRW",
-    "name": "fxKRW",
-    "address": "0xF4E8BA79d058fFf263Fd043Ef50e1010c1BdF991",
-    "decimals": 18,
-    "icon": "https://app.handle.fi/fxKRWDarkLogo.png",
-    "displayDecimals": 4
-  },
-  {
     "symbol": "FXS",
     "name": "Frax Share",
     "address": "0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0",
@@ -5117,6 +5061,14 @@
     "address": "0x80c8c3dcfb854f9542567c8dac3f44d709ebc1de",
     "decimals": 18,
     "icon": "https://tokens.1inch.exchange/0x80c8c3dcfb854f9542567c8dac3f44d709ebc1de.png",
+    "displayDecimals": 4
+  },
+  {
+    "symbol": "MIM",
+    "name": "Magic Internet Money",
+    "decimals": 18,
+    "address": "0x99d8a9c45b2eca8864373a26d1459e3dff1e17f3",
+    "icon": "https://tokens.1inch.exchange/0xfea7a6a0b346362bf88a9e4a88416b77a57d6c2a.png",
     "displayDecimals": 4
   },
   {

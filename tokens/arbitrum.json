@@ -3,7 +3,7 @@
     "symbol": "ETH",
     "name": "Ethereum",
     "decimals": 18,
-    "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "address": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
     "icon": "https://tokens.1inch.io/0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee.png",
     "displayDecimals": 4
   },
@@ -137,58 +137,34 @@
   },
   {
     "symbol": "fxAUD",
-    "name": "fxAUD",
+    "name": "handleAUD",
     "address": "0x7E141940932E3D13bfa54B224cb4a16510519308",
     "decimals": 18,
-    "icon": "https://app.handle.fi/fxAUDDarkLogo.png",
-    "displayDecimals": 4
-  },
-  {
-    "symbol": "fxPHP",
-    "name": "fxPHP",
-    "address": "0x3d147cD9aC957B2a5F968dE9d1c6B9d0872286a0",
-    "decimals": 18,
-    "icon": "https://app.handle.fi/fxPHPDarkLogo.png",
-    "displayDecimals": 4
-  },
-  {
-    "symbol": "fxUSD",
-    "name": "fxUSD",
-    "address": "0x8616E8EA83f048ab9A5eC513c9412Dd2993bcE3F",
-    "decimals": 18,
-    "icon": "https://app.handle.fi/fxUSDDarkLogo.png",
+    "icon": "https://app.handle.fi/fxAUDLogo.png",
     "displayDecimals": 4
   },
   {
     "symbol": "fxEUR",
-    "name": "fxEUR",
+    "name": "handleEUR",
     "address": "0x116172B2482c5dC3E6f445C16Ac13367aC3FCd35",
     "decimals": 18,
-    "icon": "https://app.handle.fi/fxEURDarkLogo.png",
+    "icon": "https://app.handle.fi/fxEURLogo.png",
     "displayDecimals": 4
   },
   {
-    "symbol": "fxCNY",
-    "name": "fxCNY",
-    "address": "0x2C29daAce6Aa05e3b65743EFd61f8A2C448302a3",
+    "symbol": "fxPHP",
+    "name": "handlePHP",
+    "address": "0x3d147cD9aC957B2a5F968dE9d1c6B9d0872286a0",
     "decimals": 18,
-    "icon": "https://app.handle.fi/fxCNYDarkLogo.png",
+    "icon": "https://app.handle.fi/fxPHPLogo.png",
     "displayDecimals": 4
   },
   {
-    "symbol": "fxCHF",
-    "name": "fxCHF",
-    "address": "0x8C414cB8A9Af9F7B03673e93DF73c23C1aa05b4e",
+    "symbol": "fxUSD",
+    "name": "handleUSD",
+    "address": "0x8616E8EA83f048ab9A5eC513c9412Dd2993bcE3F",
     "decimals": 18,
-    "icon": "https://app.handle.fi/fxCHFDarkLogo.png",
-    "displayDecimals": 4
-  },
-  {
-    "symbol": "fxKRW",
-    "name": "fxKRW",
-    "address": "0xF4E8BA79d058fFf263Fd043Ef50e1010c1BdF991",
-    "decimals": 18,
-    "icon": "https://app.handle.fi/fxKRWDarkLogo.png",
+    "icon": "https://app.handle.fi/fxUSDLogo.png",
     "displayDecimals": 4
   },
   {
@@ -261,6 +237,14 @@
     "decimals": 18,
     "address": "0x4e352cf164e64adcbad318c3a1e222e9eba4ce42",
     "icon": "https://tokens.1inch.io/0x4e352cf164e64adcbad318c3a1e222e9eba4ce42.png",
+    "displayDecimals": 4
+  },
+  {
+    "symbol": "MIM",
+    "name": "Magic Internet Money",
+    "decimals": 18,
+    "address": "0xfea7a6a0b346362bf88a9e4a88416b77a57d6c2a",
+    "icon": "https://tokens.1inch.exchange/0xfea7a6a0b346362bf88a9e4a88416b77a57d6c2a.png",
     "displayDecimals": 4
   },
   {

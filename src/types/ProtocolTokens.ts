@@ -3,13 +3,15 @@
   fxEUR = "fxEUR",
   fxKRW = "fxKRW",
   fxCNY = "fxCNY",
-  fxPHP = "fxPHP"
+  fxPHP = "fxPHP",
+  fxUSD = "fxUSD"
 }
 
 export enum CollateralTokens {
   WETH = "WETH",
   WBTC = "WBTC",
-  DAI = "DAI"
+  DAI = "DAI",
+  FOREX = "FOREX"
 }
 
 export const fxTokensArray = (() => {

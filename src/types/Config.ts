@@ -7,6 +7,9 @@ import Handle from "../../abi/Handle.json";
 import Treasury from "../../abi/Treasury.json";
 import VaultLibrary from "../../abi/VaultLibrary.json";
 import Liquidator from "../../abi/Liquidator.json";
+import GovernanceLock from "../../abi/GovernanceLock.json";
+import RewardPool from "../../abi/RewardPool.json";
+import fxTransformer from "../../abi/fxTransformer.json";
 
 export enum Abi {
   Handle = "Handle",
@@ -15,7 +18,10 @@ export enum Abi {
   fxKeeperPool = "fxKeeperPool",
   Treasury = "Treasury",
   VaultLibrary = "VaultLibrary",
-  Liquidator = "Liquidator"
+  Liquidator = "Liquidator",
+  GovernanceLock = "GovernanceLock",
+  RewardPool = "RewardPool",
+  fxTransformer = "fxTransformer"
 }
 
 const abi = {
@@ -25,13 +31,23 @@ const abi = {
   [Abi.Handle]: Handle,
   [Abi.Treasury]: Treasury,
   [Abi.VaultLibrary]: VaultLibrary,
-  [Abi.Liquidator]: Liquidator
+  [Abi.Liquidator]: Liquidator,
+  [Abi.GovernanceLock]: GovernanceLock,
+  [Abi.RewardPool]: RewardPool,
+  [Abi.fxTransformer]: fxTransformer
 };
 
-type NetworkConfig = {
+export type NetworkConfig = {
   name: string;
   theGraphEndpoint?: string;
   handleAddress?: string;
+  governanceLockAddress?: string;
+  fxTransformerAddress?: string;
+};
+
+export type ValidNetworkConfig = NetworkConfig & {
+  theGraphEndpoint: string;
+  handleAddress: string;
 };
 
 export class Config {
