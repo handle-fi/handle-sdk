@@ -4,7 +4,7 @@
       "name": "arbitrum",
       "chainId": 42161,
       "handleAddress": "0xA112D1bFd43fcFbF2bE2eBFcaebD6B6DB73aaD8B",
-      "governanceLockAddress": "0x1f75Cb1e06987637f7728Df47C0002a6411c4411",
+      "governanceLockAddress": "0xC6008E6baD8c2c0814A32f6F494fa419E95593b6",
       "fxTransformerAddress": "0x6a67CB66B928629DE164d7CE55fB1Bd77F31e553",
       "theGraphEndpoint": "https://api.thegraph.com/subgraphs/name/handle-fi/handle"
     },
