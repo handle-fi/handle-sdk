@@ -74,32 +74,6 @@ export default class FxTokens {
     return contract.allowance(account, this.config.protocolAddresses.comptroller);
   };
 
-  public setRepayAllowance = async (
-    fxTokenSymbol: FxTokenSymbol,
-    amount: ethers.BigNumber,
-    signer: ethers.Signer
-  ): Promise<ethers.ContractTransaction> => {
-    return this.setRepayAllowanceInternal(
-      fxTokenSymbol,
-      amount,
-      signer,
-      false
-    ) as Promise<ethers.ContractTransaction>;
-  };
-
-  public setRepayAllowancePopulate = async (
-    fxTokenSymbol: FxTokenSymbol,
-    amount: ethers.BigNumber,
-    signer: ethers.Signer
-  ): Promise<ethers.PopulatedTransaction> => {
-    return this.setRepayAllowanceInternal(
-      fxTokenSymbol,
-      amount,
-      signer,
-      true
-    ) as Promise<ethers.PopulatedTransaction>;
-  };
-
   public getSingleCollateralRepayAllowance = (
     fxToken: FxTokenSymbol,
     account: string,
@@ -111,59 +85,55 @@ export default class FxTokens {
     return contract.allowance(account, BENTOBOX_ADDRESS[chainId]);
   };
 
-  public setSingleCollateralRepayAllowance = async (
-    fxTokenSymbol: FxTokenSymbol,
-    amount: ethers.BigNumber,
-    network: SingleCollateralVaultNetwork,
-    signer: ethers.Signer
-  ): Promise<ethers.ContractTransaction> => {
-    return this.setSingleCollateralRepayAllowanceInternal(
-      fxTokenSymbol,
-      amount,
-      network,
-      signer,
-      false
-    ) as Promise<ethers.ContractTransaction>;
-  };
-
-  public setSingleCollateralRepayAllowancePropulate = async (
-    fxTokenSymbol: FxTokenSymbol,
-    amount: ethers.BigNumber,
-    network: SingleCollateralVaultNetwork,
-    signer: ethers.Signer
-  ): Promise<ethers.PopulatedTransaction> => {
-    return this.setSingleCollateralRepayAllowanceInternal(
-      fxTokenSymbol,
-      amount,
-      network,
-      signer,
-      true
-    ) as Promise<ethers.PopulatedTransaction>;
-  };
-
-  private setRepayAllowanceInternal = async (
+  public setRepayAllowance(
     fxTokenSymbol: FxTokenSymbol,
     amount: ethers.BigNumber,
     signer: ethers.Signer,
-    populateTransaction: boolean
-  ) => {
+    populateTransaction?: false
+  ): Promise<ethers.ContractTransaction>;
+  public setRepayAllowance(
+    fxTokenSymbol: FxTokenSymbol,
+    amount: ethers.BigNumber,
+    signer: ethers.Signer,
+    populateTransaction?: true
+  ): Promise<ethers.PopulatedTransaction>;
+  public setRepayAllowance(
+    fxTokenSymbol: FxTokenSymbol,
+    amount: ethers.BigNumber,
+    signer: ethers.Signer,
+    populateTransaction: boolean = false
+  ): Promise<ethers.ContractTransaction | ethers.PopulatedTransaction> {
     const fxContract = this.getFxTokenContract(fxTokenSymbol, signer);
     const contract = populateTransaction ? fxContract.populateTransaction : fxContract;
     return contract.approve(this.config.protocolAddresses.comptroller, amount);
-  };
+  }
 
-  private setSingleCollateralRepayAllowanceInternal = (
+  public setSingleCollateralRepayAllowance(
     fxTokenSymbol: FxTokenSymbol,
     amount: ethers.BigNumber,
     network: SingleCollateralVaultNetwork,
     signer: ethers.Signer,
-    populateTransaction: boolean
-  ) => {
+    populateTransaction?: false
+  ): Promise<ethers.ContractTransaction>;
+  public setSingleCollateralRepayAllowance(
+    fxTokenSymbol: FxTokenSymbol,
+    amount: ethers.BigNumber,
+    network: SingleCollateralVaultNetwork,
+    signer: ethers.Signer,
+    populateTransaction?: true
+  ): Promise<ethers.PopulatedTransaction>;
+  public setSingleCollateralRepayAllowance(
+    fxTokenSymbol: FxTokenSymbol,
+    amount: ethers.BigNumber,
+    network: SingleCollateralVaultNetwork,
+    signer: ethers.Signer,
+    populateTransaction: boolean = false
+  ): Promise<ethers.ContractTransaction | ethers.PopulatedTransaction> {
     const fxContract = this.getFxTokenContract(fxTokenSymbol, signer);
     const contract = populateTransaction ? fxContract.populateTransaction : fxContract;
     const chainId = sdkConfig.networkNameToId[network];
     return contract.approve(BENTOBOX_ADDRESS[chainId], amount);
-  };
+  }
 
   private getFxTokenMulticall = (
     fxToken: FxTokenSymbol,

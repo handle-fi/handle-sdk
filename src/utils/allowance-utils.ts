@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import { BENTOBOX_ADDRESS, KASHI_ADDRESS } from "@sushiswap/core-sdk";
 import config from "../config";
-import { SingleCollateralVaultNetwork } from "../types/web3";
+import { SingleCollateralVaultNetwork } from "../types/network";
 import { SushiBento__factory } from "../contracts";
 
 export const getIsKashiApproved = async (

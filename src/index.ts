@@ -8,7 +8,7 @@ import {
   NetworkMap,
   SingleCollateralVaultNetwork,
   SingleCollateralVaultNetworkMap
-} from "./types/web3";
+} from "./types/network";
 import FxTokensSDK from "./components/FxTokens";
 import PricesSDK, { Price } from "./components/Prices";
 import VaultsSDK from "./components/Vaults";

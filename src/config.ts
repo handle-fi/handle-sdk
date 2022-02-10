@@ -3,7 +3,7 @@ import { CollateralSymbolMap } from "./types/collaterals";
 import { FxTokenSymbolMap, FxTokenSymbol } from "./types/fxTokens";
 
 import { Token } from "./types/general";
-import { NetworkMap } from "./types/web3";
+import { NetworkMap } from "./types/network";
 
 export type FxTokenAddresses = FxTokenSymbolMap<string>;
 export type CollateralAddresses = CollateralSymbolMap<string>;
