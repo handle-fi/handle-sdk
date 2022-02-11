@@ -477,7 +477,7 @@ export default class Vaults {
     const referral = args.referral ?? ethers.constants.AddressZero;
 
     if (args.collateral) {
-      if (args.collateral.symbol === "NATIVE") {
+      if (args.collateral.symbol === "AETH") {
         return contract.mintWithEth(args.amount, fxToken.address, deadline, referral, {
           ...options,
           value: args.collateral.amount
@@ -624,7 +624,7 @@ export default class Vaults {
 
     const referral = args.referral ?? ethers.constants.AddressZero;
 
-    if (args.collateral === "NATIVE") {
+    if (args.collateral === "AETH") {
       return contract.depositCollateralETH(args.account, fxToken.address, referral, {
         ...options,
         value: args.amount
@@ -676,7 +676,7 @@ export default class Vaults {
       ? protocolContracts.treasury.populateTransaction
       : protocolContracts.treasury;
 
-    if (args.collateral === "NATIVE") {
+    if (args.collateral === "AETH") {
       return contract.withdrawCollateralETH(args.account, args.amount, fxToken.address, options);
     }
 
