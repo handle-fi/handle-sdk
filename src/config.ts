@@ -1,6 +1,7 @@
 import { ethers } from "ethers";
 import { CollateralSymbolMap } from "./types/collaterals";
 import { FxTokenSymbolMap, FxTokenSymbol } from "./types/fxTokens";
+import { BridgeConfigByNetwork } from "./components/Bridge";
 
 import { Token } from "./types/general";
 import { NetworkMap } from "./types/network";
@@ -34,6 +35,7 @@ export type Config = {
   theGraphEndpoints: {
     arbitrum: string;
   };
+  bridges: BridgeConfigByNetwork;
   singleCollateralVaults: SingleCollateralVaults;
   networkNameToId: NetworkMap<number>;
   kashiMinimumMintingRatio: ethers.BigNumber;
@@ -89,6 +91,11 @@ const config: Config = {
   },
   theGraphEndpoints: {
     arbitrum: "https://api.thegraph.com/subgraphs/name/handle-fi/handle"
+  },
+  bridges: {
+    ethereum: { address: "0xA112D1bFd43fcFbF2bE2eBFcaebD6B6DB73aaD8B", id: 0 },
+    arbitrum: { address: "0x000877168981dDc3CA1894c2A8979A2F0C6bBF3a", id: 1 },
+    polygon: { address: "0x62E13B35770D40aB0fEC1AB7814d21505620057b", id: 2 }
   },
   singleCollateralVaults: {
     polygon: {
