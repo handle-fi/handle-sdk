@@ -2,9 +2,10 @@ import { ethers } from "ethers";
 import { ProtocolAddresses } from "../config";
 import sdkConfig from "../config";
 import { callMulticallObject, createMulticallProtocolContracts } from "../utils/contract-utils";
-import { Promisified } from "../types/general";
+import { Promisified, Token } from "../types/general";
 
 export type ProtocolConfig = {
+  forexTokenAddress: string;
   protocolAddresses: ProtocolAddresses;
   chainId: number;
 };
@@ -19,11 +20,19 @@ export type ProtocolParameters = {
 
 export default class Vaults {
   private config: ProtocolConfig;
+  public forexToken: Token<"FOREX">;
 
   constructor(c?: ProtocolConfig) {
     this.config = c || {
+      forexTokenAddress: sdkConfig.forexAddress,
       protocolAddresses: sdkConfig.protocol.arbitrum.protocol,
       chainId: sdkConfig.networkNameToId.arbitrum
+    };
+
+    this.forexToken = {
+      symbol: "FOREX",
+      address: this.config.forexTokenAddress,
+      decimals: 18
     };
   }
 
