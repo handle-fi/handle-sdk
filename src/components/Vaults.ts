@@ -35,6 +35,7 @@ import KashiCooker from "../utils/KashiCooker";
 import { SingleCollateralVaultNetwork } from "../types/network";
 
 export type VaultsConfig = {
+  forexTokenAddress: string;
   protocolAddresses: ProtocolAddresses;
   fxTokenAddresses: FxTokenAddresses;
   collaterals: CollateralDetails;
@@ -117,6 +118,7 @@ export default class Vaults {
 
   constructor(c?: VaultsConfig) {
     this.config = c || {
+      forexTokenAddress: sdkConfig.forexAddress,
       protocolAddresses: sdkConfig.protocol.arbitrum.protocol,
       fxTokenAddresses: sdkConfig.fxTokenAddresses,
       collaterals: sdkConfig.protocol.arbitrum.collaterals,
