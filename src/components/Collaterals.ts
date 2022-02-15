@@ -1,7 +1,6 @@
 import { ethers } from "ethers";
-import { CollateralAddresses, ProtocolAddresses } from "../config";
-import { getAvailableAddresses } from "../utils/fxToken-utils";
-import { Promisified } from "../types/general";
+import { CollateralDetails, ProtocolAddresses } from "../config";
+import { Promisified, Token } from "../types/general";
 import { Collateral, CollateralSymbol } from "../types/collaterals";
 import sdkConfig from "../config";
 import {
@@ -14,10 +13,11 @@ import Graph, { IndexedCollateral } from "./Graph";
 import { ERC20__factory } from "../contracts";
 import { SingleCollateralVaultNetwork, SingleCollateralVaultSymbol } from "..";
 import { BENTOBOX_ADDRESS } from "@sushiswap/core-sdk";
+import { getTokensFromConfig } from "../utils/collateral-utils";
 
 export type CollateralsConfig = {
   protocolAddresses: ProtocolAddresses;
-  collateralAddresses: Partial<CollateralAddresses>;
+  collaterals: Partial<CollateralDetails>;
   chainId: number;
   graphEndpoint: string;
 };
@@ -32,24 +32,19 @@ type CollateralMulticall = {
   price: ethers.BigNumber;
 };
 
-type Available = {
-  symbol: CollateralSymbol;
-  address: string;
-};
-
 export default class Collaterals {
-  public available: Available[];
+  public tokens: Token<CollateralSymbol>[];
   private config: CollateralsConfig;
   private graph: Graph;
 
   constructor(c?: CollateralsConfig) {
     this.config = c || {
-      protocolAddresses: sdkConfig.protocolAddress.arbitrum.protocol,
-      collateralAddresses: sdkConfig.protocolAddress.arbitrum.collaterals,
+      protocolAddresses: sdkConfig.protocol.arbitrum.protocol,
+      collaterals: sdkConfig.protocol.arbitrum.collaterals,
       chainId: sdkConfig.networkNameToId.arbitrum,
       graphEndpoint: sdkConfig.theGraphEndpoints.arbitrum
     };
-    this.available = getAvailableAddresses(this.config.collateralAddresses);
+    this.tokens = getTokensFromConfig(this.config.collaterals);
     this.graph = new Graph(this.config.graphEndpoint);
   }
 
@@ -75,16 +70,18 @@ export default class Collaterals {
       signer
     );
 
-    const collateralMulticalls = this.available.map((a) =>
+    const collateralMulticalls = this.tokens.map((a) =>
       this.getCollateralMulticall(a.symbol, signer)
     );
     const raw = await callMulticallObjects(collateralMulticalls, provider);
-    return raw.map((c, index) => this.toCollateral(this.available[index], c));
+    return raw.map((c, index) => this.toCollateral(this.tokens[index], c));
   };
 
   public getIndexedCollaterals = async (): Promise<Collateral[]> => {
     const collaterals = await this.graph.collateralGraphClient.query({});
-    return collaterals.map(this.indexedToCollateral);
+    return collaterals.map(this.indexedToCollateral).filter((col) => {
+      return this.tokens.find((t) => t.address.toLowerCase() === col.address.toLowerCase());
+    });
   };
 
   public getDepositAllowance = async (
@@ -191,13 +188,15 @@ export default class Collaterals {
   };
 
   private getCollateralMulticall = (
-    collateral: CollateralSymbol,
+    collateralSymbol: CollateralSymbol,
     signer: ethers.Signer
   ): Promisified<CollateralMulticall> => {
-    const collateralAddress = this.config.collateralAddresses[collateral];
+    const collateralAddress = this.config.collaterals[collateralSymbol]?.address;
 
     if (!collateralAddress) {
-      throw new Error(`Collaterals not initialised with collateral that matches: ${collateral}`);
+      throw new Error(
+        `Collaterals not initialised with collateral that matches: ${collateralSymbol}`
+      );
     }
 
     const { contracts } = createMulticallProtocolContracts(
@@ -216,19 +215,19 @@ export default class Collaterals {
   };
 
   private toCollateral = (
-    addressAndSymbol: Available,
+    token: Token<CollateralSymbol>,
     collateral: CollateralMulticall
   ): Collateral => {
     const { decimals, collateralDetails, price } = collateral;
 
     return {
-      symbol: addressAndSymbol.symbol,
-      address: addressAndSymbol.address,
+      symbol: token.symbol,
+      address: token.address,
       decimals,
+      price,
       mintCR: collateralDetails.mintCR,
       liquidationFee: collateralDetails.liquidationFee,
-      interestRate: collateralDetails.interestRate,
-      price
+      interestRate: collateralDetails.interestRate
     };
   };
 
@@ -244,8 +243,8 @@ export default class Collaterals {
     };
   };
 
-  private findAvailable = (collateralSymbol: CollateralSymbol): Available => {
-    const avail = this.available.find((a) => a.symbol === collateralSymbol);
+  private findAvailable = (collateralSymbol: CollateralSymbol): Token<CollateralSymbol> => {
+    const avail = this.tokens.find((a) => a.symbol === collateralSymbol);
 
     if (!avail) {
       throw new Error(

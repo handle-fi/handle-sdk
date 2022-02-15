@@ -1,15 +1,19 @@
-import { Collateral, CollateralSymbol, CollateralSymbolMap } from "../types/collaterals";
+import { CollateralDetails } from "../config";
+import { Collateral, CollateralSymbol } from "../types/collaterals";
+import { Token } from "../types/general";
 
-export const getCollateralTokenSymbolFromAddress = (
-  address: string,
-  config: CollateralSymbolMap<string>
-): CollateralSymbol => {
-  const keys = Object.keys(config) as CollateralSymbol[];
+export const getTokensFromConfig = (
+  details: Partial<CollateralDetails>
+): Token<CollateralSymbol>[] => {
+  return (Object.keys(details) as []).map((key) => {
+    const k = key as CollateralSymbol;
+    const detail = (details as CollateralDetails)[k];
 
-  return keys.find((k) => {
-    const symbol = k as CollateralSymbol;
-    return config[symbol].toLowerCase() === address.toLowerCase();
-  })!;
+    return {
+      symbol: key,
+      ...detail
+    };
+  });
 };
 
 export const getCollateralByAddress = (collaterals: Collateral[], address: string): Collateral => {

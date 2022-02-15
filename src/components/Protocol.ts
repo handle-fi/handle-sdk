@@ -22,7 +22,7 @@ export default class Vaults {
 
   constructor(c?: ProtocolConfig) {
     this.config = c || {
-      protocolAddresses: sdkConfig.protocolAddress.arbitrum.protocol,
+      protocolAddresses: sdkConfig.protocol.arbitrum.protocol,
       chainId: sdkConfig.networkNameToId.arbitrum
     };
   }

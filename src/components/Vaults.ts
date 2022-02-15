@@ -9,7 +9,7 @@ import {
   Vault,
   VaultData
 } from "../types/vaults";
-import { ProtocolAddresses, FxTokenAddresses, CollateralAddresses, Config } from "../config";
+import { ProtocolAddresses, FxTokenAddresses, CollateralDetails, Config } from "../config";
 import {
   createMulticallProtocolContracts,
   createProtocolContracts,
@@ -37,7 +37,7 @@ import { SingleCollateralVaultNetwork } from "../types/network";
 export type VaultsConfig = {
   protocolAddresses: ProtocolAddresses;
   fxTokenAddresses: FxTokenAddresses;
-  collateralAddresses: CollateralAddresses;
+  collaterals: CollateralDetails;
   singleCollateralVaults: Config["singleCollateralVaults"];
   chainId: number;
   graphEndpoint: string;
@@ -117,9 +117,9 @@ export default class Vaults {
 
   constructor(c?: VaultsConfig) {
     this.config = c || {
-      protocolAddresses: sdkConfig.protocolAddress.arbitrum.protocol,
+      protocolAddresses: sdkConfig.protocol.arbitrum.protocol,
       fxTokenAddresses: sdkConfig.fxTokenAddresses,
-      collateralAddresses: sdkConfig.protocolAddress.arbitrum.collaterals,
+      collaterals: sdkConfig.protocol.arbitrum.collaterals,
       chainId: sdkConfig.networkNameToId.arbitrum,
       graphEndpoint: sdkConfig.theGraphEndpoints.arbitrum,
       singleCollateralVaults: sdkConfig.singleCollateralVaults

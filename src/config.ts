@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import { CollateralSymbolMap } from "./types/collaterals";
+import { CollateralSymbolMap, CollateralSymbol } from "./types/collaterals";
 import { FxTokenSymbolMap, FxTokenSymbol } from "./types/fxTokens";
 import { BridgeConfigByNetwork } from "./components/Bridge";
 
@@ -7,7 +7,7 @@ import { Token } from "./types/general";
 import { NetworkMap } from "./types/network";
 
 export type FxTokenAddresses = FxTokenSymbolMap<string>;
-export type CollateralAddresses = CollateralSymbolMap<string>;
+export type CollateralDetails = CollateralSymbolMap<Omit<Token<CollateralSymbol>, "symbol">>;
 
 export type KashiPoolConfig = {
   address: string;
@@ -20,22 +20,23 @@ export type SingleCollateralVaults = {
   arbitrum: { [key: string]: KashiPoolConfig };
 };
 
-const FX_AUD_ADDRESS = "0x7E141940932E3D13bfa54B224cb4a16510519308";
-
 export type Config = {
   forexAddress: string;
   fxTokenAddresses: FxTokenAddresses;
-  protocolAddress: {
+  protocol: {
     arbitrum: {
       protocol: ProtocolAddresses;
       chainlinkFeeds: ChainlinkFeeds;
-      collaterals: CollateralAddresses;
+      collaterals: CollateralDetails;
     };
   };
   theGraphEndpoints: {
     arbitrum: string;
   };
-  bridges: BridgeConfigByNetwork;
+  bridge: {
+    apiBaseUrl: string;
+    byNetwork: BridgeConfigByNetwork;
+  };
   singleCollateralVaults: SingleCollateralVaults;
   networkNameToId: NetworkMap<number>;
   kashiMinimumMintingRatio: ethers.BigNumber;
@@ -60,14 +61,14 @@ export type ChainlinkFeeds = {
 const config: Config = {
   forexAddress: "0xDb298285FE4C5410B05390cA80e8Fbe9DE1F259B",
   fxTokenAddresses: {
-    fxAUD: FX_AUD_ADDRESS,
+    fxAUD: "0x7E141940932E3D13bfa54B224cb4a16510519308",
     fxPHP: "0x3d147cD9aC957B2a5F968dE9d1c6B9d0872286a0",
     fxUSD: "0x8616E8EA83f048ab9A5eC513c9412Dd2993bcE3F",
     fxEUR: "0x116172B2482c5dC3E6f445C16Ac13367aC3FCd35",
     fxKRW: "0xF4E8BA79d058fFf263Fd043Ef50e1010c1BdF991",
     fxCNY: "0x2C29daAce6Aa05e3b65743EFd61f8A2C448302a3"
   },
-  protocolAddress: {
+  protocol: {
     arbitrum: {
       protocol: {
         handle: "0xA112D1bFd43fcFbF2bE2eBFcaebD6B6DB73aaD8B",
@@ -84,18 +85,27 @@ const config: Config = {
         cny_usd: "0xcc3370bde6afe51e1205a5038947b9836371eccb"
       },
       collaterals: {
-        FOREX: "0xdb298285fe4c5410b05390ca80e8fbe9de1f259b",
-        WETH: "0x82af49447d8a07e3bd95bd0d56f35241523fbab1"
+        FOREX: {
+          address: "0xdb298285fe4c5410b05390ca80e8fbe9de1f259b",
+          decimals: 18
+        },
+        WETH: {
+          address: "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+          decimals: 18
+        }
       }
     }
   },
   theGraphEndpoints: {
     arbitrum: "https://api.thegraph.com/subgraphs/name/handle-fi/handle"
   },
-  bridges: {
-    ethereum: { address: "0xA112D1bFd43fcFbF2bE2eBFcaebD6B6DB73aaD8B", id: 0 },
-    arbitrum: { address: "0x000877168981dDc3CA1894c2A8979A2F0C6bBF3a", id: 1 },
-    polygon: { address: "0x62E13B35770D40aB0fEC1AB7814d21505620057b", id: 2 }
+  bridge: {
+    apiBaseUrl: "https://handle-bridge.herokuapp.com/bridge",
+    byNetwork: {
+      ethereum: { address: "0xA112D1bFd43fcFbF2bE2eBFcaebD6B6DB73aaD8B", id: 0 },
+      arbitrum: { address: "0x000877168981dDc3CA1894c2A8979A2F0C6bBF3a", id: 1 },
+      polygon: { address: "0x62E13B35770D40aB0fEC1AB7814d21505620057b", id: 2 }
+    }
   },
   singleCollateralVaults: {
     polygon: {

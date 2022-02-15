@@ -14,7 +14,7 @@ import PricesSDK, { Price } from "./components/Prices";
 import VaultsSDK from "./components/Vaults";
 import CollateralsSDK from "./components/Collaterals";
 import GraphSDK, { IndexedFxToken, IndexedVault, IndexedFxKeeperPool } from "./components/Graph";
-import BridgeSDK from "./components/Bridge";
+import BridgeSDK, { PendingWithdrawal } from "./components/Bridge";
 import VaultController from "./components/VaultController";
 import SingleCollateralVaultController from "./components/SingleCollateralVaultController";
 import ProtocolSDK, { ProtocolParameters } from "./components/Protocol";
@@ -58,5 +58,6 @@ export type {
   SingleCollateralVaultNetworkMap,
   SingleCollateralVaultNetwork,
   SingleCollateralVaultSymbol,
-  SingleCollateralVault
+  SingleCollateralVault,
+  PendingWithdrawal
 };

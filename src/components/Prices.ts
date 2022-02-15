@@ -20,7 +20,7 @@ export default class Prices {
 
   constructor(c?: PricesConfig) {
     this.config = c || {
-      feeds: config.protocolAddress.arbitrum.chainlinkFeeds,
+      feeds: config.protocol.arbitrum.chainlinkFeeds,
       chainId: config.networkNameToId.arbitrum
     };
   }

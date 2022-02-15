@@ -1,9 +1,10 @@
+import axios from "axios";
+import { ethers } from "ethers";
 import { FxTokenAddresses } from "../config";
 import sdkConfig from "../config";
 import { FxTokenSymbol, Network, NetworkMap } from "..";
 import { Bridge__factory, ERC20__factory } from "../contracts";
 import { DepositEvent } from "../contracts/Bridge";
-import { ethers } from "ethers";
 import { getFxTokenSymbolFromAddress } from "../utils/fxToken-utils";
 
 export type BridgeConfigByNetwork = NetworkMap<{ address: string; id: number }>;
@@ -11,6 +12,7 @@ export type BridgeConfigByNetwork = NetworkMap<{ address: string; id: number }>;
 export type BridgeToken = FxTokenSymbol | "FOREX";
 
 export type BridgeConfig = {
+  apiBaseUrl: string;
   byNetwork: BridgeConfigByNetwork;
   forexAddress: string;
   fxTokenAddresses: FxTokenAddresses;
@@ -26,21 +28,26 @@ export type BridgeDepositArguments = {
 export type BridgeWithdrawArguments = {
   tokenSymbol: BridgeToken;
   amount: ethers.BigNumber;
-  nonce: number;
+  nonce: ethers.BigNumber;
   fromNetwork: Network;
   toNetwork: Network;
   signature: string;
+};
+
+export type BridgeGetNonceArguments = {
+  fromNetwork: Network;
+  toNetwork: Network;
 };
 
 type DepositEventData = DepositEvent["args"] & {
   txHash: string;
 };
 
-type PendingWithdrawal = {
+export type PendingWithdrawal = {
   txHash: string;
   tokenSymbol: BridgeToken;
   amount: ethers.BigNumber;
-  nonce: number;
+  nonce: ethers.BigNumber;
   fromNetwork: Network;
   toNetwork: Network;
 };
@@ -50,8 +57,9 @@ export default class Bridge {
 
   constructor(c?: BridgeConfig) {
     this.config = c || {
+      apiBaseUrl: sdkConfig.bridge.apiBaseUrl,
       forexAddress: sdkConfig.forexAddress,
-      byNetwork: sdkConfig.bridges,
+      byNetwork: sdkConfig.bridge.byNetwork,
       fxTokenAddresses: sdkConfig.fxTokenAddresses
     };
   }
@@ -76,6 +84,7 @@ export default class Bridge {
     const bridgeContract = this.getBridgeContract(args.fromNetwork, signer);
     const tokenAddress = this.getTokenAddress(args.tokenSymbol);
     const contract = populateTransaction ? bridgeContract.populateTransaction : bridgeContract;
+
     return contract.deposit(
       tokenAddress,
       args.amount,
@@ -102,7 +111,7 @@ export default class Bridge {
     populateTransaction: boolean = false,
     options: ethers.Overrides = {}
   ): Promise<ethers.ContractTransaction | ethers.PopulatedTransaction> {
-    const bridgeContract = this.getBridgeContract(args.fromNetwork, signer);
+    const bridgeContract = this.getBridgeContract(args.toNetwork, signer);
     const tokenAddress = this.getTokenAddress(args.tokenSymbol);
     const contract = populateTransaction ? bridgeContract.populateTransaction : bridgeContract;
     const address = await signer.getAddress();
@@ -170,6 +179,22 @@ export default class Bridge {
     return results.reduce((acc, curr) => [...acc, ...curr], []);
   };
 
+  public getWithdrawSignature = async (network: Network, txHash: string) => {
+    const { data } = await axios.get(
+      `${this.config.apiBaseUrl}/sign?network=${network}&transactionHash=${txHash}`
+    );
+    return data.signature;
+  };
+
+  public getWithdrawNonce = async (
+    args: BridgeGetNonceArguments,
+    signer: ethers.Signer
+  ): Promise<ethers.BigNumber> => {
+    const bridgeContract = this.getBridgeContract(args.toNetwork, signer);
+    const account = await signer.getAddress();
+    return bridgeContract.withdrawNonce(account, this.config.byNetwork[args.fromNetwork].id);
+  };
+
   private getPendingWithdrawsForNetwork = async (
     account: string,
     network: Network,
@@ -203,9 +228,12 @@ export default class Bridge {
     const networksWithEvents = Object.keys(eventsByNetwork) as Network[];
 
     const withdrawCounts = await Promise.all(
-      networksWithEvents.map((n) => {
-        return bridgeContract.withdrawNonce(account, this.config.byNetwork[n].id);
-      })
+      networksWithEvents
+        .filter((n) => n !== network)
+        .map((n) => {
+          const bc = this.getBridgeContract(n, signers[n]);
+          return bc.withdrawNonce(account, this.config.byNetwork[network].id);
+        })
     );
 
     const withdrawCountsByNetwork = withdrawCounts.reduce((progress, count, index) => {
@@ -221,7 +249,7 @@ export default class Bridge {
       const withdrawCount = withdrawCountsByNetwork[network || 0];
       const pendingCount = depositCount - (withdrawCount || 0);
 
-      const pendingEvents = events?.slice(0, pendingCount) || [];
+      const pendingEvents = events?.slice(events.length - pendingCount, events.length) || [];
 
       return [...progress, ...pendingEvents];
     }, [] as DepositEventData[]);
@@ -230,7 +258,7 @@ export default class Bridge {
       txHash: pw.txHash,
       tokenSymbol: this.getTokenSymbolFromAddress(pw.token),
       amount: pw.amount,
-      nonce: pw.nonce.toNumber(),
+      nonce: pw.nonce,
       fromNetwork: this.bridgeIdToNetwork(pw.fromId.toNumber()),
       toNetwork: this.bridgeIdToNetwork(pw.toId.toNumber())
     }));
