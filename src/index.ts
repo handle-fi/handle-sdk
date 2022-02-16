@@ -3,6 +3,7 @@ import { FxTokenSymbol, FxTokenSymbolMap } from "./types/fxTokens";
 import { Vault, SingleCollateralVaultSymbol, SingleCollateralVault } from "./types/vaults";
 import { Collateral, CollateralSymbol, CollateralSymbolWithNative } from "./types/collaterals";
 import { FxToken } from "./types/fxTokens";
+import { Token } from "./types/general";
 import {
   Network,
   NetworkMap,
@@ -59,5 +60,6 @@ export type {
   SingleCollateralVaultNetwork,
   SingleCollateralVaultSymbol,
   SingleCollateralVault,
-  PendingWithdrawal
+  PendingWithdrawal,
+  Token
 };
