@@ -3,17 +3,19 @@ import { FxTokenSymbol, FxTokenSymbolMap } from "./types/fxTokens";
 import { Vault, SingleCollateralVaultSymbol, SingleCollateralVault } from "./types/vaults";
 import { Collateral, CollateralSymbol, CollateralSymbolWithNative } from "./types/collaterals";
 import { FxToken } from "./types/fxTokens";
+import { Token } from "./types/general";
 import {
   Network,
   NetworkMap,
   SingleCollateralVaultNetwork,
   SingleCollateralVaultNetworkMap
-} from "./types/web3";
+} from "./types/network";
 import FxTokensSDK from "./components/FxTokens";
 import PricesSDK, { Price } from "./components/Prices";
 import VaultsSDK from "./components/Vaults";
 import CollateralsSDK from "./components/Collaterals";
 import GraphSDK, { IndexedFxToken, IndexedVault, IndexedFxKeeperPool } from "./components/Graph";
+import BridgeSDK, { PendingWithdrawal } from "./components/Bridge";
 import VaultController from "./components/VaultController";
 import SingleCollateralVaultController from "./components/SingleCollateralVaultController";
 import ProtocolSDK, { ProtocolParameters } from "./components/Protocol";
@@ -30,6 +32,7 @@ export {
   VaultController,
   SingleCollateralVaultController,
   ProtocolSDK,
+  BridgeSDK,
   config,
   NETWORK_NAMES,
   SINGLE_COLLATERAL_NETWORK_NAMES,
@@ -56,5 +59,7 @@ export type {
   SingleCollateralVaultNetworkMap,
   SingleCollateralVaultNetwork,
   SingleCollateralVaultSymbol,
-  SingleCollateralVault
+  SingleCollateralVault,
+  PendingWithdrawal,
+  Token
 };

@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 
 export type CollateralSymbol = "FOREX" | "WETH";
-export type CollateralSymbolWithNative = CollateralSymbol | "NATIVE";
+export type CollateralSymbolWithNative = CollateralSymbol | "AETH";
 export type CollateralSymbolMap<T> = { [key in CollateralSymbol]: T };
 
 export type Collateral = {

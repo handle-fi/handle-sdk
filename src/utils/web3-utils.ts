@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import config from "../config";
-import { Network } from "../types/web3";
+import { Network } from "../types/network";
 
 export const getNetworkName = (network: ethers.providers.Network): Network => {
   const result = Object.entries(config.networkNameToId).find(([_networkName, networkId]) => {

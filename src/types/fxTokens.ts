@@ -1,11 +1,9 @@
 import { ethers } from "ethers";
+import { Token } from "./general";
 
 export type FxTokenSymbol = "fxAUD" | "fxPHP" | "fxUSD" | "fxEUR" | "fxKRW" | "fxCNY";
 export type FxTokenSymbolMap<T> = { [key in FxTokenSymbol]: T };
 
-export type FxToken = {
-  symbol: FxTokenSymbol;
-  address: string;
+export type FxToken = Token<FxTokenSymbol> & {
   price: ethers.BigNumber;
-  decimals: 18;
 };

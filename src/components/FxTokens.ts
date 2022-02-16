@@ -1,11 +1,11 @@
 import { ethers } from "ethers";
 import { FxTokenAddresses, ProtocolAddresses } from "../config";
-import { ERC20, ERC20__factory } from "../contracts";
-import { FxToken, FxTokenSymbol, FxTokenSymbolMap } from "../types/fxTokens";
+import { ERC20__factory } from "../contracts";
+import { FxToken, FxTokenSymbol } from "../types/fxTokens";
 import { callMulticallObjects, createMulticallProtocolContracts } from "../utils/contract-utils";
-import { getAvailableAddresses } from "../utils/fxToken-utils";
+import { getTokensFromAddresses } from "../utils/fxToken-utils";
 import sdkConfig from "../config";
-import { Promisified } from "../types/general";
+import { Promisified, Token } from "../types/general";
 import Graph, { IndexedFxToken } from "./Graph";
 import { SingleCollateralVaultNetwork } from "..";
 import { BENTOBOX_ADDRESS } from "@sushiswap/core-sdk";
@@ -21,24 +21,23 @@ type FxTokenMulticallMulticall = {
   price: ethers.BigNumber;
 };
 
-type Available = {
-  symbol: FxTokenSymbol;
-  address: string;
-};
 export default class FxTokens {
-  public available: Available[];
+  public tokens: Token<FxTokenSymbol>[];
   private config: FxTokensConfig;
   private graph: Graph;
 
   constructor(c?: FxTokensConfig) {
     this.config = c || {
-      protocolAddresses: sdkConfig.protocolAddress.arbitrum.protocol,
+      protocolAddresses: sdkConfig.protocol.arbitrum.protocol,
       fxTokenAddresses: sdkConfig.fxTokenAddresses,
       chainId: sdkConfig.networkNameToId.arbitrum,
       graphEndpoint: sdkConfig.theGraphEndpoints.arbitrum
     };
 
-    this.available = getAvailableAddresses(this.config.fxTokenAddresses);
+    this.tokens = getTokensFromAddresses(this.config.fxTokenAddresses).map((t) => ({
+      ...t,
+      decimals: 18
+    }));
     this.graph = new Graph(this.config.graphEndpoint);
   }
 
@@ -49,55 +48,23 @@ export default class FxTokens {
       signer
     );
 
-    const multicalls = this.available.map((a) => this.getFxTokenMulticall(a.symbol, signer));
+    const multicalls = this.tokens.map((a) => this.getFxTokenMulticall(a.symbol, signer));
     const raw = await callMulticallObjects(multicalls, provider);
-    return raw.map((t, index) => this.onChainToFxToken(this.available[index], t));
+    return raw.map((t, index) => this.onChainToFxToken(this.tokens[index], t));
   };
 
   public getIndexedFxTokens = async (): Promise<FxToken[]> => {
     const fxTokens = await this.graph.fxTokens.query({});
-    return fxTokens.map(this.indexedToFxToken);
-  };
-
-  public createFxTokenContracts = (signer: ethers.Signer) => {
-    return Object.keys(this.config.fxTokenAddresses).reduce((progress, key) => {
-      const symbol = key as FxTokenSymbol;
-      return {
-        ...progress,
-        [key]: ERC20__factory.connect(this.config.fxTokenAddresses[symbol], signer)
-      };
-    }, {} as FxTokenSymbolMap<ERC20>);
+    return fxTokens
+      .map(this.indexedToFxToken)
+      .filter((fx) =>
+        this.tokens.find((t) => t.address.toLowerCase() === fx.address.toLowerCase())
+      );
   };
 
   public getRepayAllowance = (fxToken: FxTokenSymbol, account: string, signer: ethers.Signer) => {
     const contract = this.getFxTokenContract(fxToken, signer);
     return contract.allowance(account, this.config.protocolAddresses.comptroller);
-  };
-
-  public setRepayAllowance = async (
-    fxTokenSymbol: FxTokenSymbol,
-    amount: ethers.BigNumber,
-    signer: ethers.Signer
-  ): Promise<ethers.ContractTransaction> => {
-    return this.setRepayAllowanceInternal(
-      fxTokenSymbol,
-      amount,
-      signer,
-      false
-    ) as Promise<ethers.ContractTransaction>;
-  };
-
-  public setRepayAllowancePopulate = async (
-    fxTokenSymbol: FxTokenSymbol,
-    amount: ethers.BigNumber,
-    signer: ethers.Signer
-  ): Promise<ethers.PopulatedTransaction> => {
-    return this.setRepayAllowanceInternal(
-      fxTokenSymbol,
-      amount,
-      signer,
-      true
-    ) as Promise<ethers.PopulatedTransaction>;
   };
 
   public getSingleCollateralRepayAllowance = (
@@ -111,68 +78,63 @@ export default class FxTokens {
     return contract.allowance(account, BENTOBOX_ADDRESS[chainId]);
   };
 
-  public setSingleCollateralRepayAllowance = async (
-    fxTokenSymbol: FxTokenSymbol,
-    amount: ethers.BigNumber,
-    network: SingleCollateralVaultNetwork,
-    signer: ethers.Signer
-  ): Promise<ethers.ContractTransaction> => {
-    return this.setSingleCollateralRepayAllowanceInternal(
-      fxTokenSymbol,
-      amount,
-      network,
-      signer,
-      false
-    ) as Promise<ethers.ContractTransaction>;
-  };
-
-  public setSingleCollateralRepayAllowancePropulate = async (
-    fxTokenSymbol: FxTokenSymbol,
-    amount: ethers.BigNumber,
-    network: SingleCollateralVaultNetwork,
-    signer: ethers.Signer
-  ): Promise<ethers.PopulatedTransaction> => {
-    return this.setSingleCollateralRepayAllowanceInternal(
-      fxTokenSymbol,
-      amount,
-      network,
-      signer,
-      true
-    ) as Promise<ethers.PopulatedTransaction>;
-  };
-
-  private setRepayAllowanceInternal = async (
+  public setRepayAllowance(
     fxTokenSymbol: FxTokenSymbol,
     amount: ethers.BigNumber,
     signer: ethers.Signer,
-    populateTransaction: boolean
-  ) => {
+    populateTransaction?: false
+  ): Promise<ethers.ContractTransaction>;
+  public setRepayAllowance(
+    fxTokenSymbol: FxTokenSymbol,
+    amount: ethers.BigNumber,
+    signer: ethers.Signer,
+    populateTransaction?: true
+  ): Promise<ethers.PopulatedTransaction>;
+  public setRepayAllowance(
+    fxTokenSymbol: FxTokenSymbol,
+    amount: ethers.BigNumber,
+    signer: ethers.Signer,
+    populateTransaction: boolean = false
+  ): Promise<ethers.ContractTransaction | ethers.PopulatedTransaction> {
     const fxContract = this.getFxTokenContract(fxTokenSymbol, signer);
     const contract = populateTransaction ? fxContract.populateTransaction : fxContract;
     return contract.approve(this.config.protocolAddresses.comptroller, amount);
-  };
+  }
 
-  private setSingleCollateralRepayAllowanceInternal = (
+  public setSingleCollateralRepayAllowance(
     fxTokenSymbol: FxTokenSymbol,
     amount: ethers.BigNumber,
     network: SingleCollateralVaultNetwork,
     signer: ethers.Signer,
-    populateTransaction: boolean
-  ) => {
+    populateTransaction?: false
+  ): Promise<ethers.ContractTransaction>;
+  public setSingleCollateralRepayAllowance(
+    fxTokenSymbol: FxTokenSymbol,
+    amount: ethers.BigNumber,
+    network: SingleCollateralVaultNetwork,
+    signer: ethers.Signer,
+    populateTransaction?: true
+  ): Promise<ethers.PopulatedTransaction>;
+  public setSingleCollateralRepayAllowance(
+    fxTokenSymbol: FxTokenSymbol,
+    amount: ethers.BigNumber,
+    network: SingleCollateralVaultNetwork,
+    signer: ethers.Signer,
+    populateTransaction: boolean = false
+  ): Promise<ethers.ContractTransaction | ethers.PopulatedTransaction> {
     const fxContract = this.getFxTokenContract(fxTokenSymbol, signer);
     const contract = populateTransaction ? fxContract.populateTransaction : fxContract;
     const chainId = sdkConfig.networkNameToId[network];
     return contract.approve(BENTOBOX_ADDRESS[chainId], amount);
-  };
+  }
 
   private getFxTokenMulticall = (
-    fxToken: FxTokenSymbol,
+    fxTokenSymbol: FxTokenSymbol,
     signer: ethers.Signer
   ): Promisified<FxTokenMulticallMulticall> => {
-    const fxAddress = this.config.fxTokenAddresses[fxToken];
-
-    if (!fxAddress) {
-      throw new Error(`fxTokens not initialised with token that matches: ${fxToken}`);
+    const tokenAddress = this.config.fxTokenAddresses[fxTokenSymbol];
+    if (!tokenAddress) {
+      throw new Error(`fxTokens not initialised with token that matches: ${fxTokenSymbol}`);
     }
 
     const { contracts } = createMulticallProtocolContracts(
@@ -182,21 +144,21 @@ export default class FxTokens {
     );
 
     return {
-      price: contracts.handle.getTokenPrice(fxAddress)
+      price: contracts.handle.getTokenPrice(tokenAddress)
     };
   };
 
   private onChainToFxToken = (
-    addressAndSymbol: Available,
+    token: Token<FxTokenSymbol>,
     fxToken: FxTokenMulticallMulticall
   ): FxToken => {
     const { price } = fxToken;
 
     return {
-      symbol: addressAndSymbol.symbol,
-      address: addressAndSymbol.address,
-      price,
-      decimals: 18
+      symbol: token.symbol,
+      address: token.address,
+      decimals: token.decimals,
+      price
     };
   };
 
@@ -204,23 +166,16 @@ export default class FxTokens {
     return {
       symbol: fxToken.symbol,
       address: fxToken.address,
-      price: fxToken.rate,
-      decimals: 18
+      decimals: fxToken.decimals,
+      price: fxToken.rate
     };
   };
 
   private getFxTokenContract = (fxTokenSymbol: FxTokenSymbol, signer: ethers.Signer) => {
-    const avail = this.findAvailable(fxTokenSymbol);
-    return ERC20__factory.connect(avail.address, signer);
-  };
-
-  private findAvailable = (fxTokenSymbol: FxTokenSymbol): Available => {
-    const avail = this.available.find((a) => a.symbol === fxTokenSymbol);
-
-    if (!avail) {
-      throw new Error(`FxTokens not initialised with collateral that matches: ${fxTokenSymbol}`);
+    const tokenAddress = this.config.fxTokenAddresses[fxTokenSymbol];
+    if (!tokenAddress) {
+      throw new Error(`fxTokens not initialised with token that matches: ${fxTokenSymbol}`);
     }
-
-    return avail;
+    return ERC20__factory.connect(tokenAddress, signer);
   };
 }
