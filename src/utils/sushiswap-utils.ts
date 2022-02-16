@@ -5,7 +5,9 @@ import { createMultiCallContract } from "./contract-utils";
 import { SushiBento, SushiKashi } from "../contracts";
 import sushiKashiAbi from "../abis/sushi/SushiKashi.json";
 import sushiBentoAbi from "../abis/sushi/SushiBento.json";
-import { Promisified, Token } from "../types/general";
+import { Promisified } from "../types/general";
+import { Token } from "../types/tokens";
+
 import { FxTokenSymbol } from "..";
 import { KashiPoolConfig } from "../config";
 import { SingleCollateralVaultData } from "../types/vaults";

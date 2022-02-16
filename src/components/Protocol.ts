@@ -2,7 +2,8 @@ import { ethers } from "ethers";
 import { ProtocolAddresses } from "../config";
 import sdkConfig from "../config";
 import { callMulticallObject, createMulticallProtocolContracts } from "../utils/contract-utils";
-import { Promisified, Token } from "../types/general";
+import { Promisified } from "../types/general";
+import { Token } from "../types/tokens";
 
 export type ProtocolConfig = {
   forexTokenAddress: string;

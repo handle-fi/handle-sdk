@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import { Token } from "./general";
+import { Token } from "./tokens";
 
 export type FxTokenSymbol = "fxAUD" | "fxPHP" | "fxUSD" | "fxEUR" | "fxKRW" | "fxCNY";
 export type FxTokenSymbolMap<T> = { [key in FxTokenSymbol]: T };

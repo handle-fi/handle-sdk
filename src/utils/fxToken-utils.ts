@@ -1,5 +1,5 @@
 import { FxToken, FxTokenSymbol, FxTokenSymbolMap } from "..";
-import { Token } from "../types/general";
+import { Token } from "../types/tokens";
 
 export const getTokensFromAddresses = (
   addresses: Partial<FxTokenSymbolMap<string>>

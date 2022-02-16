@@ -2,8 +2,7 @@ import { ethers } from "ethers";
 import { CollateralSymbolMap, CollateralSymbol } from "./types/collaterals";
 import { FxTokenSymbolMap, FxTokenSymbol } from "./types/fxTokens";
 import { BridgeConfigByNetwork } from "./components/Bridge";
-
-import { Token } from "./types/general";
+import { StableType, Token } from "./types/tokens";
 import { NetworkMap } from "./types/network";
 
 export type FxTokenAddresses = FxTokenSymbolMap<string>;
@@ -40,6 +39,16 @@ export type Config = {
   singleCollateralVaults: SingleCollateralVaults;
   networkNameToId: NetworkMap<number>;
   kashiMinimumMintingRatio: ethers.BigNumber;
+  convert: {
+    feeAddress: string;
+    fees: {
+      buyingForex: number;
+      stableToStable: number; // eur -> usd
+      sameStableToStable: number; // usd -> usd
+      nonStable: number;
+    };
+    tokenSymbolToStableType: { [key: string]: StableType };
+  };
 };
 
 export type ProtocolAddresses = {
@@ -136,7 +145,24 @@ const config: Config = {
     arbitrum: 42161,
     polygon: 137
   },
-  kashiMinimumMintingRatio: ethers.utils.parseEther("1.75")
+  kashiMinimumMintingRatio: ethers.utils.parseEther("1.75"),
+  convert: {
+    feeAddress: "0xFa2c1bE677BE4BEc8851D1577B343F7060B51E3A",
+    fees: {
+      buyingForex: 0,
+      stableToStable: 0.1, // eur -> usd
+      sameStableToStable: 0.04, // usd -> usd
+      nonStable: 0.3
+    },
+    tokenSymbolToStableType: {
+      USDC: "USD",
+      LUSD: "USD",
+      DAI: "USD",
+      USDT: "USD",
+      sUSD: "USD",
+      EURS: "EURO"
+    }
+  }
 };
 
 export default config;

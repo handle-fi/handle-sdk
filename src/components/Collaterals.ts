@@ -1,6 +1,7 @@
 import { ethers } from "ethers";
 import { CollateralDetails, ProtocolAddresses } from "../config";
-import { Promisified, Token } from "../types/general";
+import { Promisified } from "../types/general";
+import { Token } from "../types/tokens";
 import { Collateral, CollateralSymbol } from "../types/collaterals";
 import sdkConfig from "../config";
 import {
