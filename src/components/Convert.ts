@@ -77,7 +77,7 @@ const NETWORK_TO_TOKENS: ConvertNetworkMap<TokenExtended<string>[]> = {
   polygon
 };
 
-export class Convert {
+export default class Convert {
   public getQuote = async ({
     sellToken,
     buyToken,
