@@ -12,7 +12,7 @@ type GetQuoteArguments = {
   buyToken: string;
   sellAmount: BigNumber | undefined;
   buyAmount: BigNumber | undefined;
-  gasPriceInWei: string;
+  gasPrice: BigNumber;
   fromAddress: string;
   network: ConvertNetwork;
 };
@@ -22,8 +22,8 @@ type GetSwapArguments = {
   buyToken: string;
   sellAmount: BigNumber | undefined;
   buyAmount: BigNumber | undefined;
-  slippagePercentage: string;
-  gasPriceInWei: string;
+  slippagePercentage: number;
+  gasPrice: BigNumber;
   fromAddress: string;
   network: ConvertNetwork;
 };
@@ -83,7 +83,7 @@ export default class Convert {
     buyToken,
     sellAmount,
     buyAmount,
-    gasPriceInWei,
+    gasPrice,
     fromAddress,
     network
   }: GetQuoteArguments): Promise<Quote> => {
@@ -91,7 +91,7 @@ export default class Convert {
       if (!sellAmount) {
         throw new Error("Must supply a sell amount when trading on arbitrum");
       }
-      return this.get1InchQuote(sellToken, buyToken, sellAmount, gasPriceInWei, network);
+      return this.get1InchQuote(sellToken, buyToken, sellAmount, gasPrice, network);
     }
 
     return this.get0xQuote(
@@ -99,7 +99,7 @@ export default class Convert {
       buyToken,
       sellAmount,
       buyAmount,
-      gasPriceInWei,
+      gasPrice,
       fromAddress,
       network
     );
@@ -111,7 +111,7 @@ export default class Convert {
     sellAmount,
     buyAmount,
     slippagePercentage,
-    gasPriceInWei,
+    gasPrice,
     fromAddress,
     network
   }: GetSwapArguments): Promise<Swap> => {
@@ -129,7 +129,7 @@ export default class Convert {
         buyToken,
         sellAmount,
         slippagePercentage,
-        gasPriceInWei,
+        gasPrice,
         fromAddress,
         network
       );
@@ -141,7 +141,7 @@ export default class Convert {
       sellAmount,
       buyAmount,
       slippagePercentage,
-      gasPriceInWei,
+      gasPrice,
       fromAddress,
       network
     );
@@ -152,7 +152,7 @@ export default class Convert {
     buyToken: string,
     sellAmount: BigNumber | undefined,
     buyAmount: BigNumber | undefined,
-    gasPriceInWei: string,
+    gasPrice: BigNumber,
     takerAddress: string,
     network: ConvertNetwork
   ): Promise<Quote> => {
@@ -165,7 +165,7 @@ export default class Convert {
       buyAmount: buyAmount?.toString(),
       buyTokenPercentageFee: (fee / 100).toString(),
       feeRecipient: sdkConfig.convert.feeAddress,
-      gasPrice: gasPriceInWei,
+      gasPrice: gasPrice.toString(),
       takerAddress
     };
 
@@ -185,7 +185,7 @@ export default class Convert {
     sellToken: string,
     buyToken: string,
     sellAmount: BigNumber,
-    gasPriceInWei: string,
+    gasPrice: BigNumber,
     network: ConvertNetwork
   ): Promise<Quote> => {
     const fee = await this.getFeeAsPercentage(network, sellToken, buyToken);
@@ -195,7 +195,7 @@ export default class Convert {
       toTokenAddress: buyToken,
       amount: sellAmount.toString(),
       fee: fee.toString(),
-      gasPrice: gasPriceInWei
+      gasPrice: gasPrice.toString()
     };
 
     const { data } = await axios.get(`${this.get1InchBaseUrl(network)}/quote`, {
@@ -219,8 +219,8 @@ export default class Convert {
     buyToken: string,
     sellAmount: BigNumber | undefined,
     buyAmount: BigNumber | undefined,
-    slippagePercentage: string,
-    gasPriceInWei: string,
+    slippagePercentage: number,
+    gasPrice: BigNumber,
     takerAddress: string,
     network: ConvertNetwork
   ): Promise<Swap> => {
@@ -232,8 +232,8 @@ export default class Convert {
       sellAmount: sellAmount?.toString(),
       buyAmount: buyAmount?.toString(),
       affiliateAddress: sdkConfig.convert.feeAddress,
-      slippagePercentage: (Number(slippagePercentage) / 100).toString(),
-      gasPrice: gasPriceInWei,
+      slippagePercentage: (slippagePercentage / 100).toString(),
+      gasPrice: gasPrice.toString(),
       buyTokenPercentageFee: (fee / 100).toString(),
       feeRecipient: sdkConfig.convert.feeAddress,
       takerAddress
@@ -258,8 +258,8 @@ export default class Convert {
     sellToken: string,
     buyToken: string,
     sellAmount: BigNumber,
-    slippagePercentage: string,
-    gasPriceInWei: string,
+    slippagePercentage: number,
+    gasPrice: BigNumber,
     fromAddress: string,
     network: ConvertNetwork
   ): Promise<Swap> => {
@@ -270,10 +270,10 @@ export default class Convert {
       toTokenAddress: buyToken,
       amount: sellAmount.toString(),
       fromAddress,
-      slippage: slippagePercentage,
+      slippage: slippagePercentage.toString(),
       referrerAddress: sdkConfig.convert.feeAddress,
       fee: fee.toString(),
-      gasPrice: gasPriceInWei
+      gasPrice: gasPrice.toString()
     };
 
     const { data } = await axios.get(`${this.get1InchBaseUrl(network)}/swap`, {
