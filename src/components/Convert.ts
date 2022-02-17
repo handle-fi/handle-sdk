@@ -13,7 +13,7 @@ type GetQuoteArguments = {
   sellAmount: BigNumber | undefined;
   buyAmount: BigNumber | undefined;
   gasPrice: BigNumber;
-  fromAddress: string;
+  fromAddress: string | undefined;
   network: ConvertNetwork;
 };
 
@@ -49,7 +49,7 @@ type ZeroXQuoteParams = {
   buyTokenPercentageFee: string;
   feeRecipient: string;
   gasPrice: string;
-  takerAddress: string;
+  takerAddress: string | undefined;
 };
 
 type ZeroXSwapParams = ZeroXQuoteParams & {
@@ -153,7 +153,7 @@ export default class Convert {
     sellAmount: BigNumber | undefined,
     buyAmount: BigNumber | undefined,
     gasPrice: BigNumber,
-    takerAddress: string,
+    takerAddress: string | undefined,
     network: ConvertNetwork
   ): Promise<Quote> => {
     const fee = await this.getFeeAsPercentage(network, sellToken, buyToken);
