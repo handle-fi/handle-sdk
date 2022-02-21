@@ -28,14 +28,14 @@ type GetSwapArguments = {
   network: ConvertNetwork;
 };
 
-type Quote = {
+export type Quote = {
   buyAmount: string;
   sellAmount: string;
   gas: string;
   allowanceTarget: string;
 };
 
-type Swap = Quote & {
+export type Swap = Quote & {
   to: string;
   value: string;
   data: string;

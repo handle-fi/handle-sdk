@@ -17,7 +17,7 @@ import CollateralsSDK from "./components/Collaterals";
 import GraphSDK, { IndexedFxToken, IndexedVault, IndexedFxKeeperPool } from "./components/Graph";
 import BridgeSDK, { PendingWithdrawal } from "./components/Bridge";
 import VaultController from "./components/VaultController";
-import ConvertSDK from "./components/Convert";
+import ConvertSDK, { Quote, Swap } from "./components/Convert";
 import SingleCollateralVaultController from "./components/SingleCollateralVaultController";
 import ProtocolSDK, { ProtocolParameters } from "./components/Protocol";
 import { getIsKashiApproved, signKashiApproval } from "./utils/allowance-utils";
@@ -74,5 +74,7 @@ export type {
   SingleCollateralVault,
   PendingWithdrawal,
   Token,
-  TokenExtended
+  TokenExtended,
+  Quote,
+  Swap
 };
