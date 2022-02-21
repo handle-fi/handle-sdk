@@ -1,6 +1,6 @@
 import { CollateralDetails } from "../config";
 import { Collateral, CollateralSymbol } from "../types/collaterals";
-import { Token } from "../types/general";
+import { Token } from "../types/tokens";
 
 export const getTokensFromConfig = (
   details: Partial<CollateralDetails>

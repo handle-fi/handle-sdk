@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import { FxTokenSymbol } from "..";
 import { CollateralSymbol } from "./collaterals";
-import { Token } from "./general";
+import { Token } from "../types/tokens";
 
 export type SingleCollateralVaultSymbol = "fxAUD-WETH" | "fxAUD-WBTC";
 

@@ -45,8 +45,8 @@ export default class Prices {
       fxAUD: this.config.feeds.aud_usd,
       fxPHP: this.config.feeds.php_usd,
       fxEUR: this.config.feeds.eur_usd,
-      fxKRW: this.config.feeds.krw_usd,
-      fxCNY: this.config.feeds.cny_usd,
+      // fxKRW: this.config.feeds.krw_usd,
+      // fxCNY: this.config.feeds.cny_usd,
       fxUSD: ""
     };
 
