@@ -9,6 +9,7 @@ import {
   Handle,
   VaultLibrary,
   Comptroller,
+  FxKeeperPool,
   Handle__factory,
   VaultLibrary__factory,
   Comptroller__factory,
@@ -17,6 +18,7 @@ import {
 import handleAbi from "../abis/handle/Handle.json";
 import vaultLibraryAbi from "../abis/handle/VaultLibrary.json";
 import comptrollerAbi from "../abis/handle/Comptroller.json";
+import fxKeeperPoolAbi from "../abis/handle/FxKeeperPool.json";
 import erc20Abi from "../abis/ERC20.json";
 import { ProtocolAddresses } from "../config";
 import { Promisified } from "../types/general";
@@ -25,6 +27,7 @@ type ProtocolContracts = {
   handle: Handle;
   vaultLibrary: VaultLibrary;
   comptroller: Comptroller;
+  fxKeeperPool: FxKeeperPool;
 };
 
 export const createMultiCallContract = <T>(address: string, abi: any) =>
@@ -46,7 +49,14 @@ export const createMulticallProtocolContracts = (
       protocolAddresses.vaultLibrary,
       vaultLibraryAbi.abi
     ),
-    comptroller: createMultiCallContract<Comptroller>(protocolAddresses.comptroller, comptrollerAbi)
+    comptroller: createMultiCallContract<Comptroller>(
+      protocolAddresses.comptroller,
+      comptrollerAbi
+    ),
+    fxKeeperPool: createMultiCallContract<FxKeeperPool>(
+      protocolAddresses.fxKeeperPool,
+      fxKeeperPoolAbi
+    )
   };
 
   return { provider, contracts };

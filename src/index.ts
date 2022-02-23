@@ -10,6 +10,7 @@ import {
   SingleCollateralVaultNetwork,
   SingleCollateralVaultNetworkMap
 } from "./types/network";
+import { FxKeeperPoolPool } from "./types/fxKeeperPool";
 import FxTokensSDK from "./components/FxTokens";
 import PricesSDK, { Price } from "./components/Prices";
 import VaultsSDK from "./components/Vaults";
@@ -20,6 +21,7 @@ import VaultController from "./components/VaultController";
 import ConvertSDK, { Quote, Swap } from "./components/Convert";
 import SingleCollateralVaultController from "./components/SingleCollateralVaultController";
 import ProtocolSDK, { ProtocolParameters } from "./components/Protocol";
+import FxKeeperPoolSDK from "./components/FxKeeperPool";
 import { getIsKashiApproved, signKashiApproval } from "./utils/allowance-utils";
 import { getNetworkName } from "./utils/web3-utils";
 import { NETWORK_NAMES, SINGLE_COLLATERAL_NETWORK_NAMES } from "./constants";
@@ -42,6 +44,7 @@ export {
   ProtocolSDK,
   BridgeSDK,
   ConvertSDK,
+  FxKeeperPoolSDK,
   config,
   NETWORK_NAMES,
   SINGLE_COLLATERAL_NETWORK_NAMES,
@@ -76,5 +79,6 @@ export type {
   Token,
   TokenExtended,
   Quote,
-  Swap
+  Swap,
+  FxKeeperPoolPool
 };

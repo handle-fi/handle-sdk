@@ -56,6 +56,7 @@ export type ProtocolAddresses = {
   vaultLibrary: string;
   comptroller: string;
   treasury: string;
+  fxKeeperPool: string;
 };
 
 export type ChainlinkFeeds = {
@@ -83,7 +84,8 @@ const config: Config = {
         handle: "0xA112D1bFd43fcFbF2bE2eBFcaebD6B6DB73aaD8B",
         vaultLibrary: "0xeaE0f01393114Dfc95c82AafB227f31ba5ECf886",
         comptroller: "0x140D144480e3eDEB4D1a519997BE1EdF4175BE2D",
-        treasury: "0x5710B75A0aA37f4Da939A61bb53c519296627994"
+        treasury: "0x5710B75A0aA37f4Da939A61bb53c519296627994",
+        fxKeeperPool: "0xc55204d4699dCce457DBF63d4B0074E6E1fa4412"
       },
       chainlinkFeeds: {
         eth_usd: "0x639Fe6ab55C921f74e7fac1ee960C0B6293ba612",
