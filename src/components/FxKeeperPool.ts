@@ -19,8 +19,8 @@ export type FxKeeperPoolConfig = {
 
 type KeeperPoolMulticall = {
   totalDeposited: ethers.BigNumber;
-  balance?: ethers.BigNumber;
-  rewards?: { collateralTypes: string[]; collateralAmounts: ethers.BigNumber[] };
+  accountBalance?: ethers.BigNumber;
+  accountRewards?: { collateralTypes: string[]; collateralAmounts: ethers.BigNumber[] };
 };
 
 export default class FxKeeperPool {
@@ -88,11 +88,11 @@ export default class FxKeeperPool {
     if (account) {
       return {
         ...base,
-        balance: contracts.fxKeeperPool.balanceOfStake(
+        accountBalance: contracts.fxKeeperPool.balanceOfStake(
           account,
           this.config.fxTokenAddresses[fxTokenSymbol]
         ),
-        rewards: contracts.fxKeeperPool.balanceOfRewards(
+        accountRewards: contracts.fxKeeperPool.balanceOfRewards(
           account,
           this.config.fxTokenAddresses[fxTokenSymbol]
         )
@@ -109,8 +109,8 @@ export default class FxKeeperPool {
     return {
       fxToken: fxTokenSymbol,
       totalDeposited: multicallResponse.totalDeposited,
-      balance: multicallResponse.balance || undefined,
-      rewards: multicallResponse.rewards || undefined
+      accountbalance: multicallResponse.accountBalance || undefined,
+      accountRewards: multicallResponse.accountRewards || undefined
     };
   };
 

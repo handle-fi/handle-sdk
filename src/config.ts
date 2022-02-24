@@ -4,6 +4,7 @@ import { FxTokenSymbolMap, FxTokenSymbol } from "./types/fxTokens";
 import { BridgeConfigByNetwork } from "./components/Bridge";
 import { StableType, Token } from "./types/tokens";
 import { NetworkMap } from "./types/network";
+import { RewardPoolNameMap } from "./types/rewardPool";
 
 export type FxTokenAddresses = FxTokenSymbolMap<string>;
 export type CollateralDetails = CollateralSymbolMap<Omit<Token<CollateralSymbol>, "symbol">>;
@@ -19,6 +20,8 @@ export type SingleCollateralVaults = {
   arbitrum: { [key: string]: KashiPoolConfig };
 };
 
+export type RewardPoolIds = RewardPoolNameMap<number>;
+
 export type Config = {
   forexAddress: string;
   fxTokenAddresses: FxTokenAddresses;
@@ -27,6 +30,7 @@ export type Config = {
       protocol: ProtocolAddresses;
       chainlinkFeeds: ChainlinkFeeds;
       collaterals: CollateralDetails;
+      rewardPoolIds: RewardPoolIds;
     };
   };
   theGraphEndpoints: {
@@ -57,6 +61,8 @@ export type ProtocolAddresses = {
   comptroller: string;
   treasury: string;
   fxKeeperPool: string;
+  governanceLock: string;
+  rewardPool: string;
 };
 
 export type ChainlinkFeeds = {
@@ -85,7 +91,9 @@ const config: Config = {
         vaultLibrary: "0xeaE0f01393114Dfc95c82AafB227f31ba5ECf886",
         comptroller: "0x140D144480e3eDEB4D1a519997BE1EdF4175BE2D",
         treasury: "0x5710B75A0aA37f4Da939A61bb53c519296627994",
-        fxKeeperPool: "0xc55204d4699dCce457DBF63d4B0074E6E1fa4412"
+        fxKeeperPool: "0xc55204d4699dCce457DBF63d4B0074E6E1fa4412",
+        governanceLock: "0xC6008E6baD8c2c0814A32f6F494fa419E95593b6",
+        rewardPool: "0xDE17Af0E4A6c870762508DcB7dCc20719584CBd0"
       },
       chainlinkFeeds: {
         eth_usd: "0x639Fe6ab55C921f74e7fac1ee960C0B6293ba612",
@@ -104,6 +112,13 @@ const config: Config = {
           address: "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
           decimals: 18
         }
+      },
+      rewardPoolIds: {
+        fxAUD: 4,
+        fxEUR: 7,
+        fxPHP: 5,
+        fxUSD: 8,
+        governanceLock: 6
       }
     }
   },

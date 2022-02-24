@@ -13,12 +13,16 @@ import {
   Handle__factory,
   VaultLibrary__factory,
   Comptroller__factory,
-  Treasury__factory
+  Treasury__factory,
+  GovernanceLock,
+  RewardPool
 } from "../contracts";
 import handleAbi from "../abis/handle/Handle.json";
 import vaultLibraryAbi from "../abis/handle/VaultLibrary.json";
 import comptrollerAbi from "../abis/handle/Comptroller.json";
 import fxKeeperPoolAbi from "../abis/handle/FxKeeperPool.json";
+import governanceLockAbi from "../abis/handle/GovernanceLock.json";
+import rewardPoolAbi from "../abis/handle/RewardPool.json";
 import erc20Abi from "../abis/ERC20.json";
 import { ProtocolAddresses } from "../config";
 import { Promisified } from "../types/general";
@@ -28,6 +32,8 @@ type ProtocolContracts = {
   vaultLibrary: VaultLibrary;
   comptroller: Comptroller;
   fxKeeperPool: FxKeeperPool;
+  governanceLock: GovernanceLock;
+  rewardPool: RewardPool;
 };
 
 export const createMultiCallContract = <T>(address: string, abi: any) =>
@@ -56,7 +62,12 @@ export const createMulticallProtocolContracts = (
     fxKeeperPool: createMultiCallContract<FxKeeperPool>(
       protocolAddresses.fxKeeperPool,
       fxKeeperPoolAbi
-    )
+    ),
+    governanceLock: createMultiCallContract<GovernanceLock>(
+      protocolAddresses.governanceLock,
+      governanceLockAbi
+    ),
+    rewardPool: createMultiCallContract<RewardPool>(protocolAddresses.rewardPool, rewardPoolAbi)
   };
 
   return { provider, contracts };

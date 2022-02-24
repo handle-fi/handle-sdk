@@ -11,6 +11,13 @@ import {
   SingleCollateralVaultNetworkMap
 } from "./types/network";
 import { FxKeeperPoolPool } from "./types/fxKeeperPool";
+import { GovernanceLockData } from "./types/governanceLock";
+import {
+  RewardPoolData,
+  RewardPoolNameMap,
+  RewardPoolPool,
+  RewardPoolName
+} from "./types/rewardPool";
 import FxTokensSDK from "./components/FxTokens";
 import PricesSDK, { Price } from "./components/Prices";
 import VaultsSDK from "./components/Vaults";
@@ -22,6 +29,8 @@ import ConvertSDK, { Quote, Swap } from "./components/Convert";
 import SingleCollateralVaultController from "./components/SingleCollateralVaultController";
 import ProtocolSDK, { ProtocolParameters } from "./components/Protocol";
 import FxKeeperPoolSDK from "./components/FxKeeperPool";
+import GovernanceLockSDK from "./components/GovernanceLock";
+import RewardPoolSDK from "./components/RewardPool";
 import { getIsKashiApproved, signKashiApproval } from "./utils/allowance-utils";
 import { getNetworkName } from "./utils/web3-utils";
 import { NETWORK_NAMES, SINGLE_COLLATERAL_NETWORK_NAMES } from "./constants";
@@ -45,6 +54,8 @@ export {
   BridgeSDK,
   ConvertSDK,
   FxKeeperPoolSDK,
+  GovernanceLockSDK,
+  RewardPoolSDK,
   config,
   NETWORK_NAMES,
   SINGLE_COLLATERAL_NETWORK_NAMES,
@@ -80,5 +91,10 @@ export type {
   TokenExtended,
   Quote,
   Swap,
-  FxKeeperPoolPool
+  FxKeeperPoolPool,
+  GovernanceLockData,
+  RewardPoolData,
+  RewardPoolNameMap,
+  RewardPoolPool,
+  RewardPoolName
 };
