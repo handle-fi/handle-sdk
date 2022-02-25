@@ -1,10 +1,10 @@
 import { ethers } from "ethers";
 
 export type GovernanceLockData = {
-  supply: ethers.BigNumber;
-  acountLocked?: {
-    amount: ethers.BigNumber;
-    end: ethers.BigNumber;
+  totalForexLocked: ethers.BigNumber;
+  account?: {
+    forexLocked: ethers.BigNumber;
+    unlocksAt: ethers.BigNumber;
+    veForexBalance: ethers.BigNumber;
   };
-  accountBalanceOf?: ethers.BigNumber;
 };

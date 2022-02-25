@@ -17,7 +17,9 @@ export type RewardPoolDataPools = RewardPoolNameMap<RewardPoolDataPool>;
 export type RewardPoolData = {
   pools: RewardPoolDataPools;
   forexDistributionRate: ethers.BigNumber;
-  accountBalance?: ethers.BigNumber;
+  account?: {
+    claimableRewards?: ethers.BigNumber;
+  };
 };
 
 export type RewardPoolPool = {

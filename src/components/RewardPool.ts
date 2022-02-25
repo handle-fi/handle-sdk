@@ -26,7 +26,7 @@ type RewardsPoolDataMulticall = {
     deltaS: ethers.BigNumber[];
   };
   forexDistributionRate: ethers.BigNumber;
-  accountBalance?: ethers.BigNumber;
+  claimableRewards?: ethers.BigNumber;
 };
 
 type RewardsPoolsMulticall = RewardPoolNameMap<{
@@ -123,7 +123,7 @@ export default class RewardPool {
     if (account) {
       return {
         ...base,
-        accountBalance: contracts.rewardPool.balanceOf(account)
+        claimableRewards: contracts.rewardPool.balanceOf(account)
       };
     }
 
@@ -135,7 +135,11 @@ export default class RewardPool {
 
     return {
       forexDistributionRate: multicallResponse.forexDistributionRate,
-      accountBalance: multicallResponse.accountBalance,
+      account: multicallResponse.claimableRewards
+        ? {
+            claimableRewards: multicallResponse.claimableRewards
+          }
+        : undefined,
       pools: poolNames.reduce((progress, pn) => {
         const poolName = pn as RewardPoolName;
         const poolId = this.config.rewardPoolIds[poolName];
