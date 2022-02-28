@@ -7,6 +7,7 @@ import { GovernanceLockData } from "../types/governanceLock";
 import { callMulticallObject, createMulticallProtocolContracts } from "../utils/contract-utils";
 
 export type FxKeeperPoolConfig = {
+  forexAddress: string;
   protocolAddresses: ProtocolAddresses;
   chainId: number;
 };
@@ -23,10 +24,11 @@ type GovernanceLockMulticall = {
 const MAX_LOCK_SECONDS = 4 * 365 * 24 * 60 * 60;
 
 export default class GovernanceLock {
-  private config: FxKeeperPoolConfig;
+  public config: FxKeeperPoolConfig;
 
   constructor(c?: FxKeeperPoolConfig) {
     this.config = c || {
+      forexAddress: sdkConfig.forexAddress,
       protocolAddresses: sdkConfig.protocol.arbitrum.protocol,
       chainId: sdkConfig.networkNameToId.arbitrum
     };

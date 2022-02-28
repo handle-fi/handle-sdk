@@ -24,7 +24,7 @@ type KeeperPoolMulticall = {
 };
 
 export default class FxKeeperPool {
-  private config: FxKeeperPoolConfig;
+  public config: FxKeeperPoolConfig;
 
   constructor(c?: FxKeeperPoolConfig) {
     this.config = c || {
