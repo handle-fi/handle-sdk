@@ -105,6 +105,11 @@ export default class RewardPool {
     }, {} as RewardPoolNameMap<RewardPoolPool>);
   };
 
+  public claim = (signer: ethers.Signer) => {
+    const contract = this.getContract(signer);
+    return contract.claim();
+  };
+
   private getDataMulticall = (
     account: string | undefined,
     signer: ethers.Signer

@@ -105,6 +105,11 @@ export default class GovernanceLock {
     return contract.increaseUnlockTime(newUnlocksAt);
   };
 
+  public withdraw = (signer: ethers.Signer) => {
+    const contract = this.getContract(signer);
+    return contract.withdraw();
+  };
+
   private getMulticall = (
     account: string | undefined,
     signer: ethers.Signer
