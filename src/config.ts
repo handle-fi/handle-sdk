@@ -4,7 +4,6 @@ import { FxTokenSymbolMap, FxTokenSymbol } from "./types/fxTokens";
 import { BridgeConfigByNetwork } from "./components/Bridge";
 import { StableType, Token } from "./types/tokens";
 import { NetworkMap } from "./types/network";
-import { RewardPoolNameMap } from "./types/rewardPool";
 
 export type FxTokenAddresses = FxTokenSymbolMap<string>;
 export type CollateralDetails = CollateralSymbolMap<Omit<Token<CollateralSymbol>, "symbol">>;
@@ -20,8 +19,6 @@ export type SingleCollateralVaults = {
   arbitrum: { [key: string]: KashiPoolConfig };
 };
 
-export type RewardPoolIds = RewardPoolNameMap<number>;
-
 export type Config = {
   forexAddress: string;
   fxTokenAddresses: FxTokenAddresses;
@@ -30,7 +27,6 @@ export type Config = {
       protocol: ProtocolAddresses;
       chainlinkFeeds: ChainlinkFeeds;
       collaterals: CollateralDetails;
-      rewardPoolIds: RewardPoolIds;
     };
   };
   theGraphEndpoints: {
@@ -112,13 +108,6 @@ const config: Config = {
           address: "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
           decimals: 18
         }
-      },
-      rewardPoolIds: {
-        fxAUD: 4,
-        fxEUR: 7,
-        fxPHP: 5,
-        fxUSD: 8,
-        governanceLock: 6
       }
     }
   },

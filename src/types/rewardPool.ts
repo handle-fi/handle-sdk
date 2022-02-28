@@ -1,7 +1,11 @@
 import { ethers } from "ethers";
-import { FxTokenSymbol } from "..";
 
-export type RewardPoolName = FxTokenSymbol | "governanceLock";
+export type RewardPoolName =
+  | "governanceLock"
+  | "fxAUDKeeper"
+  | "fxPHPKeeper"
+  | "fxUSDKeeper"
+  | "fxEURKeeper";
 export type RewardPoolNameMap<T> = {
   [key in RewardPoolName]: T;
 };
