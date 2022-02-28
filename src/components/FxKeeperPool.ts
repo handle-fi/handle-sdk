@@ -113,8 +113,4 @@ export default class FxKeeperPool {
       accountRewards: multicallResponse.accountRewards || undefined
     };
   };
-
-  // private getContract = (signer: ethers.Signer) => {
-  //   return FxKeeperPool__factory.connect(this.config.protocolAddresses.fxKeeperPool, signer);
-  // };
 }
