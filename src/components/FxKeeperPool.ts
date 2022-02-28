@@ -2,6 +2,7 @@ import { ethers } from "ethers";
 import { FxTokenSymbol } from "..";
 import sdkConfig, { FxTokenAddresses } from "../config";
 import { ProtocolAddresses } from "../config";
+import { FxKeeperPool__factory } from "../contracts";
 import { FxKeeperPoolPool } from "../types/fxKeeperPool";
 // import { FxKeeperPool__factory } from "../contracts";
 import { Promisified } from "../types/general";
@@ -21,6 +22,11 @@ type KeeperPoolMulticall = {
   totalDeposited: ethers.BigNumber;
   accountBalance?: ethers.BigNumber;
   accountRewards?: { collateralTypes: string[]; collateralAmounts: ethers.BigNumber[] };
+};
+
+type StakeArgs = {
+  amount: ethers.BigNumber;
+  fxTokenSymbol: FxTokenSymbol;
 };
 
 export default class FxKeeperPool {
@@ -68,6 +74,52 @@ export default class FxKeeperPool {
     return multicallResponses.map((r, index) => this.toFxKeeperPoolPool(fxTokenSymbols[index], r));
   };
 
+  public stake(
+    args: StakeArgs,
+    signer: ethers.Signer,
+    populateTransaction?: false,
+    options?: ethers.Overrides
+  ): Promise<ethers.ContractTransaction>;
+  public stake(
+    args: StakeArgs,
+    signer: ethers.Signer,
+    populateTransaction?: true,
+    options?: ethers.Overrides
+  ): Promise<ethers.PopulatedTransaction>;
+  public stake(
+    args: StakeArgs,
+    signer: ethers.Signer,
+    populateTransaction: boolean = false,
+    options: ethers.Overrides = {}
+  ): Promise<ethers.ContractTransaction | ethers.PopulatedTransaction> {
+    const contract = this.getContract(signer);
+    const method = populateTransaction ? contract.populateTransaction.stake : contract.stake;
+    return method(args.amount, args.fxTokenSymbol, ethers.constants.AddressZero, options);
+  }
+
+  public unstake(
+    args: StakeArgs,
+    signer: ethers.Signer,
+    populateTransaction?: false,
+    options?: ethers.Overrides
+  ): Promise<ethers.ContractTransaction>;
+  public unstake(
+    args: StakeArgs,
+    signer: ethers.Signer,
+    populateTransaction?: true,
+    options?: ethers.Overrides
+  ): Promise<ethers.PopulatedTransaction>;
+  public unstake(
+    args: StakeArgs,
+    signer: ethers.Signer,
+    populateTransaction: boolean = false,
+    options: ethers.Overrides = {}
+  ): Promise<ethers.ContractTransaction | ethers.PopulatedTransaction> {
+    const contract = this.getContract(signer);
+    const method = populateTransaction ? contract.populateTransaction.unstake : contract.unstake;
+    return method(args.amount, args.fxTokenSymbol, options);
+  }
+
   private getFxKeeperPoolMulticall = (
     account: string | undefined,
     fxTokenSymbol: FxTokenSymbol,
@@ -109,8 +161,17 @@ export default class FxKeeperPool {
     return {
       fxToken: fxTokenSymbol,
       totalDeposited: multicallResponse.totalDeposited,
-      accountbalance: multicallResponse.accountBalance || undefined,
-      accountRewards: multicallResponse.accountRewards || undefined
+      account:
+        multicallResponse.accountBalance && multicallResponse.accountRewards
+          ? {
+              fxLocked: multicallResponse.accountBalance,
+              rewards: multicallResponse.accountRewards
+            }
+          : undefined
     };
+  };
+
+  private getContract = (signer: ethers.Signer) => {
+    return FxKeeperPool__factory.connect(this.config.protocolAddresses.fxKeeperPool, signer);
   };
 }

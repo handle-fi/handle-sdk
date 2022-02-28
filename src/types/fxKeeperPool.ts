@@ -4,6 +4,8 @@ import { FxTokenSymbol } from "..";
 export type FxKeeperPoolPool = {
   fxToken: FxTokenSymbol;
   totalDeposited: ethers.BigNumber;
-  accountbalance: ethers.BigNumber | undefined;
-  accountRewards: { collateralTypes: string[]; collateralAmounts: ethers.BigNumber[] } | undefined;
+  account?: {
+    fxLocked: ethers.BigNumber;
+    rewards: { collateralTypes: string[]; collateralAmounts: ethers.BigNumber[] };
+  };
 };
