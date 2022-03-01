@@ -184,16 +184,16 @@ export default class RewardPool {
         governanceLock: contracts.rewardPool.getPoolIdByAlias(
           ethers.utils.keccak256(ethers.utils.toUtf8Bytes("governancelock"))
         ),
-        fxAUDKeeper: contracts.rewardPool.getPoolIdByAlias(
+        fxKeeperAUD: contracts.rewardPool.getPoolIdByAlias(
           this.getKeeperPoolAlias(this.config.fxTokenAddresses["fxAUD"])
         ),
-        fxEURKeeper: contracts.rewardPool.getPoolIdByAlias(
+        fxKeeperEUR: contracts.rewardPool.getPoolIdByAlias(
           this.getKeeperPoolAlias(this.config.fxTokenAddresses["fxEUR"])
         ),
-        fxPHPKeeper: contracts.rewardPool.getPoolIdByAlias(
+        fxKeeperPHP: contracts.rewardPool.getPoolIdByAlias(
           this.getKeeperPoolAlias(this.config.fxTokenAddresses["fxPHP"])
         ),
-        fxUSDKeeper: contracts.rewardPool.getPoolIdByAlias(
+        fxKeeperUSD: contracts.rewardPool.getPoolIdByAlias(
           this.getKeeperPoolAlias(this.config.fxTokenAddresses["fxUSD"])
         )
       };

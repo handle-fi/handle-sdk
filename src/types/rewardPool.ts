@@ -2,10 +2,10 @@ import { ethers } from "ethers";
 
 export type RewardPoolName =
   | "governanceLock"
-  | "fxAUDKeeper"
-  | "fxPHPKeeper"
-  | "fxUSDKeeper"
-  | "fxEURKeeper";
+  | "fxKeeperAUD"
+  | "fxKeeperPHP"
+  | "fxKeeperUSD"
+  | "fxKeeperEUR";
 export type RewardPoolNameMap<T> = {
   [key in RewardPoolName]: T;
 };
