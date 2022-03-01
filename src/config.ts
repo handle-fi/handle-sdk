@@ -4,9 +4,18 @@ import { FxTokenSymbolMap, FxTokenSymbol } from "./types/fxTokens";
 import { BridgeConfigByNetwork } from "./components/Bridge";
 import { StableType, Token } from "./types/tokens";
 import { NetworkMap } from "./types/network";
+import { LPStakingPoolNameMap, LPStakingPlatformName } from "./types/lpStaking";
+import { getTokenDetails } from "./utils/token-utils";
 
 export type FxTokenAddresses = FxTokenSymbolMap<string>;
 export type CollateralDetails = CollateralSymbolMap<Omit<Token<CollateralSymbol>, "symbol">>;
+export type LPStakingPoolDetails = {
+  platform: LPStakingPlatformName;
+  title: string;
+  stakingContractAddress: string;
+  lpTokenAddress: string;
+  tokensInLp: Token<string>[];
+};
 
 export type KashiPoolConfig = {
   address: string;
@@ -28,6 +37,9 @@ export type Config = {
       chainlinkFeeds: ChainlinkFeeds;
       collaterals: CollateralDetails;
     };
+  };
+  lpStaking: {
+    arbitrum: LPStakingPoolNameMap<LPStakingPoolDetails>;
   };
   theGraphEndpoints: {
     arbitrum: string;
@@ -122,27 +134,54 @@ const config: Config = {
       polygon: { address: "0x62E13B35770D40aB0fEC1AB7814d21505620057b", id: 2 }
     }
   },
+  lpStaking: {
+    arbitrum: {
+      sushiWethForex: {
+        title: "sushiswap WETH-FOREX",
+        platform: "sushi",
+        stakingContractAddress: "0x5cdEb8ff5FD3a3361E27e491696515F1D119537a",
+        lpTokenAddress: "0x9745e5CC0522827958eE3Fc2C03247276D359186",
+        tokensInLp: [getTokenDetails("FOREX", "arbitrum"), getTokenDetails("WETH", "arbitrum")]
+      },
+      curveEursFxEUR: {
+        title: "curve fxEUR-EURS ",
+        platform: "curve",
+        stakingContractAddress: "0x140b808C0b7e0d24fee45155473042A6f6F841Aa",
+        lpTokenAddress: "0xb0D2EB3C2cA3c6916FAb8DCbf9d9c165649231AE",
+        tokensInLp: [
+          getTokenDetails("fxEUR", "arbitrum"),
+          { symbol: "EURS", decimals: 2, address: "0xD22a58f79e9481D1a88e00c343885A588b34b68B" }
+        ]
+      },
+      curveHandle3: {
+        title: "curve fxUSD-USDC-USDT",
+        platform: "curve",
+        stakingContractAddress: "0x68F03C9DB2611C79AAa21b6dFcdF6baC0cd191f6",
+        lpTokenAddress: "0xd0dd5d76cf0fc06dabc48632735566dca241a35e",
+        tokensInLp: [
+          getTokenDetails("fxUSD", "arbitrum"),
+          {
+            symbol: "2CRV",
+            address: "0xbf7e49483881c76487b0989cd7d9a8239b20ca41",
+            decimals: 18
+          }
+        ]
+      }
+    }
+  },
   singleCollateralVaults: {
     polygon: {
       "fxAUD-WETH": {
         address: "0x78c2b09973363f8111cc122AdAefB1Ae5623feBD",
         fxToken: "fxAUD",
-        collateral: {
-          address: "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619",
-          symbol: "WETH",
-          decimals: 18
-        }
+        collateral: getTokenDetails("WETH", "polygon")
       }
     },
     arbitrum: {
       "fxAUD-WBTC": {
         address: "0x5b5906ba677f32075b3dd478d730c46eaaa48c3e",
         fxToken: "fxAUD",
-        collateral: {
-          address: "0x2f2a2543b76a4166549f7aab2e75bef0aefc5b0f",
-          symbol: "WBTC",
-          decimals: 8
-        }
+        collateral: getTokenDetails("WBTC", "arbitrum")
       }
     }
   },

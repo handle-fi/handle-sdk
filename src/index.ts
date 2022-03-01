@@ -18,6 +18,12 @@ import {
   RewardPoolPool,
   RewardPoolName
 } from "./types/rewardPool";
+import {
+  LPStakingPool,
+  LPStakingPoolName,
+  LPStakingPoolNameMap,
+  LPStakingPlatformName
+} from "./types/lpStaking";
 import FxTokensSDK from "./components/FxTokens";
 import PricesSDK, { Price } from "./components/Prices";
 import VaultsSDK from "./components/Vaults";
@@ -26,6 +32,7 @@ import GraphSDK, { IndexedFxToken, IndexedVault, IndexedFxKeeperPool } from "./c
 import BridgeSDK, { PendingWithdrawal } from "./components/Bridge";
 import VaultController from "./components/VaultController";
 import ConvertSDK, { Quote, Swap } from "./components/Convert";
+import LPStakingSDK from "./components/LPStaking";
 import SingleCollateralVaultController from "./components/SingleCollateralVaultController";
 import ProtocolSDK, { ProtocolParameters } from "./components/Protocol";
 import FxKeeperPoolSDK from "./components/FxKeeperPool";
@@ -56,6 +63,7 @@ export {
   FxKeeperPoolSDK,
   GovernanceLockSDK,
   RewardPoolSDK,
+  LPStakingSDK,
   config,
   NETWORK_NAMES,
   SINGLE_COLLATERAL_NETWORK_NAMES,
@@ -96,5 +104,9 @@ export type {
   RewardPoolData,
   RewardPoolNameMap,
   RewardPoolPool,
-  RewardPoolName
+  RewardPoolName,
+  LPStakingPool,
+  LPStakingPoolName,
+  LPStakingPoolNameMap,
+  LPStakingPlatformName
 };
