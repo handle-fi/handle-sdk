@@ -1,5 +1,5 @@
 import { ethers, Signer } from "ethers";
-import sdkConfig from "../config";
+import sdkConfig, { FxTokenAddresses } from "../config";
 import { ProtocolAddresses } from "../config";
 import { RewardPool__factory } from "../contracts";
 import { Promisified } from "../types/general";
@@ -15,6 +15,7 @@ import { callMulticallObject, createMulticallProtocolContracts } from "../utils/
 
 export type RewardsPoolConfig = {
   protocolAddresses: ProtocolAddresses;
+  fxTokenAddresses: FxTokenAddresses;
   chainId: number;
 };
 
@@ -45,6 +46,7 @@ export default class RewardPool {
   constructor(c?: RewardsPoolConfig) {
     this.config = c || {
       protocolAddresses: sdkConfig.protocol.arbitrum.protocol,
+      fxTokenAddresses: sdkConfig.fxTokenAddresses,
       chainId: sdkConfig.networkNameToId.arbitrum
     };
   }
@@ -178,23 +180,21 @@ export default class RewardPool {
         signer
       );
 
-      ethers.utils.keccak256(ethers.utils.toUtf8Bytes("governancelock"));
-
       const multicall: Promisified<RewardPoolIdsMulticall> = {
         governanceLock: contracts.rewardPool.getPoolIdByAlias(
-          ethers.utils.keccak256(ethers.utils.toUtf8Bytes("governanceLock"))
+          ethers.utils.keccak256(ethers.utils.toUtf8Bytes("governancelock"))
         ),
-        fxAUDKeeper: contracts.rewardPool.getPoolIdByAlias(
-          ethers.utils.keccak256(ethers.utils.toUtf8Bytes("fxAUDKeeper"))
+        fxKeeperAUD: contracts.rewardPool.getPoolIdByAlias(
+          this.getKeeperPoolAlias(this.config.fxTokenAddresses["fxAUD"])
         ),
-        fxEURKeeper: contracts.rewardPool.getPoolIdByAlias(
-          ethers.utils.keccak256(ethers.utils.toUtf8Bytes("fxEURKeeper"))
+        fxKeeperEUR: contracts.rewardPool.getPoolIdByAlias(
+          this.getKeeperPoolAlias(this.config.fxTokenAddresses["fxEUR"])
         ),
-        fxPHPKeeper: contracts.rewardPool.getPoolIdByAlias(
-          ethers.utils.keccak256(ethers.utils.toUtf8Bytes("fxPHPKeeper"))
+        fxKeeperPHP: contracts.rewardPool.getPoolIdByAlias(
+          this.getKeeperPoolAlias(this.config.fxTokenAddresses["fxPHP"])
         ),
-        fxUSDKeeper: contracts.rewardPool.getPoolIdByAlias(
-          ethers.utils.keccak256(ethers.utils.toUtf8Bytes("fxUSDKeeper"))
+        fxKeeperUSD: contracts.rewardPool.getPoolIdByAlias(
+          this.getKeeperPoolAlias(this.config.fxTokenAddresses["fxUSD"])
         )
       };
 
@@ -214,4 +214,7 @@ export default class RewardPool {
   private getContract = (signer: ethers.Signer) => {
     return RewardPool__factory.connect(this.config.protocolAddresses.rewardPool, signer);
   };
+
+  private getKeeperPoolAlias = (fxTokenAddress: string) =>
+    ethers.utils.keccak256(ethers.utils.solidityPack(["address", "uint256"], [fxTokenAddress, 2]));
 }
