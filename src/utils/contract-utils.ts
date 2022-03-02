@@ -111,23 +111,27 @@ export const callMulticallObjects = async <T>(
   );
 
   const response = await provider.all(calls);
-  return multicallResponsesToObjects(Object.keys(callObjects[0]), response);
+  return multicallResponsesToObjects(callObjects, response);
 };
 
-export const multicallResponsesToObjects = <T>(properties: string[], results: any[]): T[] => {
-  const objects: T[] = [];
+export const multicallResponsesToObjects = <T>(
+  callObjects: Promisified<T>[],
+  results: any[]
+): T[] => {
+  let resultIndex = 0;
 
-  while (results.length > 0) {
-    const data = results.splice(0, properties.length);
+  return callObjects.map((callObject) => {
+    const properties = Object.keys(callObject);
 
-    const newVaultData = properties.reduce((progress, key, index) => {
-      return {
+    return properties.reduce((progress, property) => {
+      const newProgess = {
         ...progress,
-        [key]: data[index]
+        [property]: results[resultIndex]
       };
-    }, {} as T);
 
-    objects.push(newVaultData);
-  }
-  return objects;
+      resultIndex++;
+
+      return newProgess;
+    }, {} as T);
+  });
 };
