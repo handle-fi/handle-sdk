@@ -4,7 +4,6 @@ import sdkConfig, { FxTokenAddresses } from "../config";
 import { ProtocolAddresses } from "../config";
 import { FxKeeperPool__factory } from "../contracts";
 import { FxKeeperPoolPool } from "../types/fxKeeperPool";
-// import { FxKeeperPool__factory } from "../contracts";
 import { Promisified } from "../types/general";
 import {
   callMulticallObject,
@@ -94,7 +93,8 @@ export default class FxKeeperPool {
   ): Promise<ethers.ContractTransaction | ethers.PopulatedTransaction> {
     const contract = this.getContract(signer);
     const method = populateTransaction ? contract.populateTransaction.stake : contract.stake;
-    return method(args.amount, args.fxTokenSymbol, ethers.constants.AddressZero, options);
+    const fxTokenAddress = this.config.fxTokenAddresses[args.fxTokenSymbol];
+    return method(args.amount, fxTokenAddress, ethers.constants.AddressZero, options);
   }
 
   public unstake(
@@ -117,7 +117,8 @@ export default class FxKeeperPool {
   ): Promise<ethers.ContractTransaction | ethers.PopulatedTransaction> {
     const contract = this.getContract(signer);
     const method = populateTransaction ? contract.populateTransaction.unstake : contract.unstake;
-    return method(args.amount, args.fxTokenSymbol, options);
+    const fxTokenAddress = this.config.fxTokenAddresses[args.fxTokenSymbol];
+    return method(args.amount, fxTokenAddress, options);
   }
 
   private getFxKeeperPoolMulticall = (
