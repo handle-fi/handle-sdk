@@ -66,20 +66,20 @@ export default class Bridge {
   public deposit(
     args: BridgeDepositArguments,
     signer: ethers.Signer,
-    populateTransaction?: false,
-    options?: ethers.Overrides
+    options?: ethers.Overrides,
+    populateTransaction?: false
   ): Promise<ethers.ContractTransaction>;
   public deposit(
     args: BridgeDepositArguments,
     signer: ethers.Signer,
-    populateTransaction?: true,
-    options?: ethers.Overrides
+    options?: ethers.Overrides,
+    populateTransaction?: true
   ): Promise<ethers.PopulatedTransaction>;
   public deposit(
     args: BridgeDepositArguments,
     signer: ethers.Signer,
-    populateTransaction: boolean = false,
-    options: ethers.Overrides = {}
+    options: ethers.Overrides = {},
+    populateTransaction: boolean = false
   ): Promise<ethers.ContractTransaction | ethers.PopulatedTransaction> {
     const bridgeContract = this.getBridgeContract(args.fromNetwork, signer);
     const tokenAddress = this.getTokenAddress(args.tokenSymbol);
@@ -96,20 +96,20 @@ export default class Bridge {
   public withdraw(
     args: BridgeWithdrawArguments,
     signer: ethers.Signer,
-    populateTransaction?: false,
-    options?: ethers.Overrides
+    options?: ethers.Overrides,
+    populateTransaction?: false
   ): Promise<ethers.ContractTransaction>;
   public withdraw(
     args: BridgeWithdrawArguments,
     signer: ethers.Signer,
-    populateTransaction?: true,
-    options?: ethers.Overrides
+    options?: ethers.Overrides,
+    populateTransaction?: true
   ): Promise<ethers.PopulatedTransaction>;
   public async withdraw(
     args: BridgeWithdrawArguments,
     signer: ethers.Signer,
-    populateTransaction: boolean = false,
-    options: ethers.Overrides = {}
+    options: ethers.Overrides = {},
+    populateTransaction: boolean = false
   ): Promise<ethers.ContractTransaction | ethers.PopulatedTransaction> {
     const bridgeContract = this.getBridgeContract(args.toNetwork, signer);
     const tokenAddress = this.getTokenAddress(args.tokenSymbol);
@@ -143,6 +143,7 @@ export default class Bridge {
     network: Network,
     amount: ethers.BigNumber,
     signer: ethers.Signer,
+    options?: ethers.Overrides,
     populateTransaction?: false
   ): Promise<ethers.ContractTransaction>;
   public setDepositAllowance(
@@ -150,6 +151,7 @@ export default class Bridge {
     network: Network,
     amount: ethers.BigNumber,
     signer: ethers.Signer,
+    options?: ethers.Overrides,
     populateTransaction?: true
   ): Promise<ethers.PopulatedTransaction>;
   public setDepositAllowance(
@@ -157,13 +159,14 @@ export default class Bridge {
     network: Network,
     amount: ethers.BigNumber,
     signer: ethers.Signer,
+    options: ethers.Overrides = {},
     populateTransaction: boolean = false
   ): Promise<ethers.ContractTransaction | ethers.PopulatedTransaction> {
     const tokenAddress = this.getTokenAddress(token);
     const bridgeAddress = this.config.byNetwork[network].address;
     const tokenContract = ERC20__factory.connect(tokenAddress, signer);
     const contract = populateTransaction ? tokenContract.populateTransaction : tokenContract;
-    return contract.approve(bridgeAddress, amount);
+    return contract.approve(bridgeAddress, amount, options);
   }
 
   public getPendingWithdrawals = async (

@@ -76,20 +76,20 @@ export default class FxKeeperPool {
   public stake(
     args: StakeArgs,
     signer: ethers.Signer,
-    populateTransaction?: false,
-    options?: ethers.Overrides
+    options?: ethers.Overrides,
+    populateTransaction?: false
   ): Promise<ethers.ContractTransaction>;
   public stake(
     args: StakeArgs,
     signer: ethers.Signer,
-    populateTransaction?: true,
-    options?: ethers.Overrides
+    options?: ethers.Overrides,
+    populateTransaction?: true
   ): Promise<ethers.PopulatedTransaction>;
   public stake(
     args: StakeArgs,
     signer: ethers.Signer,
-    populateTransaction: boolean = false,
-    options: ethers.Overrides = {}
+    options: ethers.Overrides = {},
+    populateTransaction: boolean = false
   ): Promise<ethers.ContractTransaction | ethers.PopulatedTransaction> {
     const contract = this.getContract(signer);
     const method = populateTransaction ? contract.populateTransaction.stake : contract.stake;
@@ -100,20 +100,20 @@ export default class FxKeeperPool {
   public unstake(
     args: StakeArgs,
     signer: ethers.Signer,
-    populateTransaction?: false,
-    options?: ethers.Overrides
+    options?: ethers.Overrides,
+    populateTransaction?: false
   ): Promise<ethers.ContractTransaction>;
   public unstake(
     args: StakeArgs,
     signer: ethers.Signer,
-    populateTransaction?: true,
-    options?: ethers.Overrides
+    options?: ethers.Overrides,
+    populateTransaction?: true
   ): Promise<ethers.PopulatedTransaction>;
   public unstake(
     args: StakeArgs,
     signer: ethers.Signer,
-    populateTransaction: boolean = false,
-    options: ethers.Overrides = {}
+    options: ethers.Overrides = {},
+    populateTransaction: boolean = false
   ): Promise<ethers.ContractTransaction | ethers.PopulatedTransaction> {
     const contract = this.getContract(signer);
     const method = populateTransaction ? contract.populateTransaction.unstake : contract.unstake;

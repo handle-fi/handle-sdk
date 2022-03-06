@@ -83,23 +83,26 @@ export default class FxTokens {
     fxTokenSymbol: FxTokenSymbol,
     amount: ethers.BigNumber,
     signer: ethers.Signer,
+    options?: ethers.Overrides,
     populateTransaction?: false
   ): Promise<ethers.ContractTransaction>;
   public setRepayAllowance(
     fxTokenSymbol: FxTokenSymbol,
     amount: ethers.BigNumber,
     signer: ethers.Signer,
+    options?: ethers.Overrides,
     populateTransaction?: true
   ): Promise<ethers.PopulatedTransaction>;
   public setRepayAllowance(
     fxTokenSymbol: FxTokenSymbol,
     amount: ethers.BigNumber,
     signer: ethers.Signer,
+    options: ethers.Overrides = {},
     populateTransaction: boolean = false
   ): Promise<ethers.ContractTransaction | ethers.PopulatedTransaction> {
     const fxContract = this.getFxTokenContract(fxTokenSymbol, signer);
     const contract = populateTransaction ? fxContract.populateTransaction : fxContract;
-    return contract.approve(this.config.protocolAddresses.comptroller, amount);
+    return contract.approve(this.config.protocolAddresses.comptroller, amount, options);
   }
 
   public setSingleCollateralRepayAllowance(
@@ -107,6 +110,7 @@ export default class FxTokens {
     amount: ethers.BigNumber,
     network: SingleCollateralVaultNetwork,
     signer: ethers.Signer,
+    options?: ethers.Overrides,
     populateTransaction?: false
   ): Promise<ethers.ContractTransaction>;
   public setSingleCollateralRepayAllowance(
@@ -114,6 +118,7 @@ export default class FxTokens {
     amount: ethers.BigNumber,
     network: SingleCollateralVaultNetwork,
     signer: ethers.Signer,
+    options?: ethers.Overrides,
     populateTransaction?: true
   ): Promise<ethers.PopulatedTransaction>;
   public setSingleCollateralRepayAllowance(
@@ -121,12 +126,13 @@ export default class FxTokens {
     amount: ethers.BigNumber,
     network: SingleCollateralVaultNetwork,
     signer: ethers.Signer,
+    options: ethers.Overrides = {},
     populateTransaction: boolean = false
   ): Promise<ethers.ContractTransaction | ethers.PopulatedTransaction> {
     const fxContract = this.getFxTokenContract(fxTokenSymbol, signer);
     const contract = populateTransaction ? fxContract.populateTransaction : fxContract;
     const chainId = sdkConfig.networkNameToId[network];
-    return contract.approve(BENTOBOX_ADDRESS[chainId], amount);
+    return contract.approve(BENTOBOX_ADDRESS[chainId], amount, options);
   }
 
   private getFxTokenMulticall = (

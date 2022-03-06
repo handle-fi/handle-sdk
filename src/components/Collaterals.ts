@@ -122,6 +122,7 @@ export default class Collaterals {
     amount: ethers.BigNumber,
     action: "deposit" | "mintAndDeposit",
     signer: ethers.Signer,
+    options?: ethers.Overrides,
     populateTransaction?: false
   ): Promise<ethers.ContractTransaction>;
   public setDepositAllowance(
@@ -129,6 +130,7 @@ export default class Collaterals {
     amount: ethers.BigNumber,
     action: "deposit" | "mintAndDeposit",
     signer: ethers.Signer,
+    options?: ethers.Overrides,
     populateTransaction?: true
   ): Promise<ethers.PopulatedTransaction>;
   public setDepositAllowance(
@@ -136,6 +138,7 @@ export default class Collaterals {
     amount: ethers.BigNumber,
     action: "deposit" | "mintAndDeposit",
     signer: ethers.Signer,
+    options: ethers.Overrides = {},
     populateTransaction: boolean = false
   ): Promise<ethers.ContractTransaction | ethers.PopulatedTransaction> {
     const collateralContract = this.getCollateralContract(collateralSymbol, signer);
@@ -146,7 +149,8 @@ export default class Collaterals {
       action === "deposit"
         ? this.config.protocolAddresses.treasury
         : this.config.protocolAddresses.comptroller,
-      amount
+      amount,
+      options
     );
   }
 
@@ -155,6 +159,7 @@ export default class Collaterals {
     amount: ethers.BigNumber,
     network: SingleCollateralVaultNetwork,
     signer: ethers.Signer,
+    options?: ethers.Overrides,
     populateTransaction?: false
   ): Promise<ethers.ContractTransaction>;
   public setSingleCollateralDepositAllowance(
@@ -162,6 +167,7 @@ export default class Collaterals {
     amount: ethers.BigNumber,
     network: SingleCollateralVaultNetwork,
     signer: ethers.Signer,
+    options?: ethers.Overrides,
     populateTransaction?: true
   ): Promise<ethers.PopulatedTransaction>;
   public setSingleCollateralDepositAllowance(
@@ -169,6 +175,7 @@ export default class Collaterals {
     amount: ethers.BigNumber,
     network: SingleCollateralVaultNetwork,
     signer: ethers.Signer,
+    options: ethers.Overrides = {},
     populateTransaction: boolean = false
   ): Promise<ethers.ContractTransaction | ethers.PopulatedTransaction> {
     const kashiPool = sdkConfig.singleCollateralVaults[network][vaultSymbol];
@@ -180,7 +187,7 @@ export default class Collaterals {
     const collateral = ERC20__factory.connect(kashiPool.collateral.address, signer);
     const chainId = sdkConfig.networkNameToId[network];
     const contract = populateTransaction ? collateral.populateTransaction : collateral;
-    return contract.approve(BENTOBOX_ADDRESS[chainId], amount);
+    return contract.approve(BENTOBOX_ADDRESS[chainId], amount, options);
   }
 
   private getCollateralContract = (collateralSymbol: CollateralSymbol, signer: ethers.Signer) => {
