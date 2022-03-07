@@ -66,7 +66,8 @@ export default class LPStaking {
         totalDeposited: poolData.totalDeposited,
         distributionRate: poolData.distributionRate,
         lpTokenTotalSupply: poolData.lpTokenTotalSupply,
-        lpTokenBalances: pool.tokensInLp.map((token) => ({
+        lpTokenSymbol: pool.lpTokenSymbol,
+        tokensInLp: pool.tokensInLp.map((token) => ({
           symbol: token.symbol,
           address: token.address,
           decimals: token.decimals,
