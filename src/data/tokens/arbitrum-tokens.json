@@ -407,5 +407,29 @@
     "address": "0x0f61b24272af65eacf6adfe507028957698e032f",
     "icon": "https://tokens.1inch.io/0xedd7c94fd7b4971b916d15067bc454b9e1bad980.png",
     "displayDecimals": 4
+  },
+  {
+    "symbol": "SP-WETH-FOREX",
+    "name": "SP-WETH-FOREX",
+    "decimals": 18,
+    "address": "0x9745e5CC0522827958eE3Fc2C03247276D359186",
+    "icon": "",
+    "displayDecimals": 18
+  },
+  {
+    "symbol": "CRV-fxEUR-EURS",
+    "name": "CRV-fxEUR-EURS",
+    "decimals": 18,
+    "address": "0xb0D2EB3C2cA3c6916FAb8DCbf9d9c165649231AE",
+    "icon": "",
+    "displayDecimals": 18
+  },
+  {
+    "symbol": "CRV-handle3",
+    "name": "CRV-handle3",
+    "decimals": 18,
+    "address": "0xd0dd5d76cf0fc06dabc48632735566dca241a35e",
+    "icon": "",
+    "displayDecimals": 18
   }
 ]

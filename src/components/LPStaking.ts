@@ -66,7 +66,7 @@ export default class LPStaking {
         totalDeposited: poolData.totalDeposited,
         distributionRate: poolData.distributionRate,
         lpTokenTotalSupply: poolData.lpTokenTotalSupply,
-        lpTokenSymbol: pool.lpTokenSymbol,
+        lpToken: pool.lpToken,
         tokensInLp: pool.tokensInLp.map((token) => ({
           symbol: token.symbol,
           address: token.address,
@@ -165,7 +165,7 @@ export default class LPStaking {
       stakingContractAbi
     );
 
-    const lpToken = createERC20MulticallContract(poolDetails.lpTokenAddress);
+    const lpToken = createERC20MulticallContract(poolDetails.lpToken.address);
 
     const base = {
       totalDeposited: lpToken.balanceOf(poolDetails.stakingContractAddress),
@@ -195,7 +195,9 @@ export default class LPStaking {
       return pool.tokensInLp.reduce((progress, token) => {
         return {
           ...progress,
-          [token.symbol]: createERC20MulticallContract(token.address).balanceOf(pool.lpTokenAddress)
+          [token.symbol]: createERC20MulticallContract(token.address).balanceOf(
+            pool.lpToken.address
+          )
         };
       }, {});
     });
