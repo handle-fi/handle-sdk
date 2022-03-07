@@ -67,7 +67,7 @@ export default class LPStaking {
           decimals: token.decimals,
           balance: balances[token.symbol]
         })),
-
+        url: pool.url,
         account:
           poolData.claimableRewards && poolData.deposited
             ? {
