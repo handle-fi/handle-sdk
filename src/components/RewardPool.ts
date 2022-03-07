@@ -112,10 +112,26 @@ export default class RewardPool {
     }, {} as RewardPoolNameMap<RewardPoolPool>);
   };
 
-  public claim = (signer: ethers.Signer) => {
+  public claim(
+    signer: ethers.Signer,
+    options?: ethers.Overrides,
+    populateTransaction?: false
+  ): Promise<ethers.ContractTransaction>;
+  public claim(
+    signer: ethers.Signer,
+    options?: ethers.Overrides,
+    populateTransaction?: true
+  ): Promise<ethers.PopulatedTransaction>;
+  public claim(
+    signer: ethers.Signer,
+    options: ethers.Overrides = {},
+    populateTransaction: boolean = false
+  ): Promise<ethers.ContractTransaction | ethers.PopulatedTransaction> {
     const contract = this.getContract(signer);
-    return contract.claim();
-  };
+    return populateTransaction
+      ? contract.populateTransaction.claim(options)
+      : contract.claim(options);
+  }
 
   private getDataMulticall = (
     account: string | undefined,
