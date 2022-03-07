@@ -21,4 +21,5 @@ export type LPStakingPool = {
     deposited: ethers.BigNumber;
     claimableRewards: ethers.BigNumber;
   };
+  url: string;
 };
