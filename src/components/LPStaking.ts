@@ -84,19 +84,19 @@ export default class LPStaking {
     });
   };
 
-  public state(
+  public stake(
     args: StakeAndWithdrawArgs,
     signer: ethers.Signer,
     options?: ethers.Overrides,
     populateTransaction?: false
   ): Promise<ethers.ContractTransaction>;
-  public state(
+  public stake(
     args: StakeAndWithdrawArgs,
     signer: ethers.Signer,
     options?: ethers.Overrides,
     populateTransaction?: true
   ): Promise<ethers.PopulatedTransaction>;
-  public state(
+  public stake(
     args: StakeAndWithdrawArgs,
     signer: ethers.Signer,
     options: ethers.Overrides = {},
@@ -107,19 +107,19 @@ export default class LPStaking {
     return method(args.amount, options);
   }
 
-  public withdraw(
+  public unstake(
     args: StakeAndWithdrawArgs,
     signer: ethers.Signer,
     options?: ethers.Overrides,
     populateTransaction?: false
   ): Promise<ethers.ContractTransaction>;
-  public withdraw(
+  public unstake(
     args: StakeAndWithdrawArgs,
     signer: ethers.Signer,
     options?: ethers.Overrides,
     populateTransaction?: true
   ): Promise<ethers.PopulatedTransaction>;
-  public withdraw(
+  public unstake(
     args: StakeAndWithdrawArgs,
     signer: ethers.Signer,
     options: ethers.Overrides = {},
