@@ -13,7 +13,10 @@ export type LPStakingPoolDetails = {
   platform: LPStakingPlatformName;
   title: string;
   stakingContractAddress: string;
-  lpTokenAddress: string;
+  lpToken: {
+    symbol: string;
+    address: string;
+  };
   tokensInLp: Token<string>[];
   url: string;
 };
@@ -141,15 +144,21 @@ const config: Config = {
         title: "sushiswap WETH-FOREX",
         platform: "sushi",
         stakingContractAddress: "0x5cdEb8ff5FD3a3361E27e491696515F1D119537a",
-        lpTokenAddress: "0x9745e5CC0522827958eE3Fc2C03247276D359186",
+        lpToken: {
+          address: "0x9745e5CC0522827958eE3Fc2C03247276D359186",
+          symbol: "SP-WETH-FOREX"
+        },
         tokensInLp: [getTokenDetails("FOREX", "arbitrum"), getTokenDetails("WETH", "arbitrum")],
         url: "https://app.sushi.com/add/ETH/0xDb298285FE4C5410B05390cA80e8Fbe9DE1F259B"
       },
       curveEursFxEUR: {
-        title: "curve fxEUR-EURS ",
+        title: "curve fxEUR-EURS",
         platform: "curve",
         stakingContractAddress: "0x140b808C0b7e0d24fee45155473042A6f6F841Aa",
-        lpTokenAddress: "0xb0D2EB3C2cA3c6916FAb8DCbf9d9c165649231AE",
+        lpToken: {
+          address: "0xb0D2EB3C2cA3c6916FAb8DCbf9d9c165649231AE",
+          symbol: "CRV-fxEUR-EURS"
+        },
         tokensInLp: [
           getTokenDetails("fxEUR", "arbitrum"),
           { symbol: "EURS", decimals: 2, address: "0xD22a58f79e9481D1a88e00c343885A588b34b68B" }
@@ -160,7 +169,10 @@ const config: Config = {
         title: "curve fxUSD-USDC-USDT",
         platform: "curve",
         stakingContractAddress: "0x68F03C9DB2611C79AAa21b6dFcdF6baC0cd191f6",
-        lpTokenAddress: "0xd0dd5d76cf0fc06dabc48632735566dca241a35e",
+        lpToken: {
+          address: "0xd0dd5d76cf0fc06dabc48632735566dca241a35e",
+          symbol: "CRV-handle3"
+        },
         tokensInLp: [
           getTokenDetails("fxUSD", "arbitrum"),
           {

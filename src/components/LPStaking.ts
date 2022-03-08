@@ -1,14 +1,14 @@
 import { LPStakingPoolDetails } from "../config";
 import sdkConfig from "../config";
 import { LPStakingPool, LPStakingPoolName, LPStakingPoolNameMap } from "../types/lpStaking";
-import { ethers } from "ethers";
+import { ethers, Signer } from "ethers";
 import {
   callMulticallObjects,
   createERC20MulticallContract,
   createMultiCallContract
 } from "../utils/contract-utils";
 import { Promisified } from "../types/general";
-import { Staking as StakingContract } from "../contracts";
+import { Staking as StakingContract, Staking__factory } from "../contracts";
 import stakingContractAbi from "../abis/handle/Staking.json";
 import { Provider as MultiCallProvider } from "ethers-multicall";
 
@@ -23,6 +23,11 @@ export type LPStakingPoolMulticall = {
   lpTokenTotalSupply: ethers.BigNumber;
   deposited?: ethers.BigNumber;
   claimableRewards?: ethers.BigNumber;
+};
+
+export type StakeAndWithdrawArgs = {
+  poolName: LPStakingPoolName;
+  amount: ethers.BigNumber;
 };
 
 export default class LPStaking {
@@ -61,7 +66,8 @@ export default class LPStaking {
         totalDeposited: poolData.totalDeposited,
         distributionRate: poolData.distributionRate,
         lpTokenTotalSupply: poolData.lpTokenTotalSupply,
-        lpTokenBalances: pool.tokensInLp.map((token) => ({
+        lpToken: pool.lpToken,
+        tokensInLp: pool.tokensInLp.map((token) => ({
           symbol: token.symbol,
           address: token.address,
           decimals: token.decimals,
@@ -79,6 +85,77 @@ export default class LPStaking {
     });
   };
 
+  public stake(
+    args: StakeAndWithdrawArgs,
+    signer: ethers.Signer,
+    options?: ethers.Overrides,
+    populateTransaction?: false
+  ): Promise<ethers.ContractTransaction>;
+  public stake(
+    args: StakeAndWithdrawArgs,
+    signer: ethers.Signer,
+    options?: ethers.Overrides,
+    populateTransaction?: true
+  ): Promise<ethers.PopulatedTransaction>;
+  public stake(
+    args: StakeAndWithdrawArgs,
+    signer: ethers.Signer,
+    options: ethers.Overrides = {},
+    populateTransaction: boolean = false
+  ): Promise<ethers.ContractTransaction | ethers.PopulatedTransaction> {
+    const contract = this.getContract(args.poolName, signer);
+    const method = populateTransaction ? contract.populateTransaction.stake : contract.stake;
+    return method(args.amount, options);
+  }
+
+  public unstake(
+    args: StakeAndWithdrawArgs,
+    signer: ethers.Signer,
+    options?: ethers.Overrides,
+    populateTransaction?: false
+  ): Promise<ethers.ContractTransaction>;
+  public unstake(
+    args: StakeAndWithdrawArgs,
+    signer: ethers.Signer,
+    options?: ethers.Overrides,
+    populateTransaction?: true
+  ): Promise<ethers.PopulatedTransaction>;
+  public unstake(
+    args: StakeAndWithdrawArgs,
+    signer: ethers.Signer,
+    options: ethers.Overrides = {},
+    populateTransaction: boolean = false
+  ): Promise<ethers.ContractTransaction | ethers.PopulatedTransaction> {
+    const contract = this.getContract(args.poolName, signer);
+    const method = populateTransaction ? contract.populateTransaction.withdraw : contract.withdraw;
+    return method(args.amount, options);
+  }
+
+  public claim(
+    poolName: LPStakingPoolName,
+    signer: ethers.Signer,
+    options?: ethers.Overrides,
+    populateTransaction?: false
+  ): Promise<ethers.ContractTransaction>;
+  public claim(
+    poolName: LPStakingPoolName,
+    signer: ethers.Signer,
+    options?: ethers.Overrides,
+    populateTransaction?: true
+  ): Promise<ethers.PopulatedTransaction>;
+  public claim(
+    poolName: LPStakingPoolName,
+    signer: ethers.Signer,
+    options: ethers.Overrides = {},
+    populateTransaction: boolean = false
+  ): Promise<ethers.ContractTransaction | ethers.PopulatedTransaction> {
+    const contract = this.getContract(poolName, signer);
+    const method = populateTransaction
+      ? contract.populateTransaction.getReward
+      : contract.getReward;
+    return method(options);
+  }
+
   private getMulticall = (
     account: string | undefined,
     poolDetails: LPStakingPoolDetails
@@ -88,7 +165,7 @@ export default class LPStaking {
       stakingContractAbi
     );
 
-    const lpToken = createERC20MulticallContract(poolDetails.lpTokenAddress);
+    const lpToken = createERC20MulticallContract(poolDetails.lpToken.address);
 
     const base = {
       totalDeposited: lpToken.balanceOf(poolDetails.stakingContractAddress),
@@ -118,7 +195,9 @@ export default class LPStaking {
       return pool.tokensInLp.reduce((progress, token) => {
         return {
           ...progress,
-          [token.symbol]: createERC20MulticallContract(token.address).balanceOf(pool.lpTokenAddress)
+          [token.symbol]: createERC20MulticallContract(token.address).balanceOf(
+            pool.lpToken.address
+          )
         };
       }, {});
     });
@@ -126,5 +205,9 @@ export default class LPStaking {
     const provider = new MultiCallProvider(signer.provider!, this.config.chainId);
 
     return callMulticallObjects(multicalls, provider);
+  };
+
+  private getContract = (poolName: LPStakingPoolName, signer: Signer) => {
+    return Staking__factory.connect(this.config.pools[poolName].stakingContractAddress, signer);
   };
 }
