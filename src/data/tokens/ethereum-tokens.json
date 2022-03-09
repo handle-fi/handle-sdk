@@ -1,45 +1,5 @@
 [
   {
-    "symbol": "FOREX",
-    "name": "handle.fi",
-    "address": "0xDb298285FE4C5410B05390cA80e8Fbe9DE1F259B",
-    "decimals": 18,
-    "icon": "https://handle.fi/images/handle.fiFOREXLogoLight200x200.png",
-    "displayDecimals": 4
-  },
-  {
-    "symbol": "fxAUD",
-    "name": "handleAUD",
-    "address": "0x7E141940932E3D13bfa54B224cb4a16510519308",
-    "decimals": 18,
-    "icon": "https://app.handle.fi/fxAUDLogo.png",
-    "displayDecimals": 4
-  },
-  {
-    "symbol": "fxEUR",
-    "name": "handleEUR",
-    "address": "0x116172B2482c5dC3E6f445C16Ac13367aC3FCd35",
-    "decimals": 18,
-    "icon": "https://app.handle.fi/fxEURLogo.png",
-    "displayDecimals": 4
-  },
-  {
-    "symbol": "fxPHP",
-    "name": "handlePHP",
-    "address": "0x3d147cD9aC957B2a5F968dE9d1c6B9d0872286a0",
-    "decimals": 18,
-    "icon": "https://app.handle.fi/fxPHPLogo.png",
-    "displayDecimals": 4
-  },
-  {
-    "symbol": "fxUSD",
-    "name": "handleUSD",
-    "address": "0x8616E8EA83f048ab9A5eC513c9412Dd2993bcE3F",
-    "decimals": 18,
-    "icon": "https://app.handle.fi/fxUSDLogo.png",
-    "displayDecimals": 4
-  },
-  {
     "symbol": "$ANRX",
     "name": "AnRKey X",
     "address": "0xcae72a7a0fd9046cf6b165ca54c9e3a3872109e0",
