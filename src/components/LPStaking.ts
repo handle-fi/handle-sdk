@@ -21,6 +21,7 @@ export type LPStakingPoolMulticall = {
   totalDeposited: ethers.BigNumber;
   distributionRate: ethers.BigNumber;
   lpTokenTotalSupply: ethers.BigNumber;
+  distributionPeriodEnds: ethers.BigNumber;
   deposited?: ethers.BigNumber;
   claimableRewards?: ethers.BigNumber;
 };
@@ -66,6 +67,7 @@ export default class LPStaking {
         totalDeposited: poolData.totalDeposited,
         distributionRate: poolData.distributionRate,
         lpTokenTotalSupply: poolData.lpTokenTotalSupply,
+        distributionPeriodEnds: poolData.distributionPeriodEnds,
         lpToken: pool.lpToken,
         tokensInLp: pool.tokensInLp.map((token) => ({
           symbol: token.symbol,
@@ -170,7 +172,8 @@ export default class LPStaking {
     const base = {
       totalDeposited: lpToken.balanceOf(poolDetails.stakingContractAddress),
       lpTokenTotalSupply: lpToken.totalSupply(),
-      distributionRate: stakingContract.rewardRate()
+      distributionRate: stakingContract.rewardRate(),
+      distributionPeriodEnds: stakingContract.periodFinish()
     };
 
     if (account) {

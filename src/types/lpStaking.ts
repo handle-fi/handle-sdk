@@ -11,6 +11,7 @@ export type LPStakingPool = {
   totalDeposited: ethers.BigNumber;
   distributionRate: ethers.BigNumber;
   lpTokenTotalSupply: ethers.BigNumber;
+  distributionPeriodEnds: ethers.BigNumber;
   lpToken: {
     symbol: string;
     address: string;
