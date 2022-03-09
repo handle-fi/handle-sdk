@@ -40,7 +40,7 @@
     "displayDecimals": 4
   },
   {
-    "symbol": "AETH",
+    "symbol": "ETH",
     "name": "Ethereum",
     "decimals": 18,
     "address": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
