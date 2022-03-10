@@ -6,12 +6,15 @@ export type LPStakingPlatformName = "handle" | "sushi" | "curve";
 
 export type LPStakingPool = {
   name: LPStakingPoolName;
+  address: string;
   title: string;
   platform: LPStakingPlatformName;
   totalDeposited: ethers.BigNumber;
   distributionRate: ethers.BigNumber;
-  lpTokenTotalSupply: ethers.BigNumber;
   distributionPeriodEnds: ethers.BigNumber;
+  distributionDuration: ethers.BigNumber;
+  rewardsBalance: ethers.BigNumber;
+  lpTokenTotalSupply: ethers.BigNumber;
   lpToken: {
     symbol: string;
     address: string;
