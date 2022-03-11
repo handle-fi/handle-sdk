@@ -1,5 +1,14 @@
 [
   {
+    "symbol": "MATIC",
+    "name": "MATIC",
+    "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "decimals": 18,
+    "icon": "https://tokens.1inch.exchange/0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0.png",
+    "displayDecimals": 4,
+    "isNative": true
+  },
+  {
     "symbol": "$DG",
     "name": "decentral.games",
     "address": "0x2a93172c8dccbfbc60a39d56183b7279a2f647b4",
@@ -236,7 +245,7 @@
     "name": "DEFI Top 5 Tokens Index",
     "address": "0x42435f467d33e5c4146a4e8893976ef12bbce762",
     "decimals": 18,
-    "icon": "https://tokens.1inch.exchange/0xfa6de2697d59e88ed7fc4dfe5a33dac43565ea41.png",
+    "icon": null,
     "displayDecimals": 4
   },
   {
@@ -276,7 +285,7 @@
     "name": "Digital Reserve Currency",
     "address": "0xfed16c746cb5bfed009730f9e3e6a673006105c7",
     "decimals": 0,
-    "icon": "https://tokens.1inch.exchange/0xfed16c746cb5bfed009730f9e3e6a673006105c7.png",
+    "icon": null,
     "displayDecimals": 4
   },
   {
@@ -300,7 +309,7 @@
     "name": "Easy DAI",
     "address": "0xa1c09c8f4f5d03fcc27b456475d53d988e98d7c5",
     "decimals": 8,
-    "icon": "https://raw.githubusercontent.com/sameepsi/quickswap-interface/master/assets/easyfi-token.png",
+    "icon": null,
     "displayDecimals": 4
   },
   {
@@ -324,7 +333,7 @@
     "name": "Easy USDC",
     "address": "0x4ebde54ba404be158262ede801744b92b9878c61",
     "decimals": 8,
-    "icon": "https://raw.githubusercontent.com/sameepsi/quickswap-interface/master/assets/easyfi-token.png",
+    "icon": null,
     "displayDecimals": 4
   },
   {
@@ -332,7 +341,7 @@
     "name": "Easy USDT",
     "address": "0xfc39742fe9420a7af23757fc7e78d1c3ae4a9474",
     "decimals": 8,
-    "icon": "https://raw.githubusercontent.com/sameepsi/quickswap-interface/master/assets/easyfi-token.png",
+    "icon": null,
     "displayDecimals": 4
   },
   {
@@ -356,7 +365,7 @@
     "name": "Fusion",
     "address": "0x2bf9b864cdc97b08b6d79ad4663e71b8ab65c45c",
     "decimals": 18,
-    "icon": "https://tokens.1inch.exchange/0x2bf9b864cdc97b08b6d79ad4663e71b8ab65c45c.png",
+    "icon": null,
     "displayDecimals": 4
   },
   {
@@ -500,7 +509,7 @@
     "name": "Matic AAVE Interest Bearing",
     "address": "0x823cd4264c1b951c9209ad0deaea9988fe8429bf",
     "decimals": 18,
-    "icon": "https://aavegotchi.com/images/matokens/maAAVE.svg",
+    "icon": null,
     "displayDecimals": 4
   },
   {
@@ -508,7 +517,7 @@
     "name": "Matic AAVE Interest Bearing",
     "address": "0xe0b22e0037b130a9f56bbb537684e6fa18192341",
     "decimals": 18,
-    "icon": "https://aavegotchi.com/images/matokens/maDAI.svg",
+    "icon": null,
     "displayDecimals": 4
   },
   {
@@ -516,7 +525,7 @@
     "name": "Matic LINK Interest Bearing",
     "address": "0x98ea609569bd25119707451ef982b90e3eb719cd",
     "decimals": 18,
-    "icon": "https://aavegotchi.com/images/matokens/maLINK.svg",
+    "icon": null,
     "displayDecimals": 4
   },
   {
@@ -528,20 +537,11 @@
     "displayDecimals": 4
   },
   {
-    "symbol": "MATIC",
-    "name": "MATIC",
-    "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
-    "decimals": 18,
-    "icon": "https://tokens.1inch.exchange/0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0.png",
-    "displayDecimals": 4,
-    "isNative": true
-  },
-  {
     "symbol": "maTUSD",
     "name": "Matic TUSD Interest Bearing",
     "address": "0xf4b8888427b00d7caf21654408b7cba2ecf4ebd9",
     "decimals": 18,
-    "icon": "https://aavegotchi.com/images/matokens/maTUSD.svg",
+    "icon": null,
     "displayDecimals": 4
   },
   {
@@ -549,7 +549,7 @@
     "name": "Matic UNI Interest Bearing",
     "address": "0x8c8bdbe9cee455732525086264a4bf9cf821c498",
     "decimals": 18,
-    "icon": "https://aavegotchi.com/images/matokens/maUNI.svg",
+    "icon": null,
     "displayDecimals": 4
   },
   {
@@ -557,7 +557,7 @@
     "name": "Matic USDC Interest Bearing",
     "address": "0x9719d867a500ef117cc201206b8ab51e794d3f82",
     "decimals": 6,
-    "icon": "https://aavegotchi.com/images/matokens/maUSDC.svg",
+    "icon": null,
     "displayDecimals": 4
   },
   {
@@ -565,7 +565,7 @@
     "name": "Matic USDT Interest Bearing",
     "address": "0xdae5f1590db13e3b40423b5b5c5fbf175515910b",
     "decimals": 6,
-    "icon": "https://aavegotchi.com/images/matokens/maUSDT.svg",
+    "icon": null,
     "displayDecimals": 4
   },
   {
@@ -573,7 +573,7 @@
     "name": "Matic WETH Interest Bearing",
     "address": "0x20d3922b4a1a8560e1ac99fba4fade0c849e2142",
     "decimals": 18,
-    "icon": "https://aavegotchi.com/images/matokens/maWETH.svg",
+    "icon": null,
     "displayDecimals": 4
   },
   {
@@ -581,7 +581,7 @@
     "name": "Matic YFI Interest Bearing",
     "address": "0xe20f7d1f0ec39c4d5db01f53554f2ef54c71f613",
     "decimals": 18,
-    "icon": "https://aavegotchi.com/images/matokens/maYFI.svg",
+    "icon": null,
     "displayDecimals": 4
   },
   {
@@ -589,7 +589,7 @@
     "name": "Matic Deflect Protocol",
     "address": "0x82b6205002ecd05e97642d38d61e2cfeac0e18ce",
     "decimals": 9,
-    "icon": "https://tokens.1inch.exchange/0x82b6205002ecd05e97642d38d61e2cfeac0e18ce.png",
+    "icon": null,
     "displayDecimals": 4
   },
   {
@@ -637,7 +637,7 @@
     "name": "Matic Rebalance Token",
     "address": "0x66768ad00746ac4d68ded9f64886d55d5243f5ec",
     "decimals": 18,
-    "icon": "https://tokens.1inch.exchange/0x03247a4368a280bec8133300cd930a3a61d604f6.png",
+    "icon": null,
     "displayDecimals": 4
   },
   {
@@ -741,7 +741,7 @@
     "name": "PolyDex.Fi",
     "address": "0x7a5dc8a09c831251026302c93a778748dd48b4df",
     "decimals": 18,
-    "icon": "https://tokens.1inch.exchange/0x7a5dc8a09c831251026302c93a778748dd48b4df.png",
+    "icon": null,
     "displayDecimals": 4
   },
   {
@@ -757,7 +757,7 @@
     "name": "Pepedex",
     "address": "0x127984b5e6d5c59f81dacc9f1c8b3bdc8494572e",
     "decimals": 18,
-    "icon": "https://tokens.1inch.exchange/0x127984b5e6d5c59f81dacc9f1c8b3bdc8494572e.png",
+    "icon": null,
     "displayDecimals": 4
   },
   {
@@ -773,7 +773,7 @@
     "name": "PYR Token",
     "address": "0x348e62131fce2f4e0d5ead3fe1719bc039b380a9",
     "decimals": 18,
-    "icon": "https://tokens.1inch.exchange/0x9534ad65fb398e27ac8f4251dae1780b989d136e.png",
+    "icon": null,
     "displayDecimals": 4
   },
   {
@@ -797,7 +797,7 @@
     "name": "Rebalance Token",
     "address": "0x03247a4368a280bec8133300cd930a3a61d604f6",
     "decimals": 18,
-    "icon": "https://tokens.1inch.exchange/0x03247a4368a280bec8133300cd930a3a61d604f6.png",
+    "icon": null,
     "displayDecimals": 4
   },
   {
@@ -861,7 +861,7 @@
     "name": "SuperBid",
     "address": "0xa3860f969075045d82de85b06bb665f93c4bae32",
     "decimals": 18,
-    "icon": "https://tokens.1inch.exchange/0xa3860f969075045d82de85b06bb665f93c4bae32.png",
+    "icon": null,
     "displayDecimals": 4
   },
   {
@@ -949,7 +949,7 @@
     "name": "Vertex",
     "address": "0x72572ccf5208b59f4bcc14e6653d8c31cd1fc5a0",
     "decimals": 18,
-    "icon": "https://tokens.1inch.exchange/0x72572ccf5208b59f4bcc14e6653d8c31cd1fc5a0.png",
+    "icon": null,
     "displayDecimals": 4
   },
   {
@@ -1021,7 +1021,7 @@
     "name": "WazirX",
     "address": "0x72d6066f486bd0052eefb9114b66ae40e0a6031a",
     "decimals": 8,
-    "icon": "https://tokens.1inch.exchange/0x72d6066f486bd0052eefb9114b66ae40e0a6031a.png",
+    "icon": null,
     "displayDecimals": 4
   },
   {
@@ -1037,7 +1037,7 @@
     "name": "Staked SDT",
     "address": "0xd921f8318cfd786bab1ea7492673f053c518ac04",
     "decimals": 18,
-    "icon": "https://tokens.1inch.exchange/0xd921f8318cfd786bab1ea7492673f053c518ac04.png",
+    "icon": null,
     "displayDecimals": 4
   },
   {
@@ -1045,7 +1045,7 @@
     "name": "PolyYeld Token",
     "address": "0xd0f3121a190d85de0ab6131f2bcecdbfcfb38891",
     "decimals": 18,
-    "icon": "https://tokens.1inch.exchange/0xd0f3121a190d85de0ab6131f2bcecdbfcfb38891.png",
+    "icon": null,
     "displayDecimals": 4
   },
   {

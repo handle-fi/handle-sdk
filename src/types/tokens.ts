@@ -6,7 +6,7 @@ export type Token<T> = {
 
 export type TokenExtended<T> = Token<T> & {
   name: string;
-  icon: string;
+  icon: string | null;
   displayDecimals: number;
   isNative?: boolean;
 };

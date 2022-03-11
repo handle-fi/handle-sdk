@@ -13,7 +13,7 @@
     "name": "Alchemy",
     "decimals": 18,
     "address": "0x0e15258734300290a651fdbae8deb039a8e7a2fa",
-    "icon": "https://zapper.fi/images/ALCH-icon.png",
+    "icon": null,
     "displayDecimals": 4
   },
   {
@@ -53,7 +53,7 @@
     "name": "CelerToken",
     "decimals": 18,
     "address": "0x3a8b787f78d775aecfeea15706d4221b40f345ab",
-    "icon": "https://zapper.fi/images/CELR-icon.png",
+    "icon": null,
     "displayDecimals": 4
   },
   {
@@ -85,7 +85,7 @@
     "name": "DEFI Top 5 Tokens Index",
     "decimals": 18,
     "address": "0xdeba25af35e4097146d7629055e0ec3c71706324",
-    "icon": "https://tokens.1inch.io/0xfa6de2697d59e88ed7fc4dfe5a33dac43565ea41.png",
+    "icon": null,
     "displayDecimals": 4
   },
   {
@@ -157,7 +157,7 @@
     "name": "QIAN governance token",
     "decimals": 18,
     "address": "0x04cb2d263a7489f02d813eaab9ba1bb8466347f2",
-    "icon": "https://zapper.fi/images/KUN-icon.png",
+    "icon": null,
     "displayDecimals": 4
   },
   {
@@ -373,7 +373,7 @@
     "name": "SP-WETH-FOREX",
     "decimals": 18,
     "address": "0x9745e5CC0522827958eE3Fc2C03247276D359186",
-    "icon": "",
+    "icon": null,
     "displayDecimals": 18
   },
   {
@@ -381,7 +381,7 @@
     "name": "CRV-fxEUR-EURS",
     "decimals": 18,
     "address": "0xb0D2EB3C2cA3c6916FAb8DCbf9d9c165649231AE",
-    "icon": "",
+    "icon": null,
     "displayDecimals": 18
   },
   {
@@ -389,7 +389,7 @@
     "name": "CRV-handle3",
     "decimals": 18,
     "address": "0xd0dd5d76cf0fc06dabc48632735566dca241a35e",
-    "icon": "",
+    "icon": null,
     "displayDecimals": 18
   }
 ]
