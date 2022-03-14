@@ -11,6 +11,7 @@ import { Promisified } from "../types/general";
 import { Staking as StakingContract, Staking__factory } from "../contracts";
 import stakingContractAbi from "../abis/handle/Staking.json";
 import { Provider as MultiCallProvider } from "ethers-multicall";
+import { NETWORK_NAME_TO_CHAIN_ID } from "../constants";
 
 export type LPStakingConfig = {
   pools: LPStakingPoolNameMap<LPStakingPoolDetails>;
@@ -41,7 +42,7 @@ export default class LPStaking {
     this.config = c || {
       pools: sdkConfig.lpStaking.arbitrum,
       forexAddress: sdkConfig.forexAddress,
-      chainId: sdkConfig.networkNameToId.arbitrum
+      chainId: NETWORK_NAME_TO_CHAIN_ID.arbitrum
     };
   }
 

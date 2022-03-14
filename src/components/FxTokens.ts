@@ -10,6 +10,7 @@ import { Token } from "../types/tokens";
 import Graph, { IndexedFxToken } from "./Graph";
 import { SingleCollateralVaultNetwork } from "..";
 import { BENTOBOX_ADDRESS } from "@sushiswap/core-sdk";
+import { NETWORK_NAME_TO_CHAIN_ID } from "../constants";
 
 export type FxTokensConfig = {
   protocolAddresses: ProtocolAddresses;
@@ -31,7 +32,7 @@ export default class FxTokens {
     this.config = c || {
       protocolAddresses: sdkConfig.protocol.arbitrum.protocol,
       fxTokenAddresses: sdkConfig.fxTokenAddresses,
-      chainId: sdkConfig.networkNameToId.arbitrum,
+      chainId: NETWORK_NAME_TO_CHAIN_ID.arbitrum,
       graphEndpoint: sdkConfig.theGraphEndpoints.arbitrum
     };
 
@@ -75,7 +76,7 @@ export default class FxTokens {
     signer: ethers.Signer
   ) => {
     const contract = this.getFxTokenContract(fxToken, signer);
-    const chainId = sdkConfig.networkNameToId[network];
+    const chainId = NETWORK_NAME_TO_CHAIN_ID[network];
     return contract.allowance(account, BENTOBOX_ADDRESS[chainId]);
   };
 
@@ -97,7 +98,7 @@ export default class FxTokens {
     options: ethers.Overrides = {}
   ): Promise<ethers.ContractTransaction> => {
     const fxContract = this.getFxTokenContract(fxTokenSymbol, signer);
-    const chainId = sdkConfig.networkNameToId[network];
+    const chainId = NETWORK_NAME_TO_CHAIN_ID[network];
     return fxContract.approve(BENTOBOX_ADDRESS[chainId], amount, options);
   };
 

@@ -15,6 +15,7 @@ import { ERC20__factory } from "../contracts";
 import { SingleCollateralVaultNetwork, SingleCollateralVaultSymbol } from "..";
 import { BENTOBOX_ADDRESS } from "@sushiswap/core-sdk";
 import { getTokensFromConfig } from "../utils/collateral-utils";
+import { NETWORK_NAME_TO_CHAIN_ID } from "../constants";
 
 export type CollateralsConfig = {
   protocolAddresses: ProtocolAddresses;
@@ -42,7 +43,7 @@ export default class Collaterals {
     this.config = c || {
       protocolAddresses: sdkConfig.protocol.arbitrum.protocol,
       collaterals: sdkConfig.protocol.arbitrum.collaterals,
-      chainId: sdkConfig.networkNameToId.arbitrum,
+      chainId: NETWORK_NAME_TO_CHAIN_ID.arbitrum,
       graphEndpoint: sdkConfig.theGraphEndpoints.arbitrum
     };
     this.tokens = getTokensFromConfig(this.config.collaterals);
@@ -113,7 +114,7 @@ export default class Collaterals {
     }
 
     const collateral = ERC20__factory.connect(kashiPool.collateral.address, signer);
-    const chainId = sdkConfig.networkNameToId[network];
+    const chainId = NETWORK_NAME_TO_CHAIN_ID[network];
     return collateral.allowance(account, BENTOBOX_ADDRESS[chainId]);
   };
 
@@ -149,7 +150,7 @@ export default class Collaterals {
     }
 
     const collateral = ERC20__factory.connect(kashiPool.collateral.address, signer);
-    const chainId = sdkConfig.networkNameToId[network];
+    const chainId = NETWORK_NAME_TO_CHAIN_ID[network];
     return collateral.approve(BENTOBOX_ADDRESS[chainId], amount, options);
   };
 

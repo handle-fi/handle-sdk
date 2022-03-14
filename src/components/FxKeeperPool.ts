@@ -2,6 +2,7 @@ import { ethers } from "ethers";
 import { FxTokenSymbol } from "..";
 import sdkConfig, { FxTokenAddresses } from "../config";
 import { ProtocolAddresses } from "../config";
+import { NETWORK_NAME_TO_CHAIN_ID } from "../constants";
 import { FxKeeperPool__factory } from "../contracts";
 import { FxKeeperPoolPool } from "../types/fxKeeperPool";
 import { Promisified } from "../types/general";
@@ -35,7 +36,7 @@ export default class FxKeeperPool {
     this.config = c || {
       protocolAddresses: sdkConfig.protocol.arbitrum.protocol,
       fxTokenAddresses: sdkConfig.fxTokenAddresses,
-      chainId: sdkConfig.networkNameToId.arbitrum
+      chainId: NETWORK_NAME_TO_CHAIN_ID.arbitrum
     };
   }
 

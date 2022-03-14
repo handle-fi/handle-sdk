@@ -1,15 +1,15 @@
 import { ethers } from "ethers";
 import { BENTOBOX_ADDRESS, KASHI_ADDRESS } from "@sushiswap/core-sdk";
-import config from "../config";
 import { SingleCollateralVaultNetwork } from "../types/network";
 import { SushiBento__factory } from "../contracts";
+import { NETWORK_NAME_TO_CHAIN_ID } from "../constants";
 
 export const getIsKashiApproved = async (
   account: string,
   network: SingleCollateralVaultNetwork,
   signer: ethers.Signer
 ): Promise<boolean> => {
-  const chainId = config.networkNameToId[network];
+  const chainId = NETWORK_NAME_TO_CHAIN_ID[network];
   const bentoBoxAddress = BENTOBOX_ADDRESS[chainId];
   const kashiAddress = KASHI_ADDRESS[chainId];
   const contract = SushiBento__factory.connect(bentoBoxAddress, signer);
@@ -21,7 +21,7 @@ export const signKashiApproval = async (
   network: SingleCollateralVaultNetwork,
   signer: ethers.Signer
 ): Promise<ethers.Signature> => {
-  const chainId = config.networkNameToId[network];
+  const chainId = NETWORK_NAME_TO_CHAIN_ID[network];
   const bentoBoxAddress = BENTOBOX_ADDRESS[chainId];
   const kashiAddress = KASHI_ADDRESS[chainId];
   const contract = SushiBento__factory.connect(bentoBoxAddress, signer);

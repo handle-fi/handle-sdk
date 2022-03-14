@@ -40,7 +40,11 @@ import GovernanceLockSDK from "./components/GovernanceLock";
 import RewardPoolSDK from "./components/RewardPool";
 import { getIsKashiApproved, signKashiApproval } from "./utils/allowance-utils";
 import { getNetworkName } from "./utils/web3-utils";
-import { NETWORK_NAMES, SINGLE_COLLATERAL_NETWORK_NAMES } from "./constants";
+import {
+  NETWORK_NAMES,
+  SINGLE_COLLATERAL_NETWORK_NAMES,
+  NETWORK_NAME_TO_CHAIN_ID
+} from "./constants";
 import { ETHEREUM_TOKEN_LIST, ARBITRUM_TOKEN_LIST, POLYGON_TOKEN_LIST } from "./data/tokens";
 
 export {
@@ -64,6 +68,7 @@ export {
   ETHEREUM_TOKEN_LIST,
   ARBITRUM_TOKEN_LIST,
   POLYGON_TOKEN_LIST,
+  NETWORK_NAME_TO_CHAIN_ID,
   getNetworkName,
   getIsKashiApproved,
   signKashiApproval

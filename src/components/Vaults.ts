@@ -33,6 +33,7 @@ import {
 } from "../utils/sushiswap-utils";
 import KashiCooker from "../utils/KashiCooker";
 import { SingleCollateralVaultNetwork } from "../types/network";
+import { NETWORK_NAME_TO_CHAIN_ID } from "../constants";
 
 export type VaultsConfig = {
   forexTokenAddress: string;
@@ -122,7 +123,7 @@ export default class Vaults {
       protocolAddresses: sdkConfig.protocol.arbitrum.protocol,
       fxTokenAddresses: sdkConfig.fxTokenAddresses,
       collaterals: sdkConfig.protocol.arbitrum.collaterals,
-      chainId: sdkConfig.networkNameToId.arbitrum,
+      chainId: NETWORK_NAME_TO_CHAIN_ID.arbitrum,
       graphEndpoint: sdkConfig.theGraphEndpoints.arbitrum,
       singleCollateralVaults: sdkConfig.singleCollateralVaults
     };
@@ -229,7 +230,7 @@ export default class Vaults {
     signer: ethers.Signer
   ): Promise<SingleCollateralVault> => {
     this.initialisationCheck();
-    const chainId = sdkConfig.networkNameToId[network];
+    const chainId = NETWORK_NAME_TO_CHAIN_ID[network];
 
     const provider = new MultiCallProvider(signer.provider!, chainId);
 
@@ -287,7 +288,7 @@ export default class Vaults {
     signer: ethers.Signer
   ): Promise<SingleCollateralVault[]> => {
     this.initialisationCheck();
-    const chainId = sdkConfig.networkNameToId[network];
+    const chainId = NETWORK_NAME_TO_CHAIN_ID[network];
 
     const provider = new MultiCallProvider(signer.provider!, chainId);
 
@@ -377,7 +378,7 @@ export default class Vaults {
     }
 
     const account = await signer.getAddress();
-    const chainId = sdkConfig.networkNameToId[args.network];
+    const chainId = NETWORK_NAME_TO_CHAIN_ID[args.network];
     const fxToken = getFxTokenBySymbol(this.fxTokens, kashiPool.fxToken);
     const cooker = new KashiCooker(kashiPool, account, fxToken, chainId);
 
@@ -416,7 +417,7 @@ export default class Vaults {
     }
 
     const account = await signer.getAddress();
-    const chainId = sdkConfig.networkNameToId[args.network];
+    const chainId = NETWORK_NAME_TO_CHAIN_ID[args.network];
     const fxToken = getFxTokenBySymbol(this.fxTokens, kashiPool.fxToken);
     const cooker = new KashiCooker(kashiPool, account, fxToken, chainId);
 
@@ -443,7 +444,7 @@ export default class Vaults {
     }
 
     const account = await signer.getAddress();
-    const chainId = sdkConfig.networkNameToId[args.network];
+    const chainId = NETWORK_NAME_TO_CHAIN_ID[args.network];
     const fxToken = getFxTokenBySymbol(this.fxTokens, kashiPool.fxToken);
     const cooker = new KashiCooker(kashiPool, account, fxToken, chainId);
 

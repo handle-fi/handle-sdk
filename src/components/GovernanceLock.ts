@@ -1,6 +1,7 @@
 import { ethers } from "ethers";
 import sdkConfig from "../config";
 import { ProtocolAddresses } from "../config";
+import { NETWORK_NAME_TO_CHAIN_ID } from "../constants";
 import { GovernanceLock__factory } from "../contracts";
 import { Promisified } from "../types/general";
 import { GovernanceLockData } from "../types/governanceLock";
@@ -40,7 +41,7 @@ export default class GovernanceLock {
     this.config = c || {
       forexAddress: sdkConfig.forexAddress,
       protocolAddresses: sdkConfig.protocol.arbitrum.protocol,
-      chainId: sdkConfig.networkNameToId.arbitrum
+      chainId: NETWORK_NAME_TO_CHAIN_ID.arbitrum
     };
   }
 

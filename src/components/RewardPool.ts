@@ -1,6 +1,7 @@
 import { ethers, Signer } from "ethers";
 import sdkConfig, { FxTokenAddresses } from "../config";
 import { ProtocolAddresses } from "../config";
+import { NETWORK_NAME_TO_CHAIN_ID } from "../constants";
 import { RewardPool__factory } from "../contracts";
 import { Promisified } from "../types/general";
 import {
@@ -47,7 +48,7 @@ export default class RewardPool {
     this.config = c || {
       protocolAddresses: sdkConfig.protocol.arbitrum.protocol,
       fxTokenAddresses: sdkConfig.fxTokenAddresses,
-      chainId: sdkConfig.networkNameToId.arbitrum
+      chainId: NETWORK_NAME_TO_CHAIN_ID.arbitrum
     };
   }
 
