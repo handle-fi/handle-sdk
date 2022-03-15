@@ -313,30 +313,15 @@ export default class Vaults {
     });
   };
 
-  public mint(
+  public mint = async (
     args: MintArguments,
     signer: ethers.Signer,
-    options?: ethers.Overrides,
-    populateTransaction?: false
-  ): Promise<ethers.ContractTransaction>;
-  public mint(
-    args: MintArguments,
-    signer: ethers.Signer,
-    options?: ethers.Overrides,
-    populateTransaction?: true
-  ): Promise<ethers.PopulatedTransaction>;
-  public async mint(
-    args: MintArguments,
-    signer: ethers.Signer,
-    options: ethers.Overrides = {},
-    populateTransaction: boolean = false
-  ): Promise<ethers.ContractTransaction | ethers.PopulatedTransaction> {
+    options: ethers.Overrides = {}
+  ): Promise<ethers.ContractTransaction> => {
     this.initialisationCheck();
     const protocolContracts = createProtocolContracts(this.config.protocolAddresses, signer);
 
-    const contract = populateTransaction
-      ? protocolContracts.comptroller.populateTransaction
-      : protocolContracts.comptroller;
+    const contract = protocolContracts.comptroller;
 
     const fxToken = getFxTokenBySymbol(this.fxTokens, args.fxToken);
     const deadline = getDeadline(args.deadline);
@@ -370,26 +355,13 @@ export default class Vaults {
       referral,
       options
     );
-  }
+  };
 
-  public mintAndDepositSingleCollateral(
+  public mintAndDepositSingleCollateral = async (
     args: SingleCollateralMintAndDepositArguments,
     signer: ethers.Signer,
-    options?: ethers.Overrides,
-    populateTransaction?: false
-  ): Promise<ethers.ContractTransaction>;
-  public mintAndDepositSingleCollateral(
-    args: SingleCollateralMintAndDepositArguments,
-    signer: ethers.Signer,
-    options?: ethers.Overrides,
-    populateTransaction?: true
-  ): Promise<ethers.PopulatedTransaction>;
-  public async mintAndDepositSingleCollateral(
-    args: SingleCollateralMintAndDepositArguments,
-    signer: ethers.Signer,
-    options: ethers.Overrides = {},
-    populateTransaction: boolean = false
-  ): Promise<ethers.ContractTransaction | ethers.PopulatedTransaction> {
+    options: ethers.Overrides = {}
+  ): Promise<ethers.ContractTransaction> => {
     if (!args.mintAmount && !args.depositAmount) {
       throw new Error("Must supply at least one of mintAmount or depositAmount");
     }
@@ -421,27 +393,14 @@ export default class Vaults {
       cooker.borrow(args.mintAmount);
     }
 
-    return cooker.cook(signer, options, populateTransaction);
-  }
+    return cooker.cook(signer, options);
+  };
 
-  public burnAndWithdrawSingleCollateral(
+  public burnAndWithdrawSingleCollateral = async (
     args: SingleCollateralBurnAndWithdrawArguments,
     signer: ethers.Signer,
-    options?: ethers.Overrides,
-    populateTransaction?: false
-  ): Promise<ethers.ContractTransaction>;
-  public burnAndWithdrawSingleCollateral(
-    args: SingleCollateralBurnAndWithdrawArguments,
-    signer: ethers.Signer,
-    options?: ethers.Overrides,
-    populateTransaction?: true
-  ): Promise<ethers.PopulatedTransaction>;
-  public async burnAndWithdrawSingleCollateral(
-    args: SingleCollateralBurnAndWithdrawArguments,
-    signer: ethers.Signer,
-    options: ethers.Overrides = {},
-    populateTransaction: boolean = false
-  ): Promise<ethers.ContractTransaction | ethers.PopulatedTransaction> {
+    options: ethers.Overrides = {}
+  ): Promise<ethers.ContractTransaction> => {
     if (!args.burnAmount && !args.withdrawAmount) {
       throw new Error("Must supply at least one of mintAmount or depositAmount");
     }
@@ -469,27 +428,14 @@ export default class Vaults {
       cooker.removeCollateral(args.withdrawAmount);
     }
 
-    return cooker.cook(signer, options, populateTransaction);
-  }
+    return cooker.cook(signer, options);
+  };
 
-  public supplyFxTokenSingleCollateral(
+  public supplyFxTokenSingleCollateral = async (
     args: SingleCollateralSupplyFxToken,
     signer: ethers.Signer,
-    options?: ethers.Overrides,
-    populateTransaction?: false
-  ): Promise<ethers.ContractTransaction>;
-  public supplyFxTokenSingleCollateral(
-    args: SingleCollateralSupplyFxToken,
-    signer: ethers.Signer,
-    options?: ethers.Overrides,
-    populateTransaction?: true
-  ): Promise<ethers.PopulatedTransaction>;
-  public async supplyFxTokenSingleCollateral(
-    args: SingleCollateralSupplyFxToken,
-    signer: ethers.Signer,
-    options: ethers.Overrides = {},
-    populateTransaction: boolean = false
-  ): Promise<ethers.ContractTransaction | ethers.PopulatedTransaction> {
+    options: ethers.Overrides = {}
+  ): Promise<ethers.ContractTransaction> => {
     const kashiPool = this.config.singleCollateralVaults[args.network][args.vaultSymbol];
 
     if (!kashiPool) {
@@ -507,34 +453,19 @@ export default class Vaults {
 
     cooker.addAsset(args.amount);
 
-    return cooker.cook(signer, options, populateTransaction);
-  }
+    return cooker.cook(signer, options);
+  };
 
-  public depositCollateral(
+  public depositCollateral = (
     args: DepositCollateralArguments,
     signer: ethers.Signer,
-    options?: ethers.Overrides,
-    populateTransaction?: false
-  ): Promise<ethers.ContractTransaction>;
-  public depositCollateral(
-    args: DepositCollateralArguments,
-    signer: ethers.Signer,
-    options?: ethers.Overrides,
-    populateTransaction?: true
-  ): Promise<ethers.PopulatedTransaction>;
-  public depositCollateral(
-    args: DepositCollateralArguments,
-    signer: ethers.Signer,
-    options: ethers.Overrides = {},
-    populateTransaction: boolean = false
-  ): Promise<ethers.ContractTransaction | ethers.PopulatedTransaction> {
+    options: ethers.Overrides = {}
+  ): Promise<ethers.ContractTransaction> => {
     this.initialisationCheck();
     const protocolContracts = createProtocolContracts(this.config.protocolAddresses, signer);
     const fxToken = getFxTokenBySymbol(this.fxTokens, args.fxToken);
 
-    const contract = populateTransaction
-      ? protocolContracts.treasury.populateTransaction
-      : protocolContracts.treasury;
+    const contract = protocolContracts.treasury;
 
     const referral = args.referral ?? ethers.constants.AddressZero;
 
@@ -555,65 +486,38 @@ export default class Vaults {
       referral,
       options
     );
-  }
+  };
 
-  public burn(
+  public burn = (
     args: BurnArguments,
     signer: ethers.Signer,
-    options?: ethers.Overrides,
-    populateTransaction?: false
-  ): Promise<ethers.ContractTransaction>;
-  public burn(
-    args: BurnArguments,
-    signer: ethers.Signer,
-    options?: ethers.Overrides,
-    populateTransaction?: true
-  ): Promise<ethers.PopulatedTransaction>;
-  public burn(
-    args: BurnArguments,
-    signer: ethers.Signer,
-    options: ethers.Overrides = {},
-    populateTransaction: boolean = false
-  ): Promise<ethers.ContractTransaction | ethers.PopulatedTransaction> {
+    options: ethers.Overrides = {}
+  ): Promise<ethers.ContractTransaction> => {
     this.initialisationCheck();
 
     const protocolContracts = createProtocolContracts(this.config.protocolAddresses, signer);
     const fxToken = getFxTokenBySymbol(this.fxTokens, args.fxToken);
 
-    const contract = populateTransaction
-      ? protocolContracts.comptroller.populateTransaction
-      : protocolContracts.comptroller;
+    return protocolContracts.comptroller.burn(
+      args.amount,
+      fxToken.address,
+      getDeadline(args.deadline),
+      options
+    );
+  };
 
-    return contract.burn(args.amount, fxToken.address, getDeadline(args.deadline), options);
-  }
-
-  public withdrawCollateral(
+  public withdrawCollateral = (
     args: WithdrawCollateralArguments,
     signer: ethers.Signer,
-    options?: ethers.Overrides,
-    populateTransaction?: false
-  ): Promise<ethers.ContractTransaction>;
-  public withdrawCollateral(
-    args: WithdrawCollateralArguments,
-    signer: ethers.Signer,
-    options?: ethers.Overrides,
-    populateTransaction?: true
-  ): Promise<ethers.PopulatedTransaction>;
-  public withdrawCollateral(
-    args: WithdrawCollateralArguments,
-    signer: ethers.Signer,
-    options: ethers.Overrides = {},
-    populateTransaction: boolean = false
-  ): Promise<ethers.ContractTransaction | ethers.PopulatedTransaction> {
+    options: ethers.Overrides = {}
+  ): Promise<ethers.ContractTransaction> => {
     this.initialisationCheck();
     this.initialisationCheck();
 
     const protocolContracts = createProtocolContracts(this.config.protocolAddresses, signer);
     const fxToken = getFxTokenBySymbol(this.fxTokens, args.fxToken);
 
-    const contract = populateTransaction
-      ? protocolContracts.treasury.populateTransaction
-      : protocolContracts.treasury;
+    const contract = protocolContracts.treasury;
 
     if (args.collateral === "ETH") {
       return contract.withdrawCollateralETH(args.account, args.amount, fxToken.address, options);
@@ -628,7 +532,7 @@ export default class Vaults {
       fxToken.address,
       options
     );
-  }
+  };
 
   private getVaultMulitcall = (
     account: string,

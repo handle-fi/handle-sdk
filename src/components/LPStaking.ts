@@ -21,6 +21,7 @@ export type LPStakingPoolMulticall = {
   totalDeposited: ethers.BigNumber;
   distributionRate: ethers.BigNumber;
   lpTokenTotalSupply: ethers.BigNumber;
+  distributionPeriodEnds: ethers.BigNumber;
   deposited?: ethers.BigNumber;
   claimableRewards?: ethers.BigNumber;
 };
@@ -66,6 +67,7 @@ export default class LPStaking {
         totalDeposited: poolData.totalDeposited,
         distributionRate: poolData.distributionRate,
         lpTokenTotalSupply: poolData.lpTokenTotalSupply,
+        distributionPeriodEnds: poolData.distributionPeriodEnds,
         lpToken: pool.lpToken,
         tokensInLp: pool.tokensInLp.map((token) => ({
           symbol: token.symbol,
@@ -85,76 +87,33 @@ export default class LPStaking {
     });
   };
 
-  public stake(
+  public stake = (
     args: StakeAndWithdrawArgs,
     signer: ethers.Signer,
-    options?: ethers.Overrides,
-    populateTransaction?: false
-  ): Promise<ethers.ContractTransaction>;
-  public stake(
-    args: StakeAndWithdrawArgs,
-    signer: ethers.Signer,
-    options?: ethers.Overrides,
-    populateTransaction?: true
-  ): Promise<ethers.PopulatedTransaction>;
-  public stake(
-    args: StakeAndWithdrawArgs,
-    signer: ethers.Signer,
-    options: ethers.Overrides = {},
-    populateTransaction: boolean = false
-  ): Promise<ethers.ContractTransaction | ethers.PopulatedTransaction> {
+    options: ethers.Overrides = {}
+  ): Promise<ethers.ContractTransaction> => {
     const contract = this.getContract(args.poolName, signer);
-    const method = populateTransaction ? contract.populateTransaction.stake : contract.stake;
-    return method(args.amount, options);
-  }
+    return contract.stake(args.amount, options);
+  };
 
-  public unstake(
+  public unstake = (
     args: StakeAndWithdrawArgs,
     signer: ethers.Signer,
-    options?: ethers.Overrides,
-    populateTransaction?: false
-  ): Promise<ethers.ContractTransaction>;
-  public unstake(
-    args: StakeAndWithdrawArgs,
-    signer: ethers.Signer,
-    options?: ethers.Overrides,
-    populateTransaction?: true
-  ): Promise<ethers.PopulatedTransaction>;
-  public unstake(
-    args: StakeAndWithdrawArgs,
-    signer: ethers.Signer,
-    options: ethers.Overrides = {},
-    populateTransaction: boolean = false
-  ): Promise<ethers.ContractTransaction | ethers.PopulatedTransaction> {
+    options: ethers.Overrides = {}
+  ): Promise<ethers.ContractTransaction> => {
     const contract = this.getContract(args.poolName, signer);
-    const method = populateTransaction ? contract.populateTransaction.withdraw : contract.withdraw;
-    return method(args.amount, options);
-  }
+    return contract.withdraw(args.amount, options);
+  };
 
-  public claim(
+  public claim = (
     poolName: LPStakingPoolName,
     signer: ethers.Signer,
-    options?: ethers.Overrides,
-    populateTransaction?: false
-  ): Promise<ethers.ContractTransaction>;
-  public claim(
-    poolName: LPStakingPoolName,
-    signer: ethers.Signer,
-    options?: ethers.Overrides,
-    populateTransaction?: true
-  ): Promise<ethers.PopulatedTransaction>;
-  public claim(
-    poolName: LPStakingPoolName,
-    signer: ethers.Signer,
-    options: ethers.Overrides = {},
-    populateTransaction: boolean = false
-  ): Promise<ethers.ContractTransaction | ethers.PopulatedTransaction> {
+    options: ethers.Overrides = {}
+  ): Promise<ethers.ContractTransaction> => {
     const contract = this.getContract(poolName, signer);
-    const method = populateTransaction
-      ? contract.populateTransaction.getReward
-      : contract.getReward;
-    return method(options);
-  }
+
+    return contract.getReward(options);
+  };
 
   private getMulticall = (
     account: string | undefined,
@@ -170,7 +129,8 @@ export default class LPStaking {
     const base = {
       totalDeposited: lpToken.balanceOf(poolDetails.stakingContractAddress),
       lpTokenTotalSupply: lpToken.totalSupply(),
-      distributionRate: stakingContract.rewardRate()
+      distributionRate: stakingContract.rewardRate(),
+      distributionPeriodEnds: stakingContract.periodFinish()
     };
 
     if (account) {

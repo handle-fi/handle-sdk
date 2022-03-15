@@ -63,59 +63,32 @@ export default class Bridge {
       fxTokenAddresses: sdkConfig.fxTokenAddresses
     };
   }
-  public deposit(
+
+  public deposit = (
     args: BridgeDepositArguments,
     signer: ethers.Signer,
-    options?: ethers.Overrides,
-    populateTransaction?: false
-  ): Promise<ethers.ContractTransaction>;
-  public deposit(
-    args: BridgeDepositArguments,
-    signer: ethers.Signer,
-    options?: ethers.Overrides,
-    populateTransaction?: true
-  ): Promise<ethers.PopulatedTransaction>;
-  public deposit(
-    args: BridgeDepositArguments,
-    signer: ethers.Signer,
-    options: ethers.Overrides = {},
-    populateTransaction: boolean = false
-  ): Promise<ethers.ContractTransaction | ethers.PopulatedTransaction> {
+    options: ethers.Overrides = {}
+  ): Promise<ethers.ContractTransaction> => {
     const bridgeContract = this.getBridgeContract(args.fromNetwork, signer);
     const tokenAddress = this.getTokenAddress(args.tokenSymbol);
-    const contract = populateTransaction ? bridgeContract.populateTransaction : bridgeContract;
 
-    return contract.deposit(
+    return bridgeContract.deposit(
       tokenAddress,
       args.amount,
       this.config.byNetwork[args.toNetwork].id,
       options
     );
-  }
+  };
 
-  public withdraw(
+  public withdraw = async (
     args: BridgeWithdrawArguments,
     signer: ethers.Signer,
-    options?: ethers.Overrides,
-    populateTransaction?: false
-  ): Promise<ethers.ContractTransaction>;
-  public withdraw(
-    args: BridgeWithdrawArguments,
-    signer: ethers.Signer,
-    options?: ethers.Overrides,
-    populateTransaction?: true
-  ): Promise<ethers.PopulatedTransaction>;
-  public async withdraw(
-    args: BridgeWithdrawArguments,
-    signer: ethers.Signer,
-    options: ethers.Overrides = {},
-    populateTransaction: boolean = false
-  ): Promise<ethers.ContractTransaction | ethers.PopulatedTransaction> {
+    options: ethers.Overrides = {}
+  ): Promise<ethers.ContractTransaction> => {
     const bridgeContract = this.getBridgeContract(args.toNetwork, signer);
     const tokenAddress = this.getTokenAddress(args.tokenSymbol);
-    const contract = populateTransaction ? bridgeContract.populateTransaction : bridgeContract;
     const address = await signer.getAddress();
-    return contract.withdraw(
+    return bridgeContract.withdraw(
       address,
       tokenAddress,
       args.amount,
@@ -124,7 +97,7 @@ export default class Bridge {
       ethers.utils.arrayify(args.signature),
       options
     );
-  }
+  };
 
   public getDepositAllowance = (
     account: string,
@@ -138,36 +111,18 @@ export default class Bridge {
     return contract.allowance(account, bridgeAddress);
   };
 
-  public setDepositAllowance(
+  public setDepositAllowance = (
     token: BridgeToken,
     network: Network,
     amount: ethers.BigNumber,
     signer: ethers.Signer,
-    options?: ethers.Overrides,
-    populateTransaction?: false
-  ): Promise<ethers.ContractTransaction>;
-  public setDepositAllowance(
-    token: BridgeToken,
-    network: Network,
-    amount: ethers.BigNumber,
-    signer: ethers.Signer,
-    options?: ethers.Overrides,
-    populateTransaction?: true
-  ): Promise<ethers.PopulatedTransaction>;
-  public setDepositAllowance(
-    token: BridgeToken,
-    network: Network,
-    amount: ethers.BigNumber,
-    signer: ethers.Signer,
-    options: ethers.Overrides = {},
-    populateTransaction: boolean = false
-  ): Promise<ethers.ContractTransaction | ethers.PopulatedTransaction> {
+    options: ethers.Overrides = {}
+  ): Promise<ethers.ContractTransaction> => {
     const tokenAddress = this.getTokenAddress(token);
     const bridgeAddress = this.config.byNetwork[network].address;
     const tokenContract = ERC20__factory.connect(tokenAddress, signer);
-    const contract = populateTransaction ? tokenContract.populateTransaction : tokenContract;
-    return contract.approve(bridgeAddress, amount, options);
-  }
+    return tokenContract.approve(bridgeAddress, amount, options);
+  };
 
   public getPendingWithdrawals = async (
     account: string,

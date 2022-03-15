@@ -160,18 +160,10 @@ export default class KashiCooker {
     );
   }
 
-  public cook = (
-    signer: ethers.Signer,
-    options?: ethers.Overrides,
-    populateTransaction?: boolean
-  ) => {
+  public cook = (signer: ethers.Signer, options?: ethers.Overrides) => {
     const kashiPairContract = SushiKashi__factory.connect(this.pool.address, signer);
 
-    const contract = populateTransaction
-      ? kashiPairContract.populateTransaction
-      : kashiPairContract;
-
-    return contract.cook(this.actions, this.values, this.datas, {
+    return kashiPairContract.cook(this.actions, this.values, this.datas, {
       ...options,
       value: this.values.reduce((sum, next) => sum.add(next), ethers.constants.Zero)
     });
