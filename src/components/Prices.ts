@@ -5,6 +5,7 @@ import { ChainlinkAggregator__factory, ChainlinkAggregator } from "../contracts"
 import { createMultiCallContract } from "../utils/contract-utils";
 import { ContractCall, Provider as MultiCallProvider } from "ethers-multicall";
 import chainlinkAggregatorAbi from "../abis/ChainlinkAggregator.json";
+import { NETWORK_NAME_TO_CHAIN_ID } from "../constants";
 
 export type Price = {
   bn: ethers.BigNumber;
@@ -21,7 +22,7 @@ export default class Prices {
   constructor(c?: PricesConfig) {
     this.config = c || {
       feeds: config.protocol.arbitrum.chainlinkFeeds,
-      chainId: config.networkNameToId.arbitrum
+      chainId: NETWORK_NAME_TO_CHAIN_ID.arbitrum
     };
   }
 

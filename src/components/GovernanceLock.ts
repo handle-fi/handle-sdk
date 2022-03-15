@@ -1,6 +1,7 @@
 import { ethers } from "ethers";
 import sdkConfig from "../config";
 import { ProtocolAddresses } from "../config";
+import { NETWORK_NAME_TO_CHAIN_ID } from "../constants";
 import { GovernanceLock__factory } from "../contracts";
 import { Promisified } from "../types/general";
 import { GovernanceLockData } from "../types/governanceLock";
@@ -40,7 +41,7 @@ export default class GovernanceLock {
     this.config = c || {
       forexAddress: sdkConfig.forexAddress,
       protocolAddresses: sdkConfig.protocol.arbitrum.protocol,
-      chainId: sdkConfig.networkNameToId.arbitrum
+      chainId: NETWORK_NAME_TO_CHAIN_ID.arbitrum
     };
   }
 
@@ -69,80 +70,34 @@ export default class GovernanceLock {
           : undefined
     };
   };
-
-  public createLock(
+  public createLock = (
     args: CreateLockArgs,
     signer: ethers.Signer,
-    options?: ethers.Overrides,
-    populateTransaction?: false
-  ): Promise<ethers.ContractTransaction>;
-  public createLock(
-    args: CreateLockArgs,
-    signer: ethers.Signer,
-    options?: ethers.Overrides,
-    populateTransaction?: true
-  ): Promise<ethers.PopulatedTransaction>;
-  public createLock(
-    args: CreateLockArgs,
-    signer: ethers.Signer,
-    options: ethers.Overrides = {},
-    populateTransaction: boolean = false
-  ): Promise<ethers.ContractTransaction | ethers.PopulatedTransaction> {
+    options: ethers.Overrides = {}
+  ): Promise<ethers.ContractTransaction> => {
     if (args.durationInSeconds > MAX_LOCK_SECONDS) {
       throw new Error(`Duration cannot be greater than ${MAX_LOCK_SECONDS} seconds`);
     }
 
     const unlockDate = Math.floor(Date.now() / 1000 + args.durationInSeconds);
     const contract = this.getContract(signer);
-    const method = populateTransaction
-      ? contract.populateTransaction.createLock
-      : contract.createLock;
-    return method(args.forexAmount, unlockDate, options);
-  }
+    return contract.createLock(args.forexAmount, unlockDate, options);
+  };
 
-  public increaseLockedAmount(
+  public increaseLockedAmount = (
     forexAmount: ethers.BigNumber,
     signer: ethers.Signer,
-    options?: ethers.Overrides,
-    populateTransaction?: false
-  ): Promise<ethers.ContractTransaction>;
-  public increaseLockedAmount(
-    forexAmount: ethers.BigNumber,
-    signer: ethers.Signer,
-    options?: ethers.Overrides,
-    populateTransaction?: true
-  ): Promise<ethers.PopulatedTransaction>;
-  public increaseLockedAmount(
-    forexAmount: ethers.BigNumber,
-    signer: ethers.Signer,
-    options: ethers.Overrides = {},
-    populateTransaction: boolean = false
-  ): Promise<ethers.ContractTransaction | ethers.PopulatedTransaction> {
+    options: ethers.Overrides = {}
+  ): Promise<ethers.ContractTransaction> => {
     const contract = this.getContract(signer);
-    const method = populateTransaction
-      ? contract.populateTransaction.increaseAmount
-      : contract.increaseAmount;
-    return method(forexAmount, options);
-  }
+    return contract.increaseAmount(forexAmount, options);
+  };
 
-  public increaseLockDurationBy(
+  public increaseLockDurationBy = (
     args: IncreaseLockDurationByArgs,
     signer: ethers.Signer,
-    options?: ethers.Overrides,
-    populateTransaction?: false
-  ): Promise<ethers.ContractTransaction>;
-  public increaseLockDurationBy(
-    args: IncreaseLockDurationByArgs,
-    signer: ethers.Signer,
-    options?: ethers.Overrides,
-    populateTransaction?: true
-  ): Promise<ethers.PopulatedTransaction>;
-  public increaseLockDurationBy(
-    args: IncreaseLockDurationByArgs,
-    signer: ethers.Signer,
-    options: ethers.Overrides = {},
-    populateTransaction: boolean = false
-  ): Promise<ethers.ContractTransaction | ethers.PopulatedTransaction> {
+    options: ethers.Overrides = {}
+  ): Promise<ethers.ContractTransaction> => {
     const contract = this.getContract(signer);
 
     const newUnlocksAt = Math.floor(
@@ -155,32 +110,16 @@ export default class GovernanceLock {
       throw new Error(`Duration cannot be greater than ${MAX_LOCK_SECONDS} seconds`);
     }
 
-    const method = populateTransaction
-      ? contract.populateTransaction.increaseUnlockTime
-      : contract.increaseUnlockTime;
-    return method(newUnlocksAt, options);
-  }
+    return contract.increaseUnlockTime(newUnlocksAt, options);
+  };
 
-  public withdraw(
+  public withdraw = (
     signer: ethers.Signer,
-    options?: ethers.Overrides,
-    populateTransaction?: false
-  ): Promise<ethers.ContractTransaction>;
-  public withdraw(
-    signer: ethers.Signer,
-    options?: ethers.Overrides,
-    populateTransaction?: true
-  ): Promise<ethers.PopulatedTransaction>;
-  public withdraw(
-    signer: ethers.Signer,
-    options: ethers.Overrides = {},
-    populateTransaction: boolean = false
-  ): Promise<ethers.ContractTransaction | ethers.PopulatedTransaction> {
+    options: ethers.Overrides = {}
+  ): Promise<ethers.ContractTransaction> => {
     const contract = this.getContract(signer);
-    return populateTransaction
-      ? contract.populateTransaction.withdraw(options)
-      : contract.withdraw(options);
-  }
+    return contract.withdraw(options);
+  };
 
   private getMulticall = (
     account: string | undefined,

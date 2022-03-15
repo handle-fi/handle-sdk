@@ -4,6 +4,7 @@ import sdkConfig from "../config";
 import { callMulticallObject, createMulticallProtocolContracts } from "../utils/contract-utils";
 import { Promisified } from "../types/general";
 import { Token } from "../types/tokens";
+import { NETWORK_NAME_TO_CHAIN_ID } from "../constants";
 
 export type ProtocolConfig = {
   forexTokenAddress: string;
@@ -27,7 +28,7 @@ export default class Vaults {
     this.config = c || {
       forexTokenAddress: sdkConfig.forexAddress,
       protocolAddresses: sdkConfig.protocol.arbitrum.protocol,
-      chainId: sdkConfig.networkNameToId.arbitrum
+      chainId: NETWORK_NAME_TO_CHAIN_ID.arbitrum
     };
 
     this.forexToken = {

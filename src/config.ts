@@ -3,7 +3,6 @@ import { CollateralSymbolMap, CollateralSymbol } from "./types/collaterals";
 import { FxTokenSymbolMap, FxTokenSymbol } from "./types/fxTokens";
 import { BridgeConfigByNetwork } from "./components/Bridge";
 import { StableType, Token } from "./types/tokens";
-import { NetworkMap } from "./types/network";
 import { LPStakingPoolNameMap, LPStakingPlatformName } from "./types/lpStaking";
 import { getTokenDetails } from "./utils/token-utils";
 
@@ -53,7 +52,6 @@ export type Config = {
     byNetwork: BridgeConfigByNetwork;
   };
   singleCollateralVaults: SingleCollateralVaults;
-  networkNameToId: NetworkMap<number>;
   kashiMinimumMintingRatio: ethers.BigNumber;
   convert: {
     feeAddress: string;
@@ -200,11 +198,6 @@ const config: Config = {
         collateral: getTokenDetails("WBTC", "arbitrum")
       }
     }
-  },
-  networkNameToId: {
-    ethereum: 1,
-    arbitrum: 42161,
-    polygon: 137
   },
   kashiMinimumMintingRatio: ethers.utils.parseEther("1.75"),
   convert: {

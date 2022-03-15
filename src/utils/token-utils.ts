@@ -1,13 +1,11 @@
 import { Network, NetworkMap, Token } from "..";
-import ethereumTokenList from "../data/tokens/ethereum-tokens.json";
-import arbitrumTokenList from "../data/tokens/arbitrum-tokens.json";
-import polygonTokenList from "../data/tokens/polygon-tokens.json";
+import { ARBITRUM_TOKEN_LIST, ETHEREUM_TOKEN_LIST, POLYGON_TOKEN_LIST } from "../data/tokens";
 
 export const getTokenDetails = (symbol: string, network: Network): Token<string> => {
   const tokenList: NetworkMap<Token<string>[]> = {
-    arbitrum: arbitrumTokenList,
-    polygon: polygonTokenList,
-    ethereum: ethereumTokenList
+    arbitrum: ARBITRUM_TOKEN_LIST,
+    polygon: POLYGON_TOKEN_LIST,
+    ethereum: ETHEREUM_TOKEN_LIST
   };
 
   const token = tokenList[network].find((token) => token.symbol === symbol);

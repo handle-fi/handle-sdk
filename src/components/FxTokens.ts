@@ -10,6 +10,7 @@ import { Token } from "../types/tokens";
 import Graph, { IndexedFxToken } from "./Graph";
 import { SingleCollateralVaultNetwork } from "..";
 import { BENTOBOX_ADDRESS } from "@sushiswap/core-sdk";
+import { NETWORK_NAME_TO_CHAIN_ID } from "../constants";
 
 export type FxTokensConfig = {
   protocolAddresses: ProtocolAddresses;
@@ -31,7 +32,7 @@ export default class FxTokens {
     this.config = c || {
       protocolAddresses: sdkConfig.protocol.arbitrum.protocol,
       fxTokenAddresses: sdkConfig.fxTokenAddresses,
-      chainId: sdkConfig.networkNameToId.arbitrum,
+      chainId: NETWORK_NAME_TO_CHAIN_ID.arbitrum,
       graphEndpoint: sdkConfig.theGraphEndpoints.arbitrum
     };
 
@@ -75,65 +76,31 @@ export default class FxTokens {
     signer: ethers.Signer
   ) => {
     const contract = this.getFxTokenContract(fxToken, signer);
-    const chainId = sdkConfig.networkNameToId[network];
+    const chainId = NETWORK_NAME_TO_CHAIN_ID[network];
     return contract.allowance(account, BENTOBOX_ADDRESS[chainId]);
   };
 
-  public setRepayAllowance(
+  public setRepayAllowance = (
     fxTokenSymbol: FxTokenSymbol,
     amount: ethers.BigNumber,
     signer: ethers.Signer,
-    options?: ethers.Overrides,
-    populateTransaction?: false
-  ): Promise<ethers.ContractTransaction>;
-  public setRepayAllowance(
-    fxTokenSymbol: FxTokenSymbol,
-    amount: ethers.BigNumber,
-    signer: ethers.Signer,
-    options?: ethers.Overrides,
-    populateTransaction?: true
-  ): Promise<ethers.PopulatedTransaction>;
-  public setRepayAllowance(
-    fxTokenSymbol: FxTokenSymbol,
-    amount: ethers.BigNumber,
-    signer: ethers.Signer,
-    options: ethers.Overrides = {},
-    populateTransaction: boolean = false
-  ): Promise<ethers.ContractTransaction | ethers.PopulatedTransaction> {
+    options: ethers.Overrides = {}
+  ): Promise<ethers.ContractTransaction> => {
     const fxContract = this.getFxTokenContract(fxTokenSymbol, signer);
-    const contract = populateTransaction ? fxContract.populateTransaction : fxContract;
-    return contract.approve(this.config.protocolAddresses.comptroller, amount, options);
-  }
+    return fxContract.approve(this.config.protocolAddresses.comptroller, amount, options);
+  };
 
-  public setSingleCollateralRepayAllowance(
+  public setSingleCollateralRepayAllowance = (
     fxTokenSymbol: FxTokenSymbol,
     amount: ethers.BigNumber,
     network: SingleCollateralVaultNetwork,
     signer: ethers.Signer,
-    options?: ethers.Overrides,
-    populateTransaction?: false
-  ): Promise<ethers.ContractTransaction>;
-  public setSingleCollateralRepayAllowance(
-    fxTokenSymbol: FxTokenSymbol,
-    amount: ethers.BigNumber,
-    network: SingleCollateralVaultNetwork,
-    signer: ethers.Signer,
-    options?: ethers.Overrides,
-    populateTransaction?: true
-  ): Promise<ethers.PopulatedTransaction>;
-  public setSingleCollateralRepayAllowance(
-    fxTokenSymbol: FxTokenSymbol,
-    amount: ethers.BigNumber,
-    network: SingleCollateralVaultNetwork,
-    signer: ethers.Signer,
-    options: ethers.Overrides = {},
-    populateTransaction: boolean = false
-  ): Promise<ethers.ContractTransaction | ethers.PopulatedTransaction> {
+    options: ethers.Overrides = {}
+  ): Promise<ethers.ContractTransaction> => {
     const fxContract = this.getFxTokenContract(fxTokenSymbol, signer);
-    const contract = populateTransaction ? fxContract.populateTransaction : fxContract;
-    const chainId = sdkConfig.networkNameToId[network];
-    return contract.approve(BENTOBOX_ADDRESS[chainId], amount, options);
-  }
+    const chainId = NETWORK_NAME_TO_CHAIN_ID[network];
+    return fxContract.approve(BENTOBOX_ADDRESS[chainId], amount, options);
+  };
 
   private getFxTokenMulticall = (
     fxTokenSymbol: FxTokenSymbol,
