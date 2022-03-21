@@ -39,6 +39,24 @@ export const calculateMinimumRatio = (vault: VaultData, collaterals: Collateral[
   return ratio.div(10000);
 };
 
+export const calculateInterestRate = (vault: VaultData, collaterals: Collateral[]) => {
+  const shares = calculateCollateralShares(vault, collaterals);
+
+  const interestRate = vault.collateral.reduce((sum, vaultCollateral) => {
+    const collateral = getCollateral(vaultCollateral.symbol, collaterals);
+    const collateralShare = shares.find((s) => s.symbol === vaultCollateral.symbol)!;
+
+    return sum.add(collateral.interestRate.mul(collateralShare.share));
+  }, ethers.constants.Zero);
+
+  // we round up to 1 decimal precision
+  const interestRateNumberWith3Deimals = interestRate
+    .div(ethers.constants.WeiPerEther.sub("100"))
+    .toNumber();
+
+  return ethers.BigNumber.from(interestRateNumberWith3Deimals.toString());
+};
+
 export const calculateLiquidationFee = (
   vault: VaultData,
   collaterals: Collateral[]
@@ -231,6 +249,7 @@ export const createVault = (
   const minimumMintingRatio = calculateMinimumMintingRatio(vault, collaterals);
   const { isRedeemable, redeemableTokens } = calculateReedmable(vault, collaterals, fxToken);
   const minimumDebt = calculateMinimumDebt(protocolParamters, fxToken);
+  const interestRate = calculateInterestRate(vault, collaterals);
 
   return {
     ...vault,
@@ -243,7 +262,8 @@ export const createVault = (
     utilisation,
     availableToMint,
     minimumMintingRatio,
-    minimumDebt
+    minimumDebt,
+    interestRate
   };
 };
 
@@ -291,6 +311,7 @@ export const createSingleCollateralVault = (
     availableToMint,
     minimumMintingRatio: sdkConfig.kashiMinimumMintingRatio,
     utilisation,
-    minimumDebt: ethers.constants.WeiPerEther
+    minimumDebt: ethers.constants.WeiPerEther,
+    interestRate: ethers.constants.Zero // todo - vaultData.interestPerYear might be useful
   };
 };

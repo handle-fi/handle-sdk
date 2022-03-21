@@ -39,6 +39,7 @@ type VaultBase = {
   collateralRatio: ethers.BigNumber;
   minimumMintingRatio: ethers.BigNumber;
   minimumDebt: ethers.BigNumber;
+  interestRate: ethers.BigNumber;
 };
 
 export type Vault = VaultData &
