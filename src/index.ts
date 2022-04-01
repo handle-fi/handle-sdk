@@ -43,7 +43,8 @@ import { getNetworkName } from "./utils/web3-utils";
 import {
   NETWORK_NAMES,
   SINGLE_COLLATERAL_NETWORK_NAMES,
-  NETWORK_NAME_TO_CHAIN_ID
+  NETWORK_NAME_TO_CHAIN_ID,
+  SECONDS_IN_A_YEAR_BN
 } from "./constants";
 import { ETHEREUM_TOKEN_LIST, ARBITRUM_TOKEN_LIST, POLYGON_TOKEN_LIST } from "./data/tokens";
 
@@ -69,6 +70,7 @@ export {
   ARBITRUM_TOKEN_LIST,
   POLYGON_TOKEN_LIST,
   NETWORK_NAME_TO_CHAIN_ID,
+  SECONDS_IN_A_YEAR_BN,
   getNetworkName,
   getIsKashiApproved,
   signKashiApproval
