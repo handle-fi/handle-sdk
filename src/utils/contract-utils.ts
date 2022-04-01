@@ -20,7 +20,7 @@ import {
 import handleAbi from "../abis/handle/Handle.json";
 import vaultLibraryAbi from "../abis/handle/VaultLibrary.json";
 import comptrollerAbi from "../abis/handle/Comptroller.json";
-import fxKeeperPoolAbi from "../abis/handle/FxKeeperPool.json";
+import fxKeeperPoolAbi from "../abis/handle/fxKeeperPool.json";
 import governanceLockAbi from "../abis/handle/GovernanceLock.json";
 import rewardPoolAbi from "../abis/handle/RewardPool.json";
 import erc20Abi from "../abis/ERC20.json";
