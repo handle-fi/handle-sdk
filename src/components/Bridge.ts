@@ -241,7 +241,7 @@ export default class Bridge {
     return getFxTokenSymbolFromAddress(tokenAddress, this.config.fxTokenAddresses);
   };
 
-  private getBridgeContract = (network: Network, signer: ethers.Signer) => {
+  public getBridgeContract = (network: Network, signer: ethers.Signer) => {
     return Bridge__factory.connect(this.config.byNetwork[network].address, signer);
   };
 
