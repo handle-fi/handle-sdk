@@ -3505,14 +3505,6 @@
     "displayDecimals": 4
   },
   {
-    "symbol": "FOREX",
-    "name": "handle.fi",
-    "address": "0xDb298285FE4C5410B05390cA80e8Fbe9DE1F259B",
-    "decimals": 18,
-    "icon": "https://handle.fi/images/handle.fiFOREXLogoLight200x200.png",
-    "displayDecimals": 4
-  },
-  {
     "symbol": "FXS",
     "name": "Frax Share",
     "address": "0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0",
