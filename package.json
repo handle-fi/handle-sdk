@@ -1,6 +1,6 @@
 {
   "name": "handle-sdk-react",
-  "version": "0.0.48",
+  "version": "0.0.49",
   "description": "handle.fi sdk",
   "main": "dist/src/index.js",
   "repository": "https://github.com/handle-fi/handle-sdk",
