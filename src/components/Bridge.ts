@@ -38,6 +38,7 @@ export type BridgeWithdrawArguments = {
 export type BridgeGetNonceArguments = {
   fromNetwork: Network;
   toNetwork: Network;
+  address?: string;
 };
 
 type DepositEventData = DepositEvent["args"] & {
@@ -150,7 +151,7 @@ export default class Bridge {
     signer: ethers.Signer
   ): Promise<ethers.BigNumber> => {
     const bridgeContract = this.getBridgeContract(args.toNetwork, signer);
-    const account = await signer.getAddress();
+    const account = args.address ?? await signer.getAddress();
     return bridgeContract.withdrawNonce(account, this.config.byNetwork[args.fromNetwork].id);
   };
 
