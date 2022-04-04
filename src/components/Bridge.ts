@@ -32,6 +32,7 @@ export type BridgeWithdrawArguments = {
   fromNetwork: Network;
   toNetwork: Network;
   signature: string;
+  address?: string;
 };
 
 export type BridgeGetNonceArguments = {
@@ -87,7 +88,7 @@ export default class Bridge {
   ): Promise<ethers.ContractTransaction> => {
     const bridgeContract = this.getBridgeContract(args.toNetwork, signer);
     const tokenAddress = this.getTokenAddress(args.tokenSymbol);
-    const address = await signer.getAddress();
+    const address = args.address ?? await signer.getAddress();
     return bridgeContract.withdraw(
       address,
       tokenAddress,
