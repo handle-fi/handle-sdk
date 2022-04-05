@@ -10,7 +10,7 @@ import { VaultCollateral, VaultData } from "../../src/types/vaults";
 
 export const createMockCollateral = (overides: Partial<Collateral> = {}): Collateral => {
   return {
-    symbol: `COLLATERAL_${randomId()}` as CollateralSymbol,
+    symbol: `COLLATERAL_${randomId()}` as unknown as CollateralSymbol,
     address: ethers.Wallet.createRandom().address,
     decimals: 18,
     mintCR: ethers.BigNumber.from("200"),
@@ -27,7 +27,7 @@ export const createMockCollaterals = (overides: Partial<Collateral>[]) => {
 
 export const createMockFxToken = (overides: Partial<FxToken> = {}): FxToken => {
   return {
-    symbol: `FX_${randomId()}` as FxTokenSymbol,
+    symbol: `FX_${randomId()}` as unknown as FxTokenSymbol,
     address: ethers.Wallet.createRandom().address,
     decimals: 18,
     price: ethers.constants.WeiPerEther.div(100),
@@ -54,7 +54,7 @@ export const createMockVaultData = (
   return {
     account: "0x3e5c9ced70887166612ced5b537fb294dcecb357",
     fxToken: {
-      symbol: "MOCK_FX_TOKEN" as FxTokenSymbol,
+      symbol: "MOCK_FX_TOKEN" as unknown as FxTokenSymbol,
       address: ethers.Wallet.createRandom().address,
       decimals: 18
     },
