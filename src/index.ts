@@ -47,6 +47,7 @@ import {
   SECONDS_IN_A_YEAR_BN
 } from "./constants";
 import { ETHEREUM_TOKEN_LIST, ARBITRUM_TOKEN_LIST, POLYGON_TOKEN_LIST } from "./data/tokens";
+import { vaultUtils } from "./utils/vault-utils";
 
 export {
   FxTokensSDK,
@@ -73,7 +74,8 @@ export {
   SECONDS_IN_A_YEAR_BN,
   getNetworkName,
   getIsKashiApproved,
-  signKashiApproval
+  signKashiApproval,
+  vaultUtils
 };
 
 export type {
@@ -111,3 +113,4 @@ export type {
   LPStakingPoolNameMap,
   LPStakingPlatformName
 };
+

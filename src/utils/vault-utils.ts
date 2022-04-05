@@ -315,3 +315,28 @@ export const createSingleCollateralVault = (
     interestRate: ethers.constants.Zero // todo - vaultData.interestPerYear might be useful
   };
 };
+
+const calculateWithdrawableCollateral = (collateralSymbol: CollateralSymbol, vault: Vault) => {
+  const collateral = vault.collateral.find((vc) => vc.symbol === collateralSymbol);
+
+  if (!collateral) {
+    throw new Error(`invalid collateral symbol: ${collateralSymbol}`);
+  }
+
+  if (vault.collateralRatio.isZero()) {
+    return collateral.amount;
+  }
+
+  if (vault.minimumMintingRatio.isZero() || vault.collateralRatio.lte(vault.minimumMintingRatio)) {
+    return ethers.constants.Zero;
+  }
+
+  return collateral.amount
+    .mul(vault.collateralRatio.sub(vault.minimumMintingRatio))
+    .div(vault.collateralRatio);
+};
+
+export const vaultUtils = {
+  calculateWithdrawableCollateral
+};
+
