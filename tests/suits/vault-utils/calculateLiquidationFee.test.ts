@@ -31,7 +31,7 @@ describe("calculateLiquidationFee", () => {
 
     const result = calculateLiquidationFee(vaultData, collaterals);
 
-    expect(result.eq(ethers.constants.WeiPerEther)).to.eql(true);
+    expect(result.eq(ethers.constants.WeiPerEther.div(100))).to.eql(true);
   });
 
   it("It returns correct value when two collaterals are deposited", async () => {
@@ -47,7 +47,7 @@ describe("calculateLiquidationFee", () => {
 
     const result = calculateLiquidationFee(vaultData, collaterals);
 
-    expect(result.eq(ethers.constants.WeiPerEther.mul(15).div(10))).to.eql(true);
+    expect(result.eq(ethers.constants.WeiPerEther.mul(15).div(1000))).to.eql(true);
   });
 });
 

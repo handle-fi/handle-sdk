@@ -70,7 +70,7 @@ export const calculateLiquidationFee = (
     return sum.add(collateral.liquidationFee.mul(collateralShare.share));
   }, ethers.constants.Zero);
 
-  return fee.div(100);
+  return fee.div(10000);
 };
 
 export const calculateCollateralShares = (
