@@ -119,7 +119,7 @@ export const calculateCollateralRatio = (
   const collateralAsEth = calculateCollateralAsEth(vault, collaterals);
   const debtAsEth = calculateDebtAsEth(vault, fxToken);
 
-  return vault.debt.gt(0)
+  return vault.debt.gt(0) && debtAsEth.gt(0)
     ? collateralAsEth.mul(ethers.constants.WeiPerEther).div(debtAsEth)
     : ethers.constants.Zero;
 };
@@ -193,6 +193,7 @@ const calculateAvailableToMint = (
         .mul(ethers.constants.WeiPerEther)
         .div(fxToken.price)
         .div(minimumRatio)
+        .div("100")
         .sub(vault.debt)
     : ethers.constants.Zero;
 };
@@ -336,7 +337,38 @@ const calculateWithdrawableCollateral = (collateralSymbol: CollateralSymbol, vau
     .div(vault.collateralRatio);
 };
 
+const calculateAdditionalCollateralRequired = (
+  additionalDebt: ethers.BigNumber,
+  collateral: Collateral,
+  fxToken: FxToken,
+  vault: Vault
+): ethers.BigNumber => {
+  if (vault.availableToMint.gte(additionalDebt)) {
+    return ethers.constants.Zero;
+  }
+
+  const overBy = additionalDebt.sub(vault.availableToMint);
+  const overByInEth = fxToken.price.mul(overBy);
+  const overByInCollateral = overByInEth.div(collateral.price);
+
+  if (vault.minimumMintingRatio.isZero()) {
+    // use collateral's minimum mint CR
+    return overByInCollateral.mul(collateral.mintCR);
+  }
+
+  // use vaults minimum minting ratio.
+  // this wont be accurate for vaults with more than one collateral type
+  // because a vault's minimim minting ratio changes based on the amount
+  // of each collateral deposited. See calculateCollateralShare
+
+  return overByInCollateral
+    .mul(vault.minimumMintingRatio)
+    .mul(100)
+    .div(ethers.constants.WeiPerEther);
+};
+
 export const vaultUtils = {
-  calculateWithdrawableCollateral
+  calculateWithdrawableCollateral,
+  calculateAdditionalCollateralRequired
 };
 
