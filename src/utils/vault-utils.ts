@@ -193,7 +193,6 @@ const calculateAvailableToMint = (
         .mul(ethers.constants.WeiPerEther)
         .div(fxToken.price)
         .div(minimumRatio)
-        .div("100")
         .sub(vault.debt)
     : ethers.constants.Zero;
 };
@@ -353,7 +352,7 @@ const calculateAdditionalCollateralRequired = (
 
   if (vault.minimumMintingRatio.isZero()) {
     // use collateral's minimum mint CR
-    return overByInCollateral.mul(collateral.mintCR);
+    return overByInCollateral.mul(collateral.mintCR).div(100);
   }
 
   // use vaults minimum minting ratio.
@@ -361,10 +360,7 @@ const calculateAdditionalCollateralRequired = (
   // because a vault's minimim minting ratio changes based on the amount
   // of each collateral deposited. See calculateCollateralShare
 
-  return overByInCollateral
-    .mul(vault.minimumMintingRatio)
-    .mul(100)
-    .div(ethers.constants.WeiPerEther);
+  return overByInCollateral.mul(vault.minimumMintingRatio).div(ethers.constants.WeiPerEther);
 };
 
 const calculateLiquidationPriceOfVaultWithOneCollateral = (

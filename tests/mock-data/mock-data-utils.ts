@@ -30,7 +30,7 @@ export const createMockFxToken = (overides: Partial<FxToken> = {}): FxToken => {
     symbol: `FX_${randomId()}` as unknown as FxTokenSymbol,
     address: ethers.Wallet.createRandom().address,
     decimals: 18,
-    price: ethers.constants.WeiPerEther.div(100),
+    price: ethers.constants.WeiPerEther,
     ...overides
   };
 };

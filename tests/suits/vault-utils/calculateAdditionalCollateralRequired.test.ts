@@ -95,7 +95,7 @@ describe("calculateAdditionalCollateralRequired", () => {
     const fxToken = createMockFxToken();
 
     const vaultData = createMockVaultDataFromMockCollaterals(
-      ethers.constants.WeiPerEther.mul(1),
+      ethers.constants.WeiPerEther,
       [collateralOne],
       [ethers.constants.WeiPerEther.mul(2)]
     );
