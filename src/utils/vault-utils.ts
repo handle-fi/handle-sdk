@@ -367,8 +367,43 @@ const calculateAdditionalCollateralRequired = (
     .div(ethers.constants.WeiPerEther);
 };
 
+const calculateLiquidationPriceOfVaultWithOneCollateral = (
+  vault: Vault,
+  collateral: Collateral
+): ethers.BigNumber => {
+  if (vault.debt.lte(0)) {
+    return ethers.constants.Zero;
+  }
+
+  const collateralsWithBalance = vault.collateral.filter((c) => c.amount.gt(0));
+
+  // confirm vault only has one collateral type
+  if (collateralsWithBalance.length > 1) {
+    console.error("liquidation price not implemented for multiple collateral types");
+    return ethers.constants.Zero;
+  }
+
+  const vaultCollateral = collateralsWithBalance[0];
+
+  if (!vaultCollateral) {
+    return ethers.constants.Zero;
+  }
+
+  const collateralLiquidationRatio = collateral.mintCR.mul(80).div(100);
+  const minLiquidationRatio = ethers.BigNumber.from("110");
+  const liquidationRation = collateralLiquidationRatio.gte(minLiquidationRatio)
+    ? collateralLiquidationRatio
+    : minLiquidationRatio;
+  const collateralValueWhenLiquidated = vault.debt.mul(liquidationRation).div("100");
+
+  return collateralValueWhenLiquidated
+    .mul(ethers.BigNumber.from("10").pow(collateral.decimals))
+    .div(vaultCollateral.amount);
+};
+
 export const vaultUtils = {
   calculateWithdrawableCollateral,
-  calculateAdditionalCollateralRequired
+  calculateAdditionalCollateralRequired,
+  calculateLiquidationPriceOfVaultWithOneCollateral
 };
 
