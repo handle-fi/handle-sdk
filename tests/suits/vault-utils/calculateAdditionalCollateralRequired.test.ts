@@ -85,7 +85,7 @@ describe("calculateAdditionalCollateralRequired", () => {
     expect(result.eq(ethers.constants.WeiPerEther.mul(2))).to.eql(true);
   });
 
-  it("It returns the correct value", async () => {
+  it("It returns the correct value when there is collateral deposited", async () => {
     const collaterals = createMockCollaterals([
       { price: ethers.constants.WeiPerEther, mintCR: ethers.BigNumber.from("200") }
     ]);

@@ -360,18 +360,17 @@ const calculateAdditionalCollateralRequired = (
 
   const valueDifference = valueOfCollateralAtMinimumMintingRatio.sub(valueOfCollateral);
 
-  const valueDifferenceInEth = valueDifference.mul(ethers.constants.WeiPerEther).div(fxToken.price);
+  const valueDifferenceInEth = valueDifference.mul(fxToken.price).div(ethers.constants.WeiPerEther);
 
-  // console.log({
-  //   collateralPrice: ethers.utils.formatEther(collateral.price),
-  //   fxTokenPrice: ethers.utils.formatEther(fxToken.price),
-  //   valueOfCollateral: ethers.utils.formatEther(valueOfCollateral),
-  //   valueOfCollateralAtMinimumMintingRatio: ethers.utils.formatEther(
-  //     valueOfCollateralAtMinimumMintingRatio
-  //   ),
-  //   valueDifference: ethers.utils.formatEther(valueDifference),
-  //   valueDifferenceInEth: ethers.utils.formatEther(valueDifference)
-  // });
+  console.log("collateralPrice:", ethers.utils.formatEther(collateral.price));
+  console.log("fxTokenPrice:", ethers.utils.formatEther(fxToken.price));
+  console.log("valueOfCollateral:", ethers.utils.formatEther(valueOfCollateral));
+  console.log("valueDifference:", ethers.utils.formatEther(valueDifference));
+  console.log("valueDifferenceInEth:", ethers.utils.formatEther(valueDifference));
+  console.log(
+    "valueOfCollateralAtMinimumMintingRatio",
+    ethers.utils.formatEther(valueOfCollateralAtMinimumMintingRatio)
+  );
 
   return valueDifferenceInEth.mul(collateral.price).div(ethers.constants.WeiPerEther);
 };
