@@ -337,30 +337,43 @@ const calculateWithdrawableCollateral = (collateralSymbol: CollateralSymbol, vau
 };
 
 const calculateAdditionalCollateralRequired = (
-  additionalDebt: ethers.BigNumber,
-  collateral: Collateral,
-  fxToken: FxToken,
-  vault: Vault
+  vault: Vault,
+  collateralSymbol: CollateralSymbol,
+  collaterals: Collateral[],
+  fxToken: FxToken
 ): ethers.BigNumber => {
-  if (vault.availableToMint.gte(additionalDebt)) {
+  const collateral = collaterals.find((c) => c.symbol === collateralSymbol);
+
+  if (!collateral) {
+    throw new Error("Couldnt find collateral by symbol");
+  }
+
+  const valueOfCollateral = calculateCollateralAsFxToken(vault, collaterals, fxToken);
+
+  const valueOfCollateralAtMinimumMintingRatio = vault.minimumMintingRatio.isZero()
+    ? vault.debt.mul(collateral.mintCR).div(100)
+    : vault.debt.mul(vault.minimumMintingRatio).div(ethers.constants.WeiPerEther);
+
+  if (valueOfCollateral.gte(valueOfCollateralAtMinimumMintingRatio)) {
     return ethers.constants.Zero;
   }
 
-  const overBy = additionalDebt.sub(vault.availableToMint);
-  const overByInEth = fxToken.price.mul(overBy);
-  const overByInCollateral = overByInEth.div(collateral.price);
+  const valueDifference = valueOfCollateralAtMinimumMintingRatio.sub(valueOfCollateral);
 
-  if (vault.minimumMintingRatio.isZero()) {
-    // use collateral's minimum mint CR
-    return overByInCollateral.mul(collateral.mintCR).div(100);
-  }
+  const valueDifferenceInEth = valueDifference.mul(ethers.constants.WeiPerEther).div(fxToken.price);
 
-  // use vaults minimum minting ratio.
-  // this wont be accurate for vaults with more than one collateral type
-  // because a vault's minimim minting ratio changes based on the amount
-  // of each collateral deposited. See calculateCollateralShare
+  // console.log({
+  //   collateralPrice: ethers.utils.formatEther(collateral.price),
+  //   fxTokenPrice: ethers.utils.formatEther(fxToken.price),
+  //   valueOfCollateral: ethers.utils.formatEther(valueOfCollateral),
+  //   valueOfCollateralAtMinimumMintingRatio: ethers.utils.formatEther(
+  //     valueOfCollateralAtMinimumMintingRatio
+  //   ),
+  //   valueDifference: ethers.utils.formatEther(valueDifference),
+  //   valueDifferenceInEth: ethers.utils.formatEther(valueDifference)
+  // });
 
-  return overByInCollateral.mul(vault.minimumMintingRatio).div(ethers.constants.WeiPerEther);
+  return valueDifferenceInEth.mul(collateral.price).div(ethers.constants.WeiPerEther);
 };
 
 const calculateLiquidationPriceOfVaultWithOneCollateral = (
@@ -387,10 +400,10 @@ const calculateLiquidationPriceOfVaultWithOneCollateral = (
 
   const collateralLiquidationRatio = collateral.mintCR.mul(80).div(100);
   const minLiquidationRatio = ethers.BigNumber.from("110");
-  const liquidationRation = collateralLiquidationRatio.gte(minLiquidationRatio)
+  const liquidationRatio = collateralLiquidationRatio.gte(minLiquidationRatio)
     ? collateralLiquidationRatio
     : minLiquidationRatio;
-  const collateralValueWhenLiquidated = vault.debt.mul(liquidationRation).div("100");
+  const collateralValueWhenLiquidated = vault.debt.mul(liquidationRatio).div("100");
 
   return collateralValueWhenLiquidated
     .mul(ethers.BigNumber.from("10").pow(collateral.decimals))
