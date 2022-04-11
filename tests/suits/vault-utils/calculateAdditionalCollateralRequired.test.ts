@@ -17,19 +17,22 @@ describe("calculateAdditionalCollateralRequired", () => {
       { price: ethers.constants.WeiPerEther, mintCR: ethers.BigNumber.from("200") }
     ]);
 
+    const params = createMockProtocolParams();
+
     const fxToken = createMockFxToken();
 
     const vaultData = createMockVaultDataFromMockCollaterals(ethers.constants.One, collaterals, [
       ethers.constants.WeiPerEther
     ]);
 
-    const vault = createVault(vaultData, createMockProtocolParams(), fxToken, collaterals);
+    const vault = createVault(vaultData, params, fxToken, collaterals);
 
     const result = calculateAdditionalCollateralRequired(
       vault,
       collaterals[0].symbol,
       collaterals,
-      fxToken
+      fxToken,
+      params
     );
 
     expect(result.eq(ethers.constants.Zero)).to.eql(true);
@@ -40,6 +43,8 @@ describe("calculateAdditionalCollateralRequired", () => {
       { price: ethers.constants.WeiPerEther, mintCR: ethers.BigNumber.from("200") }
     ]);
 
+    const params = createMockProtocolParams();
+
     const fxToken = createMockFxToken();
 
     const vaultData = createMockVaultDataFromMockCollaterals(
@@ -48,13 +53,14 @@ describe("calculateAdditionalCollateralRequired", () => {
       [ethers.constants.WeiPerEther.mul(2)]
     );
 
-    const vault = createVault(vaultData, createMockProtocolParams(), fxToken, collaterals);
+    const vault = createVault(vaultData, params, fxToken, collaterals);
 
     const result = calculateAdditionalCollateralRequired(
       vault,
       collaterals[0].symbol,
       collaterals,
-      fxToken
+      fxToken,
+      params
     );
 
     expect(result.eq(ethers.constants.Zero)).to.eql(true);
@@ -65,6 +71,8 @@ describe("calculateAdditionalCollateralRequired", () => {
       { price: ethers.constants.WeiPerEther, mintCR: ethers.BigNumber.from("200") }
     ]);
 
+    const params = createMockProtocolParams();
+
     const fxToken = createMockFxToken();
 
     const vaultData = createMockVaultDataFromMockCollaterals(
@@ -73,13 +81,14 @@ describe("calculateAdditionalCollateralRequired", () => {
       [ethers.constants.Zero]
     );
 
-    const vault = createVault(vaultData, createMockProtocolParams(), fxToken, collaterals);
+    const vault = createVault(vaultData, params, fxToken, collaterals);
 
     const result = calculateAdditionalCollateralRequired(
       vault,
       collaterals[0].symbol,
       collaterals,
-      fxToken
+      fxToken,
+      params
     );
 
     expect(result.eq(ethers.constants.WeiPerEther.mul(2))).to.eql(true);
@@ -90,6 +99,8 @@ describe("calculateAdditionalCollateralRequired", () => {
       { price: ethers.constants.WeiPerEther, mintCR: ethers.BigNumber.from("200") }
     ]);
 
+    const params = createMockProtocolParams();
+
     const fxToken = createMockFxToken();
 
     const vaultData = createMockVaultDataFromMockCollaterals(
@@ -98,13 +109,14 @@ describe("calculateAdditionalCollateralRequired", () => {
       [ethers.constants.WeiPerEther]
     );
 
-    const vault = createVault(vaultData, createMockProtocolParams(), fxToken, collaterals);
+    const vault = createVault(vaultData, params, fxToken, collaterals);
 
     const result = calculateAdditionalCollateralRequired(
       vault,
       collaterals[0].symbol,
       collaterals,
-      fxToken
+      fxToken,
+      params
     );
 
     expect(result.eq(ethers.constants.WeiPerEther.mul(3))).to.eql(true);

@@ -336,7 +336,8 @@ const calculateAdditionalCollateralRequired = (
   vault: Vault,
   collateralSymbol: CollateralSymbol,
   collaterals: Collateral[],
-  fxToken: FxToken
+  fxToken: FxToken,
+  _protocolParams: ProtocolParameters
 ): ethers.BigNumber => {
   const collateral = collaterals.find((c) => c.symbol === collateralSymbol);
 
