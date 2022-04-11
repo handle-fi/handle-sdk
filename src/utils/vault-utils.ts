@@ -49,12 +49,8 @@ export const calculateInterestRate = (vault: VaultData, collaterals: Collateral[
     return sum.add(collateral.interestRate.mul(collateralShare.share));
   }, ethers.constants.Zero);
 
-  // we round up to 1 decimal precision
-  const interestRateNumberWith3Deimals = interestRate
-    .div(ethers.constants.WeiPerEther.sub("100"))
-    .toNumber();
-
-  return ethers.BigNumber.from(interestRateNumberWith3Deimals.toString());
+  // we return interest as 18 decimals where 1 = 100%;
+  return interestRate.div("1000");
 };
 
 export const calculateLiquidationFee = (
@@ -312,7 +308,7 @@ export const createSingleCollateralVault = (
     minimumMintingRatio: sdkConfig.kashiMinimumMintingRatio,
     utilisation,
     minimumDebt: ethers.constants.WeiPerEther,
-    interestRate: ethers.constants.Zero // todo - vaultData.interestPerYear might be useful
+    interestRate: vaultData.interestPerYear
   };
 };
 
