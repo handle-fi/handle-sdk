@@ -35,7 +35,7 @@ export const createMockFxToken = (overides: Partial<FxToken> = {}): FxToken => {
   };
 };
 
-const createVaultCollateralFromCollateral = (
+export const createVaultCollateralFromCollateral = (
   collateral: Collateral,
   amount: ethers.BigNumber
 ): VaultCollateral<CollateralSymbol> => {

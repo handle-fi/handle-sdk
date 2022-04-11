@@ -379,7 +379,7 @@ const calculateAdditionalCollateralRequired = (
   return valueDifferenceInEth.mul(collateral.price).div(ethers.constants.WeiPerEther);
 };
 
-const calculateSingleCollateralVaultLiquidationPrice = (
+export const calculateSingleCollateralVaultLiquidationPrice = (
   debt: ethers.BigNumber,
   collateral: VaultCollateral<string>,
   collateralValueInFx: ethers.BigNumber,
