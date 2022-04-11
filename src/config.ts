@@ -52,7 +52,10 @@ export type Config = {
     byNetwork: BridgeConfigByNetwork;
   };
   singleCollateralVaults: SingleCollateralVaults;
-  kashiMinimumMintingRatio: ethers.BigNumber;
+  singleCollateralVaultParams: {
+    minimumMintingRatio: ethers.BigNumber;
+    minimumCollateralRatio: ethers.BigNumber;
+  };
   convert: {
     feeAddress: string;
     fees: {
@@ -199,7 +202,11 @@ const config: Config = {
       }
     }
   },
-  kashiMinimumMintingRatio: ethers.utils.parseEther("1.75"),
+  singleCollateralVaultParams: {
+    minimumMintingRatio: ethers.utils.parseEther("1.75"),
+    // https://github.com/sushiswap/sushiswap-interface/blob/master/src/features/kashi/constants.ts
+    minimumCollateralRatio: ethers.utils.parseEther("1.33333333333334")
+  },
   convert: {
     feeAddress: "0xFa2c1bE677BE4BEc8851D1577B343F7060B51E3A",
     fees: {
@@ -220,3 +227,4 @@ const config: Config = {
 };
 
 export default config;
+

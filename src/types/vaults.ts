@@ -52,5 +52,6 @@ export type Vault = VaultData &
 export type SingleCollateralVault = SingleCollateralVaultData &
   VaultBase & {
     vaultSymbol: SingleCollateralVaultSymbol;
+    liquidationPrice: ethers.BigNumber;
   };
 
