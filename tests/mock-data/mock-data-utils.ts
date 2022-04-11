@@ -79,10 +79,10 @@ export const createMockProtocolParams = (
   overrides: Partial<ProtocolParameters> = {}
 ): ProtocolParameters => {
   return {
-    mint: ethers.constants.Zero,
-    burn: ethers.constants.Zero,
-    withdraw: ethers.constants.Zero,
-    deposit: ethers.constants.Zero,
+    mintFee: ethers.constants.Zero,
+    burnFee: ethers.constants.Zero,
+    withdrawFee: ethers.constants.Zero,
+    depositFee: ethers.constants.Zero,
     minimumMintingAmountAsEth: ethers.constants.Zero,
     ...overrides
   };
