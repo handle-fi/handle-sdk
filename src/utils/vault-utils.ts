@@ -362,6 +362,7 @@ const calculateWithdrawableCollateral = (vault: Vault, collateral: Collateral) =
   return result.gt(0) ? result : ethers.BigNumber.from(0);
 };
 
+// todo - use same logic as vue app to account for multi collaterals
 const calculateAdditionalCollateralRequired = (
   vault: Vault,
   collateralSymbol: CollateralSymbol,
@@ -388,16 +389,6 @@ const calculateAdditionalCollateralRequired = (
   const valueDifference = valueOfCollateralAtMinimumMintingRatio.sub(valueOfCollateral);
 
   const valueDifferenceInEth = valueDifference.mul(fxToken.price).div(ethers.constants.WeiPerEther);
-
-  console.log("collateralPrice:", ethers.utils.formatEther(collateral.price));
-  console.log("fxTokenPrice:", ethers.utils.formatEther(fxToken.price));
-  console.log("valueOfCollateral:", ethers.utils.formatEther(valueOfCollateral));
-  console.log("valueDifference:", ethers.utils.formatEther(valueDifference));
-  console.log("valueDifferenceInEth:", ethers.utils.formatEther(valueDifference));
-  console.log(
-    "valueOfCollateralAtMinimumMintingRatio",
-    ethers.utils.formatEther(valueOfCollateralAtMinimumMintingRatio)
-  );
 
   return valueDifferenceInEth.mul(collateral.price).div(ethers.constants.WeiPerEther);
 };
@@ -455,7 +446,13 @@ const calculateLiquidationPriceOfVaultWithOneCollateral = (
     .div(vaultCollateral.amount);
 };
 
-function sqrt(value: BigInt) {
+export const vaultUtils = {
+  calculateWithdrawableCollateral,
+  calculateAdditionalCollateralRequired,
+  calculateLiquidationPriceOfVaultWithOneCollateral
+};
+
+const sqrt = (value: BigInt) => {
   if (value < 0n) throw new Error("negative value passed to sqrt");
   if (value < 2n) return value;
   const newtonIteration = (n: any, x0: any): any => {
@@ -466,11 +463,5 @@ function sqrt(value: BigInt) {
     return newtonIteration(n, x1);
   };
   return newtonIteration(value, 1n);
-}
-
-export const vaultUtils = {
-  calculateWithdrawableCollateral,
-  calculateAdditionalCollateralRequired,
-  calculateLiquidationPriceOfVaultWithOneCollateral
 };
 
