@@ -152,7 +152,7 @@ describe("calculateWithdrawableCollateral", () => {
     const FX_TOKEN_PRICE = ONE_ETH;
     const DEBT = ONE_ETH;
     const COLLATERAL_DEPOSITED = ONE_ETH.mul(3);
-    const EXPECTED = ethers.utils.parseEther("1.75");
+    const EXPECTED = ONE_ETH.mul(3);
 
     const [collateralOne, collateralTwo] = createMockCollaterals([
       { price: ONE_ETH, mintCR: MINIMUM_CR },

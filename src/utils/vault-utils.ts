@@ -325,7 +325,6 @@ export const createSingleCollateralVault = (
 };
 
 const calculateWithdrawableCollateral = (vault: Vault, collateral: Collateral) => {
-  const minRatioPrecision = ethers.constants.WeiPerEther;
   const collateralTypeRatioPrecision = "100";
 
   const vaultCollateral = vault.collateral.find((c) => c.symbol === collateral.symbol);
@@ -347,7 +346,7 @@ const calculateWithdrawableCollateral = (vault: Vault, collateral: Collateral) =
         ethers.BigNumber.from("4")
           .mul(vault.collateralAsEth)
           .mul(vault.minimumMintingRatio)
-          .div(minRatioPrecision)
+          .div(ethers.constants.WeiPerEther)
       )
       .add(
         vault.debtAsEth
