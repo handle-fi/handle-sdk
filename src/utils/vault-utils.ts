@@ -369,7 +369,9 @@ const calculateWithdrawableCollateral = (vault: Vault, collateral: Collateral) =
   return result.gt(0) ? result : ethers.BigNumber.from(0);
 };
 
-// todo - use same logic as vue app to account for multi collaterals
+// todo - update this function to work with multiple collateral vaults.
+// See branch "HP-1592-Lorenzo" for partial implementation.
+// I, Anthony Hinchliff, swear to have this done before my final day.
 const calculateAdditionalCollateralRequired = (
   vault: Vault,
   collateralSymbol: CollateralSymbol,
