@@ -316,24 +316,50 @@ export const createSingleCollateralVault = (
   };
 };
 
-const calculateWithdrawableCollateral = (collateralSymbol: CollateralSymbol, vault: Vault) => {
-  const collateral = vault.collateral.find((vc) => vc.symbol === collateralSymbol);
+const calculateWithdrawableCollateral = (vault: Vault, collateral: Collateral) => {
+  const minRatioPrecision = ethers.constants.WeiPerEther;
+  const collateralTypeRatioPrecision = "100";
 
-  if (!collateral) {
-    throw new Error(`invalid collateral symbol: ${collateralSymbol}`);
+  const vaultCollateral = vault.collateral.find((c) => c.symbol === collateral.symbol);
+
+  if (!vaultCollateral) {
+    throw new Error("Couldnt find collateral by symbol");
   }
 
-  if (vault.collateralRatio.isZero()) {
-    return collateral.amount;
-  }
+  const collateralValueAsEth = vaultCollateral.amount
+    .mul(collateral.price)
+    .div(ethers.BigNumber.from("10").pow(collateral.decimals));
 
-  if (vault.minimumMintingRatio.isZero() || vault.collateralRatio.lte(vault.minimumMintingRatio)) {
-    return ethers.constants.Zero;
-  }
-
-  return collateral.amount
-    .mul(vault.collateralRatio.sub(vault.minimumMintingRatio))
-    .div(vault.collateralRatio);
+  let a = vault.debtAsEth.mul(
+    ethers.BigNumber.from("-4")
+      .mul(vault.collateralAsEth)
+      .mul(collateral.mintCR)
+      .div(collateralTypeRatioPrecision)
+      .add(
+        ethers.BigNumber.from("4")
+          .mul(vault.collateralAsEth)
+          .mul(vault.minimumMintingRatio)
+          .div(minRatioPrecision)
+      )
+      .add(
+        vault.debtAsEth
+          .mul(collateral.mintCR.mul(collateral.mintCR))
+          .div(collateralTypeRatioPrecision)
+          .div(collateralTypeRatioPrecision)
+      )
+  );
+  // Use js' BigInt to calculate sqrt since ethers.BigNumber does not support it.
+  if (a.lt(0)) a = a.mul("-1");
+  const aBN = sqrt(BigInt(a.toString())).toString();
+  const aSqrt = ethers.BigNumber.from(aBN.toString());
+  const withdrawEth = aSqrt
+    .div("-2")
+    .add(vault.collateralAsEth)
+    .sub(vault.debtAsEth.mul(collateral.mintCR).div(collateralTypeRatioPrecision).div("2"));
+  const max = withdrawEth.mul(ethers.constants.WeiPerEther).div(collateral.price);
+  const maxBalance = collateralValueAsEth.mul(ethers.constants.WeiPerEther).div(collateral.price);
+  const result = max.gt(maxBalance) ? maxBalance : max;
+  return result.gt(0) ? result : ethers.BigNumber.from(0);
 };
 
 const calculateAdditionalCollateralRequired = (
@@ -428,6 +454,19 @@ const calculateLiquidationPriceOfVaultWithOneCollateral = (
     .mul(ethers.BigNumber.from("10").pow(collateral.decimals))
     .div(vaultCollateral.amount);
 };
+
+function sqrt(value: BigInt) {
+  if (value < 0n) throw new Error("negative value passed to sqrt");
+  if (value < 2n) return value;
+  const newtonIteration = (n: any, x0: any): any => {
+    const x1 = (n / x0 + x0) >> 1n;
+    if (x0 === x1 || x0 === x1 - 1n) {
+      return x0;
+    }
+    return newtonIteration(n, x1);
+  };
+  return newtonIteration(value, 1n);
+}
 
 export const vaultUtils = {
   calculateWithdrawableCollateral,

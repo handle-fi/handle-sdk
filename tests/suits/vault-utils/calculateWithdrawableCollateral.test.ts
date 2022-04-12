@@ -27,7 +27,7 @@ describe("calculateWithdrawableCollateral", () => {
 
     const vault = createVault(vaultData, createMockProtocolParams(), fxToken, [collateral]);
 
-    const result = calculateWithdrawableCollateral(collateral.symbol, vault);
+    const result = calculateWithdrawableCollateral(vault, collateral);
 
     expect(result.isZero()).to.eql(true);
   });
@@ -54,7 +54,7 @@ describe("calculateWithdrawableCollateral", () => {
       vault.collateralRatio.eq(MINIMUM_CR.mul(ethers.constants.WeiPerEther).div("100"))
     ).to.eql(true);
 
-    const result = calculateWithdrawableCollateral(collateral.symbol, vault);
+    const result = calculateWithdrawableCollateral(vault, collateral);
 
     expect(result.isZero()).to.eql(true);
   });
@@ -76,7 +76,7 @@ describe("calculateWithdrawableCollateral", () => {
 
     const vault = createVault(vaultData, createMockProtocolParams(), fxToken, [collateral]);
 
-    const result = calculateWithdrawableCollateral(collateral.symbol, vault);
+    const result = calculateWithdrawableCollateral(vault, collateral);
 
     expect(result.isZero()).to.eql(true);
   });
@@ -98,7 +98,7 @@ describe("calculateWithdrawableCollateral", () => {
 
     const vault = createVault(vaultData, createMockProtocolParams(), fxToken, [collateral]);
 
-    const result = calculateWithdrawableCollateral(collateral.symbol, vault);
+    const result = calculateWithdrawableCollateral(vault, collateral);
 
     expect(result.gt(0)).to.eql(true);
   });
@@ -120,7 +120,7 @@ describe("calculateWithdrawableCollateral", () => {
 
     const vault = createVault(vaultData, createMockProtocolParams(), fxToken, [collateral]);
 
-    const result = calculateWithdrawableCollateral(collateral.symbol, vault);
+    const result = calculateWithdrawableCollateral(vault, collateral);
 
     expect(result.eq(COLLATERAL_DEPOSITED)).to.eql(true);
   });
@@ -143,7 +143,7 @@ describe("calculateWithdrawableCollateral", () => {
 
     const vault = createVault(vaultData, createMockProtocolParams(), fxToken, [collateral]);
 
-    const result = calculateWithdrawableCollateral(collateral.symbol, vault);
+    const result = calculateWithdrawableCollateral(vault, collateral);
 
     expect(result.eq(EXPECTED)).to.eql(true);
   });
@@ -172,7 +172,7 @@ describe("calculateWithdrawableCollateral", () => {
       collateralTwo
     ]);
 
-    const result = calculateWithdrawableCollateral(collateralOne.symbol, vault);
+    const result = calculateWithdrawableCollateral(vault, collateralOne);
 
     expect(result.eq(EXPECTED)).to.eql(true);
   });
