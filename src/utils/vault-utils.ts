@@ -178,19 +178,27 @@ const calculateUtilisation = (vault: VaultData, collaterals: Collateral[], fxTok
 
 const calculateAvailableToMint = (
   vault: VaultData,
+  protocolParameters: ProtocolParameters,
   collaterals: Collateral[],
   fxToken: FxToken
 ) => {
   const collateralAsEth = calculateCollateralAsEth(vault, collaterals);
   const minimumRatio = calculateMinimumMintingRatio(vault, collaterals);
 
-  return collateralAsEth.gt(0) && minimumRatio.gt(0)
-    ? collateralAsEth
-        .mul(ethers.constants.WeiPerEther)
-        .mul(ethers.constants.WeiPerEther)
-        .div(fxToken.price)
-        .div(minimumRatio)
-        .sub(vault.debt)
+  const withoutFee =
+    collateralAsEth.gt(0) && minimumRatio.gt(0)
+      ? collateralAsEth
+          .mul(ethers.constants.WeiPerEther)
+          .mul(ethers.constants.WeiPerEther)
+          .div(fxToken.price)
+          .div(minimumRatio)
+          .sub(vault.debt)
+      : ethers.constants.Zero;
+
+  const fee = withoutFee.mul(protocolParameters.mintFee).div(ethers.constants.WeiPerEther);
+
+  return withoutFee.gt(0)
+    ? withoutFee.mul(ethers.constants.WeiPerEther).div(withoutFee.add(fee))
     : ethers.constants.Zero;
 };
 
@@ -238,7 +246,7 @@ export const createVault = (
   const debtAsEth = calculateDebtAsEth(vault, fxToken);
   const collateralAsFxToken = calculateCollateralAsFxToken(vault, collaterals, fxToken);
   const collateralRatio = calculateCollateralRatio(vault, collaterals, fxToken);
-  const availableToMint = calculateAvailableToMint(vault, collaterals, fxToken);
+  const availableToMint = calculateAvailableToMint(vault, protocolParamters, collaterals, fxToken);
   const utilisation = calculateUtilisation(vault, collaterals, fxToken);
   const minimumMintingRatio = calculateMinimumMintingRatio(vault, collaterals);
   const { isRedeemable, redeemableTokens } = calculateReedmable(vault, collaterals, fxToken);
