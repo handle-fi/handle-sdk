@@ -27,7 +27,7 @@ export const calculateCollateralAsEth = (
   }, ethers.constants.Zero);
 };
 
-export const calculateMinimumRatio = (vault: VaultData, collaterals: Collateral[]) => {
+export const calculateMinimumMintingRatio = (vault: VaultData, collaterals: Collateral[]) => {
   const shares = calculateCollateralShares(vault, collaterals);
 
   const ratio = vault.collateral.reduce((sum, vaultCollateral) => {
@@ -128,7 +128,7 @@ export const calculateReedmable = (
 ) => {
   const collateralAsEth = calculateCollateralAsEth(vault, collaterals);
   const collateralRatio = calculateCollateralRatio(vault, collaterals, fxToken);
-  const minimumRatio = calculateMinimumRatio(vault, collaterals);
+  const minimumRatio = calculateMinimumMintingRatio(vault, collaterals);
   const debtAsEth = calculateDebtAsEth(vault, fxToken);
 
   const isRedeemable =
@@ -160,7 +160,7 @@ export const calculateReedmable = (
 
 const calculateUtilisation = (vault: VaultData, collaterals: Collateral[], fxToken: FxToken) => {
   const collateralAsEth = calculateCollateralAsEth(vault, collaterals);
-  const minimumRatio = calculateMinimumRatio(vault, collaterals);
+  const minimumRatio = calculateMinimumMintingRatio(vault, collaterals);
 
   return minimumRatio.gt(0)
     ? vault.debt
@@ -182,7 +182,7 @@ const calculateAvailableToMint = (
   fxToken: FxToken
 ) => {
   const collateralAsEth = calculateCollateralAsEth(vault, collaterals);
-  const minimumRatio = calculateMinimumRatio(vault, collaterals);
+  const minimumRatio = calculateMinimumMintingRatio(vault, collaterals);
 
   return collateralAsEth.gt(0) && minimumRatio.gt(0)
     ? collateralAsEth
@@ -193,9 +193,6 @@ const calculateAvailableToMint = (
         .sub(vault.debt)
     : ethers.constants.Zero;
 };
-
-const calculateMinimumMintingRatio = (vault: VaultData, collaterals: Collateral[]) =>
-  calculateMinimumRatio(vault, collaterals);
 
 const calculateMinimumDebt = (protocolParamters: ProtocolParameters, fxToken: FxToken) => {
   const fxAmount = protocolParamters.minimumMintingAmountAsEth

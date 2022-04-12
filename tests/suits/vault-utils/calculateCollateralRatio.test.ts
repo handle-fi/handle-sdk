@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { ethers } from "ethers";
-import { calculateMinimumRatio } from "../../../src/utils/vault-utils";
+import { calculateMinimumMintingRatio } from "../../../src/utils/vault-utils";
 import {
   createMockCollaterals,
   createMockVaultDataFromMockCollaterals
@@ -14,7 +14,7 @@ describe("calculateCollateralRatio", () => {
       ethers.constants.Zero
     ]);
 
-    const result = calculateMinimumRatio(vaultData, collaterals);
+    const result = calculateMinimumMintingRatio(vaultData, collaterals);
 
     expect(result.eq(ethers.constants.Zero)).to.eql(true);
   });
@@ -28,7 +28,7 @@ describe("calculateCollateralRatio", () => {
       [ethers.constants.WeiPerEther.mul(2)]
     );
 
-    const result = calculateMinimumRatio(vaultData, collaterals);
+    const result = calculateMinimumMintingRatio(vaultData, collaterals);
 
     expect(result.eq(ethers.constants.WeiPerEther.mul(2))).to.eql(true);
   });
@@ -42,7 +42,7 @@ describe("calculateCollateralRatio", () => {
       [ethers.utils.parseEther("0.0024338771676128")]
     );
 
-    const result = calculateMinimumRatio(vaultData, collaterals);
+    const result = calculateMinimumMintingRatio(vaultData, collaterals);
 
     expect(result.eq(ethers.constants.WeiPerEther.mul(2))).to.eql(true);
   });

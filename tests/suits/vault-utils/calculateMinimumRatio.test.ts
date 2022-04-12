@@ -1,12 +1,12 @@
 import { expect } from "chai";
 import { ethers } from "ethers";
-import { calculateMinimumRatio } from "../../../src/utils/vault-utils";
+import { calculateMinimumMintingRatio } from "../../../src/utils/vault-utils";
 import {
   createMockCollaterals,
   createMockVaultDataFromMockCollaterals
 } from "../../mock-data/mock-data-utils";
 
-describe("calculateMinimumRatio", () => {
+describe("calculateMinimumMintingRatio", () => {
   it("It calculates the correct value with no collateral deposited", async () => {
     const collaterals = createMockCollaterals([
       { price: ethers.constants.WeiPerEther, mintCR: ethers.BigNumber.from("200") },
@@ -18,7 +18,7 @@ describe("calculateMinimumRatio", () => {
       ethers.constants.Zero
     ]);
 
-    expect(calculateMinimumRatio(vaultData, collaterals).eq(ethers.constants.Zero)).to.eql(true);
+    expect(calculateMinimumMintingRatio(vaultData, collaterals).eq(ethers.constants.Zero)).to.eql(true);
   });
 
   it("It calculates the correct value with the same price and deposit amounts", async () => {
@@ -33,7 +33,7 @@ describe("calculateMinimumRatio", () => {
     ]);
 
     expect(
-      calculateMinimumRatio(vaultData, collaterals).eq(ethers.constants.WeiPerEther.mul(15).div(10))
+      calculateMinimumMintingRatio(vaultData, collaterals).eq(ethers.constants.WeiPerEther.mul(15).div(10))
     ).to.eql(true);
   });
 
@@ -49,7 +49,7 @@ describe("calculateMinimumRatio", () => {
     ]);
 
     expect(
-      calculateMinimumRatio(vaultData, collaterals).eq(
+      calculateMinimumMintingRatio(vaultData, collaterals).eq(
         ethers.constants.WeiPerEther.mul(125).div(100)
       )
     ).to.eql(true);
@@ -67,7 +67,7 @@ describe("calculateMinimumRatio", () => {
     ]);
 
     expect(
-      calculateMinimumRatio(vaultData, collaterals).eq(ethers.constants.WeiPerEther.mul(15).div(10))
+      calculateMinimumMintingRatio(vaultData, collaterals).eq(ethers.constants.WeiPerEther.mul(15).div(10))
     ).to.eql(true);
   });
 });
