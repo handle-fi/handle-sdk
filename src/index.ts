@@ -1,4 +1,4 @@
-import config from "./config";
+import config, { KashiPoolConfig } from "./config";
 import { FxTokenSymbol, FxTokenSymbolMap } from "./types/fxTokens";
 import { Vault, SingleCollateralVaultSymbol, SingleCollateralVault } from "./types/vaults";
 import { Collateral, CollateralSymbol, CollateralSymbolWithNative } from "./types/collaterals";
@@ -111,6 +111,7 @@ export type {
   LPStakingPool,
   LPStakingPoolName,
   LPStakingPoolNameMap,
-  LPStakingPlatformName
+  LPStakingPlatformName,
+  KashiPoolConfig
 };
 
