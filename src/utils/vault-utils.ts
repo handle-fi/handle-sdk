@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import { ProtocolParameters } from "../components/Protocol";
 import { Collateral, CollateralSymbol } from "../types/collaterals";
 import { FxToken } from "../types/fxTokens";
-import { SingleCollateralVaultSymbol } from "../types/vaults";
+import { SingleCollateralVaultSymbol, VaultCollateral } from "../types/vaults";
 import {
   VaultData,
   Vault,
@@ -10,6 +10,7 @@ import {
   SingleCollateralVaultData
 } from "../types/vaults";
 import sdkConfig from "../config";
+import { config } from "..";
 
 export const calculateCollateralAsEth = (
   vault: VaultData,
@@ -26,7 +27,7 @@ export const calculateCollateralAsEth = (
   }, ethers.constants.Zero);
 };
 
-export const calculateMinimumRatio = (vault: VaultData, collaterals: Collateral[]) => {
+export const calculateMinimumMintingRatio = (vault: VaultData, collaterals: Collateral[]) => {
   const shares = calculateCollateralShares(vault, collaterals);
 
   const ratio = vault.collateral.reduce((sum, vaultCollateral) => {
@@ -49,12 +50,8 @@ export const calculateInterestRate = (vault: VaultData, collaterals: Collateral[
     return sum.add(collateral.interestRate.mul(collateralShare.share));
   }, ethers.constants.Zero);
 
-  // we round up to 1 decimal precision
-  const interestRateNumberWith3Deimals = interestRate
-    .div(ethers.constants.WeiPerEther.sub("100"))
-    .toNumber();
-
-  return ethers.BigNumber.from(interestRateNumberWith3Deimals.toString());
+  // we return interest as 18 decimals where 1 = 100%;
+  return interestRate.div("1000");
 };
 
 export const calculateLiquidationFee = (
@@ -119,7 +116,7 @@ export const calculateCollateralRatio = (
   const collateralAsEth = calculateCollateralAsEth(vault, collaterals);
   const debtAsEth = calculateDebtAsEth(vault, fxToken);
 
-  return vault.debt.gt(0)
+  return vault.debt.gt(0) && debtAsEth.gt(0)
     ? collateralAsEth.mul(ethers.constants.WeiPerEther).div(debtAsEth)
     : ethers.constants.Zero;
 };
@@ -131,7 +128,7 @@ export const calculateReedmable = (
 ) => {
   const collateralAsEth = calculateCollateralAsEth(vault, collaterals);
   const collateralRatio = calculateCollateralRatio(vault, collaterals, fxToken);
-  const minimumRatio = calculateMinimumRatio(vault, collaterals);
+  const minimumRatio = calculateMinimumMintingRatio(vault, collaterals);
   const debtAsEth = calculateDebtAsEth(vault, fxToken);
 
   const isRedeemable =
@@ -163,7 +160,7 @@ export const calculateReedmable = (
 
 const calculateUtilisation = (vault: VaultData, collaterals: Collateral[], fxToken: FxToken) => {
   const collateralAsEth = calculateCollateralAsEth(vault, collaterals);
-  const minimumRatio = calculateMinimumRatio(vault, collaterals);
+  const minimumRatio = calculateMinimumMintingRatio(vault, collaterals);
 
   return minimumRatio.gt(0)
     ? vault.debt
@@ -181,24 +178,29 @@ const calculateUtilisation = (vault: VaultData, collaterals: Collateral[], fxTok
 
 const calculateAvailableToMint = (
   vault: VaultData,
+  protocolParameters: ProtocolParameters,
   collaterals: Collateral[],
   fxToken: FxToken
 ) => {
   const collateralAsEth = calculateCollateralAsEth(vault, collaterals);
-  const minimumRatio = calculateMinimumRatio(vault, collaterals);
+  const minimumRatio = calculateMinimumMintingRatio(vault, collaterals);
 
-  return collateralAsEth.gt(0) && minimumRatio.gt(0)
-    ? collateralAsEth
-        .mul(ethers.constants.WeiPerEther)
-        .mul(ethers.constants.WeiPerEther)
-        .div(fxToken.price)
-        .div(minimumRatio)
-        .sub(vault.debt)
+  const withoutFee =
+    collateralAsEth.gt(0) && minimumRatio.gt(0)
+      ? collateralAsEth
+          .mul(ethers.constants.WeiPerEther)
+          .mul(ethers.constants.WeiPerEther)
+          .div(fxToken.price)
+          .div(minimumRatio)
+          .sub(vault.debt)
+      : ethers.constants.Zero;
+
+  const fee = withoutFee.mul(protocolParameters.mintFee).div(ethers.constants.WeiPerEther);
+
+  return withoutFee.gt(0)
+    ? withoutFee.mul(withoutFee).div(withoutFee.add(fee))
     : ethers.constants.Zero;
 };
-
-const calculateMinimumMintingRatio = (vault: VaultData, collaterals: Collateral[]) =>
-  calculateMinimumRatio(vault, collaterals);
 
 const calculateMinimumDebt = (protocolParamters: ProtocolParameters, fxToken: FxToken) => {
   const fxAmount = protocolParamters.minimumMintingAmountAsEth
@@ -244,7 +246,7 @@ export const createVault = (
   const debtAsEth = calculateDebtAsEth(vault, fxToken);
   const collateralAsFxToken = calculateCollateralAsFxToken(vault, collaterals, fxToken);
   const collateralRatio = calculateCollateralRatio(vault, collaterals, fxToken);
-  const availableToMint = calculateAvailableToMint(vault, collaterals, fxToken);
+  const availableToMint = calculateAvailableToMint(vault, protocolParamters, collaterals, fxToken);
   const utilisation = calculateUtilisation(vault, collaterals, fxToken);
   const minimumMintingRatio = calculateMinimumMintingRatio(vault, collaterals);
   const { isRedeemable, redeemableTokens } = calculateReedmable(vault, collaterals, fxToken);
@@ -287,12 +289,12 @@ export const createSingleCollateralVault = (
           .mul(ethers.constants.WeiPerEther)
           .mul(ethers.constants.WeiPerEther)
           .div(fxToken.price)
-          .div(sdkConfig.kashiMinimumMintingRatio)
+          .div(sdkConfig.singleCollateralVaultParams.minimumMintingRatio)
           .sub(vaultData.debt)
       : ethers.constants.Zero;
 
   const utilisation = !collateralRatio.isZero()
-    ? sdkConfig.kashiMinimumMintingRatio
+    ? sdkConfig.singleCollateralVaultParams.minimumMintingRatio
         .mul(ethers.constants.WeiPerEther)
         .div(collateralRatio)
         .mul(ethers.constants.WeiPerEther)
@@ -309,9 +311,166 @@ export const createSingleCollateralVault = (
     collateralAsEth,
     collateralRatio,
     availableToMint,
-    minimumMintingRatio: sdkConfig.kashiMinimumMintingRatio,
+    minimumMintingRatio: sdkConfig.singleCollateralVaultParams.minimumMintingRatio,
     utilisation,
     minimumDebt: ethers.constants.WeiPerEther,
-    interestRate: ethers.constants.Zero // todo - vaultData.interestPerYear might be useful
+    interestRate: vaultData.interestPerYear,
+    liquidationPrice: calculateSingleCollateralVaultLiquidationPrice(
+      vaultData.debt,
+      vaultData.collateral,
+      collateralAsFxToken,
+      config.singleCollateralVaultParams.minimumCollateralRatio
+    )
   };
 };
+
+const calculateWithdrawableCollateral = (vault: Vault, collateral: Collateral) => {
+  const collateralTypeRatioPrecision = "100";
+
+  const vaultCollateral = vault.collateral.find((c) => c.symbol === collateral.symbol);
+
+  if (!vaultCollateral) {
+    throw new Error("Couldnt find collateral by symbol");
+  }
+
+  const collateralValueAsEth = vaultCollateral.amount
+    .mul(collateral.price)
+    .div(ethers.BigNumber.from("10").pow(collateral.decimals));
+
+  let a = vault.debtAsEth.mul(
+    ethers.BigNumber.from("-4")
+      .mul(vault.collateralAsEth)
+      .mul(collateral.mintCR)
+      .div(collateralTypeRatioPrecision)
+      .add(
+        ethers.BigNumber.from("4")
+          .mul(vault.collateralAsEth)
+          .mul(vault.minimumMintingRatio)
+          .div(ethers.constants.WeiPerEther)
+      )
+      .add(
+        vault.debtAsEth
+          .mul(collateral.mintCR.mul(collateral.mintCR))
+          .div(collateralTypeRatioPrecision)
+          .div(collateralTypeRatioPrecision)
+      )
+  );
+  // Use js' BigInt to calculate sqrt since ethers.BigNumber does not support it.
+  if (a.lt(0)) a = a.mul("-1");
+  const aBN = sqrt(BigInt(a.toString())).toString();
+  const aSqrt = ethers.BigNumber.from(aBN.toString());
+  const withdrawEth = aSqrt
+    .div("-2")
+    .add(vault.collateralAsEth)
+    .sub(vault.debtAsEth.mul(collateral.mintCR).div(collateralTypeRatioPrecision).div("2"));
+  const max = withdrawEth.mul(ethers.constants.WeiPerEther).div(collateral.price);
+  const maxBalance = collateralValueAsEth.mul(ethers.constants.WeiPerEther).div(collateral.price);
+  const result = max.gt(maxBalance) ? maxBalance : max;
+  return result.gt(0) ? result : ethers.BigNumber.from(0);
+};
+
+// todo - update this function to work with multiple collateral vaults.
+// See branch "HP-1592-Lorenzo" for partial implementation.
+// I, Anthony Hinchliff, swear to have this done before my final day.
+const calculateAdditionalCollateralRequired = (
+  vault: Vault,
+  collateralSymbol: CollateralSymbol,
+  collaterals: Collateral[],
+  fxToken: FxToken,
+  _protocolParams: ProtocolParameters
+): ethers.BigNumber => {
+  const collateral = collaterals.find((c) => c.symbol === collateralSymbol);
+
+  if (!collateral) {
+    throw new Error("Couldnt find collateral by symbol");
+  }
+
+  const valueOfCollateral = calculateCollateralAsFxToken(vault, collaterals, fxToken);
+
+  const valueOfCollateralAtMinimumMintingRatio = vault.minimumMintingRatio.isZero()
+    ? vault.debt.mul(collateral.mintCR).div(100)
+    : vault.debt.mul(vault.minimumMintingRatio).div(ethers.constants.WeiPerEther);
+
+  if (valueOfCollateral.gte(valueOfCollateralAtMinimumMintingRatio)) {
+    return ethers.constants.Zero;
+  }
+
+  const valueDifference = valueOfCollateralAtMinimumMintingRatio.sub(valueOfCollateral);
+
+  const valueDifferenceInEth = valueDifference.mul(fxToken.price).div(ethers.constants.WeiPerEther);
+
+  return valueDifferenceInEth.mul(collateral.price).div(ethers.constants.WeiPerEther);
+};
+
+export const calculateSingleCollateralVaultLiquidationPrice = (
+  debt: ethers.BigNumber,
+  collateral: VaultCollateral<string>,
+  collateralValueInFx: ethers.BigNumber,
+  minCollateralRatio: ethers.BigNumber
+) => {
+  if (debt.lte(0) || collateralValueInFx.lte(0)) {
+    return ethers.constants.Zero;
+  }
+
+  const collateralValueWhenLiquidated = debt
+    .mul(minCollateralRatio)
+    .div(ethers.constants.WeiPerEther);
+
+  return collateralValueWhenLiquidated
+    .mul(ethers.BigNumber.from("10").pow(collateral.decimals))
+    .div(collateral.amount);
+};
+
+const calculateLiquidationPriceOfVaultWithOneCollateral = (
+  vault: Vault,
+  collateral: Collateral
+): ethers.BigNumber => {
+  if (vault.debt.lte(0)) {
+    return ethers.constants.Zero;
+  }
+
+  const collateralsWithBalance = vault.collateral.filter((c) => c.amount.gt(0));
+
+  // confirm vault only has one collateral type
+  if (collateralsWithBalance.length > 1) {
+    console.error("liquidation price not implemented for vaults with multiple collateral");
+    return ethers.constants.Zero;
+  }
+
+  const vaultCollateral = collateralsWithBalance[0];
+
+  if (!vaultCollateral) {
+    return ethers.constants.Zero;
+  }
+
+  const collateralLiquidationRatio = collateral.mintCR.mul(80).div(100);
+  const minLiquidationRatio = ethers.BigNumber.from("110"); // from the contracts
+  const liquidationRatio = collateralLiquidationRatio.gte(minLiquidationRatio)
+    ? collateralLiquidationRatio
+    : minLiquidationRatio;
+  const collateralValueWhenLiquidated = vault.debt.mul(liquidationRatio).div("100");
+
+  return collateralValueWhenLiquidated
+    .mul(ethers.BigNumber.from("10").pow(collateral.decimals))
+    .div(vaultCollateral.amount);
+};
+
+export const vaultUtils = {
+  calculateWithdrawableCollateral,
+  calculateAdditionalCollateralRequired,
+  calculateLiquidationPriceOfVaultWithOneCollateral
+};
+
+const sqrt = (value: BigInt) => {
+  if (value < 0n) throw new Error("negative value passed to sqrt");
+  if (value < 2n) return value;
+  const newtonIteration = (n: any, x0: any): any => {
+    const x1 = (n / x0 + x0) >> 1n;
+    if (x0 === x1 || x0 === x1 - 1n) {
+      return x0;
+    }
+    return newtonIteration(n, x1);
+  };
+  return newtonIteration(value, 1n);
+};
+

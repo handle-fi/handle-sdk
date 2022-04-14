@@ -29,14 +29,15 @@ export default class VaultController {
   };
 
   public addDebt = (amount: ethers.BigNumber) => {
-    this.setDebt(this.currentVault.debt.add(amount));
+    const fee = amount.mul(this.protocolParameters.mintFee).div(ethers.constants.WeiPerEther);
+    this.setDebt(this.currentVault.debt.add(amount).add(fee));
   };
 
   public removeDebt = (amount: ethers.BigNumber) => {
     this.setDebt(this.currentVault.debt.sub(amount));
   };
 
-  public setCollateral = (symbol: CollateralSymbol, amount: ethers.BigNumber) => {
+  private setCollateral = (symbol: CollateralSymbol, amount: ethers.BigNumber) => {
     const currentCollateral = this.getCollateral(symbol);
 
     const updatedCollateral = {
@@ -62,7 +63,8 @@ export default class VaultController {
 
   public addCollateral = (symbol: CollateralSymbol, amount: ethers.BigNumber) => {
     const currentCollateral = this.getCollateral(symbol);
-    this.setCollateral(symbol, currentCollateral.amount.add(amount));
+    const fee = amount.mul(this.protocolParameters.depositFee).div(ethers.constants.WeiPerEther);
+    this.setCollateral(symbol, currentCollateral.amount.add(amount).sub(fee));
   };
 
   public removeCollateral = (symbol: CollateralSymbol, amount: ethers.BigNumber) => {
@@ -93,3 +95,4 @@ export default class VaultController {
     return collateral;
   };
 }
+

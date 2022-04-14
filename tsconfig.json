@@ -1,7 +1,7 @@
 ﻿{
   "compilerOptions": {
     "strict": true,
-    "target": "es5",
+    "target": "es2020",
     "module": "commonjs",
     "moduleResolution": "node",
     "esModuleInterop": true,
@@ -15,7 +15,10 @@
     "noUnusedParameters": true,
     "declaration": true,
     "rootDir": ".",
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "lib": [
+      "es2020", "esnext"
+    ],
   },
   "include": ["./src", "./tests"],
   "exclude": ["node_modules", "./dist/**/*"]
