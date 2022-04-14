@@ -195,11 +195,15 @@ const calculateAvailableToMint = (
           .sub(vault.debt)
       : ethers.constants.Zero;
 
+  if (withoutFee.lte(0)) {
+    return ethers.constants.Zero;
+  }
+
   const fee = withoutFee.mul(protocolParameters.mintFee).div(ethers.constants.WeiPerEther);
 
-  return withoutFee.gt(0)
+  return fee.gt(0)
     ? withoutFee.mul(ethers.constants.WeiPerEther).div(withoutFee.add(fee))
-    : ethers.constants.Zero;
+    : withoutFee;
 };
 
 const calculateMinimumDebt = (protocolParamters: ProtocolParameters, fxToken: FxToken) => {

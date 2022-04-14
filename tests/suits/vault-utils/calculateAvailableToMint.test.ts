@@ -108,5 +108,25 @@ describe("calculateAvailableToMint", () => {
 
     expect(vault.availableToMint.eq(ethers.utils.parseEther("0.95238095238095238"))).to.eql(true);
   });
+
+  it("It returns the correct amount with a real world example", async () => {
+    const collaterals = createMockCollaterals([
+      { price: ethers.constants.WeiPerEther, mintCR: ethers.BigNumber.from("200") }
+    ]);
+
+    const fxToken = createMockFxToken({ price: ethers.utils.parseEther("0.000239119978451593") });
+
+    const vaultData = createMockVaultDataFromMockCollaterals(
+      ethers.utils.parseEther("102.327033284139238987"),
+      collaterals,
+      [ethers.utils.parseEther("0.062650121610373693")]
+    );
+
+    const protocolParams = createMockProtocolParams();
+
+    const vault = createVault(vaultData, protocolParams, fxToken, collaterals);
+
+    expect(vault.availableToMint.eq(ethers.utils.parseEther("28.674403768633969853"))).to.eql(true);
+  });
 });
 
