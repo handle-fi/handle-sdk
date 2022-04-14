@@ -192,6 +192,11 @@ const config: Config = {
         address: "0x78c2b09973363f8111cc122AdAefB1Ae5623feBD",
         fxToken: "fxAUD",
         collateral: getTokenDetails("WETH", "polygon")
+      },
+      "fxUSD-WMATIC": {
+        address: "0xcAd5da38B07CB5dA10d0Cc15783C7a8679Ba0f49",
+        fxToken: "fxUSD",
+        collateral: getTokenDetails("WMATIC", "polygon")
       }
     },
     arbitrum: {
