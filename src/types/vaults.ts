@@ -7,7 +7,7 @@ export type SingleCollateralVaultSymbol = "fxAUD-WETH" | "fxAUD-WBTC";
 
 type VaultFxToken = Token<FxTokenSymbol>;
 
-type VaultCollateral<T> = Token<T> & {
+export type VaultCollateral<T> = Token<T> & {
   amount: ethers.BigNumber;
 };
 
@@ -52,4 +52,6 @@ export type Vault = VaultData &
 export type SingleCollateralVault = SingleCollateralVaultData &
   VaultBase & {
     vaultSymbol: SingleCollateralVaultSymbol;
+    liquidationPrice: ethers.BigNumber;
   };
+

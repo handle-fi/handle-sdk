@@ -13,10 +13,10 @@ export type ProtocolConfig = {
 };
 
 export type ProtocolParameters = {
-  mint: ethers.BigNumber;
-  burn: ethers.BigNumber;
-  withdraw: ethers.BigNumber;
-  deposit: ethers.BigNumber;
+  mintFee: ethers.BigNumber;
+  burnFee: ethers.BigNumber;
+  withdrawFee: ethers.BigNumber;
+  depositFee: ethers.BigNumber;
   minimumMintingAmountAsEth: ethers.BigNumber;
 };
 
@@ -46,13 +46,14 @@ export default class Vaults {
     );
 
     const multicall: Promisified<ProtocolParameters> = {
-      mint: contracts.handle.mintFeePerMille(),
-      burn: contracts.handle.burnFeePerMille(),
-      withdraw: contracts.handle.withdrawFeePerMille(),
-      deposit: contracts.handle.depositFeePerMille(),
+      mintFee: contracts.handle.mintFeePerMille(),
+      burnFee: contracts.handle.burnFeePerMille(),
+      withdrawFee: contracts.handle.withdrawFeePerMille(),
+      depositFee: contracts.handle.depositFeePerMille(),
       minimumMintingAmountAsEth: contracts.comptroller.minimumMintingAmount()
     };
 
     return callMulticallObject(multicall, provider);
   };
 }
+

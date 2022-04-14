@@ -316,15 +316,6 @@ export default class Convert {
       return 0;
     }
 
-    if (network === "ethereum") {
-      // on ethereum we only charge the user if they are selling FOREX
-      if (sellToken?.address === sdkConfig.forexAddress) {
-        return NON_STABLE_FEE;
-      } else {
-        return 0;
-      }
-    }
-
     if (!sellToken || !buyToken) {
       // if one of the tokens cant be found it isnt a swap between our recognised stables
       return NON_STABLE_FEE;
@@ -359,3 +350,4 @@ export default class Convert {
     return `https://api.1inch.exchange/v4.0/${networkNameToIdMap[network]}`;
   };
 }
+
