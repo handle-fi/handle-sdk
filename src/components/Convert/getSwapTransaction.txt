@@ -1,0 +1,115 @@
+import { BigNumber, PopulatedTransaction, Signer } from "ethers";
+import { BASIS_POINTS_DIVISOR, tryParseNativePerpToken } from "../trade";
+import { getNativeWrappedToken } from "../perp";
+import { WETH__factory } from "../../contracts";
+import { getProvider } from "../web3/web3";
+import {
+  getHlpTokenSwap,
+  getLiquidityTokenSwap,
+  getSdkSwap,
+} from "./swapTransaction";
+import { Network, Quote, TokenExtended } from "handle-sdk-react";
+import { PerpInfoMethods } from "../../context/PerpInfo";
+
+export type GetSwapTransactionArgs = {
+  chainId: number;
+  network: Network;
+  fromToken: TokenExtended<string>;
+  toToken: TokenExtended<string>;
+  quote: Quote;
+  slippage: number;
+  perpInfo: PerpInfoMethods;
+  gasPrice: BigNumber;
+  connectedAccount: string;
+  canUseHlp: boolean;
+  signer: Signer;
+};
+
+export const getSwapTransaction = async ({
+  chainId,
+  network,
+  fromToken,
+  toToken,
+  quote,
+  slippage,
+  perpInfo,
+  gasPrice,
+  connectedAccount,
+  canUseHlp,
+  signer,
+}: GetSwapTransactionArgs): Promise<{
+  tx: PopulatedTransaction;
+  gasEstimate: BigNumber;
+}> => {
+  let tx: PopulatedTransaction;
+
+  let weth = getNativeWrappedToken(chainId)?.address;
+  let buyAmountWithTolerance = BigNumber.from(quote.buyAmount)
+    .mul(BASIS_POINTS_DIVISOR - slippage * 100)
+    .div(BASIS_POINTS_DIVISOR);
+
+  if (fromToken.isNative && toToken.address === weth) {
+    tx = await WETH__factory.connect(
+      weth,
+      getProvider(network),
+    ).populateTransaction.deposit({
+      value: quote.sellAmount,
+    });
+  } else if (toToken.isNative && fromToken.address === weth) {
+    tx = await WETH__factory.connect(
+      weth,
+      getProvider(network),
+    ).populateTransaction.withdraw(quote.sellAmount);
+  } else if (fromToken.symbol === "hLP" || toToken.symbol === "hLP") {
+    tx = await getHlpTokenSwap({
+      fromToken,
+      toToken,
+      buyAmountWithTolerance,
+      connectedAccount,
+      chainId,
+      sellAmount: BigNumber.from(quote.sellAmount),
+      perpInfo,
+      signer,
+      slippage,
+    });
+  } else if (!canUseHlp) {
+    tx = (
+      await getSdkSwap({
+        fromToken,
+        toToken,
+        gasPrice,
+        network,
+        slippagePercentage: slippage,
+        fromAddress: connectedAccount,
+        sellAmount: BigNumber.from(quote.sellAmount),
+      })
+    ).tx;
+  } else {
+    const { address: fromAddress, isNative: isFromNative } =
+      tryParseNativePerpToken(fromToken, chainId);
+    const { address: toAddress, isNative: isToNative } =
+      tryParseNativePerpToken(toToken, chainId);
+
+    buyAmountWithTolerance = BigNumber.from(quote.buyAmount)
+      .mul(BASIS_POINTS_DIVISOR - slippage * 100)
+      .div(BASIS_POINTS_DIVISOR);
+
+    weth = getNativeWrappedToken(chainId)?.address;
+    tx = await getLiquidityTokenSwap({
+      isFromNative,
+      isToNative,
+      fromAddress,
+      toAddress,
+      buyAmountWithTolerance,
+      chainId,
+      connectedAccount,
+      signer,
+      transactionAmount: BigNumber.from(quote.sellAmount),
+    });
+  }
+
+  return {
+    tx,
+    gasEstimate: await signer.estimateGas(tx),
+  };
+};

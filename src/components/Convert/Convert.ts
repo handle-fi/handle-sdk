@@ -1,11 +1,17 @@
 import axios from "axios";
-import { BigNumber } from "ethers";
-import ethereum from "../data/tokens/ethereum-tokens.json";
-import polygon from "../data/tokens/polygon-tokens.json";
-import arbitrum from "../data/tokens/arbitrum-tokens.json";
-import { ConvertNetwork, ConvertNetworkMap } from "../types/network";
-import { TokenExtended } from "../types/tokens";
-import sdkConfig from "../config";
+import { BigNumber, ethers } from "ethers";
+import ethereum from "../../data/tokens/ethereum-tokens.json";
+import polygon from "../../data/tokens/polygon-tokens.json";
+import arbitrum from "../../data/tokens/arbitrum-tokens.json";
+import { ConvertNetwork, ConvertNetworkMap, Network } from "../../types/network";
+import { TokenExtended } from "../../types/tokens";
+import sdkConfig from "../../config";
+import { getNativeWrappedToken } from "../../utils/perp";
+import { PerpToken, PERP_CONTRACTS, PERP_SWAP_GAS_LIMIT } from "../../perp-config";
+import { tryParseNativePerpToken } from "./tryParseNativePerpToken";
+import { PerpInfoMethods } from "../Trade/types";
+import { getHlpTokenQuote } from "./swapQuote";
+import { getSwapFeeBasisPoints } from "../Trade/getSwapFeeBasisPoints";
 
 type GetQuoteArguments = {
   sellToken: string;
@@ -71,6 +77,16 @@ type OneInchSwapParams = OneInchQuoteParams & {
   referrerAddress: string;
 };
 
+type GetQuoteInput = {
+  canUseHlp: boolean;
+  fromToken: PerpToken;
+  toToken: PerpToken;
+  fromAmount: BigNumber;
+  connectedAccount: string | undefined;
+  gasPrice: BigNumber | undefined;
+  network: Network;
+};
+
 const NETWORK_TO_TOKENS: ConvertNetworkMap<TokenExtended<string>[]> = {
   ethereum,
   arbitrum,
@@ -78,7 +94,94 @@ const NETWORK_TO_TOKENS: ConvertNetworkMap<TokenExtended<string>[]> = {
 };
 
 export default class Convert {
-  public getQuote = async ({
+  public getQuote = async (
+    input: GetQuoteInput,
+    perpInfo: PerpInfoMethods
+  ): Promise<{ quote: Quote; feeBasisPoints?: BigNumber }> => {
+    const { canUseHlp, fromToken, toToken, fromAmount, connectedAccount, gasPrice, network } =
+      input;
+
+    const weth = getNativeWrappedToken(network)?.address;
+
+    if (
+      (fromToken.isNative && toToken.address === weth) ||
+      (toToken.isNative && fromToken.address === weth)
+    ) {
+      return {
+        quote: {
+          allowanceTarget: ethers.constants.AddressZero,
+          buyAmount: fromAmount.toString(), // WETH swap is always 1 to 1
+          sellAmount: fromAmount.toString(),
+          gas: PERP_SWAP_GAS_LIMIT
+        },
+        feeBasisPoints: ethers.constants.Zero
+      };
+    }
+
+    // If tokens are hLP, go increase / decrease liquidity
+    if (toToken.symbol === "hLP" || fromToken.symbol === "hLP") {
+      return getHlpTokenQuote({
+        fromToken,
+        toToken,
+        fromAmount,
+        network,
+        perpInfo
+      });
+    }
+    if (!canUseHlp) {
+      // Return quote from SDK.
+      return {
+        quote: await this.getApiQuote({
+          sellToken: fromToken.address,
+          buyToken: toToken.address,
+          buyAmount: undefined,
+          sellAmount: fromAmount,
+          fromAddress: connectedAccount || ethers.constants.AddressZero,
+          network,
+          // we dont care about passing through a gas cost when
+          // users wallet isnt connected.
+          gasPrice: gasPrice || ethers.constants.Zero
+        })
+      };
+    }
+
+    // Return quote from Hlp.
+
+    // Parse ETH address into WETH address.
+    const { address: parsedFromTokenAddress } = tryParseNativePerpToken(fromToken, network);
+    const { address: parsedToTokenAddress } = tryParseNativePerpToken(toToken, network);
+
+    const priceIn = perpInfo.getMinPrice(parsedFromTokenAddress);
+    const priceOut = perpInfo.getMaxPrice(parsedToTokenAddress);
+
+    const amountOut = fromAmount.mul(priceIn).div(priceOut.isZero() ? 1 : priceOut);
+
+    const feeBasisPoints = getSwapFeeBasisPoints({
+      tokenIn: parsedFromTokenAddress,
+      tokenOut: parsedToTokenAddress,
+      usdgDelta: priceIn
+        .mul(fromAmount)
+        .mul(ethers.utils.parseUnits("1", 18))
+        .div(ethers.utils.parseUnits("1", 30))
+        .div(ethers.utils.parseUnits("1", fromToken.decimals)),
+      usdgSupply: perpInfo.getUsdgSupply(),
+      totalTokenWeights: perpInfo.getTotalTokenWeights(),
+      targetUsdgAmount: perpInfo.getTargetUsdgAmount(parsedFromTokenAddress),
+      getTokenInfo: perpInfo.getTokenInfo
+    });
+
+    return {
+      quote: {
+        allowanceTarget: PERP_CONTRACTS[network].Router,
+        buyAmount: amountOut.toString(),
+        sellAmount: fromAmount.toString(),
+        gas: PERP_SWAP_GAS_LIMIT
+      } as Quote,
+      feeBasisPoints
+    };
+  };
+
+  public getApiQuote = async ({
     sellToken,
     buyToken,
     sellAmount,
@@ -350,4 +453,3 @@ export default class Convert {
     return `https://api.1inch.exchange/v4.0/${networkNameToIdMap[network]}`;
   };
 }
-

@@ -1,0 +1,193 @@
+import { BigNumber, ethers, PopulatedTransaction } from "ethers";
+import { ConvertSDK, Network, TokenExtended } from "handle-sdk-react";
+import { PERP_CONTRACTS } from "../../config/perp";
+import { PerpInfoMethods } from "../../context/PerpInfo";
+import {
+  GlpManager__factory,
+  HlpManagerRouter__factory,
+  Router__factory,
+} from "../../contracts";
+import {
+  BASIS_POINTS_DIVISOR,
+  expandDecimals,
+  PRICE_DECIMALS,
+  tryParseNativePerpToken,
+} from "../trade";
+
+const convertSDK = new ConvertSDK();
+
+export const getSdkSwap = async ({
+  fromToken,
+  toToken,
+  gasPrice,
+  sellAmount,
+  network,
+  slippagePercentage,
+  fromAddress,
+}: {
+  fromToken: TokenExtended<string>;
+  toToken: TokenExtended<string>;
+  gasPrice: BigNumber;
+  sellAmount: BigNumber;
+  network: Network;
+  slippagePercentage: number;
+  fromAddress: string;
+}) => {
+  const swap = await convertSDK.getSwap({
+    sellToken: fromToken.address,
+    buyToken: toToken.address,
+    gasPrice,
+    sellAmount,
+    network,
+    slippagePercentage,
+    buyAmount: undefined,
+    fromAddress,
+  });
+
+  const tx = {
+    to: swap.to,
+    data: swap.data,
+    value: BigNumber.from(swap.value),
+  };
+  return {
+    tx,
+    gasEstimate: BigNumber.from(swap.gas),
+  };
+};
+
+export const getLiquidityTokenSwap = async ({
+  isFromNative,
+  isToNative,
+  fromAddress,
+  toAddress,
+  transactionAmount,
+  buyAmountWithTolerance,
+  connectedAccount,
+  chainId,
+  signer,
+}: {
+  isFromNative: boolean;
+  isToNative: boolean;
+  fromAddress: string;
+  toAddress: string;
+  transactionAmount: BigNumber;
+  buyAmountWithTolerance: BigNumber;
+  connectedAccount: string;
+  chainId: number;
+  signer: ethers.Signer;
+}) => {
+  let tx: PopulatedTransaction;
+  const router = Router__factory.connect(
+    PERP_CONTRACTS[chainId]?.Router ?? ethers.constants.AddressZero,
+    signer,
+  );
+  if (!isFromNative && !isToNative) {
+    tx = await router.populateTransaction.swap(
+      [fromAddress, toAddress],
+      transactionAmount,
+      // @ts-ignore Overload hell
+      buyAmountWithTolerance,
+      connectedAccount,
+    );
+  } else if (isFromNative) {
+    tx = await router.populateTransaction.swapETHToTokens(
+      [fromAddress, toAddress],
+      buyAmountWithTolerance,
+      connectedAccount,
+      // @ts-ignore Overload hell
+      { value: transactionAmount },
+    );
+  } else {
+    tx = await router.populateTransaction.swapTokensToETH(
+      [fromAddress, toAddress],
+      transactionAmount,
+      // @ts-ignore Overload hell
+      buyAmountWithTolerance,
+      connectedAccount,
+    );
+  }
+  return tx;
+};
+
+export const getHlpTokenSwap = async ({
+  fromToken,
+  toToken,
+  buyAmountWithTolerance,
+  connectedAccount,
+  sellAmount,
+  perpInfo,
+  slippage,
+  signer,
+  chainId,
+}: {
+  fromToken: TokenExtended<string>;
+  toToken: TokenExtended<string>;
+  buyAmountWithTolerance: BigNumber;
+  connectedAccount: string;
+  sellAmount: BigNumber;
+  perpInfo: PerpInfoMethods;
+  slippage: number;
+  signer: ethers.Signer;
+  chainId: number;
+}) => {
+  let tx: PopulatedTransaction;
+  const hlpManager = GlpManager__factory.connect(
+    PERP_CONTRACTS[chainId]?.HlpManager ?? ethers.constants.AddressZero,
+    signer,
+  );
+
+  const hlpManagerRouter = HlpManagerRouter__factory.connect(
+    PERP_CONTRACTS[chainId]?.HlpManagerRouter ?? ethers.constants.AddressZero,
+    signer,
+  );
+
+  const { address: fromAddress } = tryParseNativePerpToken(fromToken, chainId);
+  const { address: toAddress } = tryParseNativePerpToken(toToken, chainId);
+
+  if (fromToken.symbol === "hLP") {
+    // selling hlp
+    if (toToken.isNative) {
+      // if is native
+      tx = await hlpManagerRouter.populateTransaction.removeLiquidityETH(
+        BigNumber.from(sellAmount),
+        buyAmountWithTolerance,
+        connectedAccount,
+      );
+    } else {
+      // if both tokens are not native
+      tx = await hlpManager.populateTransaction.removeLiquidity(
+        toAddress,
+        BigNumber.from(sellAmount),
+        buyAmountWithTolerance,
+        connectedAccount,
+      );
+    }
+  } else {
+    // buying hlp
+    const minPriceInUsdg = perpInfo
+      .getMinPrice(fromToken.address)
+      .mul(10_000 - slippage * 100)
+      .div(expandDecimals(1, PRICE_DECIMALS - 18))
+      .div(BASIS_POINTS_DIVISOR);
+
+    if (fromToken.isNative) {
+      // if is native
+      tx = await hlpManagerRouter.populateTransaction.addLiquidityETH(
+        minPriceInUsdg,
+        buyAmountWithTolerance,
+        {
+          value: BigNumber.from(sellAmount),
+        },
+      );
+    } else {
+      // if not native
+      tx = await hlpManager.populateTransaction.addLiquidity(
+        fromAddress,
+        BigNumber.from(sellAmount),
+        minPriceInUsdg,
+        buyAmountWithTolerance,
+      );
+    }
+  }
+  return tx;
+};
