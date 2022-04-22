@@ -8,6 +8,7 @@ import { getHlpToken, getNativeWrappedToken } from "../../../src/utils/perp";
 import { getTokenDetails } from "../../../src/utils/token-utils";
 
 const convert = new Convert();
+
 const weth = getNativeWrappedToken("arbitrum")!; // arbitrum
 const eth = PERP_TOKENS["arbitrum"].find((x) => x.isNative)!;
 const hlp = getHlpToken("arbitrum");
@@ -29,9 +30,23 @@ const samplePerpTokenMethods: PerpInfoMethods = {
   getHlpPrice: () => FIVE_DOLLARS
 };
 
-describe("getQuote", () => {
+describe("getSwap", () => {
   describe("WETH", () => {
-    it("should be 1-1 from eth to weth", async () => {});
+    it("should return a transaction from eth to weth", async () => {
+      const signer = new ethers.VoidSigner("0x0000000000000000000000000000000000000000");
+      // const { tx } = await convert.getSwap({
+      //     fromToken: eth,
+      //     toToken: weth,
+      //     canUseHlp: false,
+      //     network: "arbitrum",
+      //     connectedAccount: "0x0000000000000000000000000000000000000000",
+      //     gasPrice: ethers.constants.One,
+      //     perpInfo: samplePerpTokenMethods,
+      //     buyAmount: ethers.utils.parseEther("1"),
+      //     sellAmount: ethers.utils.parseEther("1"),
+      //     signer
+      // }
+    });
     it("should be 1-1 from weth to eth", async () => {});
   });
   describe("hLP", () => {

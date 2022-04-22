@@ -96,9 +96,10 @@ type GetQuoteInput = {
 
 type GetSwapTransactionArgs = {
   network: Network;
-  fromToken: TokenExtended<string>;
-  toToken: TokenExtended<string>;
-  quote: Quote;
+  fromToken: PerpToken;
+  toToken: PerpToken;
+  buyAmount: BigNumber;
+  sellAmount: BigNumber;
   slippage: number;
   perpInfo: PerpInfoMethods;
   gasPrice: BigNumber;
@@ -232,7 +233,8 @@ export default class Convert {
     network,
     fromToken,
     toToken,
-    quote,
+    buyAmount,
+    sellAmount,
     slippage,
     perpInfo,
     gasPrice,
@@ -246,16 +248,16 @@ export default class Convert {
     let tx: PopulatedTransaction;
 
     let weth = getNativeWrappedToken(network)?.address;
-    let buyAmountWithTolerance = BigNumber.from(quote.buyAmount)
+    let buyAmountWithTolerance = BigNumber.from(buyAmount)
       .mul(BASIS_POINTS_DIVISOR - slippage * 100)
       .div(BASIS_POINTS_DIVISOR);
 
     if (fromToken.isNative && toToken.address === weth) {
       tx = await WETH__factory.connect(weth, signer).populateTransaction.deposit({
-        value: quote.sellAmount
+        value: sellAmount
       });
     } else if (toToken.isNative && fromToken.address === weth) {
-      tx = await WETH__factory.connect(weth, signer).populateTransaction.withdraw(quote.sellAmount);
+      tx = await WETH__factory.connect(weth, signer).populateTransaction.withdraw(sellAmount);
     } else if (fromToken.symbol === "hLP" || toToken.symbol === "hLP") {
       tx = await getHlpTokenSwap({
         fromToken,
@@ -263,7 +265,7 @@ export default class Convert {
         buyAmountWithTolerance,
         connectedAccount,
         network,
-        sellAmount: BigNumber.from(quote.sellAmount),
+        sellAmount: BigNumber.from(sellAmount),
         perpInfo,
         signer,
         slippage
@@ -276,7 +278,7 @@ export default class Convert {
         network,
         slippagePercentage: slippage,
         fromAddress: connectedAccount,
-        sellAmount: BigNumber.from(quote.sellAmount),
+        sellAmount: BigNumber.from(sellAmount),
         buyAmount: undefined
       });
       return {
@@ -297,7 +299,7 @@ export default class Convert {
         network
       );
 
-      buyAmountWithTolerance = BigNumber.from(quote.buyAmount)
+      buyAmountWithTolerance = BigNumber.from(buyAmount)
         .mul(BASIS_POINTS_DIVISOR - slippage * 100)
         .div(BASIS_POINTS_DIVISOR);
 
@@ -311,7 +313,7 @@ export default class Convert {
         network,
         connectedAccount,
         signer,
-        transactionAmount: BigNumber.from(quote.sellAmount)
+        transactionAmount: BigNumber.from(sellAmount)
       });
     }
 
