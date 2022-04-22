@@ -1,5 +1,5 @@
 import axios from "axios";
-import { BigNumber, ethers } from "ethers";
+import { BigNumber, ethers, PopulatedTransaction, Signer } from "ethers";
 import ethereum from "../../data/tokens/ethereum-tokens.json";
 import polygon from "../../data/tokens/polygon-tokens.json";
 import arbitrum from "../../data/tokens/arbitrum-tokens.json";
@@ -7,11 +7,18 @@ import { ConvertNetwork, ConvertNetworkMap, Network } from "../../types/network"
 import { TokenExtended } from "../../types/tokens";
 import sdkConfig from "../../config";
 import { getNativeWrappedToken } from "../../utils/perp";
-import { PerpToken, PERP_CONTRACTS, PERP_SWAP_GAS_LIMIT } from "../../perp-config";
+import {
+  BASIS_POINTS_DIVISOR,
+  PerpToken,
+  PERP_CONTRACTS,
+  PERP_SWAP_GAS_LIMIT
+} from "../../perp-config";
 import { tryParseNativePerpToken } from "./tryParseNativePerpToken";
 import { PerpInfoMethods } from "../Trade/types";
 import { getHlpTokenQuote } from "./swapQuote";
 import { getSwapFeeBasisPoints } from "../Trade/getSwapFeeBasisPoints";
+import { getHlpTokenSwap, getLiquidityTokenSwap } from "./swapTransaction";
+import { WETH__factory } from "../../contracts/factories/WETH__factory";
 
 type GetQuoteArguments = {
   sellToken: string;
@@ -85,6 +92,19 @@ type GetQuoteInput = {
   connectedAccount: string | undefined;
   gasPrice: BigNumber | undefined;
   network: Network;
+};
+
+type GetSwapTransactionArgs = {
+  network: Network;
+  fromToken: TokenExtended<string>;
+  toToken: TokenExtended<string>;
+  quote: Quote;
+  slippage: number;
+  perpInfo: PerpInfoMethods;
+  gasPrice: BigNumber;
+  connectedAccount: string;
+  canUseHlp: boolean;
+  signer: Signer;
 };
 
 const NETWORK_TO_TOKENS: ConvertNetworkMap<TokenExtended<string>[]> = {
@@ -209,6 +229,99 @@ export default class Convert {
   };
 
   public getSwap = async ({
+    network,
+    fromToken,
+    toToken,
+    quote,
+    slippage,
+    perpInfo,
+    gasPrice,
+    connectedAccount,
+    canUseHlp,
+    signer
+  }: GetSwapTransactionArgs): Promise<{
+    tx: PopulatedTransaction;
+    gasEstimate: BigNumber;
+  }> => {
+    let tx: PopulatedTransaction;
+
+    let weth = getNativeWrappedToken(network)?.address;
+    let buyAmountWithTolerance = BigNumber.from(quote.buyAmount)
+      .mul(BASIS_POINTS_DIVISOR - slippage * 100)
+      .div(BASIS_POINTS_DIVISOR);
+
+    if (fromToken.isNative && toToken.address === weth) {
+      tx = await WETH__factory.connect(weth, signer).populateTransaction.deposit({
+        value: quote.sellAmount
+      });
+    } else if (toToken.isNative && fromToken.address === weth) {
+      tx = await WETH__factory.connect(weth, signer).populateTransaction.withdraw(quote.sellAmount);
+    } else if (fromToken.symbol === "hLP" || toToken.symbol === "hLP") {
+      tx = await getHlpTokenSwap({
+        fromToken,
+        toToken,
+        buyAmountWithTolerance,
+        connectedAccount,
+        network,
+        sellAmount: BigNumber.from(quote.sellAmount),
+        perpInfo,
+        signer,
+        slippage
+      });
+    } else if (!canUseHlp) {
+      const swap = await this.getApiSwap({
+        sellToken: fromToken.address,
+        buyToken: toToken.address,
+        gasPrice,
+        network,
+        slippagePercentage: slippage,
+        fromAddress: connectedAccount,
+        sellAmount: BigNumber.from(quote.sellAmount),
+        buyAmount: undefined
+      });
+      return {
+        tx: {
+          to: swap.to,
+          data: swap.data,
+          value: BigNumber.from(swap.value)
+        },
+        gasEstimate: BigNumber.from(swap.gas)
+      };
+    } else {
+      const { address: fromAddress, isNative: isFromNative } = tryParseNativePerpToken(
+        fromToken,
+        network
+      );
+      const { address: toAddress, isNative: isToNative } = tryParseNativePerpToken(
+        toToken,
+        network
+      );
+
+      buyAmountWithTolerance = BigNumber.from(quote.buyAmount)
+        .mul(BASIS_POINTS_DIVISOR - slippage * 100)
+        .div(BASIS_POINTS_DIVISOR);
+
+      weth = getNativeWrappedToken(network)?.address;
+      tx = await getLiquidityTokenSwap({
+        isFromNative,
+        isToNative,
+        fromAddress,
+        toAddress,
+        buyAmountWithTolerance,
+        network,
+        connectedAccount,
+        signer,
+        transactionAmount: BigNumber.from(quote.sellAmount)
+      });
+    }
+
+    return {
+      tx,
+      gasEstimate: await signer.estimateGas(tx)
+    };
+  };
+
+  public getApiSwap = async ({
     sellToken,
     buyToken,
     sellAmount,

@@ -1,59 +1,11 @@
 import { BigNumber, ethers, PopulatedTransaction } from "ethers";
-import { ConvertSDK, Network, TokenExtended } from "handle-sdk-react";
-import { PERP_CONTRACTS } from "../../config/perp";
-import { PerpInfoMethods } from "../../context/PerpInfo";
-import {
-  GlpManager__factory,
-  HlpManagerRouter__factory,
-  Router__factory,
-} from "../../contracts";
-import {
-  BASIS_POINTS_DIVISOR,
-  expandDecimals,
-  PRICE_DECIMALS,
-  tryParseNativePerpToken,
-} from "../trade";
-
-const convertSDK = new ConvertSDK();
-
-export const getSdkSwap = async ({
-  fromToken,
-  toToken,
-  gasPrice,
-  sellAmount,
-  network,
-  slippagePercentage,
-  fromAddress,
-}: {
-  fromToken: TokenExtended<string>;
-  toToken: TokenExtended<string>;
-  gasPrice: BigNumber;
-  sellAmount: BigNumber;
-  network: Network;
-  slippagePercentage: number;
-  fromAddress: string;
-}) => {
-  const swap = await convertSDK.getSwap({
-    sellToken: fromToken.address,
-    buyToken: toToken.address,
-    gasPrice,
-    sellAmount,
-    network,
-    slippagePercentage,
-    buyAmount: undefined,
-    fromAddress,
-  });
-
-  const tx = {
-    to: swap.to,
-    data: swap.data,
-    value: BigNumber.from(swap.value),
-  };
-  return {
-    tx,
-    gasEstimate: BigNumber.from(swap.gas),
-  };
-};
+import { GlpManager__factory } from "../../contracts/factories/GlpManager__factory";
+import { HlpManagerRouter__factory } from "../../contracts/factories/HlpManagerRouter__factory";
+import { Router__factory } from "../../contracts/factories/Router__factory";
+import { BASIS_POINTS_DIVISOR, PerpToken, PERP_CONTRACTS, PRICE_DECIMALS } from "../../perp-config";
+import { Network } from "../../types/network";
+import { PerpInfoMethods } from "../Trade/types";
+import { tryParseNativePerpToken } from "./tryParseNativePerpToken";
 
 export const getLiquidityTokenSwap = async ({
   isFromNative,
@@ -63,8 +15,8 @@ export const getLiquidityTokenSwap = async ({
   transactionAmount,
   buyAmountWithTolerance,
   connectedAccount,
-  chainId,
-  signer,
+  network,
+  signer
 }: {
   isFromNative: boolean;
   isToNative: boolean;
@@ -73,13 +25,13 @@ export const getLiquidityTokenSwap = async ({
   transactionAmount: BigNumber;
   buyAmountWithTolerance: BigNumber;
   connectedAccount: string;
-  chainId: number;
+  network: Network;
   signer: ethers.Signer;
 }) => {
   let tx: PopulatedTransaction;
   const router = Router__factory.connect(
-    PERP_CONTRACTS[chainId]?.Router ?? ethers.constants.AddressZero,
-    signer,
+    PERP_CONTRACTS[network]?.Router ?? ethers.constants.AddressZero,
+    signer
   );
   if (!isFromNative && !isToNative) {
     tx = await router.populateTransaction.swap(
@@ -87,7 +39,7 @@ export const getLiquidityTokenSwap = async ({
       transactionAmount,
       // @ts-ignore Overload hell
       buyAmountWithTolerance,
-      connectedAccount,
+      connectedAccount
     );
   } else if (isFromNative) {
     tx = await router.populateTransaction.swapETHToTokens(
@@ -95,7 +47,7 @@ export const getLiquidityTokenSwap = async ({
       buyAmountWithTolerance,
       connectedAccount,
       // @ts-ignore Overload hell
-      { value: transactionAmount },
+      { value: transactionAmount }
     );
   } else {
     tx = await router.populateTransaction.swapTokensToETH(
@@ -103,7 +55,7 @@ export const getLiquidityTokenSwap = async ({
       transactionAmount,
       // @ts-ignore Overload hell
       buyAmountWithTolerance,
-      connectedAccount,
+      connectedAccount
     );
   }
   return tx;
@@ -118,31 +70,31 @@ export const getHlpTokenSwap = async ({
   perpInfo,
   slippage,
   signer,
-  chainId,
+  network
 }: {
-  fromToken: TokenExtended<string>;
-  toToken: TokenExtended<string>;
+  fromToken: PerpToken;
+  toToken: PerpToken;
   buyAmountWithTolerance: BigNumber;
   connectedAccount: string;
   sellAmount: BigNumber;
   perpInfo: PerpInfoMethods;
   slippage: number;
   signer: ethers.Signer;
-  chainId: number;
+  network: Network;
 }) => {
   let tx: PopulatedTransaction;
   const hlpManager = GlpManager__factory.connect(
-    PERP_CONTRACTS[chainId]?.HlpManager ?? ethers.constants.AddressZero,
-    signer,
+    PERP_CONTRACTS[network]?.HlpManager ?? ethers.constants.AddressZero,
+    signer
   );
 
   const hlpManagerRouter = HlpManagerRouter__factory.connect(
-    PERP_CONTRACTS[chainId]?.HlpManagerRouter ?? ethers.constants.AddressZero,
-    signer,
+    PERP_CONTRACTS[network]?.HlpManagerRouter ?? ethers.constants.AddressZero,
+    signer
   );
 
-  const { address: fromAddress } = tryParseNativePerpToken(fromToken, chainId);
-  const { address: toAddress } = tryParseNativePerpToken(toToken, chainId);
+  const { address: fromAddress } = tryParseNativePerpToken(fromToken, network);
+  const { address: toAddress } = tryParseNativePerpToken(toToken, network);
 
   if (fromToken.symbol === "hLP") {
     // selling hlp
@@ -151,7 +103,7 @@ export const getHlpTokenSwap = async ({
       tx = await hlpManagerRouter.populateTransaction.removeLiquidityETH(
         BigNumber.from(sellAmount),
         buyAmountWithTolerance,
-        connectedAccount,
+        connectedAccount
       );
     } else {
       // if both tokens are not native
@@ -159,7 +111,7 @@ export const getHlpTokenSwap = async ({
         toAddress,
         BigNumber.from(sellAmount),
         buyAmountWithTolerance,
-        connectedAccount,
+        connectedAccount
       );
     }
   } else {
@@ -167,7 +119,7 @@ export const getHlpTokenSwap = async ({
     const minPriceInUsdg = perpInfo
       .getMinPrice(fromToken.address)
       .mul(10_000 - slippage * 100)
-      .div(expandDecimals(1, PRICE_DECIMALS - 18))
+      .div(ethers.utils.parseUnits("1", PRICE_DECIMALS - 18))
       .div(BASIS_POINTS_DIVISOR);
 
     if (fromToken.isNative) {
@@ -176,8 +128,8 @@ export const getHlpTokenSwap = async ({
         minPriceInUsdg,
         buyAmountWithTolerance,
         {
-          value: BigNumber.from(sellAmount),
-        },
+          value: BigNumber.from(sellAmount)
+        }
       );
     } else {
       // if not native
@@ -185,7 +137,7 @@ export const getHlpTokenSwap = async ({
         fromAddress,
         BigNumber.from(sellAmount),
         minPriceInUsdg,
-        buyAmountWithTolerance,
+        buyAmountWithTolerance
       );
     }
   }
