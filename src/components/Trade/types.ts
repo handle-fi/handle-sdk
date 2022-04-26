@@ -1,6 +1,6 @@
 import { BigNumber } from "ethers";
 
-export type PerpInfoMethods = {
+export type HlpInfoMethods = {
   getMinPrice: (address: string) => BigNumber;
   getMaxPrice: (address: string) => BigNumber;
   getAveragePrice: (address: string) => BigNumber;

@@ -1,5 +1,5 @@
 import { BigNumber, ethers } from "ethers";
-import { BASIS_POINTS_DIVISOR, PRICE_DECIMALS, USD_DISPLAY_DECIMALS } from "../../perp-config";
+import { BASIS_POINTS_DIVISOR, PRICE_DECIMALS, USD_DISPLAY_DECIMALS } from "../../hlp-config";
 import { getFundingFee } from "./getFundingFee";
 import { getPositionFee } from "./getPositionFee";
 

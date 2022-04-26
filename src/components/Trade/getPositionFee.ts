@@ -1,5 +1,5 @@
 import { BigNumber, ethers } from "ethers";
-import { BASIS_POINTS_DIVISOR, MARGIN_FEE_BASIS_POINTS } from "../../perp-config";
+import { BASIS_POINTS_DIVISOR, MARGIN_FEE_BASIS_POINTS } from "../../hlp-config";
 
 export const getPositionFee = (size: BigNumber) => {
   if (!size) {

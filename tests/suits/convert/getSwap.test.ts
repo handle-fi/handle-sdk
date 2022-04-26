@@ -1,9 +1,9 @@
 import { expect } from "chai";
 // import { Network } from "../../../src";
 import Convert from "../../../src/components/Convert";
-import { PerpInfoMethods } from "../../../src/components/Trade/types";
-import { PERP_CONTRACTS, PERP_TOKENS, PRICE_DECIMALS } from "../../../src/perp-config";
-import { getHlpToken, getNativeWrappedToken } from "../../../src/utils/perp";
+import { HlpInfoMethods } from "../../../src/components/Trade/types";
+import { HLP_CONTRACTS, HLP_TOKENS, PRICE_DECIMALS } from "../../../src/hlp-config";
+import { getHlpToken, getNativeWrappedToken } from "../../../src/utils/hlp";
 // @ts-ignore ethers context is injected in hardhat config
 import { ethers } from "hardhat";
 import { HlpManagerRouter__factory, WETH__factory } from "../../../src/contracts";
@@ -14,15 +14,15 @@ import { HlpManager__factory } from "../../../src/contracts/factories/HlpManager
 const convert = new Convert();
 
 const weth = getNativeWrappedToken("arbitrum")!; // arbitrum
-const eth = PERP_TOKENS["arbitrum"].find((x) => x.isNative)!;
+const eth = HLP_TOKENS["arbitrum"].find((x) => x.isNative)!;
 const hlp = getHlpToken("arbitrum");
-const fxUsd = PERP_TOKENS["arbitrum"].find((x) => x.symbol === "fxUSD")!;
-const fxAud = PERP_TOKENS["arbitrum"].find((x) => x.symbol === "fxAUD")!;
+const fxUsd = HLP_TOKENS["arbitrum"].find((x) => x.symbol === "fxUSD")!;
+const fxAud = HLP_TOKENS["arbitrum"].find((x) => x.symbol === "fxAUD")!;
 
 const FIVE_DOLLARS = ethers.utils.parseUnits("5", PRICE_DECIMALS);
 const ONE_DOLLAR = ethers.utils.parseUnits("1", PRICE_DECIMALS);
 
-const samplePerpTokenMethods: PerpInfoMethods = {
+const sampleHlpTokenMethods: HlpInfoMethods = {
   getMinPrice: () => ONE_DOLLAR,
   getMaxPrice: () => ONE_DOLLAR,
   getAveragePrice: () => ONE_DOLLAR,
@@ -47,10 +47,10 @@ describe("convert getSwap", () => {
       value: ethers.utils.parseEther("1")
     });
     const hlpManagerRouter = HlpManagerRouter__factory.connect(
-      PERP_CONTRACTS["arbitrum"].HlpManagerRouter,
+      HLP_CONTRACTS["arbitrum"].HlpManagerRouter,
       signer
     );
-    const hlpManager = HlpManager__factory.connect(PERP_CONTRACTS["arbitrum"].HlpManager, signer);
+    const hlpManager = HlpManager__factory.connect(HLP_CONTRACTS["arbitrum"].HlpManager, signer);
     // gives signer hlp
     const hlpPromise = hlpManagerRouter.addLiquidityETH(0, 0, {
       value: ethers.utils.parseEther("2")
@@ -73,7 +73,7 @@ describe("convert getSwap", () => {
         network: "arbitrum",
         connectedAccount: await signerWithAssets.getAddress(),
         gasPrice: ethers.constants.One,
-        perpInfo: samplePerpTokenMethods,
+        hlpInfo: sampleHlpTokenMethods,
         buyAmount: ethers.utils.parseEther("0.01"),
         sellAmount: ethers.utils.parseEther("0.01"),
         signer: signerWithAssets,
@@ -89,7 +89,7 @@ describe("convert getSwap", () => {
         network: "arbitrum",
         connectedAccount: await signerWithAssets.getAddress(),
         gasPrice: ethers.utils.parseUnits("1", "gwei"),
-        perpInfo: samplePerpTokenMethods,
+        hlpInfo: sampleHlpTokenMethods,
         buyAmount: ethers.utils.parseEther("0.01"),
         sellAmount: ethers.utils.parseEther("0.01"),
         signer: signerWithAssets,
@@ -107,7 +107,7 @@ describe("convert getSwap", () => {
         network: "arbitrum",
         connectedAccount: await signerWithAssets.getAddress(),
         gasPrice: ethers.utils.parseUnits("1", "gwei"),
-        perpInfo: samplePerpTokenMethods,
+        hlpInfo: sampleHlpTokenMethods,
         sellAmount: ethers.utils.parseUnits("1", hlp.decimals),
         buyAmount: ethers.utils.parseUnits("1", fxUsd.decimals),
         signer: signerWithAssets,
@@ -123,7 +123,7 @@ describe("convert getSwap", () => {
         network: "arbitrum",
         connectedAccount: await signerWithAssets.getAddress(),
         gasPrice: ethers.utils.parseUnits("1", "gwei"),
-        perpInfo: samplePerpTokenMethods,
+        hlpInfo: sampleHlpTokenMethods,
         sellAmount: ethers.utils.parseUnits("1", hlp.decimals),
         // price of eth fluctuates, so set buy amount to zero
         buyAmount: ethers.utils.parseUnits("0", eth.decimals),
@@ -140,7 +140,7 @@ describe("convert getSwap", () => {
         network: "arbitrum",
         connectedAccount: await signerWithAssets.getAddress(),
         gasPrice: ethers.utils.parseUnits("1", "gwei"),
-        perpInfo: samplePerpTokenMethods,
+        hlpInfo: sampleHlpTokenMethods,
         sellAmount: ethers.utils.parseUnits("1", fxUsd.decimals),
         buyAmount: ethers.utils.parseUnits("1", hlp.decimals),
         signer: signerWithAssets,
@@ -156,7 +156,7 @@ describe("convert getSwap", () => {
         network: "arbitrum",
         connectedAccount: await signerWithAssets.getAddress(),
         gasPrice: ethers.utils.parseUnits("1", "gwei"),
-        perpInfo: samplePerpTokenMethods,
+        hlpInfo: sampleHlpTokenMethods,
         sellAmount: ethers.utils.parseUnits("1", eth.decimals),
         // price of eth fluctuates, so set buy amount to zero
         buyAmount: ethers.utils.parseUnits("0", fxUsd.decimals),
@@ -178,7 +178,7 @@ describe("convert getSwap", () => {
         network: "arbitrum",
         connectedAccount: await signer.getAddress(),
         gasPrice: ethers.utils.parseUnits("1", "gwei"),
-        perpInfo: samplePerpTokenMethods,
+        hlpInfo: sampleHlpTokenMethods,
         sellAmount: ethers.utils.parseUnits("1", eth.decimals),
         buyAmount: ethers.utils.parseUnits("1", usdt.decimals),
         signer: signer,
@@ -196,7 +196,7 @@ describe("convert getSwap", () => {
         network: "arbitrum",
         connectedAccount: await signerWithAssets.getAddress(),
         gasPrice: ethers.utils.parseUnits("1", "gwei"),
-        perpInfo: samplePerpTokenMethods,
+        hlpInfo: sampleHlpTokenMethods,
         sellAmount: ethers.utils.parseUnits("1", fxUsd.decimals),
         // price of fxUsd / fxAud fluctuates, so set buy amount to zero
         buyAmount: ethers.utils.parseUnits("0", fxAud.decimals),
@@ -213,7 +213,7 @@ describe("convert getSwap", () => {
         network: "arbitrum",
         connectedAccount: await signerWithAssets.getAddress(),
         gasPrice: ethers.utils.parseUnits("1", "gwei"),
-        perpInfo: samplePerpTokenMethods,
+        hlpInfo: sampleHlpTokenMethods,
         sellAmount: ethers.utils.parseUnits("1", fxUsd.decimals),
         // price of fxUsd / eth fluctuates, so set buy amount to zero
         buyAmount: ethers.utils.parseUnits("0", eth.decimals),

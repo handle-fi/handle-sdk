@@ -48,7 +48,7 @@ import {
 } from "./constants";
 import { ETHEREUM_TOKEN_LIST, ARBITRUM_TOKEN_LIST, POLYGON_TOKEN_LIST } from "./data/tokens";
 import { vaultUtils } from "./utils/vault-utils";
-import * as PerpConfig from "./perp-config";
+import * as PerpConfig from "./hlp-config";
 
 export {
   FxTokensSDK,

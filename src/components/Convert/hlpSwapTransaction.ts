@@ -2,10 +2,10 @@ import { BigNumber, ethers, PopulatedTransaction } from "ethers";
 import { HlpManager__factory } from "../../contracts/factories/HlpManager__factory";
 import { HlpManagerRouter__factory } from "../../contracts/factories/HlpManagerRouter__factory";
 import { Router__factory } from "../../contracts/factories/Router__factory";
-import { BASIS_POINTS_DIVISOR, PerpToken, PERP_CONTRACTS, PRICE_DECIMALS } from "../../perp-config";
+import { BASIS_POINTS_DIVISOR, HlpToken, HLP_CONTRACTS, PRICE_DECIMALS } from "../../hlp-config";
 import { Network } from "../../types/network";
-import { PerpInfoMethods } from "../Trade/types";
-import { tryParseNativePerpToken } from "./tryParseNativePerpToken";
+import { HlpInfoMethods } from "../Trade/types";
+import { tryParseNativeHlpToken } from "./tryParseNativeHlpToken";
 
 export const getLiquidityTokenSwap = async ({
   isFromNative,
@@ -30,7 +30,7 @@ export const getLiquidityTokenSwap = async ({
 }) => {
   let tx: PopulatedTransaction;
   const router = Router__factory.connect(
-    PERP_CONTRACTS[network]?.Router ?? ethers.constants.AddressZero,
+    HLP_CONTRACTS[network]?.Router ?? ethers.constants.AddressZero,
     signer
   );
   if (!isFromNative && !isToNative) {
@@ -67,34 +67,34 @@ export const getHlpTokenSwap = async ({
   buyAmountWithTolerance,
   connectedAccount,
   sellAmount,
-  perpInfo,
+  hlpInfo,
   slippage,
   signer,
   network
 }: {
-  fromToken: PerpToken;
-  toToken: PerpToken;
+  fromToken: HlpToken;
+  toToken: HlpToken;
   buyAmountWithTolerance: BigNumber;
   connectedAccount: string;
   sellAmount: BigNumber;
-  perpInfo: PerpInfoMethods;
+  hlpInfo: HlpInfoMethods;
   slippage: number;
   signer: ethers.Signer;
   network: Network;
 }) => {
   let tx: PopulatedTransaction;
   const hlpManager = HlpManager__factory.connect(
-    PERP_CONTRACTS[network]?.HlpManager ?? ethers.constants.AddressZero,
+    HLP_CONTRACTS[network]?.HlpManager ?? ethers.constants.AddressZero,
     signer
   );
 
   const hlpManagerRouter = HlpManagerRouter__factory.connect(
-    PERP_CONTRACTS[network]?.HlpManagerRouter ?? ethers.constants.AddressZero,
+    HLP_CONTRACTS[network]?.HlpManagerRouter ?? ethers.constants.AddressZero,
     signer
   );
 
-  const { address: fromAddress } = tryParseNativePerpToken(fromToken, network);
-  const { address: toAddress } = tryParseNativePerpToken(toToken, network);
+  const { address: fromAddress } = tryParseNativeHlpToken(fromToken, network);
+  const { address: toAddress } = tryParseNativeHlpToken(toToken, network);
 
   if (fromToken.symbol === "hLP") {
     // selling hlp
@@ -116,7 +116,7 @@ export const getHlpTokenSwap = async ({
     }
   } else {
     // buying hlp
-    const minPriceInUsdg = perpInfo
+    const minPriceInUsdg = hlpInfo
       .getMinPrice(fromToken.address)
       .mul(10_000 - slippage * 100)
       .div(ethers.utils.parseUnits("1", PRICE_DECIMALS - 18))

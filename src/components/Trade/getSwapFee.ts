@@ -1,5 +1,5 @@
 import { BigNumber } from "ethers";
-import { BASIS_POINTS_DIVISOR } from "../../perp-config";
+import { BASIS_POINTS_DIVISOR } from "../../hlp-config";
 import { VaultTokenInfo } from "./types";
 import { getSwapFeeBasisPoints } from "./getSwapFeeBasisPoints";
 

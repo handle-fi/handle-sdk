@@ -1,4 +1,4 @@
-import { FUNDING_RATE_PRECISION } from "../../perp-config";
+import { FUNDING_RATE_PRECISION } from "../../hlp-config";
 import { Position } from "./position";
 
 export const getFundingFee = (position: Position) => {

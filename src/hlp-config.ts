@@ -3,12 +3,12 @@ import config from "./config";
 import { Network } from "./types/network";
 
 /** Swap function gas limit for Arbitrum. */
-export const PERP_SWAP_GAS_LIMIT = "1500000";
+export const HLP_SWAP_GAS_LIMIT = "1500000";
 
-/** Currently the only avaliable perp network */
-export const DEFAULT_PERP_NETWORK: Network = "arbitrum";
+/** Currently the only avaliable handle liquidity pool network */
+export const DEFAULT_HLP_NETWORK: Network = "arbitrum";
 
-/** perp constants */
+/** hlp constants */
 export const BASIS_POINTS_DIVISOR = 10_000;
 export const USD_DISPLAY_DECIMALS = 2;
 export const MARGIN_FEE_BASIS_POINTS = 10;
@@ -24,19 +24,10 @@ export const MINT_BURN_FEE_BASIS_POINTS = 20;
 export const TAX_BASIS_POINTS = 10;
 export const STABLE_TAX_BASIS_POINTS = 5;
 
-/** Symbols that can be used in the perp price chart against USD. */
-export const UsdPerpChartSymbols = [
-  "AUD",
-  "JPY",
-  "CNY",
-  "EUR",
-  "KRW",
-  "BTC",
-  "BNB",
-  "ETH"
-] as const;
+/** Symbols that can be used in the hlp price chart against USD. */
+export const UsdHlpChartSymbols = ["AUD", "JPY", "CNY", "EUR", "KRW", "BTC", "BNB", "ETH"] as const;
 /** Symbols against the USD for perpetual trading. */
-export type UsdPerpChartSymbol = typeof UsdPerpChartSymbols[number];
+export type UsdPerpChartSymbol = typeof UsdHlpChartSymbols[number];
 
 /**
  * Map from symbol to subgraph entity ID for Chainlink aggregator.
@@ -54,7 +45,7 @@ export const CHAINLINK_GQL_FEED_ID_MAP: { [key: string]: string } = {
   CNY_USD: "0x673816c92ec977003eb2e6e5ba5d7ef1a4ef6c4a"
 };
 
-export type PerpContracts = {
+export type HlpContracts = {
   Vault: string;
   VaultUtils: string;
   Router: string;
@@ -64,7 +55,7 @@ export type PerpContracts = {
   HlpManagerRouter: string;
 };
 
-export type PerpToken = {
+export type HlpToken = {
   name: string;
   symbol: string;
   decimals: number;
@@ -79,7 +70,7 @@ export type PerpToken = {
 
 // TODO: use network name, with NetworkMap<T>, instead of chainId.
 /** Perp contracts for each network chain ID. */
-export const PERP_CONTRACTS: Record<Network, PerpContracts> = {
+export const HLP_CONTRACTS: Record<Network, HlpContracts> = {
   // Arbitrum One
   arbitrum: {
     Vault: "0x1785e8491e7e9d771b2A6E9E389c25265F06326A",
@@ -110,12 +101,12 @@ export const PERP_CONTRACTS: Record<Network, PerpContracts> = {
   }
 };
 
-export const PERP_CHAIN_TO_NETWORK: { [chainId: number]: Network } = {
+export const HLP_CHAIN_TO_NETWORK: { [chainId: number]: Network } = {
   42161: "arbitrum"
 };
 
 /** Tokens configured in the Vault contract. */
-export const PERP_TOKENS: Record<Network, PerpToken[]> = {
+export const HLP_TOKENS: Record<Network, HlpToken[]> = {
   // Arbitrum One
   arbitrum: [
     {
@@ -188,8 +179,8 @@ export const PERP_TOKENS: Record<Network, PerpToken[]> = {
   polygon: []
 };
 
-export const getPerpTokenSymbols = (network: Network): string[] =>
-  PERP_TOKENS[network]?.map((x) => x.symbol) || [];
+export const getHlpTokenSymbols = (network: Network): string[] =>
+  HLP_TOKENS[network]?.map((x) => x.symbol) || [];
 
 /** hLP token information. */
 export const hLP = {
@@ -201,5 +192,5 @@ export const hLP = {
 
 export const getHLPToken = (network: Network) => ({
   ...hLP,
-  address: PERP_CONTRACTS[network]?.HLP
+  address: HLP_CONTRACTS[network]?.HLP
 });

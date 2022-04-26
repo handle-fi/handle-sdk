@@ -1,31 +1,31 @@
 import { BigNumber, ethers } from "ethers";
-import { PerpToken, PERP_CONTRACTS, PERP_SWAP_GAS_LIMIT, PRICE_DECIMALS } from "../../perp-config";
-import { PerpInfoMethods } from "../Trade/types";
+import { HlpToken, HLP_CONTRACTS, HLP_SWAP_GAS_LIMIT, PRICE_DECIMALS } from "../../hlp-config";
+import { HlpInfoMethods } from "../Trade/types";
 import { getHlpFeeBasisPoints } from "../Trade/getHlpFeeBasisPoints";
-import { tryParseNativePerpToken } from "./tryParseNativePerpToken";
+import { tryParseNativeHlpToken } from "./tryParseNativeHlpToken";
 import { Network } from "../../types/network";
 
 export const getHlpTokenQuote = ({
   fromToken,
   toToken,
   network,
-  perpInfo,
+  hlpInfo,
   fromAmount
 }: {
-  fromToken: PerpToken;
-  toToken: PerpToken;
+  fromToken: HlpToken;
+  toToken: HlpToken;
   network: Network;
-  perpInfo: PerpInfoMethods;
+  hlpInfo: HlpInfoMethods;
   fromAmount: BigNumber;
 }) => {
   // Parse ETH address into WETH address.
-  const { address: parsedFromTokenAddress } = tryParseNativePerpToken(fromToken, network);
-  const { address: parsedToTokenAddress } = tryParseNativePerpToken(toToken, network);
+  const { address: parsedFromTokenAddress } = tryParseNativeHlpToken(fromToken, network);
+  const { address: parsedToTokenAddress } = tryParseNativeHlpToken(toToken, network);
   const isBuyingHlp = toToken.symbol === "hLP";
-  const hLPPrice = perpInfo.getHlpPrice(isBuyingHlp);
+  const hLPPrice = hlpInfo.getHlpPrice(isBuyingHlp);
 
   // If buying hlp, then usdg delta is the price of the swap token (mul by the amount)
-  let usdgDelta = perpInfo
+  let usdgDelta = hlpInfo
     .getMinPrice(parsedFromTokenAddress)
     .mul(fromAmount)
     .div(ethers.utils.parseUnits("1", PRICE_DECIMALS));
@@ -39,12 +39,12 @@ export const getHlpTokenQuote = ({
     token: isBuyingHlp ? parsedFromTokenAddress : parsedToTokenAddress,
     usdgDelta,
     isBuy: isBuyingHlp,
-    totalTokenWeights: perpInfo.getTotalTokenWeights(),
-    targetUsdgAmount: perpInfo.getTargetUsdgAmount(
+    totalTokenWeights: hlpInfo.getTotalTokenWeights(),
+    targetUsdgAmount: hlpInfo.getTargetUsdgAmount(
       isBuyingHlp ? parsedFromTokenAddress : parsedToTokenAddress
     ),
-    getTokenInfo: perpInfo.getTokenInfo,
-    usdgSupply: perpInfo.getUsdgSupply()
+    getTokenInfo: hlpInfo.getTokenInfo,
+    usdgSupply: hlpInfo.getUsdgSupply()
   });
 
   if (isBuyingHlp) {
@@ -52,10 +52,10 @@ export const getHlpTokenQuote = ({
 
     return {
       quote: {
-        allowanceTarget: PERP_CONTRACTS[network].HlpManager,
+        allowanceTarget: HLP_CONTRACTS[network].HlpManager,
         sellAmount: fromAmount.toString(),
         buyAmount: hlpAmount.toString(),
-        gas: PERP_SWAP_GAS_LIMIT
+        gas: HLP_SWAP_GAS_LIMIT
       },
       feeBasisPoints
     };
@@ -64,17 +64,17 @@ export const getHlpTokenQuote = ({
     const buyAmount = usdgDelta
       .mul(ethers.utils.parseUnits("1", toToken.decimals))
       .div(
-        perpInfo.getMaxPrice(parsedToTokenAddress).isZero()
+        hlpInfo.getMaxPrice(parsedToTokenAddress).isZero()
           ? ethers.constants.One
-          : perpInfo.getMaxPrice(parsedToTokenAddress)
+          : hlpInfo.getMaxPrice(parsedToTokenAddress)
       );
 
     return {
       quote: {
-        allowanceTarget: PERP_CONTRACTS[network].HlpManager,
+        allowanceTarget: HLP_CONTRACTS[network].HlpManager,
         sellAmount: fromAmount.toString(),
         buyAmount: buyAmount.toString(),
-        gas: PERP_SWAP_GAS_LIMIT
+        gas: HLP_SWAP_GAS_LIMIT
       },
       feeBasisPoints
     };

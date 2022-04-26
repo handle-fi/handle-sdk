@@ -1,11 +1,11 @@
 import { BigNumber } from "ethers";
-import { PERP_TOKENS } from "../../perp-config";
+import { HLP_TOKENS } from "../../hlp-config";
 import {
   STABLE_SWAP_FEE_BASIS_POINTS,
   STABLE_TAX_BASIS_POINTS,
   SWAP_FEE_BASIS_POINTS,
   TAX_BASIS_POINTS
-} from "../../perp-config";
+} from "../../hlp-config";
 import { VaultTokenInfo } from "./types";
 import { getFeeBasisPoints } from "./getFeeBasisPoints";
 import { Network } from "../../types/network";
@@ -23,8 +23,8 @@ export const getSwapFeeBasisPoints = (
   network: Network = "arbitrum"
 ) => {
   const isStableSwap =
-    PERP_TOKENS[network].some((token) => token.address === args.tokenIn && token.isStable) &&
-    PERP_TOKENS[network].some((token) => token.address === args.tokenOut && token.isStable);
+    HLP_TOKENS[network].some((token) => token.address === args.tokenIn && token.isStable) &&
+    HLP_TOKENS[network].some((token) => token.address === args.tokenOut && token.isStable);
   const swapBasisPoints = isStableSwap ? STABLE_SWAP_FEE_BASIS_POINTS : SWAP_FEE_BASIS_POINTS;
   const taxBasisPoints = isStableSwap ? STABLE_TAX_BASIS_POINTS : TAX_BASIS_POINTS;
 

@@ -6,18 +6,18 @@ import arbitrum from "../../data/tokens/arbitrum-tokens.json";
 import { ConvertNetwork, ConvertNetworkMap, Network } from "../../types/network";
 import { TokenExtended } from "../../types/tokens";
 import sdkConfig from "../../config";
-import { getNativeWrappedToken } from "../../utils/perp";
+import { getNativeWrappedToken } from "../../utils/hlp";
 import {
   BASIS_POINTS_DIVISOR,
-  PerpToken,
-  PERP_CONTRACTS,
-  PERP_SWAP_GAS_LIMIT
-} from "../../perp-config";
-import { tryParseNativePerpToken } from "./tryParseNativePerpToken";
-import { PerpInfoMethods } from "../Trade/types";
-import { getHlpTokenQuote } from "./swapQuote";
+  HlpToken,
+  HLP_CONTRACTS,
+  HLP_SWAP_GAS_LIMIT
+} from "../../hlp-config";
+import { tryParseNativeHlpToken } from "./tryParseNativeHlpToken";
+import { HlpInfoMethods } from "../Trade/types";
+import { getHlpTokenQuote } from "./getHlpTokenQuote";
 import { getSwapFeeBasisPoints } from "../Trade/getSwapFeeBasisPoints";
-import { getHlpTokenSwap, getLiquidityTokenSwap } from "./swapTransaction";
+import { getHlpTokenSwap, getLiquidityTokenSwap } from "./hlpSwapTransaction";
 import { WETH__factory } from "../../contracts/factories/WETH__factory";
 
 type GetQuoteArguments = {
@@ -86,8 +86,8 @@ type OneInchSwapParams = OneInchQuoteParams & {
 
 type GetQuoteInput = {
   canUseHlp: boolean;
-  fromToken: PerpToken;
-  toToken: PerpToken;
+  fromToken: HlpToken;
+  toToken: HlpToken;
   fromAmount: BigNumber;
   connectedAccount: string | undefined;
   gasPrice: BigNumber | undefined;
@@ -96,12 +96,12 @@ type GetQuoteInput = {
 
 type GetSwapTransactionArgs = {
   network: Network;
-  fromToken: PerpToken;
-  toToken: PerpToken;
+  fromToken: HlpToken;
+  toToken: HlpToken;
   buyAmount: BigNumber;
   sellAmount: BigNumber;
   slippage: number;
-  perpInfo: PerpInfoMethods;
+  hlpInfo: HlpInfoMethods;
   gasPrice: BigNumber;
   connectedAccount: string;
   canUseHlp: boolean;
@@ -117,7 +117,7 @@ const NETWORK_TO_TOKENS: ConvertNetworkMap<TokenExtended<string>[]> = {
 export default class Convert {
   public getQuote = async (
     input: GetQuoteInput,
-    perpInfo: PerpInfoMethods
+    hlpInfo: HlpInfoMethods
   ): Promise<{ quote: Quote; feeBasisPoints?: BigNumber }> => {
     const { canUseHlp, fromToken, toToken, fromAmount, connectedAccount, gasPrice, network } =
       input;
@@ -133,7 +133,7 @@ export default class Convert {
           allowanceTarget: ethers.constants.AddressZero,
           buyAmount: fromAmount.toString(), // WETH swap is always 1 to 1
           sellAmount: fromAmount.toString(),
-          gas: PERP_SWAP_GAS_LIMIT
+          gas: HLP_SWAP_GAS_LIMIT
         },
         feeBasisPoints: ethers.constants.Zero
       };
@@ -146,7 +146,7 @@ export default class Convert {
         toToken,
         fromAmount,
         network,
-        perpInfo
+        hlpInfo
       });
     }
     if (!canUseHlp) {
@@ -169,11 +169,11 @@ export default class Convert {
     // Return quote from Hlp.
 
     // Parse ETH address into WETH address.
-    const { address: parsedFromTokenAddress } = tryParseNativePerpToken(fromToken, network);
-    const { address: parsedToTokenAddress } = tryParseNativePerpToken(toToken, network);
+    const { address: parsedFromTokenAddress } = tryParseNativeHlpToken(fromToken, network);
+    const { address: parsedToTokenAddress } = tryParseNativeHlpToken(toToken, network);
 
-    const priceIn = perpInfo.getMinPrice(parsedFromTokenAddress);
-    const priceOut = perpInfo.getMaxPrice(parsedToTokenAddress);
+    const priceIn = hlpInfo.getMinPrice(parsedFromTokenAddress);
+    const priceOut = hlpInfo.getMaxPrice(parsedToTokenAddress);
 
     const amountOut = fromAmount.mul(priceIn).div(priceOut.isZero() ? 1 : priceOut);
 
@@ -185,18 +185,18 @@ export default class Convert {
         .mul(ethers.utils.parseUnits("1", 18))
         .div(ethers.utils.parseUnits("1", 30))
         .div(ethers.utils.parseUnits("1", fromToken.decimals)),
-      usdgSupply: perpInfo.getUsdgSupply(),
-      totalTokenWeights: perpInfo.getTotalTokenWeights(),
-      targetUsdgAmount: perpInfo.getTargetUsdgAmount(parsedFromTokenAddress),
-      getTokenInfo: perpInfo.getTokenInfo
+      usdgSupply: hlpInfo.getUsdgSupply(),
+      totalTokenWeights: hlpInfo.getTotalTokenWeights(),
+      targetUsdgAmount: hlpInfo.getTargetUsdgAmount(parsedFromTokenAddress),
+      getTokenInfo: hlpInfo.getTokenInfo
     });
 
     return {
       quote: {
-        allowanceTarget: PERP_CONTRACTS[network].Router,
+        allowanceTarget: HLP_CONTRACTS[network].Router,
         buyAmount: amountOut.toString(),
         sellAmount: fromAmount.toString(),
-        gas: PERP_SWAP_GAS_LIMIT
+        gas: HLP_SWAP_GAS_LIMIT
       } as Quote,
       feeBasisPoints
     };
@@ -236,7 +236,7 @@ export default class Convert {
     buyAmount,
     sellAmount,
     slippage,
-    perpInfo,
+    hlpInfo,
     gasPrice,
     connectedAccount,
     canUseHlp,
@@ -266,7 +266,7 @@ export default class Convert {
         connectedAccount,
         network,
         sellAmount: BigNumber.from(sellAmount),
-        perpInfo,
+        hlpInfo,
         signer,
         slippage
       });
@@ -290,14 +290,11 @@ export default class Convert {
         gasEstimate: BigNumber.from(swap.gas)
       };
     } else {
-      const { address: fromAddress, isNative: isFromNative } = tryParseNativePerpToken(
+      const { address: fromAddress, isNative: isFromNative } = tryParseNativeHlpToken(
         fromToken,
         network
       );
-      const { address: toAddress, isNative: isToNative } = tryParseNativePerpToken(
-        toToken,
-        network
-      );
+      const { address: toAddress, isNative: isToNative } = tryParseNativeHlpToken(toToken, network);
 
       buyAmountWithTolerance = BigNumber.from(buyAmount)
         .mul(BASIS_POINTS_DIVISOR - slippage * 100)

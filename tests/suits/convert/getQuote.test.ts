@@ -2,22 +2,22 @@ import { expect } from "chai";
 import { ethers } from "ethers";
 import { Network } from "../../../src";
 import Convert from "../../../src/components/Convert";
-import { PerpInfoMethods } from "../../../src/components/Trade/types";
-import { PERP_TOKENS, PRICE_DECIMALS } from "../../../src/perp-config";
-import { getHlpToken, getNativeWrappedToken } from "../../../src/utils/perp";
+import { HlpInfoMethods } from "../../../src/components/Trade/types";
+import { HLP_TOKENS, PRICE_DECIMALS } from "../../../src/hlp-config";
+import { getHlpToken, getNativeWrappedToken } from "../../../src/utils/hlp";
 import { getTokenDetails } from "../../../src/utils/token-utils";
 
 const convert = new Convert();
 const weth = getNativeWrappedToken("arbitrum")!; // arbitrum
-const eth = PERP_TOKENS["arbitrum"].find((x) => x.isNative)!;
+const eth = HLP_TOKENS["arbitrum"].find((x) => x.isNative)!;
 const hlp = getHlpToken("arbitrum");
-const fxUsd = PERP_TOKENS["arbitrum"].find((x) => x.symbol === "fxUSD")!;
-const fxAud = PERP_TOKENS["arbitrum"].find((x) => x.symbol === "fxAUD")!;
+const fxUsd = HLP_TOKENS["arbitrum"].find((x) => x.symbol === "fxUSD")!;
+const fxAud = HLP_TOKENS["arbitrum"].find((x) => x.symbol === "fxAUD")!;
 
 const FIVE_DOLLARS = ethers.utils.parseUnits("5", PRICE_DECIMALS);
 const ONE_DOLLAR = ethers.utils.parseUnits("1", PRICE_DECIMALS);
 
-const samplePerpTokenMethods: PerpInfoMethods = {
+const sampleHlpTokenMethods: HlpInfoMethods = {
   getMinPrice: () => ONE_DOLLAR,
   getMaxPrice: () => ONE_DOLLAR,
   getAveragePrice: () => ONE_DOLLAR,
@@ -42,7 +42,7 @@ describe("convert getQuote", () => {
           fromAmount: ethers.constants.One,
           gasPrice: ethers.constants.One
         },
-        samplePerpTokenMethods
+        sampleHlpTokenMethods
       );
       expect(quote.sellAmount).to.eq(quote.buyAmount);
       expect(feeBasisPoints?.toNumber()).to.eq(0);
@@ -58,7 +58,7 @@ describe("convert getQuote", () => {
           fromAmount: ethers.constants.One,
           gasPrice: ethers.constants.One
         },
-        samplePerpTokenMethods
+        sampleHlpTokenMethods
       );
       expect(quote.sellAmount).to.eq(quote.buyAmount);
       expect(feeBasisPoints?.toNumber()).to.eq(0);
@@ -66,8 +66,8 @@ describe("convert getQuote", () => {
   });
   describe("hLP", () => {
     it("should correctly calculate from hlp to a token", async () => {
-      const hlpPerpTokenMethods = {
-        ...samplePerpTokenMethods,
+      const hlpTokenMethods = {
+        ...sampleHlpTokenMethods,
         getHlpPrice: () => FIVE_DOLLARS,
         getMinPrice: () => ONE_DOLLAR,
         getMaxPrice: () => ONE_DOLLAR,
@@ -83,14 +83,14 @@ describe("convert getQuote", () => {
           fromAmount: ethers.utils.parseEther("1"),
           gasPrice: ethers.constants.One
         },
-        hlpPerpTokenMethods
+        hlpTokenMethods
       );
       expect(quote.sellAmount).to.eq(ethers.utils.parseEther("1").toString());
       expect(quote.buyAmount).to.eq(ethers.utils.parseEther("5").toString());
     });
     it("should correctly calculate from hlp to eth ", async () => {
-      const hlpPerpTokenMethods = {
-        ...samplePerpTokenMethods,
+      const hlpTokenMethods = {
+        ...sampleHlpTokenMethods,
         getHlpPrice: () => FIVE_DOLLARS,
         getMinPrice: () => ONE_DOLLAR,
         getMaxPrice: () => ONE_DOLLAR,
@@ -106,14 +106,14 @@ describe("convert getQuote", () => {
           fromAmount: ethers.utils.parseEther("1"),
           gasPrice: ethers.constants.One
         },
-        hlpPerpTokenMethods
+        hlpTokenMethods
       );
       expect(quote.sellAmount).to.eq(ethers.utils.parseEther("1").toString());
       expect(quote.buyAmount).to.eq(ethers.utils.parseEther("5").toString());
     });
     it("should correctly calculate a token to hlp", async () => {
-      const hlpPerpTokenMethods = {
-        ...samplePerpTokenMethods,
+      const hlpTokenMethods = {
+        ...sampleHlpTokenMethods,
         getHlpPrice: () => FIVE_DOLLARS,
         getMinPrice: () => ONE_DOLLAR,
         getMaxPrice: () => ONE_DOLLAR,
@@ -129,14 +129,14 @@ describe("convert getQuote", () => {
           fromAmount: ethers.utils.parseEther("5"),
           gasPrice: ethers.constants.One
         },
-        hlpPerpTokenMethods
+        hlpTokenMethods
       );
       expect(quote.sellAmount).to.eq(ethers.utils.parseEther("5").toString());
       expect(quote.buyAmount).to.eq(ethers.utils.parseEther("1").toString());
     });
     it("should correctly calculate eth to hlp", async () => {
-      const hlpPerpTokenMethods = {
-        ...samplePerpTokenMethods,
+      const hlpTokenMethods = {
+        ...sampleHlpTokenMethods,
         getHlpPrice: () => FIVE_DOLLARS,
         getMinPrice: () => ONE_DOLLAR,
         getMaxPrice: () => ONE_DOLLAR,
@@ -152,7 +152,7 @@ describe("convert getQuote", () => {
           fromAmount: ethers.utils.parseEther("5"),
           gasPrice: ethers.constants.One
         },
-        hlpPerpTokenMethods
+        hlpTokenMethods
       );
       expect(quote.sellAmount).to.eq(ethers.utils.parseEther("5").toString());
       expect(quote.buyAmount).to.eq(ethers.utils.parseEther("1").toString());
@@ -173,7 +173,7 @@ describe("convert getQuote", () => {
             fromAmount: ethers.utils.parseEther("1"),
             gasPrice: ethers.constants.One
           },
-          samplePerpTokenMethods
+          sampleHlpTokenMethods
         );
         expect(quote).to.have.property("buyAmount");
         expect(quote).to.have.property("sellAmount");
@@ -189,8 +189,8 @@ describe("convert getQuote", () => {
           return ethers.utils.parseUnits("1", PRICE_DECIMALS);
         }
       };
-      const perpTokenMethods = {
-        ...samplePerpTokenMethods,
+      const hlpTokenMethods = {
+        ...sampleHlpTokenMethods,
         getMinPrice: getPrice,
         getMaxPrice: getPrice,
         getAveragePrice: getPrice
@@ -205,7 +205,7 @@ describe("convert getQuote", () => {
           fromAmount: ethers.utils.parseEther("5"),
           gasPrice: ethers.constants.One
         },
-        perpTokenMethods
+        hlpTokenMethods
       );
       expect(quote.sellAmount).to.eq(ethers.utils.parseEther("5").toString());
       expect(quote.buyAmount).to.eq(ethers.utils.parseEther("10").toString());
@@ -218,8 +218,8 @@ describe("convert getQuote", () => {
           return ethers.utils.parseUnits("1", PRICE_DECIMALS);
         }
       };
-      const perpTokenMethods = {
-        ...samplePerpTokenMethods,
+      const hlpTokenMethods = {
+        ...sampleHlpTokenMethods,
         getMinPrice: getPrice,
         getMaxPrice: getPrice,
         getAveragePrice: getPrice
@@ -234,7 +234,7 @@ describe("convert getQuote", () => {
           fromAmount: ethers.utils.parseEther("5"),
           gasPrice: ethers.constants.One
         },
-        perpTokenMethods
+        hlpTokenMethods
       );
       expect(quote.sellAmount).to.eq(ethers.utils.parseEther("5").toString());
       expect(quote.buyAmount).to.eq(ethers.utils.parseEther("10").toString());
