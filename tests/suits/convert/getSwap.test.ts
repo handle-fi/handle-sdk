@@ -43,9 +43,10 @@ describe("convert getSwap", () => {
   before(async () => {
     const signer = ethers.provider.getSigner(0);
     signerWithAssets = signer;
+    const address = await signerWithAssets.getAddress();
     const weth = WETH__factory.connect(getNativeWrappedToken()?.address!, signer);
     // gives signer weth
-    await weth.deposit({
+    const wethPromise = weth.deposit({
       value: ethers.utils.parseEther("1")
     });
     const hlpManagerRouter = HlpManagerRouter__factory.connect(
@@ -54,16 +55,17 @@ describe("convert getSwap", () => {
     );
     const hlpManager = GlpManager__factory.connect(PERP_CONTRACTS["arbitrum"].HlpManager, signer);
     // gives signer hlp
-    await hlpManagerRouter.addLiquidityETH(0, 0, {
+    const hlpPromise = hlpManagerRouter.addLiquidityETH(0, 0, {
       value: ethers.utils.parseEther("2")
     });
     // gives signer fxusd
-    await hlpManager.removeLiquidity(
+    const fxUsdPromise = hlpManager.removeLiquidity(
       fxUsd.address,
       ethers.utils.parseUnits("1000", PRICE_DECIMALS),
       0,
-      await signerWithAssets.getAddress()
+      address
     );
+    await Promise.all([wethPromise, hlpPromise, fxUsdPromise]);
   });
   describe("WETH", () => {
     it("should return a transaction from eth to weth", async () => {
