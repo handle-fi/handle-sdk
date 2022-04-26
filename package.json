@@ -12,12 +12,11 @@
     "postinstall": "yarn generate-contract-types",
     "build": "npx tsc",
     "prepublish": "tsc",
-    "test": "mocha -r ts-node/register 'tests/**/*.test.ts' --timeout 10000",
+    "test": "nyc --reporter=text npx hardhat test",
     "watch-build": "tsc-watch",
     "watch-dist": "copy-and-watch --watch dist/** ../handle-react/node_modules/handle-sdk-react/dist",
     "watch": "npm-run-all -p -r watch-build watch-dist",
-    "generate-contract-types": "typechain --target ethers-v5 --out-dir ./src/contracts './src/abis/**/*.json'",
-    "fork-arbitrum": "npx hardhat node --fork https://arb1.arbitrum.io/rpc"
+    "generate-contract-types": "typechain --target ethers-v5 --out-dir ./src/contracts './src/abis/**/*.json'"
   },
   "dependencies": {
     "@sushiswap/core-sdk": "^1.0.0-canary.34",
@@ -47,6 +46,7 @@
     "jest": "^27.0.3",
     "jest-environment-node": "^27.0.3",
     "mocha": "^9.1.3",
+    "nyc": "^15.1.0",
     "prettier": "^2.3.0",
     "pretty-quick": "^3.1.0",
     "ts-jest": "^27.0.2",
