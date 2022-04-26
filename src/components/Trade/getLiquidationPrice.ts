@@ -1,5 +1,5 @@
 import { BigNumber, ethers } from "ethers";
-import { BASIS_POINTS_DIVISOR, LIQUIDATION_FEE, MAX_LEVERAGE } from "../../hlp-config";
+import { BASIS_POINTS_DIVISOR, LIQUIDATION_FEE, MAX_LEVERAGE } from "../../config/hlp-config";
 import { getLiquidationPriceFromDelta } from "./getLiquidationPriceFromDelta";
 import { getPositionFee } from "./getPositionFee";
 

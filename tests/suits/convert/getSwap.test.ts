@@ -2,7 +2,7 @@ import { expect } from "chai";
 // import { Network } from "../../../src";
 import Convert from "../../../src/components/Convert";
 import { HlpInfoMethods } from "../../../src/components/Trade/types";
-import { HLP_CONTRACTS, HLP_TOKENS, PRICE_DECIMALS } from "../../../src/hlp-config";
+import { HLP_CONTRACTS, HLP_TOKENS, PRICE_DECIMALS } from "../../../src/config/hlp-config";
 import { getHlpToken, getNativeWrappedToken } from "../../../src/utils/hlp";
 // @ts-ignore ethers context is injected in hardhat config
 import { ethers } from "hardhat";
@@ -13,9 +13,9 @@ import { HlpManager__factory } from "../../../src/contracts/factories/HlpManager
 
 const convert = new Convert();
 
-const weth = getNativeWrappedToken("arbitrum")!; // arbitrum
+const weth = getNativeWrappedToken("arbitrum")!;
 const eth = HLP_TOKENS["arbitrum"].find((x) => x.isNative)!;
-const hlp = getHlpToken("arbitrum");
+const hlp = getHlpToken("arbitrum")!;
 const fxUsd = HLP_TOKENS["arbitrum"].find((x) => x.symbol === "fxUSD")!;
 const fxAud = HLP_TOKENS["arbitrum"].find((x) => x.symbol === "fxAUD")!;
 

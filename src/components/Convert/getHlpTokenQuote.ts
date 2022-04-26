@@ -1,5 +1,10 @@
 import { BigNumber, ethers } from "ethers";
-import { HlpToken, HLP_CONTRACTS, HLP_SWAP_GAS_LIMIT, PRICE_DECIMALS } from "../../hlp-config";
+import {
+  HlpToken,
+  HLP_CONTRACTS,
+  HLP_SWAP_GAS_LIMIT,
+  PRICE_DECIMALS
+} from "../../config/hlp-config";
 import { HlpInfoMethods } from "../Trade/types";
 import { getHlpFeeBasisPoints } from "../Trade/getHlpFeeBasisPoints";
 import { tryParseNativeHlpToken } from "./tryParseNativeHlpToken";
@@ -18,6 +23,8 @@ export const getHlpTokenQuote = ({
   hlpInfo: HlpInfoMethods;
   fromAmount: BigNumber;
 }) => {
+  const hlpManagerAddress = HLP_CONTRACTS[network]?.HlpManager;
+  if (!hlpManagerAddress) throw new Error("No HlpManager for this network");
   // Parse ETH address into WETH address.
   const { address: parsedFromTokenAddress } = tryParseNativeHlpToken(fromToken, network);
   const { address: parsedToTokenAddress } = tryParseNativeHlpToken(toToken, network);
@@ -52,7 +59,7 @@ export const getHlpTokenQuote = ({
 
     return {
       quote: {
-        allowanceTarget: HLP_CONTRACTS[network].HlpManager,
+        allowanceTarget: hlpManagerAddress,
         sellAmount: fromAmount.toString(),
         buyAmount: hlpAmount.toString(),
         gas: HLP_SWAP_GAS_LIMIT
@@ -71,7 +78,7 @@ export const getHlpTokenQuote = ({
 
     return {
       quote: {
-        allowanceTarget: HLP_CONTRACTS[network].HlpManager,
+        allowanceTarget: hlpManagerAddress,
         sellAmount: fromAmount.toString(),
         buyAmount: buyAmount.toString(),
         gas: HLP_SWAP_GAS_LIMIT

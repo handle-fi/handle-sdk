@@ -1,11 +1,11 @@
 import { BigNumber } from "ethers";
-import { HLP_TOKENS } from "../../hlp-config";
+import { HLP_TOKENS } from "../../config/hlp-config";
 import {
   STABLE_SWAP_FEE_BASIS_POINTS,
   STABLE_TAX_BASIS_POINTS,
   SWAP_FEE_BASIS_POINTS,
   TAX_BASIS_POINTS
-} from "../../hlp-config";
+} from "../../config/hlp-config";
 import { VaultTokenInfo } from "./types";
 import { getFeeBasisPoints } from "./getFeeBasisPoints";
 import { Network } from "../../types/network";

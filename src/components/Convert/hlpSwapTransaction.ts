@@ -2,7 +2,12 @@ import { BigNumber, ethers, PopulatedTransaction } from "ethers";
 import { HlpManager__factory } from "../../contracts/factories/HlpManager__factory";
 import { HlpManagerRouter__factory } from "../../contracts/factories/HlpManagerRouter__factory";
 import { Router__factory } from "../../contracts/factories/Router__factory";
-import { BASIS_POINTS_DIVISOR, HlpToken, HLP_CONTRACTS, PRICE_DECIMALS } from "../../hlp-config";
+import {
+  BASIS_POINTS_DIVISOR,
+  HlpToken,
+  HLP_CONTRACTS,
+  PRICE_DECIMALS
+} from "../../config/hlp-config";
 import { Network } from "../../types/network";
 import { HlpInfoMethods } from "../Trade/types";
 import { tryParseNativeHlpToken } from "./tryParseNativeHlpToken";

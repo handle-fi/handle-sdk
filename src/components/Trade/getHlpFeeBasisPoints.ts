@@ -1,6 +1,6 @@
 import { BigNumber } from "ethers";
-import { MINT_BURN_FEE_BASIS_POINTS } from "../../hlp-config";
-import { TAX_BASIS_POINTS } from "../../hlp-config";
+import { MINT_BURN_FEE_BASIS_POINTS } from "../../config/hlp-config";
+import { TAX_BASIS_POINTS } from "../../config/hlp-config";
 import { VaultTokenInfo } from "./types";
 import { getFeeBasisPoints } from "./getFeeBasisPoints";
 

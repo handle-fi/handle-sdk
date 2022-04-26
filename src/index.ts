@@ -48,7 +48,7 @@ import {
 } from "./constants";
 import { ETHEREUM_TOKEN_LIST, ARBITRUM_TOKEN_LIST, POLYGON_TOKEN_LIST } from "./data/tokens";
 import { vaultUtils } from "./utils/vault-utils";
-import * as PerpConfig from "./hlp-config";
+import * as HlpConfig from "./config/hlp-config";
 
 export {
   FxTokensSDK,
@@ -77,7 +77,7 @@ export {
   getIsKashiApproved,
   signKashiApproval,
   vaultUtils,
-  PerpConfig
+  HlpConfig
 };
 
 export type {

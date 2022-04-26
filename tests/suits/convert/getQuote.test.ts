@@ -3,14 +3,14 @@ import { ethers } from "ethers";
 import { Network } from "../../../src";
 import Convert from "../../../src/components/Convert";
 import { HlpInfoMethods } from "../../../src/components/Trade/types";
-import { HLP_TOKENS, PRICE_DECIMALS } from "../../../src/hlp-config";
+import { HLP_TOKENS, PRICE_DECIMALS } from "../../../src//config/hlp-config";
 import { getHlpToken, getNativeWrappedToken } from "../../../src/utils/hlp";
 import { getTokenDetails } from "../../../src/utils/token-utils";
 
 const convert = new Convert();
-const weth = getNativeWrappedToken("arbitrum")!; // arbitrum
+const weth = getNativeWrappedToken("arbitrum")!;
 const eth = HLP_TOKENS["arbitrum"].find((x) => x.isNative)!;
-const hlp = getHlpToken("arbitrum");
+const hlp = getHlpToken("arbitrum")!;
 const fxUsd = HLP_TOKENS["arbitrum"].find((x) => x.symbol === "fxUSD")!;
 const fxAud = HLP_TOKENS["arbitrum"].find((x) => x.symbol === "fxAUD")!;
 
@@ -38,7 +38,7 @@ describe("convert getQuote", () => {
           toToken: eth,
           canUseHlp: false,
           network: "arbitrum",
-          connectedAccount: "0x0000000000000000000000000000000000000000",
+          connectedAccount: ethers.constants.AddressZero,
           fromAmount: ethers.constants.One,
           gasPrice: ethers.constants.One
         },
@@ -54,7 +54,7 @@ describe("convert getQuote", () => {
           toToken: eth,
           canUseHlp: false,
           network: "arbitrum",
-          connectedAccount: "0x0000000000000000000000000000000000000000",
+          connectedAccount: ethers.constants.AddressZero,
           fromAmount: ethers.constants.One,
           gasPrice: ethers.constants.One
         },
@@ -79,7 +79,7 @@ describe("convert getQuote", () => {
           toToken: fxUsd,
           canUseHlp: false,
           network: "arbitrum",
-          connectedAccount: "0x0000000000000000000000000000000000000000",
+          connectedAccount: ethers.constants.AddressZero,
           fromAmount: ethers.utils.parseEther("1"),
           gasPrice: ethers.constants.One
         },
@@ -102,7 +102,7 @@ describe("convert getQuote", () => {
           toToken: eth,
           canUseHlp: false,
           network: "arbitrum",
-          connectedAccount: "0x0000000000000000000000000000000000000000",
+          connectedAccount: ethers.constants.AddressZero,
           fromAmount: ethers.utils.parseEther("1"),
           gasPrice: ethers.constants.One
         },
@@ -125,7 +125,7 @@ describe("convert getQuote", () => {
           fromToken: fxUsd,
           canUseHlp: false,
           network: "arbitrum",
-          connectedAccount: "0x0000000000000000000000000000000000000000",
+          connectedAccount: ethers.constants.AddressZero,
           fromAmount: ethers.utils.parseEther("5"),
           gasPrice: ethers.constants.One
         },
@@ -148,7 +148,7 @@ describe("convert getQuote", () => {
           fromToken: eth,
           canUseHlp: false,
           network: "arbitrum",
-          connectedAccount: "0x0000000000000000000000000000000000000000",
+          connectedAccount: ethers.constants.AddressZero,
           fromAmount: ethers.utils.parseEther("5"),
           gasPrice: ethers.constants.One
         },
@@ -169,7 +169,7 @@ describe("convert getQuote", () => {
             toToken: { ...usdt, name: "" },
             canUseHlp: false,
             network,
-            connectedAccount: "0x0000000000000000000000000000000000000000",
+            connectedAccount: ethers.constants.AddressZero,
             fromAmount: ethers.utils.parseEther("1"),
             gasPrice: ethers.constants.One
           },
@@ -201,7 +201,7 @@ describe("convert getQuote", () => {
           fromToken: fxUsd,
           canUseHlp: true,
           network: "arbitrum",
-          connectedAccount: "0x0000000000000000000000000000000000000000",
+          connectedAccount: ethers.constants.AddressZero,
           fromAmount: ethers.utils.parseEther("5"),
           gasPrice: ethers.constants.One
         },
@@ -230,7 +230,7 @@ describe("convert getQuote", () => {
           fromToken: eth,
           canUseHlp: true,
           network: "arbitrum",
-          connectedAccount: "0x0000000000000000000000000000000000000000",
+          connectedAccount: ethers.constants.AddressZero,
           fromAmount: ethers.utils.parseEther("5"),
           gasPrice: ethers.constants.One
         },

@@ -12,7 +12,7 @@ import {
   HlpToken,
   HLP_CONTRACTS,
   HLP_SWAP_GAS_LIMIT
-} from "../../hlp-config";
+} from "../../config/hlp-config";
 import { tryParseNativeHlpToken } from "./tryParseNativeHlpToken";
 import { HlpInfoMethods } from "../Trade/types";
 import { getHlpTokenQuote } from "./getHlpTokenQuote";
@@ -193,7 +193,7 @@ export default class Convert {
 
     return {
       quote: {
-        allowanceTarget: HLP_CONTRACTS[network].Router,
+        allowanceTarget: HLP_CONTRACTS[network]?.Router,
         buyAmount: amountOut.toString(),
         sellAmount: fromAmount.toString(),
         gas: HLP_SWAP_GAS_LIMIT
