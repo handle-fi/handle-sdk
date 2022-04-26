@@ -1,6 +1,6 @@
 import { BigNumber } from "ethers";
 import config from ".";
-import { Network } from "../types/network";
+import { Network, NetworkMap } from "../types/network";
 
 /** Swap function gas limit for Arbitrum. */
 export const HLP_SWAP_GAS_LIMIT = "1500000";
@@ -70,11 +70,7 @@ export type HlpToken = {
 
 // TODO: use network name, with NetworkMap<T>, instead of chainId.
 /** Perp contracts for each network chain ID. */
-export const HLP_CONTRACTS: {
-  arbitrum: HlpContracts;
-  ethereum: undefined;
-  polygon: undefined;
-} = {
+export const HLP_CONTRACTS: NetworkMap<HlpContracts | undefined> = {
   // Arbitrum One
   arbitrum: {
     Vault: "0x1785e8491e7e9d771b2A6E9E389c25265F06326A",

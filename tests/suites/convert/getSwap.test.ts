@@ -47,10 +47,10 @@ describe("convert getSwap", () => {
       value: ethers.utils.parseEther("1")
     });
     const hlpManagerRouter = HlpManagerRouter__factory.connect(
-      HLP_CONTRACTS["arbitrum"].HlpManagerRouter,
+      HLP_CONTRACTS["arbitrum"]?.HlpManagerRouter!,
       signer
     );
-    const hlpManager = HlpManager__factory.connect(HLP_CONTRACTS["arbitrum"].HlpManager, signer);
+    const hlpManager = HlpManager__factory.connect(HLP_CONTRACTS["arbitrum"]?.HlpManager!, signer);
     // gives signer hlp
     const hlpPromise = hlpManagerRouter.addLiquidityETH(0, 0, {
       value: ethers.utils.parseEther("2")
