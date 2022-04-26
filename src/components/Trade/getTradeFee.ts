@@ -4,7 +4,7 @@ import {
   MARGIN_FEE_BASIS_POINTS,
   STABLE_SWAP_FEE_BASIS_POINTS,
   SWAP_FEE_BASIS_POINTS
-} from "../../config/hlp-config";
+} from "../../config/hlp";
 
 export const getTradeFee = (
   isSwap: boolean,

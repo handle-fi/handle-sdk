@@ -2,7 +2,7 @@ import { expect } from "chai";
 // import { Network } from "../../../src";
 import Convert from "../../../src/components/Convert";
 import { HlpInfoMethods } from "../../../src/components/Trade/types";
-import { HLP_CONTRACTS, HLP_TOKENS, PRICE_DECIMALS } from "../../../src/config/hlp-config";
+import { HLP_CONTRACTS, HLP_TOKENS, PRICE_DECIMALS } from "../../../src/config/hlp";
 import { getHlpToken, getNativeWrappedToken } from "../../../src/utils/hlp";
 // @ts-ignore ethers context is injected in hardhat config
 import { ethers } from "hardhat";

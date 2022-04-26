@@ -1,4 +1,4 @@
-import { HLP_TOKENS } from "../../config/hlp-config";
+import { HLP_TOKENS } from "../../config/hlp";
 import { Network } from "../../types/network";
 
 // Map ETH to WETH address if needed. (ETH may be 0xEEE... or 0x000...).

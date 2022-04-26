@@ -12,7 +12,7 @@ import {
   HlpToken,
   HLP_CONTRACTS,
   HLP_SWAP_GAS_LIMIT
-} from "../../config/hlp-config";
+} from "../../config/hlp";
 import { tryParseNativeHlpToken } from "./tryParseNativeHlpToken";
 import { HlpInfoMethods } from "../Trade/types";
 import { getHlpTokenQuote } from "./getHlpTokenQuote";

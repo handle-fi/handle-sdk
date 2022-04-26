@@ -3,7 +3,7 @@ import { ethers } from "ethers";
 import { Network } from "../../../src";
 import Convert from "../../../src/components/Convert";
 import { HlpInfoMethods } from "../../../src/components/Trade/types";
-import { HLP_TOKENS, PRICE_DECIMALS } from "../../../src//config/hlp-config";
+import { HLP_TOKENS, PRICE_DECIMALS } from "../../../src/config/hlp";
 import { getHlpToken, getNativeWrappedToken } from "../../../src/utils/hlp";
 import { getTokenDetails } from "../../../src/utils/token-utils";
 

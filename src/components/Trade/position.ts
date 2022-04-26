@@ -1,9 +1,5 @@
 import { BigNumber, ethers } from "ethers";
-import {
-  BASIS_POINTS_DIVISOR,
-  PRICE_DECIMALS,
-  USD_DISPLAY_DECIMALS
-} from "../../config/hlp-config";
+import { BASIS_POINTS_DIVISOR, PRICE_DECIMALS, USD_DISPLAY_DECIMALS } from "../../config/hlp";
 import { getPositionFee } from "./getPositionFee";
 
 export type Position = {

@@ -1,6 +1,6 @@
 import { BigNumber } from "ethers";
-import config from "./../config";
-import { Network } from "./../types/network";
+import config from ".";
+import { Network } from "../types/network";
 
 /** Swap function gas limit for Arbitrum. */
 export const HLP_SWAP_GAS_LIMIT = "1500000";

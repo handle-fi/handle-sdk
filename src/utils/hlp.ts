@@ -1,5 +1,5 @@
-import { HLP_CONTRACTS, HLP_TOKENS } from "../config/hlp-config";
-import { DEFAULT_HLP_NETWORK } from "../config/hlp-config";
+import { HLP_CONTRACTS, HLP_TOKENS } from "../config/hlp";
+import { DEFAULT_HLP_NETWORK } from "../config/hlp";
 
 export const getPerpTokenSymbols = (network = DEFAULT_HLP_NETWORK): string[] =>
   HLP_TOKENS[network]?.map((x) => x.symbol) || [];

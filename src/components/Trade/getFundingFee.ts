@@ -1,5 +1,5 @@
 import { BigNumber } from "ethers";
-import { FUNDING_RATE_PRECISION } from "../../config/hlp-config";
+import { FUNDING_RATE_PRECISION } from "../../config/hlp";
 import { Position } from "./position";
 
 export const getFundingFee = (position: Position, cumulativeFundingRate: BigNumber) => {
