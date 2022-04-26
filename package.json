@@ -12,7 +12,7 @@
     "postinstall": "yarn generate-contract-types",
     "build": "npx tsc",
     "prepublish": "tsc",
-    "test": "nyc --reporter=text npx hardhat test",
+    "test": "nyc --reporter=lcov npx hardhat test",
     "watch-build": "tsc-watch",
     "watch-dist": "copy-and-watch --watch dist/** ../handle-react/node_modules/handle-sdk-react/dist",
     "watch": "npm-run-all -p -r watch-build watch-dist",
