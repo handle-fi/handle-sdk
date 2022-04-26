@@ -1,11 +1,24 @@
 import axios from "axios";
-import { BigNumber } from "ethers";
-import ethereum from "../data/tokens/ethereum-tokens.json";
-import polygon from "../data/tokens/polygon-tokens.json";
-import arbitrum from "../data/tokens/arbitrum-tokens.json";
-import { ConvertNetwork, ConvertNetworkMap } from "../types/network";
-import { TokenExtended } from "../types/tokens";
-import sdkConfig from "../config";
+import { BigNumber, ethers, PopulatedTransaction, Signer } from "ethers";
+import ethereum from "../../data/tokens/ethereum-tokens.json";
+import polygon from "../../data/tokens/polygon-tokens.json";
+import arbitrum from "../../data/tokens/arbitrum-tokens.json";
+import { ConvertNetwork, ConvertNetworkMap, Network } from "../../types/network";
+import { TokenExtended } from "../../types/tokens";
+import sdkConfig from "../../config";
+import { getNativeWrappedToken } from "../../utils/hlp";
+import {
+  BASIS_POINTS_DIVISOR,
+  HlpToken,
+  HLP_CONTRACTS,
+  HLP_SWAP_GAS_LIMIT
+} from "../../config/hlp";
+import { tryParseNativeHlpToken } from "./tryParseNativeHlpToken";
+import { HlpInfoMethods } from "../Trade/types";
+import { getHlpTokenQuote } from "./getHlpTokenQuote";
+import { getSwapFeeBasisPoints } from "../Trade/getSwapFeeBasisPoints";
+import { getHlpTokenSwap, getLiquidityTokenSwap } from "./hlpSwapTransaction";
+import { WETH__factory } from "../../contracts/factories/WETH__factory";
 
 type GetQuoteArguments = {
   sellToken: string;
@@ -71,6 +84,30 @@ type OneInchSwapParams = OneInchQuoteParams & {
   referrerAddress: string;
 };
 
+type GetQuoteInput = {
+  canUseHlp: boolean;
+  fromToken: HlpToken;
+  toToken: HlpToken;
+  fromAmount: BigNumber;
+  connectedAccount: string | undefined;
+  gasPrice: BigNumber | undefined;
+  network: Network;
+};
+
+type GetSwapTransactionArgs = {
+  network: Network;
+  fromToken: HlpToken;
+  toToken: HlpToken;
+  buyAmount: BigNumber;
+  sellAmount: BigNumber;
+  slippage: number;
+  hlpInfo: HlpInfoMethods;
+  gasPrice: BigNumber;
+  connectedAccount: string;
+  canUseHlp: boolean;
+  signer: Signer;
+};
+
 const NETWORK_TO_TOKENS: ConvertNetworkMap<TokenExtended<string>[]> = {
   ethereum,
   arbitrum,
@@ -78,7 +115,94 @@ const NETWORK_TO_TOKENS: ConvertNetworkMap<TokenExtended<string>[]> = {
 };
 
 export default class Convert {
-  public getQuote = async ({
+  public getQuote = async (
+    input: GetQuoteInput,
+    hlpInfo: HlpInfoMethods
+  ): Promise<{ quote: Quote; feeBasisPoints?: BigNumber }> => {
+    const { canUseHlp, fromToken, toToken, fromAmount, connectedAccount, gasPrice, network } =
+      input;
+
+    const weth = getNativeWrappedToken(network)?.address;
+
+    if (
+      (fromToken.isNative && toToken.address === weth) ||
+      (toToken.isNative && fromToken.address === weth)
+    ) {
+      return {
+        quote: {
+          allowanceTarget: ethers.constants.AddressZero,
+          buyAmount: fromAmount.toString(), // WETH swap is always 1 to 1
+          sellAmount: fromAmount.toString(),
+          gas: HLP_SWAP_GAS_LIMIT
+        },
+        feeBasisPoints: ethers.constants.Zero
+      };
+    }
+
+    // If tokens are hLP, go increase / decrease liquidity
+    if (toToken.symbol === "hLP" || fromToken.symbol === "hLP") {
+      return getHlpTokenQuote({
+        fromToken,
+        toToken,
+        fromAmount,
+        network,
+        hlpInfo
+      });
+    }
+    if (!canUseHlp) {
+      // Return quote from SDK.
+      return {
+        quote: await this.getApiQuote({
+          sellToken: fromToken.address,
+          buyToken: toToken.address,
+          buyAmount: undefined,
+          sellAmount: fromAmount,
+          fromAddress: connectedAccount || ethers.constants.AddressZero,
+          network,
+          // we dont care about passing through a gas cost when
+          // users wallet isnt connected.
+          gasPrice: gasPrice || ethers.constants.Zero
+        })
+      };
+    }
+
+    // Return quote from Hlp.
+
+    // Parse ETH address into WETH address.
+    const { address: parsedFromTokenAddress } = tryParseNativeHlpToken(fromToken, network);
+    const { address: parsedToTokenAddress } = tryParseNativeHlpToken(toToken, network);
+
+    const priceIn = hlpInfo.getMinPrice(parsedFromTokenAddress);
+    const priceOut = hlpInfo.getMaxPrice(parsedToTokenAddress);
+
+    const amountOut = fromAmount.mul(priceIn).div(priceOut.isZero() ? 1 : priceOut);
+
+    const feeBasisPoints = getSwapFeeBasisPoints({
+      tokenIn: parsedFromTokenAddress,
+      tokenOut: parsedToTokenAddress,
+      usdgDelta: priceIn
+        .mul(fromAmount)
+        .mul(ethers.utils.parseUnits("1", 18))
+        .div(ethers.utils.parseUnits("1", 30))
+        .div(ethers.utils.parseUnits("1", fromToken.decimals)),
+      usdgSupply: hlpInfo.getUsdgSupply(),
+      totalTokenWeights: hlpInfo.getTotalTokenWeights(),
+      targetUsdgAmount: hlpInfo.getTargetUsdgAmount(parsedFromTokenAddress),
+      getTokenInfo: hlpInfo.getTokenInfo
+    });
+
+    return {
+      quote: {
+        allowanceTarget: HLP_CONTRACTS[network]?.Router,
+        buyAmount: amountOut.toString(),
+        sellAmount: fromAmount.toString(),
+        gas: HLP_SWAP_GAS_LIMIT
+      } as Quote,
+      feeBasisPoints
+    };
+  };
+
+  public getApiQuote = async ({
     sellToken,
     buyToken,
     sellAmount,
@@ -106,6 +230,97 @@ export default class Convert {
   };
 
   public getSwap = async ({
+    network,
+    fromToken,
+    toToken,
+    buyAmount,
+    sellAmount,
+    slippage,
+    hlpInfo,
+    gasPrice,
+    connectedAccount,
+    canUseHlp,
+    signer
+  }: GetSwapTransactionArgs): Promise<{
+    tx: PopulatedTransaction;
+    gasEstimate: BigNumber;
+  }> => {
+    let tx: PopulatedTransaction;
+
+    let weth = getNativeWrappedToken(network)?.address;
+    let buyAmountWithTolerance = BigNumber.from(buyAmount)
+      .mul(BASIS_POINTS_DIVISOR - slippage * 100)
+      .div(BASIS_POINTS_DIVISOR);
+
+    if (fromToken.isNative && toToken.address === weth) {
+      tx = await WETH__factory.connect(weth, signer).populateTransaction.deposit({
+        value: sellAmount
+      });
+    } else if (toToken.isNative && fromToken.address === weth) {
+      tx = await WETH__factory.connect(weth, signer).populateTransaction.withdraw(sellAmount);
+    } else if (fromToken.symbol === "hLP" || toToken.symbol === "hLP") {
+      tx = await getHlpTokenSwap({
+        fromToken,
+        toToken,
+        buyAmountWithTolerance,
+        connectedAccount,
+        network,
+        sellAmount: BigNumber.from(sellAmount),
+        hlpInfo,
+        signer,
+        slippage
+      });
+    } else if (!canUseHlp) {
+      const swap = await this.getApiSwap({
+        sellToken: fromToken.address,
+        buyToken: toToken.address,
+        gasPrice,
+        network,
+        slippagePercentage: slippage,
+        fromAddress: connectedAccount,
+        sellAmount: BigNumber.from(sellAmount),
+        buyAmount: undefined
+      });
+      return {
+        tx: {
+          to: swap.to,
+          data: swap.data,
+          value: BigNumber.from(swap.value)
+        },
+        gasEstimate: BigNumber.from(swap.gas)
+      };
+    } else {
+      const { address: fromAddress, isNative: isFromNative } = tryParseNativeHlpToken(
+        fromToken,
+        network
+      );
+      const { address: toAddress, isNative: isToNative } = tryParseNativeHlpToken(toToken, network);
+
+      buyAmountWithTolerance = BigNumber.from(buyAmount)
+        .mul(BASIS_POINTS_DIVISOR - slippage * 100)
+        .div(BASIS_POINTS_DIVISOR);
+
+      weth = getNativeWrappedToken(network)?.address;
+      tx = await getLiquidityTokenSwap({
+        isFromNative,
+        isToNative,
+        fromAddress,
+        toAddress,
+        buyAmountWithTolerance,
+        network,
+        connectedAccount,
+        signer,
+        transactionAmount: BigNumber.from(sellAmount)
+      });
+    }
+
+    return {
+      tx,
+      gasEstimate: await signer.estimateGas(tx)
+    };
+  };
+
+  public getApiSwap = async ({
     sellToken,
     buyToken,
     sellAmount,
@@ -350,4 +565,3 @@ export default class Convert {
     return `https://api.1inch.exchange/v4.0/${networkNameToIdMap[network]}`;
   };
 }
-

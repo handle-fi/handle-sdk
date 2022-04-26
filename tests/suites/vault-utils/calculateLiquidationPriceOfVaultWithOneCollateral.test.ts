@@ -82,4 +82,3 @@ describe("calculateLiquidationPriceOfVaultWithOneCollateral", () => {
     expect(result.eq(ethers.constants.WeiPerEther.mul(11).div(10).div(2))).to.eql(true);
   });
 });
-

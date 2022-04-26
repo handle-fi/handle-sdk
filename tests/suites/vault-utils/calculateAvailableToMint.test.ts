@@ -129,4 +129,3 @@ describe("calculateAvailableToMint", () => {
     expect(vault.availableToMint.eq(ethers.utils.parseEther("28.674403768633969853"))).to.eql(true);
   });
 });
-

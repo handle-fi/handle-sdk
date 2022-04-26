@@ -50,4 +50,3 @@ describe("calculateLiquidationFee", () => {
     expect(result.eq(ethers.constants.WeiPerEther.mul(15).div(1000))).to.eql(true);
   });
 });
-

@@ -48,6 +48,7 @@ import {
 } from "./constants";
 import { ETHEREUM_TOKEN_LIST, ARBITRUM_TOKEN_LIST, POLYGON_TOKEN_LIST } from "./data/tokens";
 import { vaultUtils } from "./utils/vault-utils";
+import * as HlpConfig from "./config/hlp";
 
 export {
   FxTokensSDK,
@@ -75,7 +76,8 @@ export {
   getNetworkName,
   getIsKashiApproved,
   signKashiApproval,
-  vaultUtils
+  vaultUtils,
+  HlpConfig
 };
 
 export type {
@@ -114,4 +116,3 @@ export type {
   LPStakingPlatformName,
   KashiPoolConfig
 };
-

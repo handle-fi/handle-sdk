@@ -177,4 +177,3 @@ describe("calculateWithdrawableCollateral", () => {
     expect(result.eq(EXPECTED)).to.eql(true);
   });
 });
-

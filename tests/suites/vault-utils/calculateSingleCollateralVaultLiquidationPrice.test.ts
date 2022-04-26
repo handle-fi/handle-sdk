@@ -57,4 +57,3 @@ describe("calculateSingleCollateralVaultLiquidationPrice", () => {
     expect(result.eq(minimumCollateralRatio)).to.eql(true);
   });
 });
-

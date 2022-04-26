@@ -47,4 +47,3 @@ describe("calculateCollateralRatio", () => {
     expect(result.eq(ethers.constants.WeiPerEther.mul(2))).to.eql(true);
   });
 });
-
