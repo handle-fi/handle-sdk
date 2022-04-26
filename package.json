@@ -55,8 +55,7 @@
   },
   "nyc": {
     "exclude": [
-      "**/*.spec.ts",
-      "**/*.test.ts",
+      "tests/**",
       "src/contracts/**",
       "**/node_modules/**"
     ] 
