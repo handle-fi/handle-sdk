@@ -17,3 +17,5 @@ dist/
 .idea/
 # Jest
 coverage/
+
+/src/contracts
