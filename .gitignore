@@ -15,8 +15,10 @@ dist/
 *.tsbuildinfo
 # JetBrains
 .idea/
-# Jest
+# Coverage
 coverage/
-
+.nyc_output/
+# Hardhat
+cache/
+# Build
 /src/contracts
-cache

@@ -12,7 +12,7 @@
     "postinstall": "yarn generate-contract-types",
     "build": "npx tsc",
     "prepublish": "tsc",
-    "test": "mocha -r ts-node/register 'tests/**/*.test.ts' --timeout 60000",
+    "test": "nyc --reporter=lcov npx hardhat test",
     "watch-build": "tsc-watch",
     "watch-dist": "copy-and-watch --watch dist/** ../handle-react/node_modules/handle-sdk-react/dist",
     "watch": "npm-run-all -p -r watch-build watch-dist",
@@ -46,10 +46,18 @@
     "jest": "^27.0.3",
     "jest-environment-node": "^27.0.3",
     "mocha": "^9.1.3",
+    "nyc": "^15.1.0",
     "prettier": "^2.3.0",
     "pretty-quick": "^3.1.0",
     "ts-jest": "^27.0.2",
     "ts-node": "^10.4.0",
     "tsc-watch": "^4.4.0"
+  },
+  "nyc": {
+    "exclude": [
+      "tests/**",
+      "src/contracts/**",
+      "**/node_modules/**"
+    ]
   }
 }
