@@ -6,13 +6,10 @@ import { PERP_CONTRACTS, PERP_TOKENS, PRICE_DECIMALS } from "../../../src/perp-c
 import { getHlpToken, getNativeWrappedToken } from "../../../src/utils/perp";
 // @ts-ignore ethers context is injected in hardhat config
 import { ethers } from "hardhat";
-import {
-  GlpManager__factory,
-  HlpManagerRouter__factory,
-  WETH__factory
-} from "../../../src/contracts";
+import { HlpManagerRouter__factory, WETH__factory } from "../../../src/contracts";
 import { Signer, VoidSigner } from "ethers";
 import { getTokenDetails } from "../../../src/utils/token-utils";
+import { HlpManager__factory } from "../../../src/contracts/factories/HlpManager__factory";
 
 const convert = new Convert();
 
@@ -53,7 +50,7 @@ describe("convert getSwap", () => {
       PERP_CONTRACTS["arbitrum"].HlpManagerRouter,
       signer
     );
-    const hlpManager = GlpManager__factory.connect(PERP_CONTRACTS["arbitrum"].HlpManager, signer);
+    const hlpManager = HlpManager__factory.connect(PERP_CONTRACTS["arbitrum"].HlpManager, signer);
     // gives signer hlp
     const hlpPromise = hlpManagerRouter.addLiquidityETH(0, 0, {
       value: ethers.utils.parseEther("2")

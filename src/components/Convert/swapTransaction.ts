@@ -1,5 +1,5 @@
 import { BigNumber, ethers, PopulatedTransaction } from "ethers";
-import { GlpManager__factory } from "../../contracts/factories/GlpManager__factory";
+import { HlpManager__factory } from "../../contracts/factories/HlpManager__factory";
 import { HlpManagerRouter__factory } from "../../contracts/factories/HlpManagerRouter__factory";
 import { Router__factory } from "../../contracts/factories/Router__factory";
 import { BASIS_POINTS_DIVISOR, PerpToken, PERP_CONTRACTS, PRICE_DECIMALS } from "../../perp-config";
@@ -83,7 +83,7 @@ export const getHlpTokenSwap = async ({
   network: Network;
 }) => {
   let tx: PopulatedTransaction;
-  const hlpManager = GlpManager__factory.connect(
+  const hlpManager = HlpManager__factory.connect(
     PERP_CONTRACTS[network]?.HlpManager ?? ethers.constants.AddressZero,
     signer
   );
