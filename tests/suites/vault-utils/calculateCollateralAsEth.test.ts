@@ -45,4 +45,3 @@ describe("calculateTotalCollateralBalanceAsEth", () => {
     ).to.eql(true);
   });
 });
-

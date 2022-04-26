@@ -122,4 +122,3 @@ describe("calculateAdditionalCollateralRequired", () => {
     expect(result.eq(ethers.constants.WeiPerEther.mul(3))).to.eql(true);
   });
 });
-
