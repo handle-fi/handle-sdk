@@ -52,5 +52,13 @@
     "ts-jest": "^27.0.2",
     "ts-node": "^10.4.0",
     "tsc-watch": "^4.4.0"
+  },
+  "nyc": {
+    "exclude": [
+      "**/*.spec.ts",
+      "**/*.test.ts",
+      "src/contracts/**",
+      "**/node_modules/**"
+    ] 
   }
 }
