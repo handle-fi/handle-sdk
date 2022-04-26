@@ -16,10 +16,9 @@
     "declaration": true,
     "rootDir": ".",
     "outDir": "./dist",
-    "lib": [
-      "es2020", "esnext"
-    ],
+    "lib": ["es2020", "esnext"]
   },
   "include": ["./src", "./tests"],
-  "exclude": ["node_modules", "./dist/**/*"]
+  "exclude": ["node_modules", "./dist/**/*"],
+  "files": ["./hardhat.config.ts"]
 }

@@ -29,7 +29,7 @@ const samplePerpTokenMethods: PerpInfoMethods = {
   getHlpPrice: () => FIVE_DOLLARS
 };
 
-describe("getQuote", () => {
+describe("convert getQuote", () => {
   describe("WETH", () => {
     it("should be 1-1 from eth to weth", async () => {
       const { quote, feeBasisPoints } = await convert.getQuote(
