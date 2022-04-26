@@ -1,5 +1,5 @@
 {
-  "name": "handle-sdk-react",
+  "name": "handle-sdk",
   "version": "0.0.56",
   "description": "handle.fi sdk",
   "main": "dist/src/index.js",
