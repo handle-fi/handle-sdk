@@ -5,7 +5,7 @@ import { Router__factory } from "../../contracts/factories/Router__factory";
 import { BASIS_POINTS_DIVISOR, HlpToken, HLP_CONTRACTS, PRICE_DECIMALS } from "../../config/hlp";
 import { Network } from "../../types/network";
 import { HlpInfoMethods } from "../Trade/types";
-import { tryParseNativeHlpToken } from "./tryParseNativeHlpToken";
+import { tryParseNativeHlpToken } from "../../utils/hlp";
 
 export const getLiquidityTokenSwap = async ({
   isFromNative,

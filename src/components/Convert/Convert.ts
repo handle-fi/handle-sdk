@@ -6,14 +6,13 @@ import arbitrum from "../../data/tokens/arbitrum-tokens.json";
 import { ConvertNetwork, ConvertNetworkMap, Network } from "../../types/network";
 import { TokenExtended } from "../../types/tokens";
 import sdkConfig from "../../config";
-import { getNativeWrappedToken } from "../../utils/hlp";
+import { getNativeWrappedToken, tryParseNativeHlpToken } from "../../utils/hlp";
 import {
   BASIS_POINTS_DIVISOR,
   HlpToken,
   HLP_CONTRACTS,
   HLP_SWAP_GAS_LIMIT
 } from "../../config/hlp";
-import { tryParseNativeHlpToken } from "./tryParseNativeHlpToken";
 import { HlpInfoMethods } from "../Trade/types";
 import { getHlpTokenQuote } from "./getHlpTokenQuote";
 import { getSwapFeeBasisPoints } from "../Trade/getSwapFeeBasisPoints";

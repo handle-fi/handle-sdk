@@ -2,8 +2,8 @@ import { BigNumber, ethers } from "ethers";
 import { HlpToken, HLP_CONTRACTS, HLP_SWAP_GAS_LIMIT, PRICE_DECIMALS } from "../../config/hlp";
 import { HlpInfoMethods } from "../Trade/types";
 import { getHlpFeeBasisPoints } from "../Trade/getHlpFeeBasisPoints";
-import { tryParseNativeHlpToken } from "./tryParseNativeHlpToken";
 import { Network } from "../../types/network";
+import { tryParseNativeHlpToken } from "../../utils/hlp";
 
 export const getHlpTokenQuote = ({
   fromToken,
