@@ -8,6 +8,8 @@ import { getTradeFee } from "./getTradeFee";
 import { getFeeBasisPoints } from "./getFeeBasisPoints";
 import { getLiquidationPriceFromDelta } from "./getLiquidationPriceFromDelta";
 import { Position, contractPositionToPosition } from "./position";
+import { splitPositionArray } from "./splitPositionArray";
+import { getPositionTokenList } from "./getPositionTokenList";
 
 export {
   getFundingFee,
@@ -20,5 +22,7 @@ export {
   getFeeBasisPoints,
   getLiquidationPriceFromDelta,
   Position,
-  contractPositionToPosition
+  contractPositionToPosition,
+  splitPositionArray,
+  getPositionTokenList
 };
