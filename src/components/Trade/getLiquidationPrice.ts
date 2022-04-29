@@ -1,4 +1,5 @@
 import { BigNumber } from "ethers";
+import { ethers } from "hardhat";
 import {
   BASIS_POINTS_DIVISOR,
   FUNDING_RATE_PRECISION,
@@ -21,7 +22,7 @@ export const getLiquidationPrice = (
   position: Position,
   indexTokenCumulativeFundingRate: BigNumber,
   deltaInfo?: LiquidationDelta
-) => {
+): BigNumber => {
   let { isLong, size, collateral, averagePrice, entryFundingRate, delta, hasProfit } = position;
   let { sizeDelta, collateralDelta, increaseCollateral, increaseSize } = deltaInfo ?? {};
   let nextSize = size;
@@ -48,7 +49,7 @@ export const getLiquidationPrice = (
       remainingCollateral = remainingCollateral.add(collateralDelta);
     } else {
       if (collateralDelta.gte(remainingCollateral)) {
-        return;
+        return ethers.constants.Zero;
       }
       remainingCollateral = remainingCollateral.sub(collateralDelta);
     }

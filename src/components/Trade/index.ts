@@ -10,6 +10,7 @@ import { getLiquidationPriceFromDelta } from "./getLiquidationPriceFromDelta";
 import { Position, contractPositionToPosition } from "./position";
 import { splitPositionArray } from "./splitPositionArray";
 import { getPositionTokenList } from "./getPositionTokenList";
+import { getNextAveragePrice } from "./getNextAveragePrice";
 
 export {
   getFundingFee,
@@ -24,5 +25,6 @@ export {
   Position,
   contractPositionToPosition,
   splitPositionArray,
-  getPositionTokenList
+  getPositionTokenList,
+  getNextAveragePrice
 };
