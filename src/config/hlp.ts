@@ -1,4 +1,4 @@
-import { BigNumber } from "ethers";
+import { ethers } from "ethers";
 import config from ".";
 import { Network, NetworkMap } from "../types/network";
 
@@ -15,11 +15,11 @@ export const MARGIN_FEE_BASIS_POINTS = 10;
 export const SWAP_FEE_BASIS_POINTS = 20;
 export const STABLE_SWAP_FEE_BASIS_POINTS = 1;
 export const PRICE_DECIMALS = 30;
-export const LIQUIDATION_FEE = BigNumber.from(2).mul(BigNumber.from(10).pow(PRICE_DECIMALS));
+export const LIQUIDATION_FEE = ethers.utils.parseUnits("2", PRICE_DECIMALS);
 export const MAX_LEVERAGE = 50 * BASIS_POINTS_DIVISOR;
 export const MIN_LEVERAGE = 1 * BASIS_POINTS_DIVISOR;
 export const FUNDING_FEE_DIVISOR = BASIS_POINTS_DIVISOR;
-export const FUNDING_RATE_PRECISION = 100_000;
+export const FUNDING_RATE_PRECISION = 1_000_000;
 export const MINT_BURN_FEE_BASIS_POINTS = 20;
 export const TAX_BASIS_POINTS = 10;
 export const STABLE_TAX_BASIS_POINTS = 5;

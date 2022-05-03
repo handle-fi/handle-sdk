@@ -8,7 +8,6 @@ import {
 } from "../../config/hlp";
 import { getLiquidationPriceFromDelta } from "./getLiquidationPriceFromDelta";
 import { getMarginFee } from "./getMarginFee";
-import { getPositionFee } from "./getPositionFee";
 import { Position } from "./position";
 
 type LiquidationDelta = {
@@ -35,10 +34,7 @@ export const getLiquidationPrice = (
       nextSize = size.sub(sizeDelta);
     }
 
-    const marginFee = getMarginFee(sizeDelta);
-    remainingCollateral = remainingCollateral.sub(marginFee);
-
-    if (!!deltaInfo && !hasProfit && !size.isZero()) {
+    if (sizeDelta && !hasProfit && !size.isZero()) {
       const adjustedDelta = sizeDelta.mul(delta).div(size);
       remainingCollateral = remainingCollateral.sub(adjustedDelta);
     }
@@ -55,7 +51,7 @@ export const getLiquidationPrice = (
     }
   }
 
-  let positionFee = getPositionFee(size).add(LIQUIDATION_FEE);
+  let positionFee = getMarginFee(size).add(LIQUIDATION_FEE);
   if (entryFundingRate && indexTokenCumulativeFundingRate) {
     const fundingFee = size
       .mul(indexTokenCumulativeFundingRate.sub(entryFundingRate))

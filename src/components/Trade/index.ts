@@ -1,7 +1,6 @@
 import { getFundingFee } from "./getFundingFee";
 import { getHlpFeeBasisPoints } from "./getHlpFeeBasisPoints";
 import { getLiquidationPrice } from "./getLiquidationPrice";
-import { getPositionFee } from "./getPositionFee";
 import { getSwapFee } from "./getSwapFee";
 import { getSwapFeeBasisPoints } from "./getSwapFeeBasisPoints";
 import { getTradeFee } from "./getTradeFee";
@@ -16,7 +15,6 @@ export {
   getFundingFee,
   getHlpFeeBasisPoints,
   getLiquidationPrice,
-  getPositionFee,
   getSwapFee,
   getSwapFeeBasisPoints,
   getTradeFee,
