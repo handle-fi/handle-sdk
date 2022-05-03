@@ -13,18 +13,18 @@ import { getNextAveragePrice } from "./getNextAveragePrice";
 import { getMarginFee } from "./getMarginFee";
 
 export {
+  contractPositionToPosition,
+  getFeeBasisPoints,
   getFundingFee,
   getHlpFeeBasisPoints,
   getLiquidationPrice,
+  getLiquidationPriceFromDelta,
+  getMarginFee,
+  getNextAveragePrice,
+  getPositionTokenList,
   getSwapFee,
   getSwapFeeBasisPoints,
   getTradeFee,
-  getFeeBasisPoints,
-  getLiquidationPriceFromDelta,
   Position,
-  getMarginFee,
-  contractPositionToPosition,
-  splitPositionArray,
-  getPositionTokenList,
-  getNextAveragePrice
+  splitPositionArray
 };
