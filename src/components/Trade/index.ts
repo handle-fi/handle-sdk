@@ -10,6 +10,7 @@ import { Position, contractPositionToPosition } from "./position";
 import { splitPositionArray } from "./splitPositionArray";
 import { getPositionTokenList } from "./getPositionTokenList";
 import { getNextAveragePrice } from "./getNextAveragePrice";
+import { getMarginFee } from "./getMarginFee";
 
 export {
   getFundingFee,
@@ -21,6 +22,7 @@ export {
   getFeeBasisPoints,
   getLiquidationPriceFromDelta,
   Position,
+  getMarginFee,
   contractPositionToPosition,
   splitPositionArray,
   getPositionTokenList,
