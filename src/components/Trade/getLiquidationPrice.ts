@@ -1,5 +1,4 @@
-import { BigNumber } from "ethers";
-import { ethers } from "hardhat";
+import { BigNumber, ethers } from "ethers";
 import {
   BASIS_POINTS_DIVISOR,
   FUNDING_RATE_PRECISION,
