@@ -1,8 +1,7 @@
 import { expect } from "chai";
-import { ethers } from "hardhat";
 import { getLiquidationPrice, Position } from "../../../src/components/Trade";
 import { TradeUtils } from "../../../src";
-import { BigNumber } from "ethers";
+import { BigNumber, ethers } from "ethers";
 
 const ZERO_POSITION = (
   indexToken = ethers.constants.AddressZero,
