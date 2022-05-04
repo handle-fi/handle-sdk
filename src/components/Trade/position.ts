@@ -1,6 +1,6 @@
 import { BigNumber, ethers } from "ethers";
-import { BASIS_POINTS_DIVISOR, PRICE_DECIMALS, USD_DISPLAY_DECIMALS } from "../../config/hlp";
-import { getPositionFee } from "./getPositionFee";
+import { BASIS_POINTS_DIVISOR } from "../../config/hlp";
+import { getMarginFee } from "./getMarginFee";
 
 export type Position = {
   collateralToken: string;
@@ -20,28 +20,12 @@ export type Position = {
   leverage: BigNumber;
 };
 
-export const formatPrice = (
-  price: BigNumber,
-  displayDecimals = USD_DISPLAY_DECIMALS,
-  showCurrency = true,
-  decimals = PRICE_DECIMALS
-) => {
-  if (!price) return "";
-  return `${(
-    +price.div(ethers.utils.parseUnits("1", decimals - displayDecimals)) /
-    10 ** displayDecimals
-  ).toLocaleString(undefined, {
-    minimumFractionDigits: displayDecimals,
-    maximumFractionDigits: displayDecimals
-  })}${showCurrency ? " USD" : ""}`;
-};
-
-export const contractPositionToPosition = async (
+export const contractPositionToPosition = (
   _position: BigNumber[],
   collateralToken: string,
   indexToken: string,
   isLong: boolean
-): Promise<Position> => {
+): Position => {
   const [
     size,
     collateral,
@@ -67,7 +51,7 @@ export const contractPositionToPosition = async (
     delta,
     isLong
   };
-  position.positionFee = getPositionFee(size);
+  position.positionFee = getMarginFee(size);
 
   if (position.collateral && position.collateral.gt(0)) {
     position.leverage =
