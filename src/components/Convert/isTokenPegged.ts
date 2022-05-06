@@ -24,7 +24,7 @@ export const isTokenPegged = async (
     return false;
   }
   const hpsm = HPSM__factory.connect(hpsmAddress, provider);
-  const isPegged = await hpsm.isFxTokenPegged(fxToken, pegToken);
+  const isPegged = await hpsm.isFxTokenPegged(fxToken.toLowerCase(), pegToken.toLowerCase());
   pegCache[network][cacheKey] = isPegged;
   return isPegged;
 };

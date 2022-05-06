@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { ethers } from "ethers";
-import { Network } from "../../../src";
+import { HlpConfig, Network } from "../../../src";
 import Convert from "../../../src/components/Convert";
 import { HlpInfoMethods } from "../../../src/components/Trade/types";
 import { HLP_TOKENS, PRICE_DECIMALS } from "../../../src/config/hlp";
@@ -28,6 +28,8 @@ const sampleHlpTokenMethods: HlpInfoMethods = {
   getTotalTokenWeights: () => ethers.constants.One,
   getHlpPrice: () => FIVE_DOLLARS
 };
+
+const arbitrumProvider = new ethers.providers.JsonRpcProvider("https://arb1.arbitrum.io/rpc");
 
 describe("convert getQuote", () => {
   describe("WETH", () => {
@@ -238,6 +240,28 @@ describe("convert getQuote", () => {
       );
       expect(quote.sellAmount).to.eq(ethers.utils.parseEther("5").toString());
       expect(quote.buyAmount).to.eq(ethers.utils.parseEther("10").toString());
+    });
+  });
+  describe("hPSM", () => {
+    it("should return a quote for pegged tokens", async () => {
+      // fxUSD is assumed to be pegged to USDT
+      const usdt = getTokenDetails("USDT", "arbitrum");
+      const { quote } = await convert.getQuote(
+        {
+          toToken: { ...usdt, name: "" },
+          fromToken: fxUsd,
+          canUseHlp: true,
+          network: "arbitrum",
+          connectedAccount: ethers.constants.AddressZero,
+          fromAmount: ethers.utils.parseEther("5"),
+          gasPrice: ethers.constants.One,
+          provider: arbitrumProvider
+        },
+        sampleHlpTokenMethods
+      );
+      expect(quote.sellAmount).to.eq(ethers.utils.parseEther("5").toString());
+      expect(quote.buyAmount).to.eq(ethers.utils.parseEther("5").toString());
+      expect(quote.allowanceTarget).to.eq(HlpConfig.HLP_CONTRACTS.arbitrum?.HPSM);
     });
   });
 });

@@ -181,7 +181,7 @@ describe("convert getSwap", () => {
         hlpInfo: sampleHlpTokenMethods,
         sellAmount: ethers.utils.parseUnits("1", eth.decimals),
         buyAmount: ethers.utils.parseUnits("1", usdt.decimals),
-        signer: signer,
+        signer,
         slippage: 0.05
       });
       expect(tx).to.be.an("object");

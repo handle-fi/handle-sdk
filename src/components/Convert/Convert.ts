@@ -21,6 +21,7 @@ import { WETH__factory } from "../../contracts/factories/WETH__factory";
 import { isTokenPegged } from "./isTokenPegged";
 import { getPegStabilityTransaction } from "./getPegStabilityTransaction";
 import { getPegStabilityQuote } from "./getPegStabilityQuote";
+import { HlpConfig } from "../..";
 
 type GetQuoteArguments = {
   sellToken: string;
@@ -94,7 +95,7 @@ type GetQuoteInput = {
   connectedAccount: string | undefined;
   gasPrice: BigNumber | undefined;
   network: Network;
-  provider: ethers.providers.Provider | Signer;
+  provider?: ethers.providers.Provider | Signer;
 };
 
 type GetSwapTransactionArgs = {
@@ -135,13 +136,12 @@ export default class Convert {
 
     const weth = getNativeWrappedToken(network)?.address;
 
-    const isPsmWithdraw = await isTokenPegged(
-      fromToken.address,
-      toToken.address,
-      provider,
-      network
-    );
-    const isPsmDeposit = await isTokenPegged(toToken.address, fromToken.address, provider, network);
+    let isPsmDeposit = false;
+    let isPsmWithdraw = false;
+    if (HlpConfig.HLP_CONTRACTS[network]?.HPSM && provider) {
+      isPsmWithdraw = await isTokenPegged(fromToken.address, toToken.address, provider, network);
+      isPsmDeposit = await isTokenPegged(toToken.address, fromToken.address, provider, network);
+    }
 
     if (
       (fromToken.isNative && toToken.address === weth) ||
@@ -158,7 +158,7 @@ export default class Convert {
       };
     }
 
-    if (isPsmDeposit || isPsmWithdraw) {
+    if ((isPsmDeposit || isPsmWithdraw) && provider) {
       return getPegStabilityQuote({
         network,
         fromToken: fromToken.address,
@@ -281,8 +281,12 @@ export default class Convert {
       .mul(BASIS_POINTS_DIVISOR - slippage * 100)
       .div(BASIS_POINTS_DIVISOR);
 
-    const isPsmWithdraw = await isTokenPegged(fromToken.address, toToken.address, signer, network);
-    const isPsmDeposit = await isTokenPegged(toToken.address, fromToken.address, signer, network);
+    let isPsmDeposit = false;
+    let isPsmWithdraw = false;
+    if (HlpConfig.HLP_CONTRACTS[network]?.HPSM) {
+      isPsmWithdraw = await isTokenPegged(fromToken.address, toToken.address, signer, network);
+      isPsmDeposit = await isTokenPegged(toToken.address, fromToken.address, signer, network);
+    }
 
     if (fromToken.isNative && toToken.address === weth) {
       tx = await WETH__factory.connect(weth, signer).populateTransaction.deposit({
