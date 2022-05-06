@@ -18,6 +18,9 @@ import { getHlpTokenQuote } from "./getHlpTokenQuote";
 import { getSwapFeeBasisPoints } from "../Trade/getSwapFeeBasisPoints";
 import { getHlpTokenSwap, getLiquidityTokenSwap } from "./hlpSwapTransaction";
 import { WETH__factory } from "../../contracts/factories/WETH__factory";
+import { isTokenPegged } from "./isTokenPegged";
+import { getPegStabilityTransaction } from "./getPegStabilityTransaction";
+import { getPegStabilityQuote } from "./getPegStabilityQuote";
 
 type GetQuoteArguments = {
   sellToken: string;
@@ -91,6 +94,7 @@ type GetQuoteInput = {
   connectedAccount: string | undefined;
   gasPrice: BigNumber | undefined;
   network: Network;
+  provider: ethers.providers.Provider | Signer;
 };
 
 type GetSwapTransactionArgs = {
@@ -118,10 +122,26 @@ export default class Convert {
     input: GetQuoteInput,
     hlpInfo: HlpInfoMethods
   ): Promise<{ quote: Quote; feeBasisPoints?: BigNumber }> => {
-    const { canUseHlp, fromToken, toToken, fromAmount, connectedAccount, gasPrice, network } =
-      input;
+    const {
+      provider,
+      canUseHlp,
+      fromToken,
+      toToken,
+      fromAmount,
+      connectedAccount,
+      gasPrice,
+      network
+    } = input;
 
     const weth = getNativeWrappedToken(network)?.address;
+
+    const isPsmWithdraw = await isTokenPegged(
+      fromToken.address,
+      toToken.address,
+      provider,
+      network
+    );
+    const isPsmDeposit = await isTokenPegged(toToken.address, fromToken.address, provider, network);
 
     if (
       (fromToken.isNative && toToken.address === weth) ||
@@ -136,6 +156,16 @@ export default class Convert {
         },
         feeBasisPoints: ethers.constants.Zero
       };
+    }
+
+    if (isPsmDeposit || isPsmWithdraw) {
+      return getPegStabilityQuote({
+        network,
+        fromToken: fromToken.address,
+        toToken: toToken.address,
+        fromAmount,
+        provider
+      });
     }
 
     // If tokens are hLP, go increase / decrease liquidity
@@ -251,12 +281,23 @@ export default class Convert {
       .mul(BASIS_POINTS_DIVISOR - slippage * 100)
       .div(BASIS_POINTS_DIVISOR);
 
+    const isPsmWithdraw = await isTokenPegged(fromToken.address, toToken.address, signer, network);
+    const isPsmDeposit = await isTokenPegged(toToken.address, fromToken.address, signer, network);
+
     if (fromToken.isNative && toToken.address === weth) {
       tx = await WETH__factory.connect(weth, signer).populateTransaction.deposit({
         value: sellAmount
       });
     } else if (toToken.isNative && fromToken.address === weth) {
       tx = await WETH__factory.connect(weth, signer).populateTransaction.withdraw(sellAmount);
+    } else if (isPsmDeposit || isPsmWithdraw) {
+      tx = await getPegStabilityTransaction({
+        fromAmount: buyAmount,
+        toToken: toToken.address,
+        fromToken: fromToken.address,
+        network,
+        signer
+      });
     } else if (fromToken.symbol === "hLP" || toToken.symbol === "hLP") {
       tx = await getHlpTokenSwap({
         fromToken,
