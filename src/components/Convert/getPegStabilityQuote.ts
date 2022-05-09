@@ -26,7 +26,7 @@ export const getPegStabilityQuote = async ({
 }): Promise<{ quote: Quote; feeBasisPoints?: BigNumber }> => {
   const hpsmAddress = HlpConfig.HLP_CONTRACTS[network]?.HPSM;
   if (!hpsmAddress) {
-    throw new Error("No HPSM for network '" + network + "'");
+    throw new Error(`No HPSM for network ${network}`);
   }
   if (!transactionFeeCache[network]) {
     const hpsm = HPSM__factory.connect(hpsmAddress, provider);
