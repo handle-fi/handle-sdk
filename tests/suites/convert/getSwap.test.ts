@@ -2,14 +2,12 @@ import { expect } from "chai";
 // import { Network } from "../../../src";
 import Convert from "../../../src/components/Convert";
 import { HlpInfoMethods } from "../../../src/components/Trade/types";
-import { HLP_CONTRACTS, HLP_TOKENS, PRICE_DECIMALS } from "../../../src/config/hlp";
+import { HLP_TOKENS, PRICE_DECIMALS } from "../../../src/config/hlp";
 import { getHlpToken, getNativeWrappedToken } from "../../../src/utils/hlp";
-// @ts-ignore ethers context is injected in hardhat config
 import { ethers } from "hardhat";
-import { HlpManagerRouter__factory, WETH__factory } from "../../../src/contracts";
 import { Signer, VoidSigner } from "ethers";
 import { getTokenDetails } from "../../../src/utils/token-utils";
-import { HlpManager__factory } from "../../../src/contracts/factories/HlpManager__factory";
+import { HlpConfig } from "../../../src";
 
 const convert = new Convert();
 
@@ -34,35 +32,15 @@ const sampleHlpTokenMethods: HlpInfoMethods = {
   getHlpPrice: () => FIVE_DOLLARS
 };
 
-let signerWithAssets: Signer;
+let signer: Signer;
 
 describe("convert getSwap", () => {
   before(async () => {
-    const signer = ethers.provider.getSigner(0);
-    signerWithAssets = signer;
-    const address = await signerWithAssets.getAddress();
-    const weth = WETH__factory.connect(getNativeWrappedToken()?.address!, signer);
-    // gives signer weth
-    const wethPromise = weth.deposit({
-      value: ethers.utils.parseEther("1")
-    });
-    const hlpManagerRouter = HlpManagerRouter__factory.connect(
-      HLP_CONTRACTS["arbitrum"]?.HlpManagerRouter!,
-      signer
-    );
-    const hlpManager = HlpManager__factory.connect(HLP_CONTRACTS["arbitrum"]?.HlpManager!, signer);
-    // gives signer hlp
-    const hlpPromise = hlpManagerRouter.addLiquidityETH(0, 0, {
-      value: ethers.utils.parseEther("2")
-    });
-    // gives signer fxusd
-    const fxUsdPromise = hlpManager.removeLiquidity(
-      fxUsd.address,
-      ethers.utils.parseUnits("1000", PRICE_DECIMALS),
-      0,
-      address
-    );
-    await Promise.all([wethPromise, hlpPromise, fxUsdPromise]);
+    signer = ethers.provider.getSigner(0);
+
+    // Estimate gas is overriden so that getSwap does not revert for testing
+    // since the testing address does not always have enough funds
+    signer.estimateGas = async () => ethers.constants.Zero;
   });
   describe("WETH", () => {
     it("should return a transaction from eth to weth", async () => {
@@ -71,12 +49,12 @@ describe("convert getSwap", () => {
         toToken: weth,
         canUseHlp: false,
         network: "arbitrum",
-        connectedAccount: await signerWithAssets.getAddress(),
+        connectedAccount: await signer.getAddress(),
         gasPrice: ethers.constants.One,
         hlpInfo: sampleHlpTokenMethods,
         buyAmount: ethers.utils.parseEther("0.01"),
         sellAmount: ethers.utils.parseEther("0.01"),
-        signer: signerWithAssets,
+        signer: signer,
         slippage: 0.05
       });
       expect(tx).to.be.an("object");
@@ -87,12 +65,12 @@ describe("convert getSwap", () => {
         toToken: eth,
         canUseHlp: false,
         network: "arbitrum",
-        connectedAccount: await signerWithAssets.getAddress(),
+        connectedAccount: await signer.getAddress(),
         gasPrice: ethers.utils.parseUnits("1", "gwei"),
         hlpInfo: sampleHlpTokenMethods,
         buyAmount: ethers.utils.parseEther("0.01"),
         sellAmount: ethers.utils.parseEther("0.01"),
-        signer: signerWithAssets,
+        signer: signer,
         slippage: 0.05
       });
       expect(tx).to.be.an("object");
@@ -105,12 +83,12 @@ describe("convert getSwap", () => {
         toToken: fxUsd,
         canUseHlp: false,
         network: "arbitrum",
-        connectedAccount: await signerWithAssets.getAddress(),
+        connectedAccount: await signer.getAddress(),
         gasPrice: ethers.utils.parseUnits("1", "gwei"),
         hlpInfo: sampleHlpTokenMethods,
         sellAmount: ethers.utils.parseUnits("1", hlp.decimals),
         buyAmount: ethers.utils.parseUnits("1", fxUsd.decimals),
-        signer: signerWithAssets,
+        signer: signer,
         slippage: 0.05
       });
       expect(tx).to.be.an("object");
@@ -121,13 +99,13 @@ describe("convert getSwap", () => {
         toToken: eth,
         canUseHlp: false,
         network: "arbitrum",
-        connectedAccount: await signerWithAssets.getAddress(),
+        connectedAccount: await signer.getAddress(),
         gasPrice: ethers.utils.parseUnits("1", "gwei"),
         hlpInfo: sampleHlpTokenMethods,
         sellAmount: ethers.utils.parseUnits("1", hlp.decimals),
         // price of eth fluctuates, so set buy amount to zero
         buyAmount: ethers.utils.parseUnits("0", eth.decimals),
-        signer: signerWithAssets,
+        signer: signer,
         slippage: 0.05
       });
       expect(tx).to.be.an("object");
@@ -138,12 +116,12 @@ describe("convert getSwap", () => {
         toToken: hlp,
         canUseHlp: false,
         network: "arbitrum",
-        connectedAccount: await signerWithAssets.getAddress(),
+        connectedAccount: await signer.getAddress(),
         gasPrice: ethers.utils.parseUnits("1", "gwei"),
         hlpInfo: sampleHlpTokenMethods,
         sellAmount: ethers.utils.parseUnits("1", fxUsd.decimals),
         buyAmount: ethers.utils.parseUnits("1", hlp.decimals),
-        signer: signerWithAssets,
+        signer: signer,
         slippage: 0.05
       });
       expect(tx).to.be.an("object");
@@ -154,13 +132,13 @@ describe("convert getSwap", () => {
         toToken: hlp,
         canUseHlp: false,
         network: "arbitrum",
-        connectedAccount: await signerWithAssets.getAddress(),
+        connectedAccount: await signer.getAddress(),
         gasPrice: ethers.utils.parseUnits("1", "gwei"),
         hlpInfo: sampleHlpTokenMethods,
         sellAmount: ethers.utils.parseUnits("1", eth.decimals),
         // price of eth fluctuates, so set buy amount to zero
         buyAmount: ethers.utils.parseUnits("0", fxUsd.decimals),
-        signer: signerWithAssets,
+        signer: signer,
         slippage: 0.05
       });
       expect(tx).to.be.an("object");
@@ -194,13 +172,13 @@ describe("convert getSwap", () => {
         toToken: fxAud,
         canUseHlp: true,
         network: "arbitrum",
-        connectedAccount: await signerWithAssets.getAddress(),
+        connectedAccount: await signer.getAddress(),
         gasPrice: ethers.utils.parseUnits("1", "gwei"),
         hlpInfo: sampleHlpTokenMethods,
         sellAmount: ethers.utils.parseUnits("1", fxUsd.decimals),
         // price of fxUsd / fxAud fluctuates, so set buy amount to zero
         buyAmount: ethers.utils.parseUnits("0", fxAud.decimals),
-        signer: signerWithAssets,
+        signer: signer,
         slippage: 0.05
       });
       expect(tx).to.be.an("object");
@@ -211,16 +189,54 @@ describe("convert getSwap", () => {
         toToken: eth,
         canUseHlp: true,
         network: "arbitrum",
-        connectedAccount: await signerWithAssets.getAddress(),
+        connectedAccount: await signer.getAddress(),
         gasPrice: ethers.utils.parseUnits("1", "gwei"),
         hlpInfo: sampleHlpTokenMethods,
         sellAmount: ethers.utils.parseUnits("1", fxUsd.decimals),
         // price of fxUsd / eth fluctuates, so set buy amount to zero
         buyAmount: ethers.utils.parseUnits("0", eth.decimals),
-        signer: signerWithAssets,
+        signer: signer,
         slippage: 0.05
       });
       expect(tx).to.be.an("object");
+    });
+  });
+  describe("HPSM", () => {
+    it("should return a swap to pegged tokens", async () => {
+      const usdt = getTokenDetails("USDT", "arbitrum");
+      const { tx } = await convert.getSwap({
+        fromToken: { ...usdt, name: "Tether USD" },
+        toToken: fxUsd,
+        canUseHlp: false,
+        network: "arbitrum",
+        connectedAccount: await signer.getAddress(),
+        gasPrice: ethers.utils.parseUnits("1", "gwei"),
+        hlpInfo: sampleHlpTokenMethods,
+        sellAmount: ethers.utils.parseUnits("1", usdt.decimals),
+        buyAmount: ethers.utils.parseUnits("1", fxUsd.decimals),
+        signer: signer,
+        slippage: 0.05
+      });
+      expect(tx).to.be.an("object");
+      expect(tx.to).to.eq(HlpConfig.HLP_CONTRACTS.arbitrum?.HPSM);
+    });
+    it("should return a swap from pegged tokens", async () => {
+      const usdt = getTokenDetails("USDT", "arbitrum");
+      const { tx } = await convert.getSwap({
+        toToken: { ...usdt, name: "Tether USD" },
+        fromToken: fxUsd,
+        canUseHlp: false,
+        network: "arbitrum",
+        connectedAccount: await signer.getAddress(),
+        gasPrice: ethers.utils.parseUnits("1", "gwei"),
+        hlpInfo: sampleHlpTokenMethods,
+        sellAmount: ethers.utils.parseUnits("1", usdt.decimals),
+        buyAmount: ethers.utils.parseUnits("1", fxUsd.decimals),
+        signer: signer,
+        slippage: 0.05
+      });
+      expect(tx).to.be.an("object");
+      expect(tx.to).to.eq(HlpConfig.HLP_CONTRACTS.arbitrum?.HPSM);
     });
   });
 });
