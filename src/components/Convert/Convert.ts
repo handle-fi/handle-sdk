@@ -82,6 +82,7 @@ export type ConvertQuoteInput = {
   connectedAccount: string | undefined;
   gasPrice: BigNumber | undefined;
   network: Network;
+  hlpMethods?: HlpInfoMethods;
   provider?: ethers.providers.Provider | Signer;
 };
 
@@ -100,7 +101,7 @@ export type ConvertTransactionInput = {
   buyAmount: BigNumber;
   sellAmount: BigNumber;
   slippage: number;
-  hlpInfo: HlpInfoMethods;
+  hlpMethods?: HlpInfoMethods;
   gasPrice: BigNumber;
   connectedAccount: string;
   canUseHlp: boolean;
@@ -262,7 +263,7 @@ export default class Convert {
     buyAmount,
     sellAmount,
     slippage,
-    hlpInfo,
+    hlpMethods: hlpInfo,
     gasPrice,
     connectedAccount,
     canUseHlp,
