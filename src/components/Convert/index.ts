@@ -1,5 +1,5 @@
-import Convert, { Quote, Swap } from "./Convert";
+import Convert, { Quote, Transaction } from "./Convert";
 
-export { Quote, Swap };
+export { Quote, Transaction as Swap };
 
 export default Convert;

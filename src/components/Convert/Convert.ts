@@ -44,19 +44,6 @@ type GetSwapArguments = {
   network: ConvertNetwork;
 };
 
-export type Quote = {
-  buyAmount: string;
-  sellAmount: string;
-  gas: string;
-  allowanceTarget: string;
-};
-
-export type Swap = Quote & {
-  to: string;
-  value: string;
-  data: string;
-};
-
 type ZeroXQuoteParams = {
   buyToken: string;
   sellToken: string;
@@ -87,7 +74,7 @@ type OneInchSwapParams = OneInchQuoteParams & {
   referrerAddress: string;
 };
 
-type GetQuoteInput = {
+export type ConvertQuoteInput = {
   canUseHlp: boolean;
   fromToken: HlpToken;
   toToken: HlpToken;
@@ -98,7 +85,15 @@ type GetQuoteInput = {
   provider?: ethers.providers.Provider | Signer;
 };
 
-type GetSwapTransactionArgs = {
+export type Quote = {
+  buyAmount: string;
+  sellAmount: string;
+  gas: number;
+  allowanceTarget: string;
+  feeBasisPoints: number;
+};
+
+export type ConvertTransactionInput = {
   network: Network;
   fromToken: HlpToken;
   toToken: HlpToken;
@@ -112,6 +107,8 @@ type GetSwapTransactionArgs = {
   signer: Signer;
 };
 
+export type Transaction = ethers.PopulatedTransaction;
+
 const NETWORK_TO_TOKENS: ConvertNetworkMap<TokenExtended<string>[]> = {
   ethereum,
   arbitrum,
@@ -120,7 +117,7 @@ const NETWORK_TO_TOKENS: ConvertNetworkMap<TokenExtended<string>[]> = {
 
 export default class Convert {
   public getQuote = async (
-    input: GetQuoteInput,
+    input: ConvertQuoteInput,
     hlpInfo: HlpInfoMethods
   ): Promise<{ quote: Quote; feeBasisPoints?: BigNumber }> => {
     const {
@@ -270,7 +267,7 @@ export default class Convert {
     connectedAccount,
     canUseHlp,
     signer
-  }: GetSwapTransactionArgs): Promise<{
+  }: ConvertTransactionInput): Promise<{
     tx: PopulatedTransaction;
     gasEstimate: BigNumber;
   }> => {
@@ -373,7 +370,7 @@ export default class Convert {
     gasPrice,
     fromAddress,
     network
-  }: GetSwapArguments): Promise<Swap> => {
+  }: GetSwapArguments): Promise<Transaction> => {
     if (sellAmount && buyAmount) {
       throw new Error("Can't set both sell and buy amounts");
     }
@@ -435,7 +432,7 @@ export default class Convert {
     return {
       buyAmount: data.buyAmount,
       sellAmount: data.sellAmount,
-      gas: data.gas,
+      gas: Number(data.gas),
       allowanceTarget: data.allowanceTarget
     };
   };
@@ -468,7 +465,7 @@ export default class Convert {
     return {
       buyAmount: data.toTokenAmount,
       sellAmount: data.fromTokenAmount,
-      gas: data.estimatedGas,
+      gas: Number(data.estimatedGas),
       allowanceTarget
     };
   };
@@ -482,7 +479,7 @@ export default class Convert {
     gasPrice: BigNumber,
     takerAddress: string,
     network: ConvertNetwork
-  ): Promise<Swap> => {
+  ): Promise<Transaction> => {
     const fee = await this.getFeeAsPercentage(network, sellToken, buyToken);
 
     const params: ZeroXSwapParams = {
@@ -521,7 +518,7 @@ export default class Convert {
     gasPrice: BigNumber,
     fromAddress: string,
     network: ConvertNetwork
-  ): Promise<Swap> => {
+  ): Promise<Transaction> => {
     const fee = await this.getFeeAsPercentage(network, sellToken, buyToken);
 
     const params: OneInchSwapParams = {
