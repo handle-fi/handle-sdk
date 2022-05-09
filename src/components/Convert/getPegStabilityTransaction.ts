@@ -23,13 +23,11 @@ export const getPegStabilityTransaction = async ({
   const hpsm = HPSM__factory.connect(hpsmAddress, signer);
   const isWithdraw = await isTokenPegged(fromToken, toToken, signer, network);
   const isDeposit = await isTokenPegged(toToken, fromToken, signer, network);
-  let tx: ethers.PopulatedTransaction;
   if (isDeposit) {
-    tx = await hpsm.populateTransaction.deposit(toToken, fromToken, fromAmount);
-  } else if (isWithdraw) {
-    tx = await hpsm.populateTransaction.withdraw(fromToken, toToken, fromAmount);
-  } else {
-    throw new Error(`There is no peg between ${fromToken} and ${toToken}`);
-  }
-  return tx;
+    return(await hpsm.populateTransaction.deposit(toToken, fromToken, fromAmount));
+  } 
+  if (isWithdraw) {
+    return(await hpsm.populateTransaction.withdraw(fromToken, toToken, fromAmount));
+  } 
+  throw new Error(`There is no peg between ${fromToken} and ${toToken}`);
 };
