@@ -7,25 +7,26 @@ import {
   PRICE_DECIMALS
 } from "../../../config/hlp";
 import { HlpManagerRouter__factory, HlpManager__factory } from "../../../contracts";
-import { isHlpToken, tryParseNativeHlpToken } from "../../../utils/hlp";
+import { isHlpSupportedToken, tryParseNativeHlpToken } from "../../../utils/hlp";
 import { getHlpFeeBasisPoints } from "../../Trade";
 import { ConvertQuoteInput, ConvertTransactionInput, Quote } from "../Convert";
 import { HLP_TOKEN_WEIGHT, WeightInput } from "./weights";
 
-const hlpTokenWeight = async (input: WeightInput) => {
+const hlpBuyRemoveWeight = async (input: WeightInput) => {
   if (!HlpConfig.HLP_CONTRACTS[input.network]?.HlpManager) {
     return 0;
   }
   if (
-    (input.toToken.symbol === "hLP" && isHlpToken(input.fromToken.symbol, input.network)) ||
-    (input.fromToken.symbol === "hLP" && isHlpToken(input.toToken.symbol, input.network))
+    (input.toToken.symbol === "hLP" &&
+      isHlpSupportedToken(input.fromToken.symbol, input.network)) ||
+    (input.fromToken.symbol === "hLP" && isHlpSupportedToken(input.toToken.symbol, input.network))
   ) {
     return HLP_TOKEN_WEIGHT;
   }
   return 0;
 };
 
-const hlpTokenQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote> => {
+const hlpBuyRemoveQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote> => {
   const { network, fromToken, toToken, hlpMethods, fromAmount } = input;
   const hlpManagerAddress = HLP_CONTRACTS[network]?.HlpManager;
 
@@ -38,31 +39,31 @@ const hlpTokenQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote> =>
   const isBuyingHlp = toToken.symbol === "hLP";
   const hLPPrice = hlpMethods.getHlpPrice(isBuyingHlp);
 
-  // If buying hlp, then usdg delta is the price of the swap token (mul by the amount)
-  let usdgDelta = hlpMethods
+  // If buying hlp, then usdHlp delta is the price of the swap token (mul by the amount)
+  let usdHlpDelta = hlpMethods
     .getMinPrice(parsedFromTokenAddress)
     .mul(fromAmount)
     .div(ethers.utils.parseUnits("1", PRICE_DECIMALS));
 
-  // if selling hlp, then usdg delta is the price of the hlp token (mul by the amount)
+  // if selling hlp, then usdHlp delta is the price of the hlp token (mul by the amount)
   if (!isBuyingHlp) {
-    usdgDelta = hLPPrice.mul(fromAmount).div(ethers.utils.parseUnits("1", 18));
+    usdHlpDelta = hLPPrice.mul(fromAmount).div(ethers.utils.parseUnits("1", 18));
   }
 
   const feeBasisPoints = getHlpFeeBasisPoints({
     token: isBuyingHlp ? parsedFromTokenAddress : parsedToTokenAddress,
-    usdgDelta,
+    usdHlpDelta,
     isBuy: isBuyingHlp,
     totalTokenWeights: hlpMethods.getTotalTokenWeights(),
-    targetUsdgAmount: hlpMethods.getTargetUsdgAmount(
+    targetUsdHlpAmount: hlpMethods.getTargetUsdHlpAmount(
       isBuyingHlp ? parsedFromTokenAddress : parsedToTokenAddress
     ),
     getTokenInfo: hlpMethods.getTokenInfo,
-    usdgSupply: hlpMethods.getUsdgSupply()
+    usdHlpSupply: hlpMethods.getUsdHlpSupply()
   });
 
   if (isBuyingHlp) {
-    const hlpAmount = usdgDelta.mul(ethers.utils.parseUnits("1", PRICE_DECIMALS)).div(hLPPrice);
+    const hlpAmount = usdHlpDelta.mul(ethers.utils.parseUnits("1", PRICE_DECIMALS)).div(hLPPrice);
 
     return {
       allowanceTarget: hlpManagerAddress,
@@ -72,8 +73,8 @@ const hlpTokenQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote> =>
       feeBasisPoints: feeBasisPoints.toNumber()
     };
   } else {
-    // The buy amount is the usdg delta divided by the price of the token (adjusted for decimals)
-    const buyAmount = usdgDelta
+    // The buy amount is the usdHlp delta divided by the price of the token (adjusted for decimals)
+    const buyAmount = usdHlpDelta
       .mul(ethers.utils.parseUnits("1", toToken.decimals))
       .div(
         hlpMethods.getMaxPrice(parsedToTokenAddress).isZero()
@@ -91,7 +92,7 @@ const hlpTokenQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote> =>
   }
 };
 
-const hlpTokenTransactionHandler = async (
+const hlpBuyRemoveTransactionHandler = async (
   input: ConvertTransactionInput
 ): Promise<ethers.PopulatedTransaction> => {
   const {
@@ -145,7 +146,7 @@ const hlpTokenTransactionHandler = async (
     }
   } else {
     // buying hlp
-    const minPriceInUsdg = hlpInfo
+    const minPriceInUsdHlp = hlpInfo
       .getMinPrice(fromToken.address)
       .mul(10_000 - slippage * 100)
       .div(ethers.utils.parseUnits("1", PRICE_DECIMALS - 18))
@@ -154,7 +155,7 @@ const hlpTokenTransactionHandler = async (
     if (fromToken.isNative) {
       // if is native
       return hlpManagerRouter.populateTransaction.addLiquidityETH(
-        minPriceInUsdg,
+        minPriceInUsdHlp,
         buyAmountWithTolerance,
         {
           value: BigNumber.from(sellAmount)
@@ -165,7 +166,7 @@ const hlpTokenTransactionHandler = async (
       return hlpManager.populateTransaction.addLiquidity(
         fromAddress,
         BigNumber.from(sellAmount),
-        minPriceInUsdg,
+        minPriceInUsdHlp,
         buyAmountWithTolerance
       );
     }
@@ -173,7 +174,7 @@ const hlpTokenTransactionHandler = async (
 };
 
 export default {
-  weight: hlpTokenWeight,
-  quote: hlpTokenQuoteHandler,
-  transaction: hlpTokenTransactionHandler
+  weight: hlpBuyRemoveWeight,
+  quote: hlpBuyRemoveQuoteHandler,
+  transaction: hlpBuyRemoveTransactionHandler
 };

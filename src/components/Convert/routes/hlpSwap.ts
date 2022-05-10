@@ -6,24 +6,24 @@ import { getSwapFeeBasisPoints } from "../../Trade";
 import { ConvertQuoteInput, ConvertTransactionInput, Quote } from "../Convert";
 import { LIQUIDITY_WEIGHT, WeightInput } from "./weights";
 
-const liquidityPoolWeight = async (input: WeightInput): Promise<number> => {
+const hlpSwapWeight = async (input: WeightInput): Promise<number> => {
   const routerAddress = HlpConfig.HLP_CONTRACTS[input.network]?.Router;
   if (
     routerAddress &&
-    HlpUtils.isHlpToken(input.toToken.symbol, input.network) &&
-    HlpUtils.isHlpToken(input.fromToken.symbol, input.network)
+    HlpUtils.isHlpSupportedToken(input.toToken.symbol, input.network) &&
+    HlpUtils.isHlpSupportedToken(input.fromToken.symbol, input.network)
   ) {
     return LIQUIDITY_WEIGHT;
   }
   return 0;
 };
 
-const liquidityPoolQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote> => {
+const hlpSwapQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote> => {
   const { network, fromToken, toToken, hlpMethods, fromAmount } = input;
   const routerAddress = HlpConfig.HLP_CONTRACTS[network]?.Router;
 
   if (!routerAddress) throw new Error(`Network ${network} does not have a Router contract`);
-  if (!hlpMethods) throw new Error("hlpMethods is required for a liquidityPool quote");
+  if (!hlpMethods) throw new Error("hlpMethods is required for a hlpSwap quote");
 
   // Parse ETH address into WETH address.
   const { address: parsedFromTokenAddress } = tryParseNativeHlpToken(fromToken, network);
@@ -37,14 +37,14 @@ const liquidityPoolQuoteHandler = async (input: ConvertQuoteInput): Promise<Quot
   const feeBasisPoints = getSwapFeeBasisPoints({
     tokenIn: parsedFromTokenAddress,
     tokenOut: parsedToTokenAddress,
-    usdgDelta: priceIn
+    usdHlpDelta: priceIn
       .mul(fromAmount)
       .mul(ethers.utils.parseUnits("1", 18))
       .div(ethers.utils.parseUnits("1", HlpConfig.PRICE_DECIMALS))
       .div(ethers.utils.parseUnits("1", fromToken.decimals)),
-    usdgSupply: hlpMethods.getUsdgSupply(),
+    usdHlpSupply: hlpMethods.getUsdHlpSupply(),
     totalTokenWeights: hlpMethods.getTotalTokenWeights(),
-    targetUsdgAmount: hlpMethods.getTargetUsdgAmount(parsedFromTokenAddress),
+    targetUsdHlpAmount: hlpMethods.getTargetUsdHlpAmount(parsedFromTokenAddress),
     getTokenInfo: hlpMethods.getTokenInfo
   });
 
@@ -57,7 +57,7 @@ const liquidityPoolQuoteHandler = async (input: ConvertQuoteInput): Promise<Quot
   };
 };
 
-const liquidityPoolTransactionHandler = async (
+const hlpSwapTransactionHandler = async (
   input: ConvertTransactionInput
 ): Promise<ethers.PopulatedTransaction> => {
   const { network, connectedAccount, signer, fromToken, toToken, buyAmount, slippage, sellAmount } =
@@ -101,7 +101,7 @@ const liquidityPoolTransactionHandler = async (
 };
 
 export default {
-  weight: liquidityPoolWeight,
-  quote: liquidityPoolQuoteHandler,
-  transaction: liquidityPoolTransactionHandler
+  weight: hlpSwapWeight,
+  quote: hlpSwapQuoteHandler,
+  transaction: hlpSwapTransactionHandler
 };

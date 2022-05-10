@@ -17,7 +17,7 @@ export const getHlpTokenBySymbol = (symbol: string, network = DEFAULT_HLP_NETWOR
 export const getHlpTokenByAddress = (address: string, network = DEFAULT_HLP_NETWORK) =>
   HLP_TOKENS[network]?.find((x) => x.address === address);
 
-export const isHlpToken = (symbol: string, network: Network) => {
+export const isHlpSupportedToken = (symbol: string, network: Network) => {
   return !!HLP_TOKENS[network].some((_token) => {
     return _token.symbol === symbol;
   });

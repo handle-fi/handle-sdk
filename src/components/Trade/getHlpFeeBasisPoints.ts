@@ -6,11 +6,11 @@ import { getFeeBasisPoints } from "./getFeeBasisPoints";
 
 export const getHlpFeeBasisPoints = (args: {
   token: string;
-  usdgDelta: BigNumber;
+  usdHlpDelta: BigNumber;
   isBuy: boolean;
-  usdgSupply: BigNumber;
+  usdHlpSupply: BigNumber;
   totalTokenWeights: BigNumber;
-  targetUsdgAmount: BigNumber;
+  targetUsdHlpAmount: BigNumber;
   getTokenInfo: (token: string) => VaultTokenInfo | undefined;
 }) => {
   return getFeeBasisPoints({

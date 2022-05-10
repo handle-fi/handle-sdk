@@ -22,9 +22,6 @@ export const psmWeight = async (input: WeightInput) => {
   const isWithdraw = await isTokenPegged(fromToken.address, toToken.address, provider, network);
   const isDeposit = await isTokenPegged(toToken.address, fromToken.address, provider, network);
 
-  if (!(isWithdraw || isDeposit)) {
-    throw new Error(`There is no peg between ${fromToken} and ${toToken}`);
-  }
   return isWithdraw || isDeposit ? PSM_WEIGHT : 0;
 };
 
@@ -78,6 +75,6 @@ export const psmTransactionHandler = async (
 
 export default {
   weight: psmWeight,
-  quoteHandler: psmQuoteHandler,
-  transactionHandler: psmTransactionHandler
+  quote: psmQuoteHandler,
+  transaction: psmTransactionHandler
 };

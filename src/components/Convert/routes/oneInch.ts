@@ -73,7 +73,8 @@ const oneInchTransactionHandler = async (
     toToken: { address: buyToken },
     gasPrice,
     sellAmount,
-    slippage
+    slippage,
+    connectedAccount
   } = input;
   const feePercentage = await getApiFeeAsPercentage(network, sellToken, buyToken);
 
@@ -81,7 +82,7 @@ const oneInchTransactionHandler = async (
     fromTokenAddress: sellToken,
     toTokenAddress: buyToken,
     amount: sellAmount.toString(),
-    fromAddress: sellToken,
+    fromAddress: connectedAccount,
     slippage: slippage.toString(),
     referrerAddress: config.convert.feeAddress,
     fee: feePercentage.toString(),
