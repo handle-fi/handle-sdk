@@ -12,7 +12,7 @@ import { getHlpFeeBasisPoints } from "../../Trade";
 import { ConvertQuoteInput, ConvertTransactionInput, Quote } from "../Convert";
 import { HLP_TOKEN_WEIGHT, WeightInput } from "./weights";
 
-const hlpBuyRemoveWeight = async (input: WeightInput) => {
+const hlpAddRemoveWeight = async (input: WeightInput) => {
   if (!HlpConfig.HLP_CONTRACTS[input.network]?.HlpManager) {
     return 0;
   }
@@ -26,7 +26,7 @@ const hlpBuyRemoveWeight = async (input: WeightInput) => {
   return 0;
 };
 
-const hlpBuyRemoveQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote> => {
+const hlpAddRemoveQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote> => {
   const { network, fromToken, toToken, hlpMethods, fromAmount } = input;
   const hlpManagerAddress = HLP_CONTRACTS[network]?.HlpManager;
 
@@ -92,7 +92,7 @@ const hlpBuyRemoveQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote
   }
 };
 
-const hlpBuyRemoveTransactionHandler = async (
+const hlpAddRemoveTransactionHandler = async (
   input: ConvertTransactionInput
 ): Promise<ethers.PopulatedTransaction> => {
   const {
@@ -174,7 +174,7 @@ const hlpBuyRemoveTransactionHandler = async (
 };
 
 export default {
-  weight: hlpBuyRemoveWeight,
-  quote: hlpBuyRemoveQuoteHandler,
-  transaction: hlpBuyRemoveTransactionHandler
+  weight: hlpAddRemoveWeight,
+  quote: hlpAddRemoveQuoteHandler,
+  transaction: hlpAddRemoveTransactionHandler
 };
