@@ -1,8 +1,9 @@
 import axios from "axios";
+import { ethers } from "ethers";
 import { config } from "../../..";
 import { BASIS_POINTS_DIVISOR } from "../../../config/hlp";
 import { get1InchBaseUrl } from "../baseApiUrls";
-import { ConvertQuoteInput, ConvertTransactionInput, Quote, Transaction } from "../Convert";
+import { ConvertQuoteInput, ConvertTransactionInput, Quote } from "../Convert";
 import { getApiFeeAsPercentage } from "../getApiFeeAsPercentage";
 import { ONE_INCH_WEIGHT, WeightInput } from "./weights";
 
@@ -63,7 +64,9 @@ const oneInchQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote> => 
   };
 };
 
-const oneInchTransactionHandler = async (input: ConvertTransactionInput): Promise<Transaction> => {
+const oneInchTransactionHandler = async (
+  input: ConvertTransactionInput
+): Promise<ethers.PopulatedTransaction> => {
   const {
     network,
     fromToken: { address: sellToken },

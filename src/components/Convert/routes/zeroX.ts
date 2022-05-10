@@ -1,10 +1,11 @@
 import axios from "axios";
-import { ConvertQuoteInput, ConvertTransactionInput, Quote, Transaction } from "../Convert";
+import { ConvertQuoteInput, ConvertTransactionInput, Quote } from "../Convert";
 import { getApiFeeAsPercentage } from "../getApiFeeAsPercentage";
 import config from "../../../config";
 import { get0xBaseUrl } from "../baseApiUrls";
 import { BASIS_POINTS_DIVISOR } from "../../../config/hlp";
 import { WeightInput, ZERO_X_WEIGHT } from "./weights";
+import { ethers } from "ethers";
 
 type ZeroXQuoteParams = {
   buyToken: string;
@@ -63,7 +64,9 @@ const zeroXQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote> => {
   };
 };
 
-const zeroXTransactionHandler = async (input: ConvertTransactionInput): Promise<Transaction> => {
+const zeroXTransactionHandler = async (
+  input: ConvertTransactionInput
+): Promise<ethers.PopulatedTransaction> => {
   const {
     network,
     fromToken: { address: sellToken },

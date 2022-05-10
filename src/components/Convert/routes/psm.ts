@@ -2,7 +2,7 @@ import { BigNumber, ethers } from "ethers";
 import { HlpConfig, Network } from "../../..";
 import { PSM_GAS_LIMIT } from "../../../config/hlp";
 import { HPSM__factory } from "../../../contracts";
-import { ConvertQuoteInput, ConvertTransactionInput, Quote, Transaction } from "../Convert";
+import { ConvertQuoteInput, ConvertTransactionInput, Quote } from "../Convert";
 import { isTokenPegged } from "../isTokenPegged";
 import { PSM_WEIGHT, WeightInput } from "./weights";
 
@@ -58,7 +58,7 @@ export const psmQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote> 
 
 export const psmTransactionHandler = async (
   input: ConvertTransactionInput
-): Promise<Transaction> => {
+): Promise<ethers.PopulatedTransaction> => {
   const { network, signer, fromToken, toToken, buyAmount } = input;
   const hpsmAddress = HlpConfig.HLP_CONTRACTS[network]?.HPSM;
   if (!hpsmAddress) {

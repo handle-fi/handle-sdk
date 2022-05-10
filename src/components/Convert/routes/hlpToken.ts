@@ -1,4 +1,5 @@
 import { BigNumber, ethers } from "ethers";
+import { HlpConfig } from "../../..";
 import {
   BASIS_POINTS_DIVISOR,
   HLP_CONTRACTS,
@@ -6,24 +7,31 @@ import {
   PRICE_DECIMALS
 } from "../../../config/hlp";
 import { HlpManagerRouter__factory, HlpManager__factory } from "../../../contracts";
-import { tryParseNativeHlpToken } from "../../../utils/hlp";
+import { isHlpToken, tryParseNativeHlpToken } from "../../../utils/hlp";
 import { getHlpFeeBasisPoints } from "../../Trade";
-import { ConvertQuoteInput, ConvertTransactionInput, Quote, Transaction } from "../Convert";
-import { HLP_WEIGHT, WeightInput } from "./weights";
+import { ConvertQuoteInput, ConvertTransactionInput, Quote } from "../Convert";
+import { HLP_TOKEN_WEIGHT, WeightInput } from "./weights";
 
 const hlpTokenWeight = async (input: WeightInput) => {
-  if (input.toToken.symbol === "hLP" || input.fromToken.symbol === "hLP") {
-    return HLP_WEIGHT;
+  if (!HlpConfig.HLP_CONTRACTS[input.network]?.HlpManager) {
+    return 0;
   }
+  if (
+    (input.toToken.symbol === "hLP" && isHlpToken(input.fromToken.symbol, input.network)) ||
+    (input.fromToken.symbol === "hLP" && isHlpToken(input.toToken.symbol, input.network))
+  ) {
+    return HLP_TOKEN_WEIGHT;
+  }
+  return 0;
 };
 
 const hlpTokenQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote> => {
   const { network, fromToken, toToken, hlpMethods, fromAmount } = input;
+  const hlpManagerAddress = HLP_CONTRACTS[network]?.HlpManager;
 
+  if (!hlpManagerAddress) throw new Error(`Network ${network} does not have a HlpManager contract`);
   if (!hlpMethods) throw new Error("hlpMethods is required for a hlpToken quote");
 
-  const hlpManagerAddress = HLP_CONTRACTS[network]?.HlpManager;
-  if (!hlpManagerAddress) throw new Error("No HlpManager for this network");
   // Parse ETH address into WETH address.
   const { address: parsedFromTokenAddress } = tryParseNativeHlpToken(fromToken, network);
   const { address: parsedToTokenAddress } = tryParseNativeHlpToken(toToken, network);
@@ -83,7 +91,9 @@ const hlpTokenQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote> =>
   }
 };
 
-const hlpTokenTransactionHandler = async (input: ConvertTransactionInput): Promise<Transaction> => {
+const hlpTokenTransactionHandler = async (
+  input: ConvertTransactionInput
+): Promise<ethers.PopulatedTransaction> => {
   const {
     network,
     signer,

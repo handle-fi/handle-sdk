@@ -75,7 +75,6 @@ type OneInchSwapParams = OneInchQuoteParams & {
 };
 
 export type ConvertQuoteInput = {
-  canUseHlp: boolean;
   fromToken: HlpToken;
   toToken: HlpToken;
   fromAmount: BigNumber;
@@ -104,11 +103,8 @@ export type ConvertTransactionInput = {
   hlpMethods?: HlpInfoMethods;
   gasPrice: BigNumber;
   connectedAccount: string;
-  canUseHlp: boolean;
   signer: Signer;
 };
-
-export type Transaction = ethers.PopulatedTransaction;
 
 const NETWORK_TO_TOKENS: ConvertNetworkMap<TokenExtended<string>[]> = {
   ethereum,
