@@ -69,10 +69,22 @@ export const psmQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote> 
     HlpConfig.BASIS_POINTS_DIVISOR
   ).div(TRANSACTION_FEE_UNIT);
 
+  let buyAmount = input.fromAmount;
+  if (input.fromToken.decimals > input.toToken.decimals) {
+    buyAmount = buyAmount.mul(
+      BigNumber.from(10).pow(input.fromToken.decimals - input.toToken.decimals)
+    );
+  }
+  if (input.toToken.decimals > input.fromToken.decimals) {
+    buyAmount = buyAmount.div(
+      BigNumber.from(10).pow(input.toToken.decimals - input.fromToken.decimals)
+    );
+  }
+
   const quote: Quote = {
     allowanceTarget: hpsmAddress,
-    buyAmount: input.fromAmount.toString(),
     sellAmount: input.fromAmount.toString(),
+    buyAmount: buyAmount.toString(),
     gas: PSM_GAS_LIMIT,
     feeBasisPoints: +transactionFeeBasisPoints
   };
