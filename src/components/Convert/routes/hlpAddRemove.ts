@@ -10,7 +10,7 @@ import { HlpManagerRouter__factory, HlpManager__factory } from "../../../contrac
 import { isHlpSupportedToken, tryParseNativeHlpToken } from "../../../utils/hlp";
 import { getHlpFeeBasisPoints } from "../../Trade";
 import { ConvertQuoteInput, ConvertTransactionInput, Quote } from "../Convert";
-import { HLP_TOKEN_WEIGHT, WeightInput } from "./weights";
+import { HLP_ADD_REMOVE_WEIGHT, WeightInput } from "./weights";
 
 const hlpAddRemoveWeight = async (input: WeightInput) => {
   if (!HlpConfig.HLP_CONTRACTS[input.network]?.HlpManager) {
@@ -21,7 +21,7 @@ const hlpAddRemoveWeight = async (input: WeightInput) => {
       isHlpSupportedToken(input.fromToken.symbol, input.network)) ||
     (input.fromToken.symbol === "hLP" && isHlpSupportedToken(input.toToken.symbol, input.network))
   ) {
-    return HLP_TOKEN_WEIGHT;
+    return HLP_ADD_REMOVE_WEIGHT;
   }
   return 0;
 };

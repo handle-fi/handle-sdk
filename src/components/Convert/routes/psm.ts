@@ -6,7 +6,7 @@ import { ConvertQuoteInput, ConvertTransactionInput, Quote } from "../Convert";
 import { isTokenPegged } from "../isTokenPegged";
 import { PSM_WEIGHT, WeightInput } from "./weights";
 
-let transactionFeeCache: Record<Network, BigNumber | null> = {
+const transactionFeeCache: Record<Network, BigNumber | null> = {
   arbitrum: null,
   ethereum: null,
   polygon: null
@@ -59,11 +59,13 @@ export const psmTransactionHandler = async (
   const { network, signer, fromToken, toToken, buyAmount } = input;
   const hpsmAddress = HlpConfig.HLP_CONTRACTS[network]?.HPSM;
   if (!hpsmAddress) {
-    throw new Error("No HPSM for network '" + network + "'");
+    throw new Error(`No HPSM for network ${network}`);
   }
   const hpsm = HPSM__factory.connect(hpsmAddress, signer);
-  const isWithdraw = await isTokenPegged(fromToken.address, toToken.address, signer, network);
-  const isDeposit = await isTokenPegged(toToken.address, fromToken.address, signer, network);
+  const [isWithdraw, isDeposit] = await Promise.all([
+    isTokenPegged(fromToken.address, toToken.address, signer, network),
+    isTokenPegged(toToken.address, fromToken.address, signer, network)
+  ]);
   if (isDeposit) {
     return hpsm.populateTransaction.deposit(toToken.address, fromToken.address, buyAmount);
   }

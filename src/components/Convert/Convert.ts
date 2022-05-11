@@ -3,6 +3,7 @@ import { Network } from "../../types/network";
 import { HlpToken } from "../../config/hlp";
 import { HlpInfoMethods } from "../Trade/types";
 import routes from "./routes";
+import { WeightInput } from "./routes/weights";
 
 export type ConvertQuoteInput = {
   fromToken: HlpToken;
@@ -37,53 +38,40 @@ export type ConvertTransactionInput = {
 };
 
 export default class Convert {
-  public static getQuote = async (input: ConvertQuoteInput): Promise<Quote> => {
+  private static getHighestWeightRoute = async (weightInfo: WeightInput) => {
     const weightedRoutes = await Promise.all(
       routes.map((route) =>
-        route
-          .weight({
-            fromToken: input.fromToken,
-            toToken: input.toToken,
-            network: input.network,
-            provider: input.provider
-          })
-          .then((calculatedWeight) => ({
-            handler: route.quote,
-            calculatedWeight: calculatedWeight
-          }))
+        route.weight(weightInfo).then((calculatedWeight) => ({
+          quote: route.quote,
+          transaction: route.transaction,
+          calculatedWeight: calculatedWeight
+        }))
       )
     );
     weightedRoutes.sort((a, b) => b.calculatedWeight - a.calculatedWeight);
     const route = weightedRoutes[0];
     if (route.calculatedWeight === 0) {
-      throw new Error(`No route found for ${input.fromToken.symbol} and ${input.toToken.symbol}`);
+      throw new Error(
+        `No route found for ${weightInfo.fromToken.symbol} and ${weightInfo.toToken.symbol}`
+      );
     }
-    return route.handler(input);
+    return route;
+  };
+
+  public static getQuote = async (input: ConvertQuoteInput): Promise<Quote> => {
+    const route = await this.getHighestWeightRoute(input);
+    return route.quote(input);
   };
 
   public static getSwap = async (
     input: ConvertTransactionInput
   ): Promise<ethers.PopulatedTransaction> => {
-    const weightedRoutes = await Promise.all(
-      routes.map((route) =>
-        route
-          .weight({
-            fromToken: input.fromToken,
-            toToken: input.toToken,
-            network: input.network,
-            provider: input.signer
-          })
-          .then((calculatedWeight) => ({
-            handler: route.transaction,
-            calculatedWeight: calculatedWeight
-          }))
-      )
-    );
-    weightedRoutes.sort((a, b) => b.calculatedWeight - a.calculatedWeight);
-    const route = weightedRoutes[0];
-    if (route.calculatedWeight === 0) {
-      throw new Error(`No route found for ${input.fromToken.symbol} and ${input.toToken.symbol}`);
-    }
-    return route.handler(input);
+    const route = await this.getHighestWeightRoute({
+      fromToken: input.fromToken,
+      toToken: input.toToken,
+      provider: input.signer,
+      network: input.network
+    });
+    return route.transaction(input);
   };
 }

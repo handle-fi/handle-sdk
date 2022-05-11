@@ -6,7 +6,7 @@ import { ConvertQuoteInput, ConvertTransactionInput, Quote } from "../Convert";
 import { getApiFeeAsPercentage } from "../getApiFeeAsPercentage";
 import { ONE_INCH_WEIGHT, WeightInput } from "./weights";
 
-export const get1InchBaseUrl = (network: Network) => {
+const get1InchBaseUrl = (network: Network) => {
   const networkNameToIdMap: NetworkMap<number> = {
     ethereum: 1,
     polygon: 137,

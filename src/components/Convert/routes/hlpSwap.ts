@@ -4,7 +4,7 @@ import { Router__factory } from "../../../contracts";
 import { tryParseNativeHlpToken } from "../../../utils/hlp";
 import { getSwapFeeBasisPoints } from "../../Trade";
 import { ConvertQuoteInput, ConvertTransactionInput, Quote } from "../Convert";
-import { LIQUIDITY_WEIGHT, WeightInput } from "./weights";
+import { HLP_SWAP_WEIGHT, WeightInput } from "./weights";
 
 const hlpSwapWeight = async (input: WeightInput): Promise<number> => {
   const routerAddress = HlpConfig.HLP_CONTRACTS[input.network]?.Router;
@@ -13,7 +13,7 @@ const hlpSwapWeight = async (input: WeightInput): Promise<number> => {
     HlpUtils.isHlpSupportedToken(input.toToken.symbol, input.network) &&
     HlpUtils.isHlpSupportedToken(input.fromToken.symbol, input.network)
   ) {
-    return LIQUIDITY_WEIGHT;
+    return HLP_SWAP_WEIGHT;
   }
   return 0;
 };

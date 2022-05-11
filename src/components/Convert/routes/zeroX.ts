@@ -7,7 +7,7 @@ import { WeightInput, ZERO_X_WEIGHT } from "./weights";
 import { ethers } from "ethers";
 import { Network } from "../../..";
 
-export const get0xBaseUrl = (network: Network) =>
+const get0xBaseUrl = (network: Network) =>
   `https://${network === "ethereum" ? "" : network + "."}api.0x.org/swap/v1`;
 
 type ZeroXQuoteParams = {
