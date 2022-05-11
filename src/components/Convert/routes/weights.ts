@@ -12,6 +12,6 @@ export const WETH_WEIGHT = 200;
 export type WeightInput = {
   fromToken: Omit<HlpToken, "name">;
   toToken: Omit<HlpToken, "name">;
-  provider?: ethers.providers.Provider | Signer;
+  signerOrProvider?: ethers.providers.Provider | Signer;
   network: Network;
 };

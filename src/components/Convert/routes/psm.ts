@@ -15,13 +15,13 @@ const transactionFeeCache: Record<Network, BigNumber | null> = {
 const TRANSACTION_FEE_UNIT = ethers.utils.parseEther("1");
 
 export const psmWeight = async (input: WeightInput) => {
-  const { fromToken, toToken, provider, network } = input;
+  const { fromToken, toToken, signerOrProvider, network } = input;
 
-  if (!provider) return 0;
+  if (!signerOrProvider) return 0;
 
   const [isWithdraw, isDeposit] = await Promise.all([
-    isTokenPegged(fromToken.address, toToken.address, provider, network),
-    isTokenPegged(toToken.address, fromToken.address, provider, network)
+    isTokenPegged(fromToken.address, toToken.address, signerOrProvider, network),
+    isTokenPegged(toToken.address, fromToken.address, signerOrProvider, network)
   ]);
 
   return isWithdraw || isDeposit ? PSM_WEIGHT : 0;

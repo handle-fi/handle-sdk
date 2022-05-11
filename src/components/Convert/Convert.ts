@@ -44,7 +44,7 @@ export default class Convert {
         route.weight(weightInfo).then((calculatedWeight) => ({
           quote: route.quote,
           transaction: route.transaction,
-          calculatedWeight: calculatedWeight
+          calculatedWeight
         }))
       )
     );
@@ -59,7 +59,12 @@ export default class Convert {
   };
 
   public static getQuote = async (input: ConvertQuoteInput): Promise<Quote> => {
-    const route = await this.getHighestWeightRoute(input);
+    const route = await this.getHighestWeightRoute({
+      fromToken: input.fromToken,
+      toToken: input.toToken,
+      signerOrProvider: input.provider,
+      network: input.network
+    });
     return route.quote(input);
   };
 
@@ -69,7 +74,7 @@ export default class Convert {
     const route = await this.getHighestWeightRoute({
       fromToken: input.fromToken,
       toToken: input.toToken,
-      provider: input.signer,
+      signerOrProvider: input.signer,
       network: input.network
     });
     return route.transaction(input);
