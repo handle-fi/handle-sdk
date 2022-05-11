@@ -1,18 +1,13 @@
 import axios from "axios";
 import { ethers } from "ethers";
-import { config, Network, NetworkMap } from "../../..";
+import { config, Network, NETWORK_NAME_TO_CHAIN_ID } from "../../..";
 import { BASIS_POINTS_DIVISOR } from "../../../config/hlp";
 import { ConvertQuoteInput, ConvertTransactionInput, Quote } from "../Convert";
 import { getApiFeeAsPercentage } from "../getApiFeeAsPercentage";
 import { ONE_INCH_WEIGHT, WeightInput } from "./weights";
 
 const get1InchBaseUrl = (network: Network) => {
-  const networkNameToIdMap: NetworkMap<number> = {
-    ethereum: 1,
-    polygon: 137,
-    arbitrum: 42161
-  };
-  return `https://api.1inch.exchange/v4.0/${networkNameToIdMap[network]}`;
+  return `https://api.1inch.exchange/v4.0/${NETWORK_NAME_TO_CHAIN_ID[network]}`;
 };
 
 type OneInchQuoteParams = {
