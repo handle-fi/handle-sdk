@@ -19,8 +19,10 @@ export const psmWeight = async (input: WeightInput) => {
 
   if (!provider) return 0;
 
-  const isWithdraw = await isTokenPegged(fromToken.address, toToken.address, provider, network);
-  const isDeposit = await isTokenPegged(toToken.address, fromToken.address, provider, network);
+  const [isWithdraw, isDeposit] = await Promise.all([
+    isTokenPegged(fromToken.address, toToken.address, provider, network),
+    isTokenPegged(toToken.address, fromToken.address, provider, network)
+  ]);
 
   return isWithdraw || isDeposit ? PSM_WEIGHT : 0;
 };
