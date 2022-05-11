@@ -1,9 +1,8 @@
-import { BigNumber, ethers } from "ethers";
+import { BigNumber, ethers, providers, Signer } from "ethers";
 import { HlpConfig, Network } from "../../..";
 import { PSM_GAS_LIMIT } from "../../../config/hlp";
 import { HPSM__factory } from "../../../contracts";
 import { ConvertQuoteInput, ConvertTransactionInput, Quote } from "../Convert";
-import { isTokenPegged } from "../isTokenPegged";
 import { PSM_WEIGHT, WeightInput } from "./weights";
 
 const transactionFeeCache: Record<Network, BigNumber | null> = {
@@ -13,6 +12,32 @@ const transactionFeeCache: Record<Network, BigNumber | null> = {
 };
 
 const TRANSACTION_FEE_UNIT = ethers.utils.parseEther("1");
+
+const pegCache: Record<Network, Record<string, boolean>> = {
+  arbitrum: {},
+  ethereum: {},
+  polygon: {}
+};
+
+export const isTokenPegged = async (
+  fxToken: string,
+  pegToken: string,
+  provider: Signer | providers.Provider,
+  network: Network
+): Promise<boolean> => {
+  const cacheKey = `${fxToken}-${pegToken}`;
+  if (pegCache[network][cacheKey] !== undefined) {
+    return pegCache[network][cacheKey];
+  }
+  const hpsmAddress = HlpConfig.HLP_CONTRACTS[network]?.HPSM;
+  if (!hpsmAddress) {
+    return false;
+  }
+  const hpsm = HPSM__factory.connect(hpsmAddress, provider);
+  const isPegged = await hpsm.isFxTokenPegged(fxToken, pegToken);
+  pegCache[network][cacheKey] = isPegged;
+  return isPegged;
+};
 
 export const psmWeight = async (input: WeightInput) => {
   const { fromToken, toToken, signerOrProvider, network } = input;
