@@ -3,10 +3,10 @@ import config from ".";
 import { Network, NetworkMap } from "../types/network";
 
 /** Swap function gas limit for Arbitrum. */
-export const HLP_SWAP_GAS_LIMIT = "1500000";
+export const HLP_SWAP_GAS_LIMIT = 1_500_000;
 
 /** Peg stability gas limit */
-export const PSM_GAS_LIMIT = "1000000";
+export const PSM_GAS_LIMIT = 1_000_000;
 
 /** Currently the only avaliable handle liquidity pool network */
 export const DEFAULT_HLP_NETWORK: Network = "arbitrum";

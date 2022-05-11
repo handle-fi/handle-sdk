@@ -7,14 +7,14 @@ export const getSwapFee = (args: {
   tokenIn: string;
   tokenOut: string;
   amountIn: BigNumber;
-  usdgSupply: BigNumber;
+  usdHlpSupply: BigNumber;
   totalTokenWeights: BigNumber;
-  targetUsdgAmount: BigNumber;
+  targetUsdHlpAmount: BigNumber;
   getTokenInfo: (token: string) => VaultTokenInfo | undefined;
 }) => {
   const swapBasisPoints = getSwapFeeBasisPoints({
     ...args,
-    usdgDelta: args.amountIn
+    usdHlpDelta: args.amountIn
   });
   return args.amountIn.mul(swapBasisPoints).div(BASIS_POINTS_DIVISOR);
 };

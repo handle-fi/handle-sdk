@@ -14,10 +14,10 @@ export const getSwapFeeBasisPoints = (
   args: {
     tokenIn: string;
     tokenOut: string;
-    usdgDelta: BigNumber;
-    usdgSupply: BigNumber;
+    usdHlpDelta: BigNumber;
+    usdHlpSupply: BigNumber;
     totalTokenWeights: BigNumber;
-    targetUsdgAmount: BigNumber;
+    targetUsdHlpAmount: BigNumber;
     getTokenInfo: (token: string) => VaultTokenInfo | undefined;
   },
   network: Network = "arbitrum"

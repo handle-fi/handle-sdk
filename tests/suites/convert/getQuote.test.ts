@@ -7,7 +7,6 @@ import { HLP_TOKENS, PRICE_DECIMALS } from "../../../src/config/hlp";
 import { getHlpToken, getNativeWrappedToken } from "../../../src/utils/hlp";
 import { getTokenDetails } from "../../../src/utils/token-utils";
 
-const convert = new Convert();
 const weth = getNativeWrappedToken("arbitrum")!;
 const eth = HLP_TOKENS["arbitrum"].find((x) => x.isNative)!;
 const hlp = getHlpToken("arbitrum")!;
@@ -23,8 +22,8 @@ const sampleHlpTokenMethods: HlpInfoMethods = {
   getAveragePrice: () => ONE_DOLLAR,
   getFundingRate: () => ethers.constants.One,
   getTokenInfo: () => undefined,
-  getUsdgSupply: () => ethers.constants.One,
-  getTargetUsdgAmount: () => ethers.constants.One,
+  getUsdHlpSupply: () => ethers.constants.One,
+  getTargetUsdHlpAmount: () => ethers.constants.One,
   getTotalTokenWeights: () => ethers.constants.One,
   getHlpPrice: () => FIVE_DOLLARS
 };
@@ -36,36 +35,30 @@ const arbitrumProvider = new ethers.providers.JsonRpcProvider(
 describe("convert getQuote", () => {
   describe("WETH", () => {
     it("should be 1-1 from eth to weth", async () => {
-      const { quote, feeBasisPoints } = await convert.getQuote(
-        {
-          fromToken: weth,
-          toToken: eth,
-          canUseHlp: false,
-          network: "arbitrum",
-          connectedAccount: ethers.constants.AddressZero,
-          fromAmount: ethers.constants.One,
-          gasPrice: ethers.constants.One
-        },
-        sampleHlpTokenMethods
-      );
+      const quote = await Convert.getQuote({
+        fromToken: weth,
+        toToken: eth,
+        network: "arbitrum",
+        connectedAccount: ethers.constants.AddressZero,
+        fromAmount: ethers.constants.One,
+        gasPrice: ethers.constants.One,
+        hlpMethods: sampleHlpTokenMethods
+      });
       expect(quote.sellAmount).to.eq(quote.buyAmount);
-      expect(feeBasisPoints?.toNumber()).to.eq(0);
+      expect(quote.feeBasisPoints).to.eq(0);
     });
     it("should be 1-1 from weth to eth", async () => {
-      const { quote, feeBasisPoints } = await convert.getQuote(
-        {
-          fromToken: weth,
-          toToken: eth,
-          canUseHlp: false,
-          network: "arbitrum",
-          connectedAccount: ethers.constants.AddressZero,
-          fromAmount: ethers.constants.One,
-          gasPrice: ethers.constants.One
-        },
-        sampleHlpTokenMethods
-      );
+      const quote = await Convert.getQuote({
+        fromToken: weth,
+        toToken: eth,
+        network: "arbitrum",
+        connectedAccount: ethers.constants.AddressZero,
+        fromAmount: ethers.constants.One,
+        gasPrice: ethers.constants.One,
+        hlpMethods: sampleHlpTokenMethods
+      });
       expect(quote.sellAmount).to.eq(quote.buyAmount);
-      expect(feeBasisPoints?.toNumber()).to.eq(0);
+      expect(quote.feeBasisPoints).to.eq(0);
     });
   });
   describe("hLP", () => {
@@ -77,18 +70,15 @@ describe("convert getQuote", () => {
         getMaxPrice: () => ONE_DOLLAR,
         getAveragePrice: () => ONE_DOLLAR
       };
-      const { quote } = await convert.getQuote(
-        {
-          fromToken: hlp,
-          toToken: fxUsd,
-          canUseHlp: false,
-          network: "arbitrum",
-          connectedAccount: ethers.constants.AddressZero,
-          fromAmount: ethers.utils.parseEther("1"),
-          gasPrice: ethers.constants.One
-        },
-        hlpTokenMethods
-      );
+      const quote = await Convert.getQuote({
+        fromToken: hlp,
+        toToken: fxUsd,
+        network: "arbitrum",
+        connectedAccount: ethers.constants.AddressZero,
+        fromAmount: ethers.utils.parseEther("1"),
+        gasPrice: ethers.constants.One,
+        hlpMethods: hlpTokenMethods
+      });
       expect(quote.sellAmount).to.eq(ethers.utils.parseEther("1").toString());
       expect(quote.buyAmount).to.eq(ethers.utils.parseEther("5").toString());
     });
@@ -100,18 +90,15 @@ describe("convert getQuote", () => {
         getMaxPrice: () => ONE_DOLLAR,
         getAveragePrice: () => ONE_DOLLAR
       };
-      const { quote } = await convert.getQuote(
-        {
-          fromToken: hlp,
-          toToken: eth,
-          canUseHlp: false,
-          network: "arbitrum",
-          connectedAccount: ethers.constants.AddressZero,
-          fromAmount: ethers.utils.parseEther("1"),
-          gasPrice: ethers.constants.One
-        },
-        hlpTokenMethods
-      );
+      const quote = await Convert.getQuote({
+        fromToken: hlp,
+        toToken: eth,
+        network: "arbitrum",
+        connectedAccount: ethers.constants.AddressZero,
+        fromAmount: ethers.utils.parseEther("1"),
+        gasPrice: ethers.constants.One,
+        hlpMethods: hlpTokenMethods
+      });
       expect(quote.sellAmount).to.eq(ethers.utils.parseEther("1").toString());
       expect(quote.buyAmount).to.eq(ethers.utils.parseEther("5").toString());
     });
@@ -123,18 +110,15 @@ describe("convert getQuote", () => {
         getMaxPrice: () => ONE_DOLLAR,
         getAveragePrice: () => ONE_DOLLAR
       };
-      const { quote } = await convert.getQuote(
-        {
-          toToken: hlp,
-          fromToken: fxUsd,
-          canUseHlp: false,
-          network: "arbitrum",
-          connectedAccount: ethers.constants.AddressZero,
-          fromAmount: ethers.utils.parseEther("5"),
-          gasPrice: ethers.constants.One
-        },
-        hlpTokenMethods
-      );
+      const quote = await Convert.getQuote({
+        toToken: hlp,
+        fromToken: fxUsd,
+        network: "arbitrum",
+        connectedAccount: ethers.constants.AddressZero,
+        fromAmount: ethers.utils.parseEther("5"),
+        gasPrice: ethers.constants.One,
+        hlpMethods: hlpTokenMethods
+      });
       expect(quote.sellAmount).to.eq(ethers.utils.parseEther("5").toString());
       expect(quote.buyAmount).to.eq(ethers.utils.parseEther("1").toString());
     });
@@ -146,18 +130,15 @@ describe("convert getQuote", () => {
         getMaxPrice: () => ONE_DOLLAR,
         getAveragePrice: () => ONE_DOLLAR
       };
-      const { quote } = await convert.getQuote(
-        {
-          toToken: hlp,
-          fromToken: eth,
-          canUseHlp: false,
-          network: "arbitrum",
-          connectedAccount: ethers.constants.AddressZero,
-          fromAmount: ethers.utils.parseEther("5"),
-          gasPrice: ethers.constants.One
-        },
-        hlpTokenMethods
-      );
+      const quote = await Convert.getQuote({
+        toToken: hlp,
+        fromToken: eth,
+        network: "arbitrum",
+        connectedAccount: ethers.constants.AddressZero,
+        fromAmount: ethers.utils.parseEther("5"),
+        gasPrice: ethers.constants.One,
+        hlpMethods: hlpTokenMethods
+      });
       expect(quote.sellAmount).to.eq(ethers.utils.parseEther("5").toString());
       expect(quote.buyAmount).to.eq(ethers.utils.parseEther("1").toString());
     });
@@ -167,18 +148,15 @@ describe("convert getQuote", () => {
       it(`should return an api quote for ${network}`, async () => {
         const usdc = getTokenDetails("USDC", network);
         const usdt = getTokenDetails("USDT", network);
-        const { quote } = await convert.getQuote(
-          {
-            fromToken: { ...usdc, name: "" },
-            toToken: { ...usdt, name: "" },
-            canUseHlp: false,
-            network,
-            connectedAccount: ethers.constants.AddressZero,
-            fromAmount: ethers.utils.parseEther("1"),
-            gasPrice: ethers.constants.One
-          },
-          sampleHlpTokenMethods
-        );
+        const quote = await Convert.getQuote({
+          fromToken: { ...usdc, name: "" },
+          toToken: { ...usdt, name: "" },
+          network,
+          connectedAccount: ethers.constants.AddressZero,
+          fromAmount: ethers.utils.parseEther("1"),
+          gasPrice: ethers.constants.One,
+          hlpMethods: sampleHlpTokenMethods
+        });
         expect(quote).to.have.property("buyAmount");
         expect(quote).to.have.property("sellAmount");
       });
@@ -199,18 +177,15 @@ describe("convert getQuote", () => {
         getMaxPrice: getPrice,
         getAveragePrice: getPrice
       };
-      const { quote } = await convert.getQuote(
-        {
-          toToken: fxAud,
-          fromToken: fxUsd,
-          canUseHlp: true,
-          network: "arbitrum",
-          connectedAccount: ethers.constants.AddressZero,
-          fromAmount: ethers.utils.parseEther("5"),
-          gasPrice: ethers.constants.One
-        },
-        hlpTokenMethods
-      );
+      const quote = await Convert.getQuote({
+        toToken: fxAud,
+        fromToken: fxUsd,
+        network: "arbitrum",
+        connectedAccount: ethers.constants.AddressZero,
+        fromAmount: ethers.utils.parseEther("5"),
+        gasPrice: ethers.constants.One,
+        hlpMethods: hlpTokenMethods
+      });
       expect(quote.sellAmount).to.eq(ethers.utils.parseEther("5").toString());
       expect(quote.buyAmount).to.eq(ethers.utils.parseEther("10").toString());
     });
@@ -228,18 +203,15 @@ describe("convert getQuote", () => {
         getMaxPrice: getPrice,
         getAveragePrice: getPrice
       };
-      const { quote } = await convert.getQuote(
-        {
-          toToken: fxAud,
-          fromToken: eth,
-          canUseHlp: true,
-          network: "arbitrum",
-          connectedAccount: ethers.constants.AddressZero,
-          fromAmount: ethers.utils.parseEther("5"),
-          gasPrice: ethers.constants.One
-        },
-        hlpTokenMethods
-      );
+      const quote = await Convert.getQuote({
+        toToken: fxAud,
+        fromToken: eth,
+        network: "arbitrum",
+        connectedAccount: ethers.constants.AddressZero,
+        fromAmount: ethers.utils.parseEther("5"),
+        gasPrice: ethers.constants.One,
+        hlpMethods: hlpTokenMethods
+      });
       expect(quote.sellAmount).to.eq(ethers.utils.parseEther("5").toString());
       expect(quote.buyAmount).to.eq(ethers.utils.parseEther("10").toString());
     });
@@ -248,19 +220,16 @@ describe("convert getQuote", () => {
     it("should return a quote to pegged tokens", async () => {
       // fxUSD is assumed to be pegged to USDT
       const usdt = getTokenDetails("USDT", "arbitrum");
-      const { quote } = await convert.getQuote(
-        {
-          toToken: { ...usdt, name: "" },
-          fromToken: fxUsd,
-          canUseHlp: false,
-          network: "arbitrum",
-          connectedAccount: ethers.constants.AddressZero,
-          fromAmount: ethers.utils.parseEther("5"),
-          gasPrice: ethers.constants.One,
-          provider: arbitrumProvider
-        },
-        sampleHlpTokenMethods
-      );
+      const quote = await Convert.getQuote({
+        toToken: { ...usdt, name: "" },
+        fromToken: fxUsd,
+        network: "arbitrum",
+        connectedAccount: ethers.constants.AddressZero,
+        fromAmount: ethers.utils.parseEther("5"),
+        gasPrice: ethers.constants.One,
+        provider: arbitrumProvider,
+        hlpMethods: sampleHlpTokenMethods
+      });
       expect(quote.sellAmount).to.eq(ethers.utils.parseEther("5").toString());
       expect(quote.buyAmount).to.eq(ethers.utils.parseEther("5").toString());
       expect(quote.allowanceTarget).to.eq(HlpConfig.HLP_CONTRACTS.arbitrum?.HPSM);
@@ -268,19 +237,16 @@ describe("convert getQuote", () => {
     it("should return a quote from pegged tokens", async () => {
       // fxUSD is assumed to be pegged to USDT
       const usdt = getTokenDetails("USDT", "arbitrum");
-      const { quote } = await convert.getQuote(
-        {
-          fromToken: { ...usdt, name: "" },
-          toToken: fxUsd,
-          canUseHlp: false,
-          network: "arbitrum",
-          connectedAccount: ethers.constants.AddressZero,
-          fromAmount: ethers.utils.parseEther("5"),
-          gasPrice: ethers.constants.One,
-          provider: arbitrumProvider
-        },
-        sampleHlpTokenMethods
-      );
+      const quote = await Convert.getQuote({
+        fromToken: { ...usdt, name: "" },
+        toToken: fxUsd,
+        network: "arbitrum",
+        connectedAccount: ethers.constants.AddressZero,
+        fromAmount: ethers.utils.parseEther("5"),
+        gasPrice: ethers.constants.One,
+        provider: arbitrumProvider,
+        hlpMethods: sampleHlpTokenMethods
+      });
       expect(quote.sellAmount).to.eq(ethers.utils.parseEther("5").toString());
       expect(quote.buyAmount).to.eq(ethers.utils.parseEther("5").toString());
       expect(quote.allowanceTarget).to.eq(HlpConfig.HLP_CONTRACTS.arbitrum?.HPSM);

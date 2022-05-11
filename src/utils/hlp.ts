@@ -2,20 +2,26 @@ import { HLP_CONTRACTS, HLP_TOKENS } from "../config/hlp";
 import { DEFAULT_HLP_NETWORK } from "../config/hlp";
 import { Network } from "../types/network";
 
-export const getPerpTokenSymbols = (network = DEFAULT_HLP_NETWORK): string[] =>
+export const getHlpTokenSymbols = (network = DEFAULT_HLP_NETWORK): string[] =>
   HLP_TOKENS[network]?.map((x) => x.symbol) || [];
 
-export const isPerpTokenBySymbol = (symbol: string, network = DEFAULT_HLP_NETWORK) =>
+export const isHlpTokenBySymbol = (symbol: string, network = DEFAULT_HLP_NETWORK) =>
   HLP_TOKENS[network]?.some((x) => x.symbol === symbol);
 
-export const isPerpTokenByAddress = (address: string, network = DEFAULT_HLP_NETWORK) =>
+export const isHlpTokenByAddress = (address: string, network = DEFAULT_HLP_NETWORK) =>
   HLP_TOKENS[network]?.some((x) => x.address === address);
 
-export const getPerpTokenBySymbol = (symbol: string, network = DEFAULT_HLP_NETWORK) =>
+export const getHlpTokenBySymbol = (symbol: string, network = DEFAULT_HLP_NETWORK) =>
   HLP_TOKENS[network]?.find((x) => x.symbol === symbol);
 
-export const getPerpTokenByAddress = (address: string, network = DEFAULT_HLP_NETWORK) =>
+export const getHlpTokenByAddress = (address: string, network = DEFAULT_HLP_NETWORK) =>
   HLP_TOKENS[network]?.find((x) => x.address === address);
+
+export const isHlpSupportedToken = (symbol: string, network: Network) => {
+  return !!HLP_TOKENS[network].some((_token) => {
+    return _token.symbol === symbol;
+  });
+};
 
 export const getHlpToken = (network = DEFAULT_HLP_NETWORK) => {
   const hlpAddress = HLP_CONTRACTS[network]?.HLP;
