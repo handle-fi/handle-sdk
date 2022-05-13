@@ -1,5 +1,5 @@
 import axios from "axios";
-import { ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import { config, Network, NETWORK_NAME_TO_CHAIN_ID } from "../../..";
 import { BASIS_POINTS_DIVISOR } from "../../../config/hlp";
 import { ConvertQuoteInput, ConvertTransactionInput, Quote } from "../Convert";
@@ -98,7 +98,7 @@ const oneInchTransactionHandler = async (
 
   return {
     to: data.tx.to,
-    value: data.tx.value,
+    value: BigNumber.from(data.tx.value),
     data: data.tx.data
   };
 };

@@ -4,7 +4,7 @@ import { getApiFeeAsPercentage } from "../getApiFeeAsPercentage";
 import config from "../../../config";
 import { BASIS_POINTS_DIVISOR } from "../../../config/hlp";
 import { WeightInput, ZERO_X_WEIGHT } from "./weights";
-import { ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import { Network } from "../../..";
 
 const get0xBaseUrl = (network: Network) =>
@@ -99,7 +99,7 @@ const zeroXTransactionHandler = async (
 
   return {
     to: data.to,
-    value: data.value,
+    value: BigNumber.from(data.value),
     data: data.data
   };
 };
