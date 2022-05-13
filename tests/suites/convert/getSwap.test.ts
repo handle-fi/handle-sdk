@@ -34,10 +34,6 @@ let signer: Signer;
 describe("convert getSwap", () => {
   before(async () => {
     signer = ethers.provider.getSigner(0);
-
-    // Estimate gas is overriden so that getSwap does not revert for testing
-    // since the testing address does not always have enough funds
-    signer.estimateGas = async () => ethers.constants.Zero;
   });
   describe("WETH", () => {
     it("should return a transaction from eth to weth", async () => {
@@ -140,23 +136,19 @@ describe("convert getSwap", () => {
       // void signer is used as forked chain is not used by api
       const signer = new VoidSigner("0x82af49447d8a07e3bd95bd0d56f35241523fbab1", ethers.provider);
       const usdt = getTokenDetails("USDT", "arbitrum");
-      try {
-        const tx = await Convert.getSwap({
-          fromToken: { ...getTokenDetails("ETH", "arbitrum"), name: "Ethereum" },
-          toToken: { ...usdt, name: "Tether USD" },
-          network: "arbitrum",
-          connectedAccount: "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
-          gasPrice: ethers.utils.parseUnits("1", "gwei"),
-          hlpMethods: sampleHlpTokenMethods,
-          sellAmount: ethers.utils.parseUnits("1", eth.decimals),
-          buyAmount: ethers.utils.parseUnits("1", usdt.decimals),
-          signer,
-          slippage: 0.05
-        });
-        expect(tx).to.be.an("object");
-      } catch (err) {
-        console.log(err);
-      }
+      const tx = await Convert.getSwap({
+        fromToken: { ...getTokenDetails("ETH", "arbitrum"), name: "Ethereum" },
+        toToken: { ...usdt, name: "Tether USD" },
+        network: "arbitrum",
+        connectedAccount: "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+        gasPrice: ethers.utils.parseUnits("100", "gwei"), // very high gas price
+        hlpMethods: sampleHlpTokenMethods,
+        sellAmount: ethers.utils.parseUnits("1", eth.decimals),
+        buyAmount: ethers.utils.parseUnits("1", usdt.decimals),
+        signer,
+        slippage: 0.05
+      });
+      expect(tx).to.be.an("object");
     });
   });
   describe("handle liquidity pool", () => {

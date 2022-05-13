@@ -225,13 +225,13 @@ describe("convert getQuote", () => {
         fromToken: fxUsd,
         network: "arbitrum",
         connectedAccount: ethers.constants.AddressZero,
-        fromAmount: ethers.utils.parseUnits("5", 6),
+        fromAmount: ethers.utils.parseEther("5"),
         gasPrice: ethers.constants.One,
         provider: arbitrumProvider,
         hlpMethods: sampleHlpTokenMethods
       });
-      expect(quote.sellAmount).to.eq("5000000");
-      expect(quote.buyAmount).to.eq(ethers.utils.parseEther("5").toString());
+      expect(quote.sellAmount).to.eq(ethers.utils.parseEther("5").toString());
+      expect(quote.buyAmount).to.eq(ethers.utils.parseUnits("5", usdt.decimals).toString());
       expect(quote.allowanceTarget).to.eq(HlpConfig.HLP_CONTRACTS.arbitrum?.HPSM);
     });
     it("should return a quote from pegged tokens", async () => {
@@ -242,13 +242,13 @@ describe("convert getQuote", () => {
         toToken: fxUsd,
         network: "arbitrum",
         connectedAccount: ethers.constants.AddressZero,
-        fromAmount: ethers.utils.parseEther("5"),
+        fromAmount: ethers.utils.parseUnits("5", usdt.decimals),
         gasPrice: ethers.constants.One,
         provider: arbitrumProvider,
         hlpMethods: sampleHlpTokenMethods
       });
-      expect(quote.sellAmount).to.eq(ethers.utils.parseEther("5").toString());
-      expect(quote.buyAmount).to.eq(ethers.utils.parseUnits("5", 6).toString());
+      expect(quote.sellAmount).to.eq(ethers.utils.parseUnits("5", usdt.decimals).toString());
+      expect(quote.buyAmount).to.eq(ethers.utils.parseEther("5").toString());
       expect(quote.allowanceTarget).to.eq(HlpConfig.HLP_CONTRACTS.arbitrum?.HPSM);
     });
   });
