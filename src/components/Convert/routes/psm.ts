@@ -2,6 +2,7 @@ import { BigNumber, ethers, providers, Signer } from "ethers";
 import { HlpConfig, Network } from "../../..";
 import { PSM_GAS_LIMIT } from "../../../config/hlp";
 import { HPSM__factory } from "../../../contracts";
+import { transformDecimals } from "../../../utils/general-utils";
 import { ConvertQuoteInput, ConvertTransactionInput, Quote } from "../Convert";
 import { PSM_WEIGHT, WeightInput } from "./weights";
 
@@ -69,18 +70,11 @@ export const psmQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote> 
     HlpConfig.BASIS_POINTS_DIVISOR
   ).div(TRANSACTION_FEE_UNIT);
 
-  // converts 1 of the from token to 1 of the to token, accounting for decimals
-  let buyAmount = input.fromAmount;
-  if (input.fromToken.decimals < input.toToken.decimals) {
-    buyAmount = buyAmount.mul(
-      BigNumber.from(10).pow(input.toToken.decimals - input.fromToken.decimals)
-    );
-  }
-  if (input.fromToken.decimals > input.toToken.decimals) {
-    buyAmount = buyAmount.div(
-      BigNumber.from(10).pow(input.fromToken.decimals - input.toToken.decimals)
-    );
-  }
+  const buyAmount = transformDecimals(
+    input.fromAmount,
+    input.fromToken.decimals,
+    input.toToken.decimals
+  );
 
   const quote: Quote = {
     allowanceTarget: hpsmAddress,
