@@ -54,31 +54,30 @@ export const psmWeight = async (input: WeightInput) => {
 };
 
 export const psmQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote> => {
-  const hpsmAddress = HlpConfig.HLP_CONTRACTS[input.network]?.HPSM;
+  const { fromToken, toToken, provider, network, fromAmount } = input;
+  const hpsmAddress = HlpConfig.HLP_CONTRACTS[network]?.HPSM;
   if (!hpsmAddress) {
-    throw new Error(`No HPSM for network ${input.network}`);
+    throw new Error(`No HPSM for network ${network}`);
   }
-  if (!input.provider) {
+  if (!provider) {
     throw new Error(`Provider missing. Provider must be given for HPSM quote.`);
   }
-  if (!transactionFeeCache[input.network]) {
-    const hpsm = HPSM__factory.connect(hpsmAddress, input.provider);
-    transactionFeeCache[input.network] = await hpsm.transactionFee();
+  if (!transactionFeeCache[network]) {
+    const hpsm = HPSM__factory.connect(hpsmAddress, provider);
+    transactionFeeCache[network] = await hpsm.transactionFee();
   }
   // convert transaction fee to basis points
-  const transactionFeeBasisPoints = transactionFeeCache[input.network]!.mul(
+  const transactionFeeBasisPoints = transactionFeeCache[network]!.mul(
     HlpConfig.BASIS_POINTS_DIVISOR
   ).div(TRANSACTION_FEE_UNIT);
 
-  const buyAmount = transformDecimals(
-    input.fromAmount,
-    input.fromToken.decimals,
-    input.toToken.decimals
-  );
+  const isDeposit = await isTokenPegged(toToken.address, fromToken.address, provider, network);
+
+  const buyAmount = transformDecimals(fromAmount, fromToken.decimals, toToken.decimals);
 
   const quote: Quote = {
-    allowanceTarget: hpsmAddress,
-    sellAmount: input.fromAmount.toString(),
+    allowanceTarget: isDeposit ? hpsmAddress : null,
+    sellAmount: fromAmount.toString(),
     buyAmount: buyAmount.toString(),
     gas: PSM_GAS_LIMIT,
     feeBasisPoints: +transactionFeeBasisPoints

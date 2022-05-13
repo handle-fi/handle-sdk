@@ -20,7 +20,7 @@ const wethWeight = async (input: WeightInput): Promise<number> => {
 
 const wethQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote> => {
   return {
-    allowanceTarget: ethers.constants.AddressZero,
+    allowanceTarget: null,
     buyAmount: input.fromAmount.toString(), // WETH swap is always 1 to 1
     sellAmount: input.fromAmount.toString(),
     gas: HLP_SWAP_GAS_LIMIT,

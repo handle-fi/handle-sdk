@@ -46,6 +46,7 @@ describe("convert getQuote", () => {
       });
       expect(quote.sellAmount).to.eq(quote.buyAmount);
       expect(quote.feeBasisPoints).to.eq(0);
+      expect(quote.allowanceTarget).to.eq(null);
     });
     it("should be 1-1 from weth to eth", async () => {
       const quote = await Convert.getQuote({
@@ -59,6 +60,7 @@ describe("convert getQuote", () => {
       });
       expect(quote.sellAmount).to.eq(quote.buyAmount);
       expect(quote.feeBasisPoints).to.eq(0);
+      expect(quote.allowanceTarget).to.eq(null);
     });
   });
   describe("hLP", () => {
@@ -232,7 +234,7 @@ describe("convert getQuote", () => {
       });
       expect(quote.sellAmount).to.eq(ethers.utils.parseEther("5").toString());
       expect(quote.buyAmount).to.eq(ethers.utils.parseUnits("5", usdt.decimals).toString());
-      expect(quote.allowanceTarget).to.eq(HlpConfig.HLP_CONTRACTS.arbitrum?.HPSM);
+      expect(quote.allowanceTarget).to.eq(null); // no allowance needed on withdraw
     });
     it("should return a quote from pegged tokens", async () => {
       // fxUSD is assumed to be pegged to USDT

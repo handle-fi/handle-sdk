@@ -20,7 +20,7 @@ export type Quote = {
   buyAmount: string;
   sellAmount: string;
   gas: number;
-  allowanceTarget: string;
+  allowanceTarget: string | null;
   feeBasisPoints: number;
 };
 
