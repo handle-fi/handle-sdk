@@ -78,7 +78,7 @@ export const psmQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote> 
     allowanceTarget: isDeposit ? hpsmAddress : null,
     sellAmount: fromAmount.toString(),
     buyAmount: buyAmount.toString(),
-    gas: config.convert.gasEstimates.hPsm,
+    gas: config.convert.gasEstimates.hpsm,
     feeBasisPoints: +transactionFeeBasisPoints
   };
 

@@ -66,7 +66,7 @@ export type Config = {
     };
     tokenSymbolToStableType: { [key: string]: StableType };
     gasEstimates: {
-      hPsm: number;
+      hpsm: number;
       hlp: number;
       weth: number;
     };
@@ -237,7 +237,7 @@ const config: Config = {
     },
     gasEstimates: {
       hlp: 800_000,
-      hPsm: 800_000,
+      hpsm: 800_000,
       weth: 500_000
     }
   }

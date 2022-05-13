@@ -67,24 +67,23 @@ const hlpAddRemoveQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote
       gas: config.convert.gasEstimates.hlp,
       feeBasisPoints: feeBasisPoints.toNumber()
     };
-  } else {
-    // The buy amount is the usdHlp delta divided by the price of the token (adjusted for decimals)
-    const buyAmount = usdHlpDelta
-      .mul(ethers.utils.parseUnits("1", toToken.decimals))
-      .div(
-        hlpMethods.getMaxPrice(parsedToTokenAddress).isZero()
-          ? ethers.constants.One
-          : hlpMethods.getMaxPrice(parsedToTokenAddress)
-      );
-
-    return {
-      allowanceTarget: hlpManagerAddress,
-      sellAmount: fromAmount.toString(),
-      buyAmount: buyAmount.toString(),
-      gas: config.convert.gasEstimates.hlp,
-      feeBasisPoints: feeBasisPoints.toNumber()
-    };
   }
+  // The buy amount is the usdHlp delta divided by the price of the token (adjusted for decimals)
+  const buyAmount = usdHlpDelta
+    .mul(ethers.utils.parseUnits("1", toToken.decimals))
+    .div(
+      hlpMethods.getMaxPrice(parsedToTokenAddress).isZero()
+        ? ethers.constants.One
+        : hlpMethods.getMaxPrice(parsedToTokenAddress)
+    );
+
+  return {
+    allowanceTarget: hlpManagerAddress,
+    sellAmount: fromAmount.toString(),
+    buyAmount: buyAmount.toString(),
+    gas: config.convert.gasEstimates.hlp,
+    feeBasisPoints: feeBasisPoints.toNumber()
+  };
 };
 
 const hlpAddRemoveTransactionHandler = async (
@@ -121,51 +120,46 @@ const hlpAddRemoveTransactionHandler = async (
   const { address: fromAddress } = tryParseNativeHlpToken(fromToken, network);
   const { address: toAddress } = tryParseNativeHlpToken(toToken, network);
 
-  if (fromToken.symbol === "hLP") {
-    // selling hlp
-    if (toToken.isNative) {
-      // if is native
-      return hlpManagerRouter.populateTransaction.removeLiquidityETH(
-        BigNumber.from(sellAmount),
-        buyAmountWithTolerance,
-        connectedAccount
-      );
-    } else {
-      // if both tokens are not native
-      return hlpManager.populateTransaction.removeLiquidity(
-        toAddress,
-        BigNumber.from(sellAmount),
-        buyAmountWithTolerance,
-        connectedAccount
-      );
-    }
-  } else {
-    // buying hlp
-    const minPriceInUsdHlp = hlpInfo
-      .getMinPrice(fromToken.address)
-      .mul(10_000 - slippage * 100)
-      .div(ethers.utils.parseUnits("1", PRICE_DECIMALS - 18))
-      .div(BASIS_POINTS_DIVISOR);
-
-    if (fromToken.isNative) {
-      // if is native
-      return hlpManagerRouter.populateTransaction.addLiquidityETH(
-        minPriceInUsdHlp,
-        buyAmountWithTolerance,
-        {
-          value: BigNumber.from(sellAmount)
-        }
-      );
-    } else {
-      // if not native
-      return hlpManager.populateTransaction.addLiquidity(
-        fromAddress,
-        BigNumber.from(sellAmount),
-        minPriceInUsdHlp,
-        buyAmountWithTolerance
-      );
-    }
+  // If selling Hlp and toToken is native
+  if (fromToken.symbol === "hLP" && toToken.isNative) {
+    return hlpManagerRouter.populateTransaction.removeLiquidityETH(
+      BigNumber.from(sellAmount),
+      buyAmountWithTolerance,
+      connectedAccount
+    );
   }
+  if (fromToken.symbol === "hLP" && !toToken.isNative) {
+    // If selling Hlp and toToken is not native
+    return hlpManager.populateTransaction.removeLiquidity(
+      toAddress,
+      BigNumber.from(sellAmount),
+      buyAmountWithTolerance,
+      connectedAccount
+    );
+  }
+
+  // buying hlp
+  const minPriceInUsdHlp = hlpInfo
+    .getMinPrice(fromToken.address)
+    .mul(10_000 - slippage * 100)
+    .div(ethers.utils.parseUnits("1", PRICE_DECIMALS - 18))
+    .div(BASIS_POINTS_DIVISOR);
+
+  if (fromToken.isNative) {
+    return hlpManagerRouter.populateTransaction.addLiquidityETH(
+      minPriceInUsdHlp,
+      buyAmountWithTolerance,
+      {
+        value: BigNumber.from(sellAmount)
+      }
+    );
+  }
+  return hlpManager.populateTransaction.addLiquidity(
+    fromAddress,
+    BigNumber.from(sellAmount),
+    minPriceInUsdHlp,
+    buyAmountWithTolerance
+  );
 };
 
 export default {

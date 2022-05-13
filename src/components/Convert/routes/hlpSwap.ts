@@ -83,21 +83,23 @@ const hlpSwapTransactionHandler = async (
       buyAmountWithTolerance,
       connectedAccount
     );
-  } else if (isFromNative) {
+  }
+
+  if (isFromNative) {
     return router.populateTransaction.swapETHToTokens(
       [fromAddress, toAddress],
       buyAmountWithTolerance,
       connectedAccount,
       { value: sellAmount }
     );
-  } else {
-    return router.populateTransaction.swapTokensToETH(
-      [fromAddress, toAddress],
-      sellAmount,
-      buyAmountWithTolerance,
-      connectedAccount
-    );
   }
+
+  return router.populateTransaction.swapTokensToETH(
+    [fromAddress, toAddress],
+    sellAmount,
+    buyAmountWithTolerance,
+    connectedAccount
+  );
 };
 
 export default {

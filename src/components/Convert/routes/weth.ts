@@ -38,9 +38,12 @@ const wethTransactionHandler = async (
     return WETH__factory.connect(weth, signer).populateTransaction.deposit({
       value: sellAmount
     });
-  } else if (toToken.isNative && fromToken.address === weth) {
+  }
+
+  if (toToken.isNative && fromToken.address === weth) {
     return WETH__factory.connect(weth, signer).populateTransaction.withdraw(sellAmount);
   }
+
   throw new Error("Invalid WETH swap");
 };
 
