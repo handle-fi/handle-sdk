@@ -1,11 +1,6 @@
 import { BigNumber, ethers } from "ethers";
-import { HlpConfig } from "../../..";
-import {
-  BASIS_POINTS_DIVISOR,
-  HLP_CONTRACTS,
-  HLP_SWAP_GAS_LIMIT,
-  PRICE_DECIMALS
-} from "../../../config/hlp";
+import { config, HlpConfig } from "../../..";
+import { BASIS_POINTS_DIVISOR, HLP_CONTRACTS, PRICE_DECIMALS } from "../../../config/hlp";
 import { HlpManagerRouter__factory, HlpManager__factory } from "../../../contracts";
 import { isHlpSupportedToken, tryParseNativeHlpToken } from "../../../utils/hlp";
 import { getHlpFeeBasisPoints } from "../../Trade";
@@ -69,7 +64,7 @@ const hlpAddRemoveQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote
       allowanceTarget: hlpManagerAddress,
       sellAmount: fromAmount.toString(),
       buyAmount: hlpAmount.toString(),
-      gas: HLP_SWAP_GAS_LIMIT,
+      gas: config.convert.gasEstimates.hlp,
       feeBasisPoints: feeBasisPoints.toNumber()
     };
   } else {
@@ -86,7 +81,7 @@ const hlpAddRemoveQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote
       allowanceTarget: hlpManagerAddress,
       sellAmount: fromAmount.toString(),
       buyAmount: buyAmount.toString(),
-      gas: HLP_SWAP_GAS_LIMIT,
+      gas: config.convert.gasEstimates.hlp,
       feeBasisPoints: feeBasisPoints.toNumber()
     };
   }

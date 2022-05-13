@@ -1,5 +1,5 @@
 import { BigNumber, ethers } from "ethers";
-import { HlpConfig, HlpUtils } from "../../..";
+import { config, HlpConfig, HlpUtils } from "../../..";
 import { Router__factory } from "../../../contracts";
 import { tryParseNativeHlpToken } from "../../../utils/hlp";
 import { getSwapFeeBasisPoints } from "../../Trade";
@@ -52,7 +52,7 @@ const hlpSwapQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote> => 
     allowanceTarget: routerAddress,
     buyAmount: amountOut.toString(),
     sellAmount: fromAmount.toString(),
-    gas: HlpConfig.HLP_SWAP_GAS_LIMIT,
+    gas: config.convert.gasEstimates.hlp,
     feeBasisPoints: feeBasisPoints.toNumber()
   };
 };

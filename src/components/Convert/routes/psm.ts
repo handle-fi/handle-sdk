@@ -1,6 +1,5 @@
 import { BigNumber, ethers, providers, Signer } from "ethers";
-import { HlpConfig, Network } from "../../..";
-import { PSM_GAS_LIMIT } from "../../../config/hlp";
+import { config, HlpConfig, Network } from "../../..";
 import { HPSM__factory } from "../../../contracts";
 import { transformDecimals } from "../../../utils/general-utils";
 import { ConvertQuoteInput, ConvertTransactionInput, Quote } from "../Convert";
@@ -30,7 +29,7 @@ export const isTokenPegged = async (
   if (pegCache[network][cacheKey] !== undefined) {
     return pegCache[network][cacheKey];
   }
-  const hpsmAddress = HlpConfig.HLP_CONTRACTS[network]?.HPSM;
+  const hpsmAddress = config.protocol.arbitrum.protocol.hPsm;
   if (!hpsmAddress) {
     return false;
   }
@@ -55,7 +54,7 @@ export const psmWeight = async (input: WeightInput) => {
 
 export const psmQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote> => {
   const { fromToken, toToken, provider, network, fromAmount } = input;
-  const hpsmAddress = HlpConfig.HLP_CONTRACTS[network]?.HPSM;
+  const hpsmAddress = config.protocol.arbitrum.protocol.hPsm;
   if (!hpsmAddress) {
     throw new Error(`No HPSM for network ${network}`);
   }
@@ -79,7 +78,7 @@ export const psmQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote> 
     allowanceTarget: isDeposit ? hpsmAddress : null,
     sellAmount: fromAmount.toString(),
     buyAmount: buyAmount.toString(),
-    gas: PSM_GAS_LIMIT,
+    gas: config.convert.gasEstimates.hPsm,
     feeBasisPoints: +transactionFeeBasisPoints
   };
 
@@ -90,7 +89,7 @@ export const psmTransactionHandler = async (
   input: ConvertTransactionInput
 ): Promise<ethers.PopulatedTransaction> => {
   const { network, signer, fromToken, toToken, sellAmount } = input;
-  const hpsmAddress = HlpConfig.HLP_CONTRACTS[network]?.HPSM;
+  const hpsmAddress = config.protocol.arbitrum.protocol.hPsm;
   if (!hpsmAddress) {
     throw new Error(`No HPSM for network ${network}`);
   }

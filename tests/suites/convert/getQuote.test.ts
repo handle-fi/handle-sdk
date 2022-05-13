@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { ethers } from "ethers";
-import { HlpConfig, Network } from "../../../src";
+import { config, Network } from "../../../src";
 import Convert from "../../../src/components/Convert";
 import { HlpInfoMethods } from "../../../src/components/Trade/types";
 import { HLP_TOKENS, PRICE_DECIMALS } from "../../../src/config/hlp";
@@ -251,7 +251,7 @@ describe("convert getQuote", () => {
       });
       expect(quote.sellAmount).to.eq(ethers.utils.parseUnits("5", usdt.decimals).toString());
       expect(quote.buyAmount).to.eq(ethers.utils.parseEther("5").toString());
-      expect(quote.allowanceTarget).to.eq(HlpConfig.HLP_CONTRACTS.arbitrum?.HPSM);
+      expect(quote.allowanceTarget).to.eq(config.protocol.arbitrum.protocol.hPsm);
     });
   });
 });

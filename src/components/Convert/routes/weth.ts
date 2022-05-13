@@ -1,6 +1,5 @@
 import { ethers } from "ethers";
-import { Quote } from "../../..";
-import { HLP_SWAP_GAS_LIMIT } from "../../../config/hlp";
+import { Quote, config } from "../../..";
 import { WETH__factory } from "../../../contracts";
 import { getNativeWrappedToken } from "../../../utils/hlp";
 import { ConvertQuoteInput, ConvertTransactionInput } from "../Convert";
@@ -23,7 +22,7 @@ const wethQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote> => {
     allowanceTarget: null,
     buyAmount: input.fromAmount.toString(), // WETH swap is always 1 to 1
     sellAmount: input.fromAmount.toString(),
-    gas: HLP_SWAP_GAS_LIMIT,
+    gas: config.convert.gasEstimates.weth,
     feeBasisPoints: 0
   };
 };

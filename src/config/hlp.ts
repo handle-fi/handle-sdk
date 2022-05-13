@@ -2,12 +2,6 @@ import { ethers } from "ethers";
 import config from ".";
 import { Network, NetworkMap } from "../types/network";
 
-/** Swap function gas limit for Arbitrum. */
-export const HLP_SWAP_GAS_LIMIT = 1_500_000;
-
-/** Peg stability gas limit */
-export const PSM_GAS_LIMIT = 1_000_000;
-
 /** Currently the only avaliable handle liquidity pool network */
 export const DEFAULT_HLP_NETWORK: Network = "arbitrum";
 
@@ -56,7 +50,6 @@ export type HlpContracts = {
   HlpManager: string;
   HLP: string;
   HlpManagerRouter: string;
-  HPSM: string;
 };
 
 export type HlpToken = {
@@ -82,8 +75,7 @@ export const HLP_CONTRACTS: NetworkMap<HlpContracts | undefined> = {
     Router: "0xa3815EB3D81f45634E33fBC67CD0C1177Ba3A131",
     Reader: "0xCb7AEB7f471D1c19C78E3cd578ee5Ff0788278B6",
     HLP: "0xB666b08609b2E69A8ba51AA720770053AeC0d2d3",
-    HlpManagerRouter: "0x3ecB21eABEF68a237862E8A003807eE4Fa47509b",
-    HPSM: "0xa2b81201F92b2F3081e9e2900Cf01942e0BCCeD3"
+    HlpManagerRouter: "0x3ecB21eABEF68a237862E8A003807eE4Fa47509b"
   },
   ethereum: undefined,
   polygon: undefined
