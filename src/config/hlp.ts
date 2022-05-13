@@ -165,16 +165,3 @@ export const HLP_TOKENS: Record<Network, HlpToken[]> = {
 
 export const getHlpTokenSymbols = (network: Network): string[] =>
   HLP_TOKENS[network]?.map((x) => x.symbol) || [];
-
-/** hLP token information. */
-export const hLP = {
-  name: "handle Liquidity Pool",
-  symbol: "hLP",
-  decimals: 18,
-  isStable: true
-};
-
-export const getHLPToken = (network: Network) => ({
-  ...hLP,
-  address: HLP_CONTRACTS[network]?.HLP
-});

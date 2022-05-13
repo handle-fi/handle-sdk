@@ -1,6 +1,7 @@
 import { HLP_CONTRACTS, HLP_TOKENS } from "../config/hlp";
 import { DEFAULT_HLP_NETWORK } from "../config/hlp";
 import { Network } from "../types/network";
+import { TokenExtended } from "../types/tokens";
 
 export const getPerpTokenSymbols = (network = DEFAULT_HLP_NETWORK): string[] =>
   HLP_TOKENS[network]?.map((x) => x.symbol) || [];
@@ -17,7 +18,7 @@ export const getPerpTokenBySymbol = (symbol: string, network = DEFAULT_HLP_NETWO
 export const getPerpTokenByAddress = (address: string, network = DEFAULT_HLP_NETWORK) =>
   HLP_TOKENS[network]?.find((x) => x.address === address);
 
-export const getHlpToken = (network = DEFAULT_HLP_NETWORK) => {
+export const getHlpToken = (network = DEFAULT_HLP_NETWORK): TokenExtended<string> | null => {
   const hlpAddress = HLP_CONTRACTS[network]?.HLP;
   if (!hlpAddress) return null;
   return {
@@ -26,7 +27,7 @@ export const getHlpToken = (network = DEFAULT_HLP_NETWORK) => {
     decimals: 18,
     displayDecimals: 4,
     address: hlpAddress,
-    icon: null
+    icon: "https://handle.fi/images/handle.fiLogoCutInvertedBackground.png"
   };
 };
 
