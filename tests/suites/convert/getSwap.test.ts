@@ -6,7 +6,7 @@ import { getHlpToken, getNativeWrappedToken } from "../../../src/utils/hlp";
 import { ethers } from "hardhat";
 import { Signer, VoidSigner } from "ethers";
 import { getTokenDetails } from "../../../src/utils/token-utils";
-import { HlpConfig } from "../../../src";
+import { config } from "../../../src";
 
 const weth = getNativeWrappedToken("arbitrum")!;
 const eth = HLP_TOKENS["arbitrum"].find((x) => x.isNative)!;
@@ -201,7 +201,7 @@ describe("convert getSwap", () => {
         slippage: 0.05
       });
       expect(tx).to.be.an("object");
-      expect(tx.to).to.eq(HlpConfig.HLP_CONTRACTS.arbitrum?.HPSM);
+      expect(tx.to).to.eq(config.protocol.arbitrum.protocol.hPsm);
     });
     it("should return a swap from pegged tokens", async () => {
       const usdt = getTokenDetails("USDT", "arbitrum");
@@ -218,7 +218,7 @@ describe("convert getSwap", () => {
         slippage: 0.05
       });
       expect(tx).to.be.an("object");
-      expect(tx.to).to.eq(HlpConfig.HLP_CONTRACTS.arbitrum?.HPSM);
+      expect(tx.to).to.eq(config.protocol.arbitrum.protocol.hPsm);
     });
   });
 });
