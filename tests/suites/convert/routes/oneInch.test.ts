@@ -24,8 +24,7 @@ describe("oneInch route", () => {
     });
   });
   describe("swap", () => {
-    it(`should return an api swap`, async () => {
-      // void signer is used as forked chain is not used by api
+    it(`should return an api swap for arbitrum`, async () => {
       const signer = new ethers.VoidSigner(
         "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
         ethers.provider
