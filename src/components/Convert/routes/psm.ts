@@ -90,7 +90,7 @@ export const psmQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote> 
 export const psmTransactionHandler = async (
   input: ConvertTransactionInput
 ): Promise<ethers.PopulatedTransaction> => {
-  const { network, signer, fromToken, toToken, buyAmount } = input;
+  const { network, signer, fromToken, toToken, sellAmount } = input;
   const hpsmAddress = HlpConfig.HLP_CONTRACTS[network]?.HPSM;
   if (!hpsmAddress) {
     throw new Error(`No HPSM for network ${network}`);
@@ -101,10 +101,10 @@ export const psmTransactionHandler = async (
     isTokenPegged(toToken.address, fromToken.address, signer, network)
   ]);
   if (isDeposit) {
-    return hpsm.populateTransaction.deposit(toToken.address, fromToken.address, buyAmount);
+    return hpsm.populateTransaction.deposit(toToken.address, fromToken.address, sellAmount);
   }
   if (isWithdraw) {
-    return hpsm.populateTransaction.withdraw(fromToken.address, toToken.address, buyAmount);
+    return hpsm.populateTransaction.withdraw(fromToken.address, toToken.address, sellAmount);
   }
   throw new Error(`There is no peg between ${fromToken} and ${toToken}`);
 };

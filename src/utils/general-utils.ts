@@ -15,7 +15,7 @@ export const transformDecimals = (value: BigNumber, fromDecimals: number, toDeci
     return value.mul(TEN.pow(toDecimals - fromDecimals));
   }
   if (fromDecimals > toDecimals) {
-    return value.div(BigNumber.from(10).pow(fromDecimals - toDecimals));
+    return value.div(TEN.pow(fromDecimals - toDecimals));
   }
   return value;
 };
