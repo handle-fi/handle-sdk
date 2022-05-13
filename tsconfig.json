@@ -20,5 +20,5 @@
   },
   "include": ["./src", "./tests"],
   "exclude": ["node_modules", "./dist/**/*"],
-  "files": ["./hardhat.config.ts"]
+  "files": ["./hardhat.config.ts", "./tests/suites/convert/wetsh.ts"]
 }
