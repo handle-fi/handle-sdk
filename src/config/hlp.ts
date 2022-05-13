@@ -2,9 +2,6 @@ import { ethers } from "ethers";
 import config from ".";
 import { Network, NetworkMap } from "../types/network";
 
-/** Swap function gas limit for Arbitrum. */
-export const HLP_SWAP_GAS_LIMIT = "1500000";
-
 /** Currently the only avaliable handle liquidity pool network */
 export const DEFAULT_HLP_NETWORK: Network = "arbitrum";
 
@@ -68,7 +65,6 @@ export type HlpToken = {
   baseSymbol?: string;
 };
 
-// TODO: use network name, with NetworkMap<T>, instead of chainId.
 /** Perp contracts for each network chain ID. */
 export const HLP_CONTRACTS: NetworkMap<HlpContracts | undefined> = {
   // Arbitrum One

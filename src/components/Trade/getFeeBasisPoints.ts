@@ -3,35 +3,37 @@ import { VaultTokenInfo } from "./types";
 
 type FeeBasisPointsArgs = {
   token: string;
-  usdgDelta: BigNumber;
+  usdHlpDelta: BigNumber;
   feeBasisPoints: BigNumber;
   taxBasisPoints: BigNumber;
   increment: boolean;
-  usdgSupply: BigNumber;
+  usdHlpSupply: BigNumber;
   totalTokenWeights: BigNumber;
-  targetUsdgAmount: BigNumber;
+  targetUsdHlpAmount: BigNumber;
   getTokenInfo: (token: string) => VaultTokenInfo | undefined;
 };
 
 export const getFeeBasisPoints = ({
   token,
-  usdgDelta,
+  usdHlpDelta,
   feeBasisPoints,
   taxBasisPoints,
   increment,
   getTokenInfo,
-  targetUsdgAmount
+  targetUsdHlpAmount
 }: FeeBasisPointsArgs) => {
   const tokenInfo = getTokenInfo(token);
   if (!tokenInfo) return ethers.constants.Zero;
 
-  const initialAmount = tokenInfo.usdgAmount;
-  let nextAmount = initialAmount.add(usdgDelta);
+  const initialAmount = tokenInfo.usdHlpAmount;
+  let nextAmount = initialAmount.add(usdHlpDelta);
   if (!increment) {
-    nextAmount = usdgDelta.gt(initialAmount) ? ethers.constants.Zero : initialAmount.sub(usdgDelta);
+    nextAmount = usdHlpDelta.gt(initialAmount)
+      ? ethers.constants.Zero
+      : initialAmount.sub(usdHlpDelta);
   }
 
-  const targetAmount = targetUsdgAmount;
+  const targetAmount = targetUsdHlpAmount;
   if (!targetAmount || targetAmount.eq(0)) {
     return feeBasisPoints;
   }

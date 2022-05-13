@@ -30,7 +30,6 @@ describe("calculateLiquidationFee", () => {
     ]);
 
     const result = calculateLiquidationFee(vaultData, collaterals);
-
     expect(result.eq(ethers.constants.WeiPerEther.div(100))).to.eql(true);
   });
 

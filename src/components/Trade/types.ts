@@ -6,8 +6,8 @@ export type HlpInfoMethods = {
   getAveragePrice: (address: string) => BigNumber;
   getFundingRate: (address: string) => BigNumber;
   getTokenInfo: (address: string) => VaultTokenInfo | undefined;
-  getUsdgSupply: () => BigNumber;
-  getTargetUsdgAmount: (address: string) => BigNumber;
+  getUsdHlpSupply: () => BigNumber;
+  getTargetUsdHlpAmount: (address: string) => BigNumber;
   getTotalTokenWeights: () => BigNumber;
   getHlpPrice: (isBuying: boolean) => BigNumber;
 };
@@ -15,10 +15,10 @@ export type HlpInfoMethods = {
 export type VaultTokenInfo = {
   poolAmount: BigNumber;
   reservedAmount: BigNumber;
-  usdgAmount: BigNumber;
+  usdHlpAmount: BigNumber;
   tokenWeight: BigNumber;
   bufferAmount: BigNumber;
-  maxUsdgAmount: BigNumber;
+  maxUsdHlpAmount: BigNumber;
   minPrice: BigNumber;
   maxPrice: BigNumber;
   guaranteeUsd: BigNumber;
