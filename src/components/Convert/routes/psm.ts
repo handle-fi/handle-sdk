@@ -69,6 +69,7 @@ export const psmQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote> 
     HlpConfig.BASIS_POINTS_DIVISOR
   ).div(TRANSACTION_FEE_UNIT);
 
+  // converts 1 of the from token to 1 of the to token, accounting for decimals
   let buyAmount = input.fromAmount;
   if (input.fromToken.decimals < input.toToken.decimals) {
     buyAmount = buyAmount.mul(
