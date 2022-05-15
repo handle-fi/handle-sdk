@@ -31,7 +31,7 @@ import CollateralsSDK from "./components/Collaterals";
 import GraphSDK, { IndexedFxToken, IndexedVault, IndexedFxKeeperPool } from "./components/Graph";
 import BridgeSDK, { PendingWithdrawal } from "./components/Bridge";
 import VaultController from "./components/VaultController";
-import ConvertSDK, { Quote, Swap } from "./components/Convert";
+import ConvertSDK, { Quote } from "./components/Convert";
 import LPStakingSDK from "./components/LPStaking";
 import SingleCollateralVaultController from "./components/SingleCollateralVaultController";
 import ProtocolSDK, { ProtocolParameters } from "./components/Protocol";
@@ -107,7 +107,6 @@ export type {
   Token,
   TokenExtended,
   Quote,
-  Swap,
   FxKeeperPoolPool,
   GovernanceLockData,
   RewardPoolData,

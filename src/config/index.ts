@@ -65,6 +65,11 @@ export type Config = {
       nonStable: number;
     };
     tokenSymbolToStableType: { [key: string]: StableType };
+    gasEstimates: {
+      hpsm: number;
+      hlp: number;
+      weth: number;
+    };
   };
 };
 
@@ -76,6 +81,7 @@ export type ProtocolAddresses = {
   fxKeeperPool: string;
   governanceLock: string;
   rewardPool: string;
+  hPsm?: string;
 };
 
 export type ChainlinkFeeds = {
@@ -106,7 +112,8 @@ const config: Config = {
         treasury: "0x5710B75A0aA37f4Da939A61bb53c519296627994",
         fxKeeperPool: "0xc55204d4699dCce457DBF63d4B0074E6E1fa4412",
         governanceLock: "0xC6008E6baD8c2c0814A32f6F494fa419E95593b6",
-        rewardPool: "0xDE17Af0E4A6c870762508DcB7dCc20719584CBd0"
+        rewardPool: "0xDE17Af0E4A6c870762508DcB7dCc20719584CBd0",
+        hPsm: "0xa2b81201F92b2F3081e9e2900Cf01942e0BCCeD3"
       },
       chainlinkFeeds: {
         eth_usd: "0x639Fe6ab55C921f74e7fac1ee960C0B6293ba612",
@@ -227,6 +234,11 @@ const config: Config = {
       USDT: "USD",
       sUSD: "USD",
       EURS: "EURO"
+    },
+    gasEstimates: {
+      hlp: 800_000,
+      hpsm: 800_000,
+      weth: 500_000
     }
   }
 };
