@@ -24,7 +24,7 @@ export const isHlpSupportedToken = (symbol: string, network: Network) => {
   });
 };
 
-export const getHlpToken = (network = DEFAULT_HLP_NETWORK) => {
+export const getHlpToken = (network = DEFAULT_HLP_NETWORK): TokenExtended<string> | null => {
   const hlpAddress = HLP_CONTRACTS[network]?.HLP;
   if (!hlpAddress) return null;
   return {
