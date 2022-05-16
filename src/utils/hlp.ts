@@ -33,7 +33,7 @@ export const getHlpToken = (network = DEFAULT_HLP_NETWORK): TokenExtended<string
     decimals: 18,
     displayDecimals: 4,
     address: hlpAddress,
-    icon: "https://handle.fi/images/handle.fiLogoCutInvertedBackground.png"
+    icon: "https://app.handle.fi/assets/images/handle.fiLogoLightNewCut.png"
   };
 };
 
