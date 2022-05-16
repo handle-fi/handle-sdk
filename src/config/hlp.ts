@@ -5,6 +5,8 @@ import { Network, NetworkMap } from "../types/network";
 /** Currently the only avaliable handle liquidity pool network */
 export const DEFAULT_HLP_NETWORK: Network = "arbitrum";
 
+export const HLP_IMAGE_URL = "https://app.handle.fi/assets/images/handle.fiLogoLightNewCut.png";
+
 /** hlp constants */
 export const BASIS_POINTS_DIVISOR = 10_000;
 export const USD_DISPLAY_DECIMALS = 2;
@@ -161,16 +163,3 @@ export const HLP_TOKENS: Record<Network, HlpToken[]> = {
 
 export const getHlpTokenSymbols = (network: Network): string[] =>
   HLP_TOKENS[network]?.map((x) => x.symbol) || [];
-
-/** hLP token information. */
-export const hLP = {
-  name: "handle Liquidity Pool",
-  symbol: "hLP",
-  decimals: 18,
-  isStable: true
-};
-
-export const getHLPToken = (network: Network) => ({
-  ...hLP,
-  address: HLP_CONTRACTS[network]?.HLP
-});

@@ -40,6 +40,8 @@ export type Config = {
       chainlinkFeeds: ChainlinkFeeds;
       collaterals: CollateralDetails;
     };
+    ethereum: null;
+    polygon: null;
   };
   lpStaking: {
     arbitrum: LPStakingPoolNameMap<LPStakingPoolDetails>;
@@ -81,7 +83,7 @@ export type ProtocolAddresses = {
   fxKeeperPool: string;
   governanceLock: string;
   rewardPool: string;
-  hPsm?: string;
+  hPsm: string;
 };
 
 export type ChainlinkFeeds = {
@@ -133,7 +135,9 @@ const config: Config = {
           decimals: 18
         }
       }
-    }
+    },
+    ethereum: null,
+    polygon: null
   },
   theGraphEndpoints: {
     arbitrum: "https://api.thegraph.com/subgraphs/name/handle-fi/handle"
