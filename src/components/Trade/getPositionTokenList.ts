@@ -7,30 +7,34 @@ export const getPositionTokenList = (network: Network) => {
   const indexTokens: string[] = [];
   const isLong: boolean[] = [];
 
-  const perpTokens = HlpConfig.HLP_TOKENS[network] || [];
-  for (let token of perpTokens) {
-    if (!token.isStable && !token.isWrapped) {
-      collateralTokens.push(token.address);
-      indexTokens.push(token.address);
-      isLong.push(true);
-    }
-
-    // token should be stable from here
-    if (!token.isStable) continue;
-
-    // Loop for non stable tokens.
-    for (let j = 0; j < perpTokens.length; j++) {
-      const nonStableToken = perpTokens[j];
-
-      if (nonStableToken.isStable) continue;
-      if (nonStableToken.isWrapped) continue;
-
-      // Push stable token to collateral array.
-      collateralTokens.push(token.address);
-      indexTokens.push(nonStableToken.address);
-      isLong.push(false);
-    }
+  const hlpTokens = HlpConfig.HLP_TOKENS[network];
+  if (!hlpTokens) {
+    return {
+      collateralTokens,
+      indexTokens,
+      isLong
+    };
   }
+
+  // push tokens for long positions
+  const nonStableTokens = hlpTokens.filter((token) => !token.isStable && !token.isWrapped);
+  const stableTokens = hlpTokens.filter((token) => token.isStable && !token.isWrapped);
+  nonStableTokens.forEach((token) => {
+    collateralTokens.push(token.address);
+    indexTokens.push(token.address);
+    isLong.push(true);
+  });
+
+  // push tokens for short positions
+  stableTokens.forEach((stableToken) => {
+    nonStableTokens.forEach((nonStableToken) => {
+      if (nonStableToken.isShortable) {
+        collateralTokens.push(stableToken.address);
+        indexTokens.push(nonStableToken.address);
+        isLong.push(false);
+      }
+    });
+  });
 
   return {
     collateralTokens,

@@ -1,5 +1,5 @@
 import { BigNumber, ethers } from "ethers";
-import { BASIS_POINTS_DIVISOR } from "../../config/hlp";
+import { getLeverage } from "./getLeverage";
 import { getMarginFee } from "./getMarginFee";
 
 export type Position = {
@@ -54,8 +54,14 @@ export const contractPositionToPosition = (
   position.positionFee = getMarginFee(size);
 
   if (position.collateral && position.collateral.gt(0)) {
-    position.leverage =
-      position.size?.mul(BASIS_POINTS_DIVISOR).div(position.collateral) || ethers.constants.Zero;
+    position.leverage = getLeverage({
+      size,
+      sizeDelta: ethers.constants.Zero,
+      collateral,
+      collateralDelta: ethers.constants.Zero,
+      hasProfit: !!position.hasProfit,
+      includeDelta: true
+    });
   } else {
     position.leverage = ethers.constants.Zero;
   }
