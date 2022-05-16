@@ -1,4 +1,4 @@
-import { HLP_CONTRACTS, HLP_TOKENS } from "../config/hlp";
+import { HLP_CONTRACTS, HLP_IMAGE_URL, HLP_TOKENS } from "../config/hlp";
 import { DEFAULT_HLP_NETWORK } from "../config/hlp";
 import { Network } from "../types/network";
 import { TokenExtended } from "../types/tokens";
@@ -33,7 +33,7 @@ export const getHlpToken = (network = DEFAULT_HLP_NETWORK): TokenExtended<string
     decimals: 18,
     displayDecimals: 4,
     address: hlpAddress,
-    icon: "https://app.handle.fi/assets/images/handle.fiLogoLightNewCut.png"
+    icon: HLP_IMAGE_URL
   };
 };
 
