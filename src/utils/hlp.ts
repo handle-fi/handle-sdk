@@ -1,6 +1,7 @@
-import { HLP_CONTRACTS, HLP_TOKENS } from "../config/hlp";
+import { HLP_CONTRACTS, HLP_IMAGE_URL, HLP_TOKENS } from "../config/hlp";
 import { DEFAULT_HLP_NETWORK } from "../config/hlp";
 import { Network } from "../types/network";
+import { TokenExtended } from "../types/tokens";
 
 export const getHlpTokenSymbols = (network = DEFAULT_HLP_NETWORK): string[] =>
   HLP_TOKENS[network]?.map((x) => x.symbol) || [];
@@ -18,12 +19,12 @@ export const getHlpTokenByAddress = (address: string, network = DEFAULT_HLP_NETW
   HLP_TOKENS[network]?.find((x) => x.address === address);
 
 export const isHlpSupportedToken = (symbol: string, network: Network) => {
-  return !!HLP_TOKENS[network].some((_token) => {
+  return HLP_TOKENS[network].some((_token) => {
     return _token.symbol === symbol;
   });
 };
 
-export const getHlpToken = (network = DEFAULT_HLP_NETWORK) => {
+export const getHlpToken = (network = DEFAULT_HLP_NETWORK): TokenExtended<string> | null => {
   const hlpAddress = HLP_CONTRACTS[network]?.HLP;
   if (!hlpAddress) return null;
   return {
@@ -32,7 +33,7 @@ export const getHlpToken = (network = DEFAULT_HLP_NETWORK) => {
     decimals: 18,
     displayDecimals: 4,
     address: hlpAddress,
-    icon: null
+    icon: HLP_IMAGE_URL
   };
 };
 
