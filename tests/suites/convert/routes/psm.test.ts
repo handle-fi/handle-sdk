@@ -46,7 +46,22 @@ describe("psm", () => {
       });
       expect(quote.sellAmount).to.eq(ethers.utils.parseUnits("5", usdt.decimals).toString());
       expect(quote.buyAmount).to.eq(ethers.utils.parseEther("5").toString());
-      expect(quote.allowanceTarget).to.eq(config.protocol.arbitrum.protocol.hPsm);
+      expect(quote.allowanceTarget).to.eq(config.protocol.arbitrum?.protocol.hPsm);
+    });
+    it("should return a quote for unsupported networks even if conditions are met", async () => {
+      const usdt = getTokenDetails("USDT", "ethereum");
+      const usdc = getTokenDetails("USDC", "ethereum");
+      const quote = await Convert.getQuote({
+        fromToken: { ...usdt, name: "" },
+        toToken: { ...usdc, name: "" },
+        network: "ethereum",
+        connectedAccount: ethers.constants.AddressZero,
+        fromAmount: ethers.utils.parseUnits("5", usdt.decimals),
+        gasPrice: ethers.constants.One,
+        provider: arbitrumProvider,
+        hlpMethods: sampleHlpTokenMethods
+      });
+      expect(quote).to.be.an("object");
     });
   });
   describe("swap", () => {
@@ -65,7 +80,7 @@ describe("psm", () => {
         slippage: 0.05
       });
       expect(tx).to.be.an("object");
-      expect(tx.to).to.eq(config.protocol.arbitrum.protocol.hPsm);
+      expect(tx.to).to.eq(config.protocol.arbitrum?.protocol.hPsm);
     });
     it("should return a swap from pegged tokens", async () => {
       const usdt = getTokenDetails("USDT", "arbitrum");
@@ -82,7 +97,24 @@ describe("psm", () => {
         slippage: 0.05
       });
       expect(tx).to.be.an("object");
-      expect(tx.to).to.eq(config.protocol.arbitrum.protocol.hPsm);
+      expect(tx.to).to.eq(config.protocol.arbitrum?.protocol.hPsm);
+    });
+    it("should return a swap for unsupported networks even if conditions are met", async () => {
+      const usdt = getTokenDetails("USDT", "ethereum");
+      const eth = getTokenDetails("ETH", "ethereum");
+      const tx = await Convert.getSwap({
+        toToken: { ...usdt, name: "Tether USD" },
+        fromToken: { ...eth, name: "" },
+        network: "ethereum",
+        connectedAccount: ethers.constants.AddressZero,
+        gasPrice: ethers.utils.parseUnits("100", "gwei"),
+        hlpMethods: sampleHlpTokenMethods,
+        sellAmount: ethers.utils.parseUnits("1", eth.decimals),
+        buyAmount: ethers.utils.parseUnits("3000", usdt.decimals),
+        signer: signer,
+        slippage: 0.05
+      });
+      expect(tx).to.be.an("object");
     });
   });
 });

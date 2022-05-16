@@ -29,7 +29,7 @@ export const isTokenPegged = async (
   if (pegCache[network][cacheKey] !== undefined) {
     return pegCache[network][cacheKey];
   }
-  const hpsmAddress = config.protocol.arbitrum.protocol.hPsm;
+  const hpsmAddress = config.protocol[network]?.protocol.hPsm;
   if (!hpsmAddress) {
     return false;
   }
@@ -54,7 +54,7 @@ export const psmWeight = async (input: WeightInput) => {
 
 export const psmQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote> => {
   const { fromToken, toToken, provider, network, fromAmount } = input;
-  const hpsmAddress = config.protocol.arbitrum.protocol.hPsm;
+  const hpsmAddress = config.protocol[network]?.protocol.hPsm;
   if (!hpsmAddress) {
     throw new Error(`No HPSM for network ${network}`);
   }
@@ -89,7 +89,7 @@ export const psmTransactionHandler = async (
   input: ConvertTransactionInput
 ): Promise<ethers.PopulatedTransaction> => {
   const { network, signer, fromToken, toToken, sellAmount } = input;
-  const hpsmAddress = config.protocol.arbitrum.protocol.hPsm;
+  const hpsmAddress = config.protocol[network]?.protocol.hPsm;
   if (!hpsmAddress) {
     throw new Error(`No HPSM for network ${network}`);
   }
