@@ -1,4 +1,4 @@
-import { HlpConfig, Network } from "../..";
+import { HlpConfig, Network } from "../../..";
 
 export const getPositionTokenList = (network: Network) => {
   // These arrays will represent the possible positions that a user can be in.

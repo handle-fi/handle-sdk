@@ -1,9 +1,10 @@
-import { BigNumber } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import {
   BASIS_POINTS_DIVISOR,
   FUNDING_RATE_PRECISION,
   MARGIN_FEE_BASIS_POINTS
-} from "../../config/hlp";
+} from "../../../config/hlp";
+import { Position } from ".";
 
 type GetLeverageArgs = {
   size: BigNumber;
@@ -16,7 +17,6 @@ type GetLeverageArgs = {
   cumulativeFundingRate?: BigNumber;
   hasProfit: boolean;
   delta?: BigNumber;
-  includeDelta: boolean;
 };
 
 export function getLeverage({
@@ -68,3 +68,33 @@ export function getLeverage({
 
   return nextSize.mul(BASIS_POINTS_DIVISOR).div(remainingCollateral);
 }
+
+type PositionDelta = {
+  sizeDelta: BigNumber;
+  increaseSize: boolean;
+  collateralDelta: BigNumber;
+  increaseCollateral: boolean;
+};
+
+const DEFAULT_POSITION_DELTA: PositionDelta = {
+  sizeDelta: ethers.constants.Zero,
+  increaseSize: false,
+  collateralDelta: ethers.constants.Zero,
+  increaseCollateral: false
+};
+
+export const getLeverageFromPosition = (
+  position: Position,
+  positionDelta: PositionDelta = DEFAULT_POSITION_DELTA,
+  cumulativeFundingRate?: BigNumber
+) => {
+  return getLeverage({
+    size: position.size,
+    ...positionDelta,
+    collateral: position.collateral,
+    hasProfit: position.hasProfit,
+    entryFundingRate: position.entryFundingRate,
+    cumulativeFundingRate,
+    delta: position.delta
+  });
+};

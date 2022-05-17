@@ -1,6 +1,6 @@
 import { BigNumber, ethers } from "ethers";
 import { getLeverage } from "./getLeverage";
-import { getMarginFee } from "./getMarginFee";
+import { getMarginFee } from "./../getMarginFee";
 
 export type Position = {
   collateralToken: string;
@@ -60,7 +60,7 @@ export const contractPositionToPosition = (
       collateral,
       collateralDelta: ethers.constants.Zero,
       hasProfit: !!position.hasProfit,
-      includeDelta: true
+      delta: position.delta
     });
   } else {
     position.leverage = ethers.constants.Zero;
