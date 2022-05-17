@@ -1,0 +1,144 @@
+{
+  "name": "handle fi token list",
+  "timestamp": "2020-06-12T00:00:00+00:00",
+  "version": {
+    "major": 1,
+    "minor": 0,
+    "patch": 0
+  },
+  "tokens": [
+    {
+      "chainId": 1,
+      "symbol": "FOREX",
+      "name": "handle.fi",
+      "address": "0xDb298285FE4C5410B05390cA80e8Fbe9DE1F259B",
+      "decimals": 18,
+      "logoURI": "https://app.handle.fi/assets/images/handle/FOREXLogo.png"
+    },
+    {
+      "chainId": 1,
+      "symbol": "fxAUD",
+      "name": "handleAUD",
+      "address": "0x7E141940932E3D13bfa54B224cb4a16510519308",
+      "decimals": 18,
+      "logoURI": "https://app.handle.fi/assets/images/handle/fxAUDLogo.png"
+    },
+    {
+      "chainId": 1,
+      "symbol": "fxEUR",
+      "name": "handleEUR",
+      "address": "0x116172B2482c5dC3E6f445C16Ac13367aC3FCd35",
+      "decimals": 18,
+      "logoURI": "https://app.handle.fi/assets/images/handle/fxEURLogo.png"
+    },
+    {
+      "chainId": 1,
+      "symbol": "fxPHP",
+      "name": "handlePHP",
+      "address": "0x3d147cD9aC957B2a5F968dE9d1c6B9d0872286a0",
+      "decimals": 18,
+      "logoURI": "https://app.handle.fi/assets/images/handle/fxPHPLogo.png"
+    },
+    {
+      "chainId": 1,
+      "symbol": "fxUSD",
+      "name": "handleUSD",
+      "address": "0x8616E8EA83f048ab9A5eC513c9412Dd2993bcE3F",
+      "decimals": 18,
+      "logoURI": "https://app.handle.fi/assets/images/handle/fxUSDLogo.png"
+    },
+    {
+      "chainId": 137,
+      "symbol": "FOREX",
+      "name": "handle.fi",
+      "address": "0xDb298285FE4C5410B05390cA80e8Fbe9DE1F259B",
+      "decimals": 18,
+      "logoURI": "https://app.handle.fi/assets/images/handle/FOREXLogo.png"
+    },
+    {
+      "chainId": 137,
+      "symbol": "fxAUD",
+      "name": "handleAUD",
+      "address": "0x7E141940932E3D13bfa54B224cb4a16510519308",
+      "decimals": 18,
+      "logoURI": "https://app.handle.fi/assets/images/handle/fxAUDLogo.png"
+    },
+    {
+      "chainId": 137,
+      "symbol": "fxEUR",
+      "name": "handleEUR",
+      "address": "0x116172B2482c5dC3E6f445C16Ac13367aC3FCd35",
+      "decimals": 18,
+      "logoURI": "https://app.handle.fi/assets/images/handle/fxEURLogo.png"
+    },
+    {
+      "chainId": 137,
+      "symbol": "fxPHP",
+      "name": "handlePHP",
+      "address": "0x3d147cD9aC957B2a5F968dE9d1c6B9d0872286a0",
+      "decimals": 18,
+      "logoURI": "https://app.handle.fi/assets/images/handle/fxPHPLogo.png"
+    },
+    {
+      "chainId": 137,
+      "symbol": "fxUSD",
+      "name": "handleUSD",
+      "address": "0x8616E8EA83f048ab9A5eC513c9412Dd2993bcE3F",
+      "decimals": 18,
+      "logoURI": "https://app.handle.fi/assets/images/handle/fxUSDLogo.png"
+    },
+    {
+      "chainId": 42161,
+      "symbol": "FOREX",
+      "name": "handle.fi",
+      "address": "0xDb298285FE4C5410B05390cA80e8Fbe9DE1F259B",
+      "decimals": 18,
+      "logoURI": "https://app.handle.fi/assets/images/handle/FOREXLogo.png"
+    },
+    {
+      "chainId": 42161,
+      "symbol": "fxAUD",
+      "name": "handleAUD",
+      "address": "0x7E141940932E3D13bfa54B224cb4a16510519308",
+      "decimals": 18,
+      "logoURI": "https://app.handle.fi/assets/images/handle/fxAUDLogo.png",
+      "extensions": {
+        "isHlpToken": true
+      }
+    },
+    {
+      "chainId": 42161,
+      "symbol": "fxEUR",
+      "name": "handleEUR",
+      "address": "0x116172B2482c5dC3E6f445C16Ac13367aC3FCd35",
+      "decimals": 18,
+      "logoURI": "https://app.handle.fi/assets/images/handle/fxEURLogo.png",
+      "extensions": {
+        "isHlpToken": true
+      }
+    },
+    {
+      "chainId": 42161,
+      "symbol": "fxPHP",
+      "name": "handlePHP",
+      "address": "0x3d147cD9aC957B2a5F968dE9d1c6B9d0872286a0",
+      "decimals": 18,
+      "logoURI": "https://app.handle.fi/assets/images/handle/fxPHPLogo.png",
+      "extensions": {
+        "isHlpToken": true
+      }
+    },
+    {
+      "chainId": 42161,
+      "symbol": "fxUSD",
+      "name": "handleUSD",
+      "address": "0x8616E8EA83f048ab9A5eC513c9412Dd2993bcE3F",
+      "decimals": 18,
+      "logoURI": "https://app.handle.fi/assets/images/handle/fxUSDLogo.png",
+      "extensions": {
+        "isHlpToken": true,
+        "isStable": true
+      }
+    }
+  ]
+}
