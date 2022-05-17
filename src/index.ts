@@ -3,7 +3,6 @@ import { FxTokenSymbol, FxTokenSymbolMap } from "./types/fxTokens";
 import { Vault, SingleCollateralVaultSymbol, SingleCollateralVault } from "./types/vaults";
 import { Collateral, CollateralSymbol, CollateralSymbolWithNative } from "./types/collaterals";
 import { FxToken } from "./types/fxTokens";
-import { Token, TokenExtended } from "./types/tokens";
 import {
   Network,
   NetworkMap,
@@ -46,7 +45,6 @@ import {
   NETWORK_NAME_TO_CHAIN_ID,
   SECONDS_IN_A_YEAR_BN
 } from "./constants";
-import { ETHEREUM_TOKEN_LIST, ARBITRUM_TOKEN_LIST, POLYGON_TOKEN_LIST } from "./data/tokens";
 import { vaultUtils } from "./utils/vault-utils";
 import * as HlpConfig from "./config/hlp";
 import * as TradeUtils from "./components/Trade";
@@ -70,9 +68,6 @@ export {
   config,
   NETWORK_NAMES,
   SINGLE_COLLATERAL_NETWORK_NAMES,
-  ETHEREUM_TOKEN_LIST,
-  ARBITRUM_TOKEN_LIST,
-  POLYGON_TOKEN_LIST,
   NETWORK_NAME_TO_CHAIN_ID,
   SECONDS_IN_A_YEAR_BN,
   getNetworkName,
@@ -104,8 +99,6 @@ export type {
   SingleCollateralVaultSymbol,
   SingleCollateralVault,
   PendingWithdrawal,
-  Token,
-  TokenExtended,
   Quote,
   FxKeeperPoolPool,
   GovernanceLockData,

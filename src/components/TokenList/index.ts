@@ -25,11 +25,13 @@ type TokenListCache = {
   [url: string]: TokenListType;
 };
 
+const DEFAULT_FETCH_URLS: string[] = []; // none defined yet TODO: define
+
 class TokenList {
   protected cache: TokenListCache;
 
   constructor(
-    tokenListUrls: string[] = [],
+    tokenListUrls: string[] = DEFAULT_FETCH_URLS,
     includeHandleTokens = true,
     includeNativeTokens = true
   ) {
@@ -69,6 +71,26 @@ class TokenList {
       // undefined, which is ok as it is handled in the first half of the boolean expression
       return token.chainId === network || token.chainId === NETWORK_NAME_TO_CHAIN_ID[network];
     });
+  }
+
+  /**
+   * @param symbol symbol of the token to get
+   * @param network the network to get the token from
+   * @returns the first occurence of the token with the given symbol, or undefined if not found
+   */
+  public getTokenBySymbol(symbol: string, network?: Network | number): TokenInfo | undefined {
+    const tokens = this.getLoadedTokens(network);
+    return tokens.find((token) => token.symbol === symbol);
+  }
+
+  /**
+   * @param address address of the token to get
+   * @param network the network to get the token from
+   * @returns the first occurence of the token with the given address, or undefined if not found
+   */
+  public getTokenByAddress(address: string, network?: Network | number): TokenInfo | undefined {
+    const tokens = this.getLoadedTokens(network);
+    return tokens.find((token) => token.address.toLowerCase() === address.toLowerCase());
   }
 
   /**

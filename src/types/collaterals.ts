@@ -1,3 +1,4 @@
+import { TokenInfo } from "@uniswap/token-lists";
 import { ethers } from "ethers";
 
 export type CollateralSymbol = "FOREX" | "WETH";
@@ -12,4 +13,8 @@ export type Collateral = {
   liquidationFee: ethers.BigNumber;
   interestRate: ethers.BigNumber;
   price: ethers.BigNumber;
+};
+
+export type CollateralToken = TokenInfo & {
+  symbol: CollateralSymbol;
 };

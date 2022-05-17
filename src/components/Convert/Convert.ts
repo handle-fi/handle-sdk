@@ -4,6 +4,7 @@ import { HlpToken } from "../../config/hlp";
 import { HlpInfoMethods } from "../Trade/types";
 import routes from "./routes";
 import { WeightInput } from "./routes/weights";
+import { TokenInfo } from "@uniswap/token-lists";
 
 export type ConvertQuoteInput = {
   fromToken: HlpToken;
@@ -14,6 +15,7 @@ export type ConvertQuoteInput = {
   network: Network;
   hlpMethods?: HlpInfoMethods;
   provider?: ethers.providers.Provider | Signer;
+  tokenList: TokenInfo[];
 };
 
 export type Quote = {
@@ -35,6 +37,7 @@ export type ConvertTransactionInput = {
   gasPrice: BigNumber;
   connectedAccount: string;
   signer: Signer;
+  tokenList: TokenInfo[];
 };
 
 export default class Convert {

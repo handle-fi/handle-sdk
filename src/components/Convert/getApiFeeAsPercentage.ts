@@ -1,30 +1,20 @@
-import { TokenExtended } from "../..";
-import { Network, NetworkMap } from "../../types/network";
-import ethereum from "../../data/tokens/ethereum-tokens.json";
-import polygon from "../../data/tokens/polygon-tokens.json";
-import arbitrum from "../../data/tokens/arbitrum-tokens.json";
 import config from "../../config";
-
-const NETWORK_TO_TOKENS: NetworkMap<TokenExtended<string>[]> = {
-  ethereum,
-  arbitrum,
-  polygon
-};
+import { TokenInfo } from "@uniswap/token-lists";
 
 export const getApiFeeAsPercentage = async (
-  network: Network,
   sellTokenAddress: string,
-  buyTokenAddress: string
+  buyTokenAddress: string,
+  tokenList: TokenInfo[]
 ): Promise<number> => {
   const SAME_CURRENCY_STABLE_TO_SAME_CURRENCY_STABLE_FEE = 0.04;
   const STABLE_TO_STABLE_FEE = 0.1;
   const NON_STABLE_FEE = 0.3;
 
-  const sellToken = NETWORK_TO_TOKENS[network].find(
+  const sellToken = tokenList.find(
     (token) => token.address.toLowerCase() === sellTokenAddress.toLowerCase()
   );
 
-  const buyToken = NETWORK_TO_TOKENS[network].find(
+  const buyToken = tokenList.find(
     (token) => token.address.toLowerCase() === buyTokenAddress.toLowerCase()
   );
 
