@@ -56,9 +56,7 @@ export const contractPositionToPosition = (
   if (position.collateral && position.collateral.gt(0)) {
     position.leverage = getLeverage({
       size,
-      sizeDelta: ethers.constants.Zero,
       collateral,
-      collateralDelta: ethers.constants.Zero,
       hasProfit: !!position.hasProfit,
       delta: position.delta
     });
