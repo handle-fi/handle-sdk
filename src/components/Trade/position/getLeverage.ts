@@ -8,30 +8,37 @@ import { Position } from ".";
 
 type GetLeverageArgs = {
   size: BigNumber;
-  sizeDelta: BigNumber;
-  increaseSize?: boolean;
   collateral: BigNumber;
-  collateralDelta: BigNumber;
-  increaseCollateral?: boolean;
   entryFundingRate?: BigNumber;
   cumulativeFundingRate?: BigNumber;
   hasProfit: boolean;
   delta?: BigNumber;
 };
 
-export function getLeverage({
-  size,
-  sizeDelta,
-  increaseSize,
-  collateral,
-  collateralDelta,
-  increaseCollateral,
-  entryFundingRate,
-  cumulativeFundingRate,
-  hasProfit,
-  delta
-}: GetLeverageArgs) {
-  let nextSize = increaseSize ? size.add(sizeDelta) : size.sub(sizeDelta);
+type PositionDelta = {
+  sizeDelta: BigNumber;
+  increaseSize: boolean;
+  collateralDelta: BigNumber;
+  increaseCollateral: boolean;
+};
+
+const DEFAULT_POSITION_DELTA: PositionDelta = {
+  sizeDelta: ethers.constants.Zero,
+  increaseSize: false,
+  collateralDelta: ethers.constants.Zero,
+  increaseCollateral: false
+};
+
+export const getLeverage = (
+  { size, collateral, entryFundingRate, cumulativeFundingRate, hasProfit, delta }: GetLeverageArgs,
+  {
+    sizeDelta,
+    collateralDelta,
+    increaseCollateral,
+    increaseSize
+  }: PositionDelta = DEFAULT_POSITION_DELTA
+) => {
+  const nextSize = increaseSize ? size.add(sizeDelta) : size.sub(sizeDelta);
   let remainingCollateral = increaseCollateral
     ? collateral.add(collateralDelta)
     : collateral.sub(collateralDelta);
@@ -67,20 +74,6 @@ export function getLeverage({
   }
 
   return nextSize.mul(BASIS_POINTS_DIVISOR).div(remainingCollateral);
-}
-
-type PositionDelta = {
-  sizeDelta: BigNumber;
-  increaseSize: boolean;
-  collateralDelta: BigNumber;
-  increaseCollateral: boolean;
-};
-
-const DEFAULT_POSITION_DELTA: PositionDelta = {
-  sizeDelta: ethers.constants.Zero,
-  increaseSize: false,
-  collateralDelta: ethers.constants.Zero,
-  increaseCollateral: false
 };
 
 export const getLeverageFromPosition = (
