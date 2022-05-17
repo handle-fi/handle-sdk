@@ -1,14 +1,13 @@
 import { BigNumber, ethers, Signer } from "ethers";
 import { Network } from "../../types/network";
-import { HlpToken } from "../../config/hlp";
 import { HlpInfoMethods } from "../Trade/types";
 import routes from "./routes";
 import { WeightInput } from "./routes/weights";
 import { TokenInfo } from "@uniswap/token-lists";
 
 export type ConvertQuoteInput = {
-  fromToken: HlpToken;
-  toToken: HlpToken;
+  fromToken: TokenInfo;
+  toToken: TokenInfo;
   fromAmount: BigNumber;
   connectedAccount: string | undefined;
   gasPrice: BigNumber | undefined;
@@ -28,8 +27,8 @@ export type Quote = {
 
 export type ConvertTransactionInput = {
   network: Network;
-  fromToken: HlpToken;
-  toToken: HlpToken;
+  fromToken: TokenInfo;
+  toToken: TokenInfo;
   buyAmount: BigNumber;
   sellAmount: BigNumber;
   slippage: number;

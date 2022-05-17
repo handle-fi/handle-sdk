@@ -1,7 +1,7 @@
+import { TokenInfo } from "@uniswap/token-lists";
 import { HLP_CONTRACTS, HLP_IMAGE_URL, HLP_TOKENS } from "../config/hlp";
 import { DEFAULT_HLP_NETWORK } from "../config/hlp";
 import { Network } from "../types/network";
-import { TokenExtended } from "../types/tokens";
 
 export const getHlpTokenSymbols = (network = DEFAULT_HLP_NETWORK): string[] =>
   HLP_TOKENS[network]?.map((x) => x.symbol) || [];
@@ -42,20 +42,13 @@ export const getNativeWrappedToken = (network = DEFAULT_HLP_NETWORK) => {
   return HLP_TOKENS[network]?.find((x) => x.isWrapped && x.baseSymbol === nativeToken?.symbol);
 };
 
-export const tryParseNativeHlpToken = (
-  token: { symbol: string; address: string },
-  network: Network
-): {
-  address: string;
-  isNative: boolean;
-} => {
-  const nativeSymbol = HLP_TOKENS[network].find((x) => x.isNative)?.symbol;
-  if (!nativeSymbol) throw new Error("Can't find native token");
-  const isNative = HLP_TOKENS[network].find((x) => x.symbol === token.symbol)?.isNative || false;
-  if (!isNative) return { address: token.address, isNative };
-  const wrappedAddress = HLP_TOKENS[network].find(
-    (x) => x.isWrapped && x.baseSymbol === nativeSymbol
-  )?.address;
-  if (!wrappedAddress) throw new Error("Can't parse native hlp token: no wrapped token");
-  return { address: wrappedAddress, isNative };
+export const tryParseNativeHlpToken = (token: TokenInfo, tokenList: TokenInfo[]): string => {
+  if (token.extensions?.isNative) {
+    const address = tokenList.find(
+      (t) => t.extensions?.isWrappedNativeToken && t.extensions?.isHlpToken
+    )?.address;
+    if (!address) throw new Error("Could not find wrapped native token in hLP");
+    return address;
+  }
+  return token.address;
 };

@@ -25,7 +25,11 @@ type TokenListCache = {
   [url: string]: TokenListType;
 };
 
-const DEFAULT_FETCH_URLS: string[] = []; // none defined yet TODO: define
+const DEFAULT_FETCH_URLS: string[] = [
+  "https://api-polygon-tokens.polygon.technology/tokenlists/allTokens.tokenlist.json", // polygon
+  "https://bridge.arbitrum.io/token-list-42161.json", // arbitrum
+  "https://api.coinmarketcap.com/data-api/v3/uniswap/all.json" // ethereum
+];
 
 class TokenList {
   protected cache: TokenListCache;
@@ -78,7 +82,7 @@ class TokenList {
    * @param network the network to get the token from
    * @returns the first occurence of the token with the given symbol, or undefined if not found
    */
-  public getTokenBySymbol(symbol: string, network?: Network | number): TokenInfo | undefined {
+  public getTokenBySymbol(symbol: string, network: Network | number): TokenInfo | undefined {
     const tokens = this.getLoadedTokens(network);
     return tokens.find((token) => token.symbol === symbol);
   }
@@ -88,9 +92,13 @@ class TokenList {
    * @param network the network to get the token from
    * @returns the first occurence of the token with the given address, or undefined if not found
    */
-  public getTokenByAddress(address: string, network?: Network | number): TokenInfo | undefined {
+  public getTokenByAddress(address: string, network: Network | number): TokenInfo | undefined {
     const tokens = this.getLoadedTokens(network);
     return tokens.find((token) => token.address.toLowerCase() === address.toLowerCase());
+  }
+
+  public getNativeToken(network: Network | number) {
+    return this.getLoadedTokens(network).find((token) => token.extensions?.isNative);
   }
 
   /**

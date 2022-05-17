@@ -121,14 +121,14 @@ const hlpAddRemoveTransactionHandler = async (
   const { address: toAddress } = tryParseNativeHlpToken(toToken, network);
 
   // If selling Hlp and toToken is native
-  if (fromToken.symbol === "hLP" && toToken.isNative) {
+  if (fromToken.symbol === "hLP" && toToken.extensions?.isNative) {
     return hlpManagerRouter.populateTransaction.removeLiquidityETH(
       BigNumber.from(sellAmount),
       buyAmountWithTolerance,
       connectedAccount
     );
   }
-  if (fromToken.symbol === "hLP" && !toToken.isNative) {
+  if (fromToken.symbol === "hLP" && !toToken.extensions?.isNative) {
     // If selling Hlp and toToken is not native
     return hlpManager.populateTransaction.removeLiquidity(
       toAddress,
@@ -145,7 +145,7 @@ const hlpAddRemoveTransactionHandler = async (
     .div(ethers.utils.parseUnits("1", PRICE_DECIMALS - 18))
     .div(BASIS_POINTS_DIVISOR);
 
-  if (fromToken.isNative) {
+  if (fromToken.extensions?.isNative) {
     return hlpManagerRouter.populateTransaction.addLiquidityETH(
       minPriceInUsdHlp,
       buyAmountWithTolerance,
