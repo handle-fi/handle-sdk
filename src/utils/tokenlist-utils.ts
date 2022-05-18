@@ -1,13 +1,14 @@
-import { TokenInfo, TokenList, schema } from "@uniswap/token-lists";
+import { TokenInfo, TokenList } from "@uniswap/token-lists";
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
 import { NETWORK_NAME_TO_CHAIN_ID } from "../constants";
 import { Network } from "../types/network";
+import validationSchema from "../components/TokenManager/schema/tokenlist.schema.json";
 
 /* construct validators */
 const ajv = new Ajv({ allErrors: true, verbose: true });
 addFormats(ajv);
-const tokenSchemeValidator = ajv.compile(schema);
+const tokenSchemeValidator = ajv.compile(validationSchema);
 
 export const isSameNetwork = (network1: Network | number, network2: Network | number) => {
   if (network1 === network2) return true;
