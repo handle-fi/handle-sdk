@@ -1,17 +1,17 @@
 import { BigNumber, ethers } from "ethers";
-import { config, HlpConfig, HlpUtils } from "../../..";
+import { config, HandleTokenManager, HlpConfig } from "../../..";
 import { Router__factory } from "../../../contracts";
-import { tryParseNativeHlpToken } from "../../../utils/hlp";
 import { getSwapFeeBasisPoints } from "../../Trade";
 import { ConvertQuoteInput, ConvertTransactionInput, Quote } from "../Convert";
 import { HLP_SWAP_WEIGHT, WeightInput } from "./weights";
 
 const hlpSwapWeight = async (input: WeightInput): Promise<number> => {
   const routerAddress = HlpConfig.HLP_CONTRACTS[input.network]?.Router;
+  const tokenManager = new HandleTokenManager();
   if (
     routerAddress &&
-    HlpUtils.isHlpSupportedToken(input.toToken.symbol, input.network) &&
-    HlpUtils.isHlpSupportedToken(input.fromToken.symbol, input.network)
+    tokenManager.isHlpTokenBySymbol(input.toToken.symbol, input.network) &&
+    tokenManager.isHlpTokenBySymbol(input.fromToken.symbol, input.network)
   ) {
     return HLP_SWAP_WEIGHT;
   }
@@ -24,10 +24,11 @@ const hlpSwapQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote> => 
 
   if (!routerAddress) throw new Error(`Network ${network} does not have a Router contract`);
   if (!hlpMethods) throw new Error("hlpMethods is required for a hlpSwap quote");
+  const tokenManager = new HandleTokenManager();
 
   // Parse ETH address into WETH address.
-  const { address: parsedFromTokenAddress } = tryParseNativeHlpToken(fromToken, network);
-  const { address: parsedToTokenAddress } = tryParseNativeHlpToken(toToken, network);
+  const { hlpAddress: parsedFromTokenAddress } = tokenManager.checkForHlpNativeToken(fromToken);
+  const { hlpAddress: parsedToTokenAddress } = tokenManager.checkForHlpNativeToken(toToken);
 
   const priceIn = hlpMethods.getMinPrice(parsedFromTokenAddress);
   const priceOut = hlpMethods.getMaxPrice(parsedToTokenAddress);
@@ -66,11 +67,11 @@ const hlpSwapTransactionHandler = async (
     HlpConfig.HLP_CONTRACTS[network]?.Router ?? ethers.constants.AddressZero,
     signer
   );
-  const { address: fromAddress, isNative: isFromNative } = tryParseNativeHlpToken(
-    fromToken,
-    network
-  );
-  const { address: toAddress, isNative: isToNative } = tryParseNativeHlpToken(toToken, network);
+  const tokenManager = new HandleTokenManager();
+  const { hlpAddress: fromAddress, isNative: isFromNative } =
+    tokenManager.checkForHlpNativeToken(fromToken);
+  const { hlpAddress: toAddress, isNative: isToNative } =
+    tokenManager.checkForHlpNativeToken(toToken);
 
   const buyAmountWithTolerance = BigNumber.from(buyAmount)
     .mul(HlpConfig.BASIS_POINTS_DIVISOR - slippage * 100)
