@@ -1,12 +1,12 @@
 import { ethers } from "ethers";
-import { FxToken } from "..";
+import { FxTokenPriced } from "../types/fxTokens";
 import { SingleCollateralVault, SingleCollateralVaultData } from "../types/vaults";
 import { createSingleCollateralVault } from "../utils/vault-utils";
 
 export default class VaultController {
   public vault: SingleCollateralVault;
 
-  constructor(private currentVault: SingleCollateralVaultData, private fxToken: FxToken) {
+  constructor(private currentVault: SingleCollateralVaultData, private fxToken: FxTokenPriced) {
     this.vault = createSingleCollateralVault(currentVault, fxToken);
   }
 

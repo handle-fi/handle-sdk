@@ -1,7 +1,6 @@
 import axios from "axios";
 import { ethers } from "ethers";
-import { FxTokens } from "../config";
-import sdkConfig from "../config";
+import sdkConfig, { FxTokenAddresses } from "../config";
 import { FxTokenSymbol, Network, NetworkMap } from "..";
 import { Bridge__factory, ERC20__factory } from "../contracts";
 import { DepositEvent } from "../contracts/Bridge";
@@ -15,7 +14,7 @@ export type BridgeConfig = {
   apiBaseUrl: string;
   byNetwork: BridgeConfigByNetwork;
   forexAddress: string;
-  fxTokenAddresses: FxTokens;
+  fxTokenAddresses: FxTokenAddresses;
 };
 
 export type BridgeDepositArguments = {

@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import { Collateral, FxToken, ProtocolParameters } from "..";
+import { Collateral, FxTokenPriced, ProtocolParameters } from "..";
 import { CollateralSymbol } from "../types/collaterals";
 import { Vault, VaultData } from "../types/vaults";
 import { createVault } from "../utils/vault-utils";
@@ -10,7 +10,7 @@ export default class VaultController {
   constructor(
     private currentVault: VaultData,
     private protocolParameters: ProtocolParameters,
-    private fxToken: FxToken,
+    private fxToken: FxTokenPriced,
     private collaterals: Collateral[]
   ) {
     this.vault = createVault(currentVault, protocolParameters, fxToken, collaterals);
@@ -95,4 +95,3 @@ export default class VaultController {
     return collateral;
   };
 }
-

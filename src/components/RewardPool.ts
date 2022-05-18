@@ -1,5 +1,5 @@
 import { ethers, Signer } from "ethers";
-import sdkConfig, { FxTokens } from "../config";
+import sdkConfig, { FxTokenAddresses } from "../config";
 import { ProtocolAddresses } from "../config";
 import { NETWORK_NAME_TO_CHAIN_ID } from "../constants";
 import { RewardPool__factory } from "../contracts";
@@ -16,7 +16,7 @@ import { callMulticallObject, createMulticallProtocolContracts } from "../utils/
 
 export type RewardsPoolConfig = {
   protocolAddresses: ProtocolAddresses;
-  fxTokenAddresses: FxTokens;
+  fxTokenAddresses: FxTokenAddresses;
   chainId: number;
 };
 

@@ -45,7 +45,9 @@ export default class Collaterals {
       chainId: NETWORK_NAME_TO_CHAIN_ID.arbitrum,
       graphEndpoint: sdkConfig.theGraphEndpoints.arbitrum
     };
-    this.tokens = getTokensFromConfig(this.config.collaterals);
+    this.tokens = getTokensFromConfig(
+      Object.values(this.config.collaterals).map(({ address }) => address)
+    );
     this.graph = new Graph(this.config.graphEndpoint);
   }
 
@@ -78,7 +80,7 @@ export default class Collaterals {
     return raw.map((c, index) => this.toCollateral(this.tokens[index], c));
   };
 
-  public getIndexedCollaterals = async (): Promise<Collateral[]> => {
+  public getIndexedCollaterals = async (): Promise<Omit<Collateral, "name" | "chainId">[]> => {
     const collaterals = await this.graph.collateralGraphClient.query({});
     return collaterals.map(this.indexedToCollateral).filter((col) => {
       return this.tokens.find((t) => t.address.toLowerCase() === col.address.toLowerCase());
@@ -195,11 +197,15 @@ export default class Collaterals {
       price,
       mintCR: collateralDetails.mintCR,
       liquidationFee: collateralDetails.liquidationFee,
-      interestRate: collateralDetails.interestRate
+      interestRate: collateralDetails.interestRate,
+      chainId: token.chainId,
+      name: token.name
     };
   };
 
-  private indexedToCollateral = (collateral: IndexedCollateral): Collateral => {
+  private indexedToCollateral = (
+    collateral: IndexedCollateral
+  ): Omit<Collateral, "chainId" | "name"> => {
     return {
       symbol: collateral.symbol,
       address: collateral.address,

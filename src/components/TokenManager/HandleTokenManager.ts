@@ -1,5 +1,5 @@
 import { TokenInfo } from "@uniswap/token-lists";
-import TokenManager, { DEFAULT_FETCH_URLS } from ".";
+import TokenManager from ".";
 import { Network } from "../..";
 
 /**
@@ -13,7 +13,7 @@ import { Network } from "../..";
  * @note the handle liquidity token (symbol hLP) has isHlpToken set to false, as it is not technically in the liquidity pool
  */
 class HandleTokenManager extends TokenManager {
-  constructor(tokenListUrls: string[] = DEFAULT_FETCH_URLS, includeNativeTokens = true) {
+  constructor(tokenListUrls: string[] = [], includeNativeTokens = true) {
     super(tokenListUrls, true, includeNativeTokens);
   }
 
