@@ -1,15 +1,17 @@
 import { TokenInfo } from "@uniswap/token-lists";
-import TokenList, { DEFAULT_FETCH_URLS } from ".";
+import TokenManager, { DEFAULT_FETCH_URLS } from ".";
 import { Network } from "../..";
 
 /**
+ * TokenManager that comes with handle tokens by default.
  * Handle supported token extensions:
  * - isNative: true if token is native for that network (e.g. ETH, MATIC)
  * - isHlpToken: true if the token is a hlp token in a handle Vault contract
  * - isWrappedNative: true if the token is a wrapped version of a native token (e.g. WETH)
+ * - isStable: true if the token is a USD stablecoin, false otherwise
  * @note the handle liquidity token (symbol hLP) has isHlpToken set to false, as it is not technically in the liquidity pool
  */
-class HandleTokenList extends TokenList {
+class HandleTokenManager extends TokenManager {
   constructor(tokenListUrls: string[] = DEFAULT_FETCH_URLS, includeNativeTokens = true) {
     super(tokenListUrls, true, includeNativeTokens);
   }
@@ -19,8 +21,8 @@ class HandleTokenList extends TokenList {
    * @param tokenList the tokenList from which to construct the HandleTokenList
    * @returns an instance of HandleTokenList with the cache of the tokenList
    */
-  public static from(tokenList: TokenList): HandleTokenList {
-    const handleList = new HandleTokenList();
+  public static from(tokenList: TokenManager): HandleTokenManager {
+    const handleList = new HandleTokenManager();
     Object.assign(handleList.cache, tokenList.cache);
     return handleList;
   }
@@ -47,6 +49,34 @@ class HandleTokenList extends TokenList {
     return tokens.some(
       (token) =>
         token.address.toLowerCase() === address.toLowerCase() && token.extensions?.isHlpToken
+    );
+  }
+
+  /**
+   * Checks if the token is a stable hLP token
+   * @param symbol the symbol of the token to check
+   * @param network the network on which to check the token
+   * @returns whether there exists a stable hLP token with the given symbol
+   */
+  public isHlpStableTokenBySymbol(symbol: string, network: Network | number): boolean {
+    return this.getLoadedTokens(network).some(
+      (token) =>
+        token.symbol === symbol && token.extensions?.isStable && token.extensions?.isHlpToken
+    );
+  }
+
+  /**
+   * Checks if the token is a stable hLP token
+   * @param address the address of the token to check
+   * @param network the network on which to check the token
+   * @returns whether there exists a stable hLP token with the given address
+   */
+  public isHlpStableTokenByAddress(address: string, network: Network | number): boolean {
+    return this.getLoadedTokens(network).some(
+      (token) =>
+        token.address.toLowerCase() === address.toLowerCase() &&
+        token.extensions?.isStable &&
+        token.extensions?.isHlpToken
     );
   }
 
@@ -95,4 +125,4 @@ class HandleTokenList extends TokenList {
   }
 }
 
-export default HandleTokenList;
+export default HandleTokenManager;

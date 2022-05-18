@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import { ProtocolParameters } from "../components/Protocol";
 import { Collateral, CollateralSymbol } from "../types/collaterals";
 import { FxTokenPriced } from "../types/fxTokens";
-import { SingleCollateralVaultSymbol, VaultCollateral } from "../types/vaults";
+import { SingleCollateralVaultSymbol, VaultCollateralToken } from "../types/vaults";
 import {
   VaultData,
   Vault,
@@ -405,6 +405,7 @@ const calculateAdditionalCollateralRequired = (
 
   return valueDifferenceInEth.mul(collateral.price).div(ethers.constants.WeiPerEther);
 };
+VaultCollateralToken;
 
 export const calculateSingleCollateralVaultLiquidationPrice = (
   debt: ethers.BigNumber,

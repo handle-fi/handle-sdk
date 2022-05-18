@@ -1,10 +1,17 @@
 import { ethers } from "ethers";
-import { CollateralSymbolMap, CollateralSymbol, CollateralToken } from "./../types/collaterals";
+import { CollateralSymbolMap } from "./../types/collaterals";
 import { FxTokenSymbolMap, FxTokenSymbol } from "./../types/fxTokens";
 import { BridgeConfigByNetwork } from "./../components/Bridge";
 import { StableType } from "./../types/tokens";
 import { LPStakingPoolNameMap, LPStakingPlatformName } from "./../types/lpStaking";
 import { TokenInfo } from "@uniswap/token-lists";
+import _stakingTokens from "../components/TokenManager/staking-tokens.json";
+import _handleTokens from "../components/TokenManager/handle-tokens.json";
+import { getTokenFromTokenList, validateTokenList } from "../utils/tokenlist";
+import { mustExist } from "../utils/general-utils";
+
+const stakingTokens = validateTokenList(_stakingTokens);
+const handleTokens = validateTokenList(_handleTokens);
 
 export type FxTokenAddresses = FxTokenSymbolMap<string>;
 export type CollateralDetails = CollateralSymbolMap<{ address: string; decimals: number }>;
@@ -160,7 +167,10 @@ const config: Config = {
           address: "0x9745e5CC0522827958eE3Fc2C03247276D359186",
           symbol: "SP-WETH-FOREX"
         },
-        tokensInLp: [getTokenDetails("FOREX", "arbitrum"), getTokenDetails("WETH", "arbitrum")],
+        tokensInLp: [
+          mustExist(getTokenFromTokenList(handleTokens, "FOREX", "arbitrum"), "FOREX on arbitrum"),
+          mustExist(getTokenFromTokenList(handleTokens, "WETH", "arbitrum"), "WETH on arbitrum")
+        ],
         url: "https://app.sushi.com/add/ETH/0xDb298285FE4C5410B05390cA80e8Fbe9DE1F259B"
       },
       curveEursFxEUR: {
@@ -172,7 +182,7 @@ const config: Config = {
           symbol: "CRV-fxEUR-EURS"
         },
         tokensInLp: [
-          getTokenDetails("fxEUR", "arbitrum"),
+          mustExist(getTokenFromTokenList(handleTokens, "fxEUR", "arbitrum"), "fxEUR on arbitrum"),
           { symbol: "EURS", decimals: 2, address: "0xD22a58f79e9481D1a88e00c343885A588b34b68B" }
         ],
         url: "https://arbitrum.curve.fi/factory/7/deposit"
@@ -186,7 +196,7 @@ const config: Config = {
           symbol: "CRV-handle3"
         },
         tokensInLp: [
-          getTokenDetails("fxUSD", "arbitrum"),
+          mustExist(getTokenFromTokenList(handleTokens, "fxUSD", "arbitrum"), "fxUSD on arbitrum"),
           {
             symbol: "2CRV",
             address: "0xbf7e49483881c76487b0989cd7d9a8239b20ca41",
@@ -202,19 +212,28 @@ const config: Config = {
       "fxAUD-WETH": {
         address: "0x78c2b09973363f8111cc122AdAefB1Ae5623feBD",
         fxToken: "fxAUD",
-        collateral: getTokenDetails("WETH", "polygon")
+        collateral: mustExist(
+          getTokenFromTokenList(stakingTokens, "WETH", "polygon"),
+          "WETH on polygon"
+        )
       },
       "fxUSD-WMATIC": {
         address: "0xcAd5da38B07CB5dA10d0Cc15783C7a8679Ba0f49",
         fxToken: "fxUSD",
-        collateral: getTokenDetails("WMATIC", "polygon")
+        collateral: mustExist(
+          getTokenFromTokenList(stakingTokens, "WMATIC", "polygon"),
+          "WMATIC on polygon"
+        )
       }
     },
     arbitrum: {
       "fxAUD-WBTC": {
         address: "0x5b5906ba677f32075b3dd478d730c46eaaa48c3e",
         fxToken: "fxAUD",
-        collateral: getTokenDetails("WBTC", "arbitrum")
+        collateral: mustExist(
+          getTokenFromTokenList(stakingTokens, "WBTC", "arbitrum"),
+          "WBTC on arbitrum"
+        )
       }
     }
   },

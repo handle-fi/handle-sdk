@@ -3,10 +3,9 @@ import { Collateral, CollateralSymbol, CollateralToken } from "../types/collater
 
 export const getTokensFromConfig = (
   details: Partial<CollateralDetails>
-): Partial<CollateralToken> => {
-  return (Object.keys(details) as []).map((key) => {
-    const k = key as CollateralSymbol;
-    const detail = (details as CollateralDetails)[k];
+): Partial<CollateralToken>[] => {
+  return (Object.keys(details) as []).map((key: CollateralSymbol) => {
+    const detail = (details as CollateralDetails)[key];
 
     return {
       symbol: key,

@@ -48,7 +48,9 @@ import {
 import { vaultUtils } from "./utils/vault-utils";
 import * as HlpConfig from "./config/hlp";
 import * as TradeUtils from "./components/Trade";
-import * as HlpUtils from "./utils/hlp";
+import TokenManager from "./components/TokenManager";
+import HandleTokenManager from "./components/TokenManager/HandleTokenManager";
+import { TokenInfo, TokenList } from "@uniswap/token-lists";
 
 export {
   FxTokensSDK,
@@ -75,8 +77,9 @@ export {
   signKashiApproval,
   vaultUtils,
   HlpConfig,
-  HlpUtils,
-  TradeUtils
+  TradeUtils,
+  TokenManager,
+  HandleTokenManager
 };
 
 export type {
@@ -110,5 +113,7 @@ export type {
   LPStakingPoolName,
   LPStakingPoolNameMap,
   LPStakingPlatformName,
-  KashiPoolConfig
+  KashiPoolConfig,
+  TokenInfo,
+  TokenList
 };

@@ -1,3 +1,3 @@
-import HandleTokenList from "../../src/components/TokenList/HandleTokenList";
+import HandleTokenManager from "../../src/components/TokenManager/HandleTokenManager";
 
-export const testTokenList = new HandleTokenList();
+export const testTokenList = new HandleTokenManager();

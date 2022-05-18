@@ -1,25 +1,12 @@
 import axios from "axios";
 import handleTokenList from "./handle-tokens.json";
 import nativeTokenList from "./native-tokens.json";
-import Ajv from "ajv";
-import addFormats from "ajv-formats";
-import { schema, TokenList as TokenListType, TokenInfo } from "@uniswap/token-lists";
+import { TokenList as TokenListType, TokenInfo } from "@uniswap/token-lists";
 import { Network } from "../../types/network";
-import { NETWORK_NAME_TO_CHAIN_ID } from "../..";
+import { isSameNetwork, validateTokenList } from "../../utils/tokenlist";
 
-/* construct validators */
-const ajv = new Ajv({ allErrors: true, verbose: true });
-addFormats(ajv);
-const tokenSchemeValidator = ajv.compile(schema);
-
-const HandleTokenList = handleTokenList as TokenListType;
-const NATIVE_TOKENS = nativeTokenList as TokenListType;
-
-/* validate token lists */
-if (!tokenSchemeValidator(HandleTokenList) || !tokenSchemeValidator(NATIVE_TOKENS)) {
-  console.error(tokenSchemeValidator.errors);
-  throw new Error("Inbuilt token list validation failed");
-}
+const HandleTokenList = validateTokenList(handleTokenList);
+const NATIVE_TOKENS = validateTokenList(nativeTokenList);
 
 type TokenListCache = {
   [url: string]: TokenListType;
@@ -34,7 +21,7 @@ export const DEFAULT_FETCH_URLS: string[] = [
 /**
  * The TokenList class is used to fetch and validate token lists.
  */
-class TokenList {
+class TokenManager {
   /** Caches fetched results indefinetely */
   public cache: TokenListCache;
 
@@ -74,11 +61,9 @@ class TokenList {
     if (network === undefined) {
       return this.getTokensFromLists(Object.values(this.cache));
     }
-    return this.getTokensFromLists(Object.values(this.cache)).filter((token) => {
-      // @ts-ignore we can index into NETWORK_NAME_TO_CHAIN_ID as if it is a chain id, it will return
-      // undefined, which is ok as it is handled in the first half of the boolean expression
-      return token.chainId === network || token.chainId === NETWORK_NAME_TO_CHAIN_ID[network];
-    });
+    return this.getTokensFromLists(Object.values(this.cache)).filter((token) =>
+      isSameNetwork(token.chainId, network)
+    );
   }
 
   /**
@@ -131,16 +116,10 @@ class TokenList {
     }
 
     const { data } = await axios.get(url);
-    const valid = tokenSchemeValidator(data as unknown);
-
-    if (!valid) {
-      console.error(tokenSchemeValidator.errors);
-      throw new Error("Invalid token list");
-    } else {
-      this.cache[url] = data as TokenListType;
-      return data as TokenListType;
-    }
+    const tokenList = validateTokenList(data);
+    this.cache[url] = tokenList;
+    return tokenList;
   }
 }
 
-export default TokenList;
+export default TokenManager;

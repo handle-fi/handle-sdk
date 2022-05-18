@@ -6,7 +6,7 @@ import {
   FxTokenSymbol,
   ProtocolParameters
 } from "../../src";
-import { VaultCollateral, VaultData } from "../../src/types/vaults";
+import { VaultCollateralToken, VaultData } from "../../src/types/vaults";
 
 export const createMockCollateral = (overides: Partial<Collateral> = {}): Collateral => {
   return {
@@ -41,18 +41,20 @@ export const createMockFxToken = (overrides: Partial<FxToken> = {}): FxToken => 
 export const createVaultCollateralFromCollateral = (
   collateral: Collateral,
   amount: ethers.BigNumber
-): VaultCollateral<CollateralSymbol> => {
+): VaultCollateralToken<CollateralSymbol> => {
   return {
     symbol: collateral.symbol,
     decimals: collateral.decimals,
     address: collateral.address,
-    amount
+    amount,
+    chainId: 1,
+    name: "Vault Collateral Token"
   };
 };
 
 export const createMockVaultData = (
   debt: ethers.BigNumber,
-  collateral: VaultCollateral<CollateralSymbol>[]
+  collateral: VaultCollateralToken<CollateralSymbol>[]
 ): VaultData => {
   return {
     account: "0x3e5c9ced70887166612ced5b537fb294dcecb357",
