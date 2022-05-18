@@ -4,6 +4,7 @@ import { HlpInfoMethods } from "../Trade/types";
 import routes from "./routes";
 import { WeightInput } from "./routes/weights";
 import { TokenInfo } from "@uniswap/token-lists";
+import { CHAIN_ID_TO_NETWORK_NAME } from "../../constants";
 
 export type ConvertQuoteInput = {
   fromToken: TokenInfo;
@@ -11,10 +12,10 @@ export type ConvertQuoteInput = {
   fromAmount: BigNumber;
   connectedAccount: string | undefined;
   gasPrice: BigNumber | undefined;
-  network: Network;
   hlpMethods?: HlpInfoMethods;
   provider?: ethers.providers.Provider | Signer;
   tokenList: TokenInfo[];
+  network: Network;
 };
 
 export type Quote = {
@@ -26,7 +27,6 @@ export type Quote = {
 };
 
 export type ConvertTransactionInput = {
-  network: Network;
   fromToken: TokenInfo;
   toToken: TokenInfo;
   buyAmount: BigNumber;
@@ -37,6 +37,7 @@ export type ConvertTransactionInput = {
   connectedAccount: string;
   signer: Signer;
   tokenList: TokenInfo[];
+  network: Network;
 };
 
 export default class Convert {
@@ -60,25 +61,38 @@ export default class Convert {
     return route;
   };
 
-  public static getQuote = async (input: ConvertQuoteInput): Promise<Quote> => {
+  private static getNetwork = (token1: TokenInfo, token2: TokenInfo): Network => {
+    if (token1.chainId !== token2.chainId) {
+      throw new Error(`Tokens ${token1.symbol} and ${token2.symbol} are on different chains`);
+    }
+    const network = CHAIN_ID_TO_NETWORK_NAME[token1.chainId];
+    if (!network) {
+      throw new Error(`Token ${token1.symbol} is on an unsupported chain`);
+    }
+    return network;
+  };
+
+  public static getQuote = async (input: Omit<ConvertQuoteInput, "network">): Promise<Quote> => {
+    const network = Convert.getNetwork(input.fromToken, input.toToken);
     const route = await this.getHighestWeightRoute({
       fromToken: input.fromToken,
       toToken: input.toToken,
       signerOrProvider: input.provider,
-      network: input.network
+      network: network
     });
-    return route.quote(input);
+    return route.quote({ ...input, network });
   };
 
   public static getSwap = async (
-    input: ConvertTransactionInput
+    input: Omit<ConvertTransactionInput, "network">
   ): Promise<ethers.PopulatedTransaction> => {
+    const network = Convert.getNetwork(input.fromToken, input.toToken);
     const route = await this.getHighestWeightRoute({
       fromToken: input.fromToken,
       toToken: input.toToken,
       signerOrProvider: input.signer,
-      network: input.network
+      network: network
     });
-    return route.transaction(input);
+    return route.transaction({ ...input, network });
   };
 }

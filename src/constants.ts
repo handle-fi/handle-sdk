@@ -11,6 +11,12 @@ export const NETWORK_NAME_TO_CHAIN_ID: NetworkMap<number> = {
   polygon: 137
 };
 
+export const CHAIN_ID_TO_NETWORK_NAME: Record<number, Network> = {
+  1: "ethereum",
+  42161: "arbitrum",
+  137: "polygon"
+};
+
 export const NETWORK_NAMES = Object.keys(NETWORK_NAME_TO_CHAIN_ID) as Network[];
 
 export const SINGLE_COLLATERAL_NETWORK_NAMES = Object.keys(

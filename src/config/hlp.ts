@@ -83,10 +83,6 @@ export const HLP_CONTRACTS: NetworkMap<HlpContracts | undefined> = {
   polygon: undefined
 };
 
-export const HLP_CHAIN_TO_NETWORK: { [chainId: number]: Network } = {
-  42161: "arbitrum"
-};
-
 /** Tokens configured in the Vault contract. */
 // export const HLP_TOKENS: Record<Network, HlpToken[]> = {
 //   // Arbitrum One
