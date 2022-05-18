@@ -10,7 +10,9 @@ import { Network } from "../..";
  * - isWrappedNative: true if the token is a wrapped version of a native token (e.g. WETH)
  * - isStable: true if the token is a USD stablecoin, false otherwise
  * - isFxToken: true if token is a fx token, false otherwise
- * @note the handle liquidity token (symbol hLP) has isHlpToken set to false, as it is not technically in the liquidity pool
+ * - isLiquidityToken: true if token is the Handle Liquidity Token (symbol hLP), false otherwise
+ * @note the Handle Liquidity Token (symbol hLP) has isHlpToken set to false, as it is not technically in the liquidity pool.
+ * Instead, it has isLiquidityToken set to true
  */
 class HandleTokenManager extends TokenManager {
   constructor(tokenListUrls: string[] = [], includeNativeTokens = true) {
@@ -128,8 +130,8 @@ class HandleTokenManager extends TokenManager {
       }
       return { isNative: true, hlpAddress: wrappedNative.address };
     }
-    if (!token.extensions?.isHlpToken) {
-      throw new Error("Token is neither a hlp token nor native");
+    if (!token.extensions?.isHlpToken && !token.extensions?.isLiquidityToken) {
+      throw new Error("Token is neither a hLP, a hLP token, or a native token");
     }
     return { isNative: false, hlpAddress: token.address };
   }

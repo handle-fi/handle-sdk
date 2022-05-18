@@ -8,8 +8,10 @@ const wethWeight = async (input: WeightInput): Promise<number> => {
   const weth = new HandleTokenManager().getHlpWrappedNativeToken(input.network)?.address;
   if (!weth) return 0;
   if (
-    (input.fromToken.address === weth && input.toToken.isNative) ||
-    (input.toToken.address === weth && input.fromToken.isNative)
+    (input.fromToken.address.toLowerCase() === weth.toLowerCase() &&
+      input.toToken.extensions?.isNative) ||
+    (input.toToken.address.toLowerCase() === weth.toLowerCase() &&
+      input.fromToken.extensions?.isNative)
   ) {
     return WETH_WEIGHT;
   }

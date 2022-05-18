@@ -8,11 +8,13 @@ import { HLP_SWAP_WEIGHT, WeightInput } from "./weights";
 const hlpSwapWeight = async (input: WeightInput): Promise<number> => {
   const routerAddress = HlpConfig.HLP_CONTRACTS[input.network]?.Router;
   const tokenManager = new HandleTokenManager();
-  if (
-    routerAddress &&
-    tokenManager.isHlpTokenBySymbol(input.toToken.symbol, input.network) &&
-    tokenManager.isHlpTokenBySymbol(input.fromToken.symbol, input.network)
-  ) {
+  const isToTokenValid =
+    tokenManager.isHlpTokenBySymbol(input.toToken.symbol, input.network) ||
+    input.toToken.extensions?.isNative;
+  const isFromTokenValid =
+    tokenManager.isHlpTokenBySymbol(input.fromToken.symbol, input.network) ||
+    input.fromToken.extensions?.isNative;
+  if (routerAddress && isToTokenValid && isFromTokenValid) {
     return HLP_SWAP_WEIGHT;
   }
   return 0;

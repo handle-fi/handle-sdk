@@ -187,7 +187,7 @@ const config: Config = {
         },
         tokensInLp: [
           mustExist(getTokenFromTokenList(handleTokens, "fxEUR", "arbitrum"), "fxEUR on arbitrum"),
-          mustExist(getTokenFromTokenList(handleTokens, "EURS", "arbitrum"), "EURS on arbitrum")
+          mustExist(getTokenFromTokenList(stakingTokens, "EURS", "arbitrum"), "EURS on arbitrum")
         ],
         url: "https://arbitrum.curve.fi/factory/7/deposit"
       },
@@ -201,7 +201,7 @@ const config: Config = {
         },
         tokensInLp: [
           mustExist(getTokenFromTokenList(handleTokens, "fxUSD", "arbitrum"), "fxUSD on arbitrum"),
-          mustExist(getTokenFromTokenList(handleTokens, "2CRV", "arbitrum"), "2CRV on arbitrum")
+          mustExist(getTokenFromTokenList(stakingTokens, "2CRV", "arbitrum"), "2CRV on arbitrum")
         ],
         url: "https://arbitrum.curve.fi/factory/12/deposit"
       }

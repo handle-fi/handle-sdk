@@ -13,7 +13,7 @@ type TokenListCache = {
 };
 
 export const DEFAULT_FETCH_URLS: string[] = [
-  "https://api-polygon-tokens.polygon.technology/tokenlists/allTokens.tokenlist.json", // polygon
+  "https://api-polygon-tokens.polygon.technology/tokenlists/default.tokenlist.json", // polygon
   "https://bridge.arbitrum.io/token-list-42161.json", // arbitrum
   "https://api.coinmarketcap.com/data-api/v3/uniswap/all.json" // ethereum
 ];
@@ -25,6 +25,8 @@ class TokenManager {
   /** Caches fetched results indefinetely */
   public cache: TokenListCache;
 
+  public initialLoad: Promise<TokenListType[]>;
+
   constructor(
     tokenListUrls: string[] = DEFAULT_FETCH_URLS,
     includeHandleTokens = true,
@@ -33,7 +35,7 @@ class TokenManager {
     this.cache = {};
     if (includeHandleTokens) this.cache["handle-tokens"] = HandleTokenList;
     if (includeNativeTokens) this.cache["native-tokens"] = NATIVE_TOKENS;
-    tokenListUrls.forEach((url) => this.fetchTokenList(url));
+    this.initialLoad = Promise.all(tokenListUrls.map((url) => this.fetchTokenList(url)));
   }
 
   /**

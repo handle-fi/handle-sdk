@@ -11,11 +11,17 @@ const hlpAddRemoveWeight = async (input: WeightInput) => {
     return 0;
   }
   const tokenManager = new HandleTokenManager();
+
+  const isToValidHlp =
+    tokenManager.isHlpTokenByAddress(input.toToken.address, input.network) ||
+    input.toToken.extensions?.isNative;
+  const isFromValidHlp =
+    tokenManager.isHlpTokenByAddress(input.fromToken.address, input.network) ||
+    input.fromToken.extensions?.isNative;
+
   if (
-    (input.toToken.symbol === "hLP" &&
-      tokenManager.isHlpStableTokenByAddress(input.fromToken.address, input.network)) ||
-    (input.fromToken.symbol === "hLP" &&
-      tokenManager.isHlpStableTokenByAddress(input.toToken.symbol, input.network))
+    (input.toToken.symbol === "hLP" && isFromValidHlp) ||
+    (input.fromToken.symbol === "hLP" && isToValidHlp)
   ) {
     return HLP_ADD_REMOVE_WEIGHT;
   }
