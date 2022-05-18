@@ -1,8 +1,6 @@
 import { FxToken, FxTokenSymbol, FxTokenSymbolMap } from "..";
 
-export const getTokensFromAddresses = (
-  addresses: Partial<FxTokenSymbolMap<string>>
-): Partial<FxToken>[] => {
+export const getTokensFromAddresses = (addresses: Partial<FxTokenSymbolMap<string>>): FxToken[] => {
   return (Object.keys(addresses) as []).map((key) => {
     const k = key as FxTokenSymbol;
     const a = addresses as FxTokenSymbolMap<string>;

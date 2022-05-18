@@ -16,7 +16,7 @@ export type VaultCollateralToken<T> = TokenInfo & {
 export type VaultData = {
   account: string;
   debt: ethers.BigNumber;
-  fxToken: Partial<VaultFxToken>;
+  fxToken: VaultFxToken;
   collateral: VaultCollateralToken<CollateralSymbol>[];
 };
 

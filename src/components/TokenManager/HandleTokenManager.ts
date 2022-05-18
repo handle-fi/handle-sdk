@@ -28,6 +28,15 @@ class HandleTokenManager extends TokenManager {
   }
 
   /**
+   * Gets all hLP tokens for a network
+   * @param network the network on which to search for tokens
+   * @returns all hLP tokens for the network
+   */
+  public getHlpTokens(network: number | Network): TokenInfo[] {
+    return this.getLoadedTokens(network).filter((token) => token.extensions?.isHlpToken);
+  }
+
+  /**
    * Checks if a token is a supported hLP token by its symbol
    * @param symbol the symbol of the token to check
    * @param network the network on which to check the token

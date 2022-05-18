@@ -5,10 +5,7 @@ export type CollateralSymbol = "FOREX" | "WETH";
 export type CollateralSymbolWithNative = CollateralSymbol | "ETH";
 export type CollateralSymbolMap<T> = { [key in CollateralSymbol]: T };
 
-export type Collateral = {
-  symbol: CollateralSymbol;
-  address: string;
-  decimals: number;
+export type Collateral = CollateralToken & {
   mintCR: ethers.BigNumber;
   liquidationFee: ethers.BigNumber;
   interestRate: ethers.BigNumber;

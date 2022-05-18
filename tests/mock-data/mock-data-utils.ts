@@ -13,6 +13,8 @@ export const createMockCollateral = (overides: Partial<Collateral> = {}): Collat
     symbol: `COLLATERAL_${randomId()}` as unknown as CollateralSymbol,
     address: ethers.Wallet.createRandom().address,
     decimals: 18,
+    chainId: 1,
+    name: "Mock Collateral",
     mintCR: ethers.BigNumber.from("200"),
     liquidationFee: ethers.BigNumber.from("1250"),
     interestRate: ethers.BigNumber.from("25"),
@@ -61,7 +63,10 @@ export const createMockVaultData = (
     fxToken: {
       symbol: "MOCK_FX_TOKEN" as unknown as FxTokenSymbol,
       address: ethers.Wallet.createRandom().address,
-      decimals: 18
+      decimals: 18,
+      chainId: 1,
+      name: "Mock Fx Token",
+      price: ethers.constants.WeiPerEther
     },
     debt,
     collateral

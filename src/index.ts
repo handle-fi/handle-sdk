@@ -92,7 +92,7 @@ export type {
   Collateral,
   CollateralSymbol,
   CollateralSymbolWithNative,
-  FxTokenPriced as FxToken,
+  FxTokenPriced,
   Price,
   ProtocolParameters,
   Network,

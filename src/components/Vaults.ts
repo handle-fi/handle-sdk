@@ -608,7 +608,9 @@ export default class Vaults {
         address: c.address.toLowerCase(),
         symbol: collateral.symbol,
         amount: ethers.BigNumber.from(c.amount),
-        decimals: collateral.decimals
+        decimals: collateral.decimals,
+        name: collateral.name,
+        chainId: collateral.chainId
       };
     });
 

@@ -1,14 +1,13 @@
 import { ethers } from "ethers";
 import { FxTokenAddresses, ProtocolAddresses } from "../config";
 import { ERC20__factory } from "../contracts";
-import { FxTokenPriced, FxTokenSymbol } from "../types/fxTokens";
+import { FxTokenPriced, FxTokenSymbol, FxToken } from "../types/fxTokens";
 import { callMulticallObjects, createMulticallProtocolContracts } from "../utils/contract-utils";
-import { getTokensFromAddresses } from "../utils/fxToken-utils";
+// import { getTokensFromAddresses } from "../utils/fxToken-utils";
 import sdkConfig from "../config";
 import { Promisified } from "../types/general";
-import { Token } from "../types/tokens";
 import Graph, { IndexedFxToken } from "./Graph";
-import { SingleCollateralVaultNetwork } from "..";
+import { SingleCollateralVaultNetwork, TokenInfo } from "..";
 import { BENTOBOX_ADDRESS } from "@sushiswap/core-sdk";
 import { NETWORK_NAME_TO_CHAIN_ID } from "../constants";
 
@@ -19,12 +18,12 @@ export type FxTokensConfig = {
   graphEndpoint: string;
 };
 
-type FxTokenMulticallMulticall = {
+type Price = {
   price: ethers.BigNumber;
 };
 
 export default class FxTokens {
-  public tokens: Token<FxTokenSymbol>[];
+  public tokens: TokenInfo[];
   private config: FxTokensConfig;
   private graph: Graph;
 
@@ -105,7 +104,7 @@ export default class FxTokens {
   private getFxTokenMulticall = (
     fxTokenSymbol: FxTokenSymbol,
     signer: ethers.Signer
-  ): Promisified<FxTokenMulticallMulticall> => {
+  ): Promisified<Price> => {
     const tokenAddress = this.config.fxTokenAddresses[fxTokenSymbol];
     if (!tokenAddress) {
       throw new Error(`fxTokens not initialised with token that matches: ${fxTokenSymbol}`);
@@ -122,10 +121,7 @@ export default class FxTokens {
     };
   };
 
-  private onChainToFxToken = (
-    token: Token<FxTokenSymbol>,
-    fxToken: FxTokenMulticallMulticall
-  ): FxTokenPriced => {
+  private onChainToFxToken = (token: FxToken, fxToken: Price): FxTokenPriced => {
     const { price } = fxToken;
 
     return {
