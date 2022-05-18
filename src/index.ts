@@ -39,18 +39,17 @@ import GovernanceLockSDK from "./components/GovernanceLock";
 import RewardPoolSDK from "./components/RewardPool";
 import { getIsKashiApproved, signKashiApproval } from "./utils/allowance-utils";
 import { getNetworkName } from "./utils/web3-utils";
-import {
-  NETWORK_NAMES,
-  SINGLE_COLLATERAL_NETWORK_NAMES,
-  NETWORK_NAME_TO_CHAIN_ID,
-  SECONDS_IN_A_YEAR_BN
-} from "./constants";
+import { NETWORK_NAMES, NETWORK_NAME_TO_CHAIN_ID, SECONDS_IN_A_YEAR_BN } from "./constants";
 import { vaultUtils } from "./utils/vault-utils";
 import * as HlpConfig from "./config/hlp";
 import * as TradeUtils from "./components/Trade";
 import TokenManager from "./components/TokenManager";
 import HandleTokenManager from "./components/TokenManager/HandleTokenManager";
 import { TokenInfo, TokenList } from "@uniswap/token-lists";
+
+const SINGLE_COLLATERAL_NETWORK_NAMES = Object.keys(
+  config.singleCollateralVaults
+) as SingleCollateralVaultNetwork[];
 
 export {
   FxTokensSDK,

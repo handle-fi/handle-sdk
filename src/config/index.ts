@@ -7,30 +7,8 @@ import { LPStakingPoolNameMap, LPStakingPlatformName } from "./../types/lpStakin
 import { TokenInfo } from "@uniswap/token-lists";
 import _stakingTokens from "../components/TokenManager/staking-tokens.json";
 import _handleTokens from "../components/TokenManager/handle-tokens.json";
-import { getTokenFromTokenList, validateTokenList } from "../utils/tokenlist";
+import { validateTokenList, getTokenFromTokenList } from "../utils/tokenlist-utils";
 import { mustExist } from "../utils/general-utils";
-
-// import Ajv from "ajv";
-// import addFormats from "ajv-formats";
-// import { schema, TokenList } from "@uniswap/token-lists";
-// /* construct validators */
-// const ajv = new Ajv({ allErrors: true, verbose: true });
-// addFormats(ajv);
-// const tokenSchemeValidator = ajv.compile(schema);
-
-// /**
-//  * validates a tokenList and returns it if it is valid, throws otherwise
-//  * @param tokenList the tokenList to validate
-//  * @returns the tokenList, if valid
-//  * @throws if the tokenList is not valid
-//  */
-// export const validateTokenList = (tokenList: any) => {
-//   if (!tokenSchemeValidator(tokenList)) {
-//     console.error(tokenSchemeValidator.errors);
-//     throw new Error("Failed to validate token list");
-//   }
-//   return tokenList as any as TokenList;
-// };
 
 const stakingTokens = validateTokenList(_stakingTokens);
 const handleTokens = validateTokenList(_handleTokens);
@@ -131,7 +109,7 @@ const forexAddress = mustExist(
 
 const config: Config = {
   forexAddress: forexAddress,
-  fxTokenAddresses: handleTokens.tokens.reduce((acc, token) => {
+  fxTokenAddresses: handleTokens.tokens.reduce((acc: any, token: any) => {
     if (!token.extensions?.isFxToken) return acc;
     return {
       ...acc,

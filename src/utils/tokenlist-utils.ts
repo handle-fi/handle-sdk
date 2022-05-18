@@ -1,7 +1,8 @@
 import { TokenInfo, TokenList, schema } from "@uniswap/token-lists";
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
-import { Network, NETWORK_NAME_TO_CHAIN_ID } from "..";
+import { NETWORK_NAME_TO_CHAIN_ID } from "../constants";
+import { Network } from "../types/network";
 
 /* construct validators */
 const ajv = new Ajv({ allErrors: true, verbose: true });
@@ -35,7 +36,9 @@ export const validateTokenList = (tokenList: any) => {
   return tokenList as any as TokenList;
 };
 
-export const log = () => console.log("huiasfhfdhjklfdhklj");
+export function doSomething() {
+  console.log("huiasfhfdhjklfdhklj");
+}
 
 export const getTokenFromTokenList = (
   tokenList: TokenList,

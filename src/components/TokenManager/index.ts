@@ -3,7 +3,7 @@ import handleTokenList from "./handle-tokens.json";
 import nativeTokenList from "./native-tokens.json";
 import { TokenList as TokenListType, TokenInfo } from "@uniswap/token-lists";
 import { Network } from "../../types/network";
-import { isSameNetwork, validateTokenList } from "../../utils/tokenlist";
+import { isSameNetwork, validateTokenList } from "../../utils/tokenlist-utils";
 
 const HandleTokenList = validateTokenList(handleTokenList);
 const NATIVE_TOKENS = validateTokenList(nativeTokenList);
