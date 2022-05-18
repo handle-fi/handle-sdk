@@ -8,14 +8,14 @@ import sushiBentoAbi from "../abis/sushi/SushiBento.json";
 import { Promisified } from "../types/general";
 import { TokenInfo } from "@uniswap/token-lists";
 
-import { FxToken } from "..";
 import { KashiPoolConfig } from "../config";
 import { SingleCollateralVaultData } from "../types/vaults";
+import { FxTokenPriced } from "../types/fxTokens";
 
 export type KashiPair = {
   account: string;
   collateralAsset: TokenInfo;
-  borrowAsset: FxToken;
+  borrowAsset: FxTokenPriced;
   interestPerYear: ethers.BigNumber;
   availableToBorrow: ethers.BigNumber;
   currentBorrowAmount: ethers.BigNumber;

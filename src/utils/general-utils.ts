@@ -20,9 +20,9 @@ export const transformDecimals = (value: BigNumber, fromDecimals: number, toDeci
   return value;
 };
 
-export const mustExist = (value: any, name: string) => {
+export function mustExist<Type>(value: Type | undefined | null, name: string): Type {
   if (value == null) {
     throw new Error(`'${name}' is required`);
   }
   return value;
-};
+}

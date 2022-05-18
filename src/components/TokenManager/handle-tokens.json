@@ -21,7 +21,10 @@
       "name": "handleAUD",
       "address": "0x7E141940932E3D13bfa54B224cb4a16510519308",
       "decimals": 18,
-      "logoURI": "https://app.handle.fi/assets/images/handle/fxAUDLogo.png"
+      "logoURI": "https://app.handle.fi/assets/images/handle/fxAUDLogo.png",
+      "extensions": {
+        "isFxToken": true
+      }
     },
     {
       "chainId": 1,
@@ -29,7 +32,10 @@
       "name": "handleEUR",
       "address": "0x116172B2482c5dC3E6f445C16Ac13367aC3FCd35",
       "decimals": 18,
-      "logoURI": "https://app.handle.fi/assets/images/handle/fxEURLogo.png"
+      "logoURI": "https://app.handle.fi/assets/images/handle/fxEURLogo.png",
+      "extensions": {
+        "isFxToken": true
+      }
     },
     {
       "chainId": 1,
@@ -37,7 +43,10 @@
       "name": "handlePHP",
       "address": "0x3d147cD9aC957B2a5F968dE9d1c6B9d0872286a0",
       "decimals": 18,
-      "logoURI": "https://app.handle.fi/assets/images/handle/fxPHPLogo.png"
+      "logoURI": "https://app.handle.fi/assets/images/handle/fxPHPLogo.png",
+      "extensions": {
+        "isFxToken": true
+      }
     },
     {
       "chainId": 1,
@@ -45,7 +54,10 @@
       "name": "handleUSD",
       "address": "0x8616E8EA83f048ab9A5eC513c9412Dd2993bcE3F",
       "decimals": 18,
-      "logoURI": "https://app.handle.fi/assets/images/handle/fxUSDLogo.png"
+      "logoURI": "https://app.handle.fi/assets/images/handle/fxUSDLogo.png",
+      "extensions": {
+        "isFxToken": true
+      }
     },
     {
       "chainId": 137,
@@ -61,7 +73,10 @@
       "name": "handleAUD",
       "address": "0x7E141940932E3D13bfa54B224cb4a16510519308",
       "decimals": 18,
-      "logoURI": "https://app.handle.fi/assets/images/handle/fxAUDLogo.png"
+      "logoURI": "https://app.handle.fi/assets/images/handle/fxAUDLogo.png",
+      "extensions": {
+        "isFxToken": true
+      }
     },
     {
       "chainId": 137,
@@ -69,7 +84,10 @@
       "name": "handleEUR",
       "address": "0x116172B2482c5dC3E6f445C16Ac13367aC3FCd35",
       "decimals": 18,
-      "logoURI": "https://app.handle.fi/assets/images/handle/fxEURLogo.png"
+      "logoURI": "https://app.handle.fi/assets/images/handle/fxEURLogo.png",
+      "extensions": {
+        "isFxToken": true
+      }
     },
     {
       "chainId": 137,
@@ -77,7 +95,10 @@
       "name": "handlePHP",
       "address": "0x3d147cD9aC957B2a5F968dE9d1c6B9d0872286a0",
       "decimals": 18,
-      "logoURI": "https://app.handle.fi/assets/images/handle/fxPHPLogo.png"
+      "logoURI": "https://app.handle.fi/assets/images/handle/fxPHPLogo.png",
+      "extensions": {
+        "isFxToken": true
+      }
     },
     {
       "chainId": 137,
@@ -85,7 +106,10 @@
       "name": "handleUSD",
       "address": "0x8616E8EA83f048ab9A5eC513c9412Dd2993bcE3F",
       "decimals": 18,
-      "logoURI": "https://app.handle.fi/assets/images/handle/fxUSDLogo.png"
+      "logoURI": "https://app.handle.fi/assets/images/handle/fxUSDLogo.png",
+      "extensions": {
+        "isFxToken": true
+      }
     },
     {
       "chainId": 42161,
@@ -103,7 +127,8 @@
       "decimals": 18,
       "logoURI": "https://app.handle.fi/assets/images/handle/fxAUDLogo.png",
       "extensions": {
-        "isHlpToken": true
+        "isHlpToken": true,
+        "isFxToken": true
       }
     },
     {
@@ -114,7 +139,8 @@
       "decimals": 18,
       "logoURI": "https://app.handle.fi/assets/images/handle/fxEURLogo.png",
       "extensions": {
-        "isHlpToken": true
+        "isHlpToken": true,
+        "isFxToken": true
       }
     },
     {
@@ -125,7 +151,8 @@
       "decimals": 18,
       "logoURI": "https://app.handle.fi/assets/images/handle/fxPHPLogo.png",
       "extensions": {
-        "isHlpToken": true
+        "isHlpToken": true,
+        "isFxToken": true
       }
     },
     {
@@ -137,7 +164,8 @@
       "logoURI": "https://app.handle.fi/assets/images/handle/fxUSDLogo.png",
       "extensions": {
         "isHlpToken": true,
-        "isStable": true
+        "isStable": true,
+        "isFxToken": true
       }
     },
     {

@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import { FxTokenSymbol } from "..";
-import sdkConfig, { FxTokenAddresses } from "../config";
+import sdkConfig, { FxTokens } from "../config";
 import { ProtocolAddresses } from "../config";
 import { NETWORK_NAME_TO_CHAIN_ID } from "../constants";
 import { FxKeeperPool__factory } from "../contracts";
@@ -14,7 +14,7 @@ import {
 
 export type FxKeeperPoolConfig = {
   protocolAddresses: ProtocolAddresses;
-  fxTokenAddresses: FxTokenAddresses;
+  fxTokenAddresses: FxTokens;
   chainId: number;
 };
 

@@ -1,16 +1,9 @@
-import { FxToken, FxTokenSymbol, FxTokenSymbolMap } from "..";
+import { FxTokenSymbol, FxTokenSymbolMap, TokenInfo } from "..";
+import { FxTokenPriced } from "../types/fxTokens";
+import { HandleTokenManager } from "..";
 
-export const getTokensFromAddresses = (addresses: Partial<FxTokenSymbolMap<string>>): FxToken[] => {
-  return (Object.keys(addresses) as []).map((key) => {
-    const k = key as FxTokenSymbol;
-    const a = addresses as FxTokenSymbolMap<string>;
-
-    return {
-      symbol: key,
-      address: a[k],
-      decimals: 18
-    };
-  });
+export const getFxTokensFromAddresses = (addresses: string[]): TokenInfo[] => {
+  return new HandleTokenManager([]).getTokensByAddresses(addresses);
 };
 
 export const getFxTokenSymbolFromAddress = (
@@ -25,7 +18,7 @@ export const getFxTokenSymbolFromAddress = (
   })!;
 };
 
-export const getFxTokenByAddress = (fxTokens: FxToken[], address: string): FxToken => {
+export const getFxTokenByAddress = (fxTokens: FxTokenPriced[], address: string): FxTokenPriced => {
   const fxToken = fxTokens.find(
     (fxToken) => fxToken.address.toLowerCase() === address.toLowerCase()
   );
@@ -37,7 +30,10 @@ export const getFxTokenByAddress = (fxTokens: FxToken[], address: string): FxTok
   return fxToken;
 };
 
-export const getFxTokenBySymbol = (fxTokens: FxToken[], symbol: FxTokenSymbol): FxToken => {
+export const getFxTokenPricedBySymbol = (
+  fxTokens: FxTokenPriced[],
+  symbol: FxTokenSymbol
+): FxTokenPriced => {
   const fxToken = fxTokens.find((fxToken) => fxToken.symbol === symbol);
 
   if (!fxToken) {

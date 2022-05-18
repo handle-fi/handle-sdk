@@ -102,16 +102,20 @@ export type ChainlinkFeeds = {
   cny_usd: string;
 };
 
+const forexAddress = mustExist(
+  getTokenFromTokenList(handleTokens, "FOREX", "arbitrum"),
+  "FOREX on arbitrum"
+).address;
+
 const config: Config = {
-  forexAddress: "0xDb298285FE4C5410B05390cA80e8Fbe9DE1F259B",
-  fxTokenAddresses: {
-    fxAUD: "0x7E141940932E3D13bfa54B224cb4a16510519308",
-    fxPHP: "0x3d147cD9aC957B2a5F968dE9d1c6B9d0872286a0",
-    fxUSD: "0x8616E8EA83f048ab9A5eC513c9412Dd2993bcE3F",
-    fxEUR: "0x116172B2482c5dC3E6f445C16Ac13367aC3FCd35"
-    // fxKRW: "0xF4E8BA79d058fFf263Fd043Ef50e1010c1BdF991",
-    // fxCNY: "0x2C29daAce6Aa05e3b65743EFd61f8A2C448302a3"
-  },
+  forexAddress: forexAddress,
+  fxTokenAddresses: handleTokens.tokens.reduce((acc, token) => {
+    if (!token.extensions?.isFxToken) return acc;
+    return {
+      ...acc,
+      [token.symbol]: token.address
+    };
+  }, {}) as FxTokenAddresses,
   protocol: {
     arbitrum: {
       protocol: {
@@ -134,7 +138,7 @@ const config: Config = {
       },
       collaterals: {
         FOREX: {
-          address: "0xdb298285fe4c5410b05390ca80e8fbe9de1f259b",
+          address: forexAddress,
           decimals: 18
         },
         WETH: {
@@ -183,7 +187,7 @@ const config: Config = {
         },
         tokensInLp: [
           mustExist(getTokenFromTokenList(handleTokens, "fxEUR", "arbitrum"), "fxEUR on arbitrum"),
-          { symbol: "EURS", decimals: 2, address: "0xD22a58f79e9481D1a88e00c343885A588b34b68B" }
+          mustExist(getTokenFromTokenList(handleTokens, "EURS", "arbitrum"), "EURS on arbitrum")
         ],
         url: "https://arbitrum.curve.fi/factory/7/deposit"
       },
@@ -197,11 +201,7 @@ const config: Config = {
         },
         tokensInLp: [
           mustExist(getTokenFromTokenList(handleTokens, "fxUSD", "arbitrum"), "fxUSD on arbitrum"),
-          {
-            symbol: "2CRV",
-            address: "0xbf7e49483881c76487b0989cd7d9a8239b20ca41",
-            decimals: 18
-          }
+          mustExist(getTokenFromTokenList(handleTokens, "2CRV", "arbitrum"), "2CRV on arbitrum")
         ],
         url: "https://arbitrum.curve.fi/factory/12/deposit"
       }

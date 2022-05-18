@@ -7,9 +7,10 @@ import { callMulticallObjects, createMulticallProtocolContracts } from "../utils
 import sdkConfig from "../config";
 import { Promisified } from "../types/general";
 import Graph, { IndexedFxToken } from "./Graph";
-import { SingleCollateralVaultNetwork, TokenInfo } from "..";
+import { HandleTokenManager, SingleCollateralVaultNetwork } from "..";
 import { BENTOBOX_ADDRESS } from "@sushiswap/core-sdk";
 import { NETWORK_NAME_TO_CHAIN_ID } from "../constants";
+import { getFxTokensFromAddresses } from "../utils/fxToken-utils";
 
 export type FxTokensConfig = {
   protocolAddresses: ProtocolAddresses;
@@ -23,7 +24,7 @@ type Price = {
 };
 
 export default class FxTokens {
-  public tokens: TokenInfo[];
+  public tokens: FxToken[];
   private config: FxTokensConfig;
   private graph: Graph;
 
@@ -35,10 +36,9 @@ export default class FxTokens {
       graphEndpoint: sdkConfig.theGraphEndpoints.arbitrum
     };
 
-    this.tokens = getTokensFromAddresses(this.config.fxTokenAddresses).map((t) => ({
-      ...t,
-      decimals: 18
-    }));
+    this.tokens = getFxTokensFromAddresses(
+      Object.values(this.config.fxTokenAddresses)
+    ) as FxToken[];
     this.graph = new Graph(this.config.graphEndpoint);
   }
 
@@ -51,7 +51,7 @@ export default class FxTokens {
 
     const multicalls = this.tokens.map((a) => this.getFxTokenMulticall(a.symbol, signer));
     const raw = await callMulticallObjects(multicalls, provider);
-    return raw.map((t, index) => this.onChainToFxToken(this.tokens[index], t));
+    return raw.map((t, index) => this.includeTokenPrice(this.tokens[index], t.price));
   };
 
   public getIndexedFxTokens = async (): Promise<FxTokenPriced[]> => {
@@ -121,22 +121,20 @@ export default class FxTokens {
     };
   };
 
-  private onChainToFxToken = (token: FxToken, fxToken: Price): FxTokenPriced => {
-    const { price } = fxToken;
-
+  private includeTokenPrice = (token: FxToken, price: ethers.BigNumber): FxTokenPriced => {
     return {
-      symbol: token.symbol,
-      address: token.address,
-      decimals: token.decimals,
+      ...token,
       price
     };
   };
 
   private indexedToFxToken = (fxToken: IndexedFxToken): FxTokenPriced => {
+    // note that address does not matter in this case, as all fx tokens have the same addresses across chains
+    const fullFxToken = new HandleTokenManager([]).getTokenByAddress(fxToken.address, 1);
+    if (!fullFxToken) throw new Error("Could not find fxToken to match indexed fxToken");
     return {
-      symbol: fxToken.symbol,
-      address: fxToken.address,
-      decimals: fxToken.decimals,
+      ...fullFxToken,
+      ...fxToken,
       price: fxToken.rate
     };
   };

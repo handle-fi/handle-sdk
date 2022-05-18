@@ -9,6 +9,7 @@ import { Network } from "../..";
  * - isHlpToken: true if the token is a hlp token in a handle Vault contract
  * - isWrappedNative: true if the token is a wrapped version of a native token (e.g. WETH)
  * - isStable: true if the token is a USD stablecoin, false otherwise
+ * - isFxToken: true if token is a fx token, false otherwise
  * @note the handle liquidity token (symbol hLP) has isHlpToken set to false, as it is not technically in the liquidity pool
  */
 class HandleTokenManager extends TokenManager {

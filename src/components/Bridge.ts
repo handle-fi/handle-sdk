@@ -1,6 +1,6 @@
 import axios from "axios";
 import { ethers } from "ethers";
-import { FxTokenAddresses } from "../config";
+import { FxTokens } from "../config";
 import sdkConfig from "../config";
 import { FxTokenSymbol, Network, NetworkMap } from "..";
 import { Bridge__factory, ERC20__factory } from "../contracts";
@@ -15,7 +15,7 @@ export type BridgeConfig = {
   apiBaseUrl: string;
   byNetwork: BridgeConfigByNetwork;
   forexAddress: string;
-  fxTokenAddresses: FxTokenAddresses;
+  fxTokenAddresses: FxTokens;
 };
 
 export type BridgeDepositArguments = {
@@ -89,7 +89,7 @@ export default class Bridge {
   ): Promise<ethers.ContractTransaction> => {
     const bridgeContract = this.getBridgeContract(args.toNetwork, signer);
     const tokenAddress = this.getTokenAddress(args.tokenSymbol);
-    const address = args.address ?? await signer.getAddress();
+    const address = args.address ?? (await signer.getAddress());
     return bridgeContract.withdraw(
       address,
       tokenAddress,
@@ -151,7 +151,7 @@ export default class Bridge {
     signer: ethers.Signer
   ): Promise<ethers.BigNumber> => {
     const bridgeContract = this.getBridgeContract(args.toNetwork, signer);
-    const account = args.address ?? await signer.getAddress();
+    const account = args.address ?? (await signer.getAddress());
     return bridgeContract.withdrawNonce(account, this.config.byNetwork[args.fromNetwork].id);
   };
 

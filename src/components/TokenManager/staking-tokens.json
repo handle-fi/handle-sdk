@@ -30,6 +30,20 @@
       "address": "0x2f2a2543b76a4166549f7aab2e75bef0aefc5b0f",
       "logoURI": "https://tokens.1inch.io/0x2260fac5e5542a773aa44fbcfedf7c193bc2c599.png",
       "chainId": 42161
+    },
+    {
+      "symbol": "EURS",
+      "name": "Stasis Euro",
+      "decimals": 2,
+      "address": "0xD22a58f79e9481D1a88e00c343885A588b34b68B",
+      "chainId": 42161
+    },
+    {
+      "symbol": "2CRV",
+      "name": "Curve.fi",
+      "decimals": 18,
+      "address": "0xbf7e49483881c76487b0989cd7d9a8239b20ca41",
+      "chainId": 42161
     }
   ]
 }

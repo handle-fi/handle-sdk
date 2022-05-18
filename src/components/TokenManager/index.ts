@@ -71,9 +71,16 @@ class TokenManager {
    * @param network the network to get the token from
    * @returns the first occurence of the token with the given symbol, or undefined if not found
    */
-  public getTokenBySymbol(symbol: string, network: Network | number): TokenInfo | undefined {
+  public getTokenBySymbol<Symbol extends string>(
+    symbol: Symbol,
+    network: Network | number
+  ): (TokenInfo & { symbol: Symbol }) | undefined {
     const tokens = this.getLoadedTokens(network);
-    return tokens.find((token) => token.symbol === symbol);
+    // In alot of other places, token symbols are strong typed. This typing allows for this, as it is known that if
+    // a token is found with the given symbol, it will be the type of the symbol.
+    return tokens.find((token) => token.symbol === symbol) as
+      | (TokenInfo & { symbol: Symbol })
+      | undefined;
   }
 
   /**
@@ -96,12 +103,27 @@ class TokenManager {
   }
 
   /**
-   * Gets all hLP compatiable tokens for a network
-   * @param network the network from which to get the tokens
-   * @returns all tokens that are hlp tokens in the handle vault contract
+   * Returns an array of tokens with the given addresses. Order is not guaranteed.
+   * If a token cannot be found with the given address, it will be omitted from the array.
+   * If multiple tokens are found with the same address, only the first found will be included.
+   * @param addresses addresses of the tokens to get
+   * @returns an array of tokens with the given addresses.
+   * @note this is not optimised for large addresses arrays
    */
-  public getHlpTokens(network: Network | number) {
-    return this.getLoadedTokens(network).filter((token) => token.extensions?.isHlpToken);
+  public getTokensByAddresses(addresses: string[]): TokenInfo[] {
+    const seenAddresses: string[] = [];
+    const returnTokens: TokenInfo[] = [];
+    this.getLoadedTokens().forEach((token) => {
+      if (addresses.some((address) => address.toLowerCase() === token.address.toLowerCase())) {
+        if (
+          !seenAddresses.some((address) => address.toLowerCase() === token.address.toLowerCase())
+        ) {
+          returnTokens.push(token);
+          seenAddresses.push(token.address);
+        }
+      }
+    });
+    return returnTokens;
   }
 
   /**
