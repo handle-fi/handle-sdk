@@ -3,7 +3,6 @@ import { BigNumber } from "ethers";
 export type HlpInfoMethods = {
   getMinPrice: (address: string) => BigNumber;
   getMaxPrice: (address: string) => BigNumber;
-  getAveragePrice: (address: string) => BigNumber;
   getFundingRate: (address: string) => BigNumber;
   getTokenInfo: (address: string) => VaultTokenInfo | undefined;
   getUsdHlpSupply: () => BigNumber;

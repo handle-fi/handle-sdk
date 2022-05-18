@@ -1,3 +1,3 @@
-import TokenList from "../../src/components/TokenList";
+import HandleTokenList from "../../src/components/TokenList/HandleTokenList";
 
-export const tokenList = new TokenList();
+export const testTokenList = new HandleTokenList();

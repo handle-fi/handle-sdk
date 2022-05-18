@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import { FxTokenAddresses, ProtocolAddresses } from "../config";
 import { ERC20__factory } from "../contracts";
-import { FxToken, FxTokenSymbol } from "../types/fxTokens";
+import { FxTokenPriced, FxTokenSymbol } from "../types/fxTokens";
 import { callMulticallObjects, createMulticallProtocolContracts } from "../utils/contract-utils";
 import { getTokensFromAddresses } from "../utils/fxToken-utils";
 import sdkConfig from "../config";
@@ -43,7 +43,7 @@ export default class FxTokens {
     this.graph = new Graph(this.config.graphEndpoint);
   }
 
-  public getFxTokens = async (signer: ethers.Signer): Promise<FxToken[]> => {
+  public getFxTokens = async (signer: ethers.Signer): Promise<FxTokenPriced[]> => {
     const { provider } = createMulticallProtocolContracts(
       this.config.protocolAddresses,
       this.config.chainId,
@@ -55,7 +55,7 @@ export default class FxTokens {
     return raw.map((t, index) => this.onChainToFxToken(this.tokens[index], t));
   };
 
-  public getIndexedFxTokens = async (): Promise<FxToken[]> => {
+  public getIndexedFxTokens = async (): Promise<FxTokenPriced[]> => {
     const fxTokens = await this.graph.fxTokens.query({});
     return fxTokens
       .map(this.indexedToFxToken)
@@ -125,7 +125,7 @@ export default class FxTokens {
   private onChainToFxToken = (
     token: Token<FxTokenSymbol>,
     fxToken: FxTokenMulticallMulticall
-  ): FxToken => {
+  ): FxTokenPriced => {
     const { price } = fxToken;
 
     return {
@@ -136,7 +136,7 @@ export default class FxTokens {
     };
   };
 
-  private indexedToFxToken = (fxToken: IndexedFxToken): FxToken => {
+  private indexedToFxToken = (fxToken: IndexedFxToken): FxTokenPriced => {
     return {
       symbol: fxToken.symbol,
       address: fxToken.address,

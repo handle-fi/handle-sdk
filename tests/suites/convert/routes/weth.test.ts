@@ -3,7 +3,7 @@ import { expect } from "chai";
 import Convert from "../../../../src/components/Convert";
 import { sampleHlpTokenMethods } from "../sampleHlpTokenMethods";
 import { eth, weth } from "../test-tokens";
-import { tokenList } from "../../../mock-data/token-list";
+import { testTokenList } from "../../../mock-data/token-list";
 
 const signer = ethers.provider.getSigner(0);
 
@@ -18,7 +18,7 @@ describe("weth route", () => {
         fromAmount: ethers.constants.One,
         gasPrice: ethers.constants.One,
         hlpMethods: sampleHlpTokenMethods,
-        tokenList: tokenList.getLoadedTokens()
+        tokenList: testTokenList.getLoadedTokens()
       });
       expect(quote.sellAmount).to.eq(quote.buyAmount);
       expect(quote.feeBasisPoints).to.eq(0);
@@ -33,7 +33,7 @@ describe("weth route", () => {
         fromAmount: ethers.constants.One,
         gasPrice: ethers.constants.One,
         hlpMethods: sampleHlpTokenMethods,
-        tokenList: tokenList.getLoadedTokens()
+        tokenList: testTokenList.getLoadedTokens()
       });
       expect(quote.sellAmount).to.eq(quote.buyAmount);
       expect(quote.feeBasisPoints).to.eq(0);
@@ -54,7 +54,7 @@ describe("weth route", () => {
           sellAmount: ethers.utils.parseEther("0.01"),
           signer: signer,
           slippage: 0.05,
-          tokenList: tokenList.getLoadedTokens()
+          tokenList: testTokenList.getLoadedTokens()
         });
         expect(tx).to.be.an("object");
       });
@@ -70,7 +70,7 @@ describe("weth route", () => {
           sellAmount: ethers.utils.parseEther("0.01"),
           signer: signer,
           slippage: 0.05,
-          tokenList: tokenList.getLoadedTokens()
+          tokenList: testTokenList.getLoadedTokens()
         });
         expect(tx).to.be.an("object");
       });

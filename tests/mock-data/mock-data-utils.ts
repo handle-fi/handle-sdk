@@ -25,13 +25,16 @@ export const createMockCollaterals = (overides: Partial<Collateral>[]) => {
   return overides.map(createMockCollateral);
 };
 
-export const createMockFxToken = (overides: Partial<FxToken> = {}): FxToken => {
+export const createMockFxToken = (overrides: Partial<FxToken> = {}): FxToken => {
+  const id = randomId();
   return {
-    symbol: `FX_${randomId()}` as unknown as FxTokenSymbol,
+    name: `FX_TOKEN_${id}` as unknown as string,
+    symbol: `FX_${id}` as unknown as FxTokenSymbol,
     address: ethers.Wallet.createRandom().address,
     decimals: 18,
+    chainId: 1,
     price: ethers.constants.WeiPerEther,
-    ...overides
+    ...overrides
   };
 };
 
@@ -89,4 +92,3 @@ export const createMockProtocolParams = (
 };
 
 const randomId = () => Math.floor(Math.random() * 100);
-

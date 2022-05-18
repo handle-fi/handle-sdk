@@ -3,6 +3,7 @@ import { expect } from "chai";
 import Convert from "../../../../src/components/Convert";
 import { FIVE_DOLLARS, ONE_DOLLAR, sampleHlpTokenMethods } from "../sampleHlpTokenMethods";
 import { eth, fxUsd, hlp } from "../test-tokens";
+import { testTokenList } from "../../../mock-data/token-list";
 
 const signer = ethers.provider.getSigner(0);
 
@@ -23,7 +24,8 @@ describe("hLPAddRemove", () => {
         connectedAccount: ethers.constants.AddressZero,
         fromAmount: ethers.utils.parseEther("1"),
         gasPrice: ethers.constants.One,
-        hlpMethods: hlpTokenMethods
+        hlpMethods: hlpTokenMethods,
+        tokenList: testTokenList.getLoadedTokens()
       });
       expect(quote.sellAmount).to.eq(ethers.utils.parseEther("1").toString());
       expect(quote.buyAmount).to.eq(ethers.utils.parseEther("5").toString());
@@ -43,7 +45,8 @@ describe("hLPAddRemove", () => {
         connectedAccount: ethers.constants.AddressZero,
         fromAmount: ethers.utils.parseEther("1"),
         gasPrice: ethers.constants.One,
-        hlpMethods: hlpTokenMethods
+        hlpMethods: hlpTokenMethods,
+        tokenList: testTokenList.getLoadedTokens()
       });
       expect(quote.sellAmount).to.eq(ethers.utils.parseEther("1").toString());
       expect(quote.buyAmount).to.eq(ethers.utils.parseEther("5").toString());
@@ -63,7 +66,8 @@ describe("hLPAddRemove", () => {
         connectedAccount: ethers.constants.AddressZero,
         fromAmount: ethers.utils.parseEther("5"),
         gasPrice: ethers.constants.One,
-        hlpMethods: hlpTokenMethods
+        hlpMethods: hlpTokenMethods,
+        tokenList: testTokenList.getLoadedTokens()
       });
       expect(quote.sellAmount).to.eq(ethers.utils.parseEther("5").toString());
       expect(quote.buyAmount).to.eq(ethers.utils.parseEther("1").toString());
@@ -83,7 +87,8 @@ describe("hLPAddRemove", () => {
         connectedAccount: ethers.constants.AddressZero,
         fromAmount: ethers.utils.parseEther("5"),
         gasPrice: ethers.constants.One,
-        hlpMethods: hlpTokenMethods
+        hlpMethods: hlpTokenMethods,
+        tokenList: testTokenList.getLoadedTokens()
       });
       expect(quote.sellAmount).to.eq(ethers.utils.parseEther("5").toString());
       expect(quote.buyAmount).to.eq(ethers.utils.parseEther("1").toString());
@@ -101,7 +106,8 @@ describe("hLPAddRemove", () => {
         sellAmount: ethers.utils.parseUnits("1", hlp.decimals),
         buyAmount: ethers.utils.parseUnits("1", fxUsd.decimals),
         signer: signer,
-        slippage: 0.05
+        slippage: 0.05,
+        tokenList: testTokenList.getLoadedTokens()
       });
       expect(tx).to.be.an("object");
     });
@@ -117,7 +123,8 @@ describe("hLPAddRemove", () => {
         // price of eth fluctuates, so set buy amount to zero
         buyAmount: ethers.utils.parseUnits("0", eth.decimals),
         signer: signer,
-        slippage: 0.05
+        slippage: 0.05,
+        tokenList: testTokenList.getLoadedTokens()
       });
       expect(tx).to.be.an("object");
     });
@@ -132,7 +139,8 @@ describe("hLPAddRemove", () => {
         sellAmount: ethers.utils.parseUnits("1", fxUsd.decimals),
         buyAmount: ethers.utils.parseUnits("1", hlp.decimals),
         signer: signer,
-        slippage: 0.05
+        slippage: 0.05,
+        tokenList: testTokenList.getLoadedTokens()
       });
       expect(tx).to.be.an("object");
     });
@@ -148,7 +156,8 @@ describe("hLPAddRemove", () => {
         // price of eth fluctuates, so set buy amount to zero
         buyAmount: ethers.utils.parseUnits("0", fxUsd.decimals),
         signer: signer,
-        slippage: 0.05
+        slippage: 0.05,
+        tokenList: testTokenList.getLoadedTokens()
       });
       expect(tx).to.be.an("object");
     });

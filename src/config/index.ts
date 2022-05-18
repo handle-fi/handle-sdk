@@ -1,13 +1,13 @@
 import { ethers } from "ethers";
-import { CollateralSymbolMap, CollateralSymbol } from "./../types/collaterals";
+import { CollateralSymbolMap, CollateralSymbol, CollateralToken } from "./../types/collaterals";
 import { FxTokenSymbolMap, FxTokenSymbol } from "./../types/fxTokens";
 import { BridgeConfigByNetwork } from "./../components/Bridge";
-import { StableType, Token } from "./../types/tokens";
+import { StableType } from "./../types/tokens";
 import { LPStakingPoolNameMap, LPStakingPlatformName } from "./../types/lpStaking";
-import { getTokenDetails } from "./../utils/token-utils";
+import { TokenInfo } from "@uniswap/token-lists";
 
 export type FxTokenAddresses = FxTokenSymbolMap<string>;
-export type CollateralDetails = CollateralSymbolMap<Omit<Token<CollateralSymbol>, "symbol">>;
+export type CollateralDetails = CollateralSymbolMap<{ address: string; decimals: number }>;
 export type LPStakingPoolDetails = {
   platform: LPStakingPlatformName;
   title: string;
@@ -16,14 +16,14 @@ export type LPStakingPoolDetails = {
     symbol: string;
     address: string;
   };
-  tokensInLp: Token<string>[];
+  tokensInLp: TokenInfo[];
   url: string;
 };
 
 export type KashiPoolConfig = {
   address: string;
   fxToken: FxTokenSymbol;
-  collateral: Token<string>;
+  collateral: TokenInfo;
 };
 
 export type SingleCollateralVaults = {

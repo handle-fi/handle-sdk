@@ -1,8 +1,11 @@
-import { HLP_TOKENS } from "../../../src/config/hlp";
-import { getHlpToken, getNativeWrappedToken } from "../../../src/utils/hlp";
+import { testTokenList } from "../../mock-data/token-list";
 
-export const weth = getNativeWrappedToken("arbitrum")!;
-export const eth = HLP_TOKENS["arbitrum"].find((x) => x.isNative)!;
-export const hlp = getHlpToken("arbitrum")!;
-export const fxUsd = HLP_TOKENS["arbitrum"].find((x) => x.symbol === "fxUSD")!;
-export const fxAud = HLP_TOKENS["arbitrum"].find((x) => x.symbol === "fxAUD")!;
+export const weth = testTokenList.getHlpWrappedNativeToken("arbitrum")!;
+export const eth = testTokenList.getNativeToken("arbitrum")!;
+export const hlp = testTokenList.getTokenBySymbol("hLP", "arbitrum")!;
+export const fxUsd = testTokenList.getTokenBySymbol("fxUSD", "arbitrum")!;
+export const fxAud = testTokenList.getTokenBySymbol("fxAUD", "arbitrum")!;
+
+if (!weth || !eth || !hlp || !fxUsd || !fxAud) {
+  throw new Error("missing tokens");
+}

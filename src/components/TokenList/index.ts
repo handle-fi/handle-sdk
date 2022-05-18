@@ -25,14 +25,18 @@ type TokenListCache = {
   [url: string]: TokenListType;
 };
 
-const DEFAULT_FETCH_URLS: string[] = [
+export const DEFAULT_FETCH_URLS: string[] = [
   "https://api-polygon-tokens.polygon.technology/tokenlists/allTokens.tokenlist.json", // polygon
   "https://bridge.arbitrum.io/token-list-42161.json", // arbitrum
   "https://api.coinmarketcap.com/data-api/v3/uniswap/all.json" // ethereum
 ];
 
+/**
+ * The TokenList class is used to fetch and validate token lists.
+ */
 class TokenList {
-  protected cache: TokenListCache;
+  /** Caches fetched results indefinetely */
+  public cache: TokenListCache;
 
   constructor(
     tokenListUrls: string[] = DEFAULT_FETCH_URLS,
@@ -67,7 +71,7 @@ class TokenList {
    * @returns all tokens from all cached token lists
    */
   public getLoadedTokens(network?: Network | number): TokenInfo[] {
-    if (!network) {
+    if (network === undefined) {
       return this.getTokensFromLists(Object.values(this.cache));
     }
     return this.getTokensFromLists(Object.values(this.cache)).filter((token) => {
@@ -97,8 +101,22 @@ class TokenList {
     return tokens.find((token) => token.address.toLowerCase() === address.toLowerCase());
   }
 
+  /**
+   * Finds the native token for a network
+   * @param network the network from which to get the token
+   * @returns the native token if one exists, otherwise undefined
+   */
   public getNativeToken(network: Network | number) {
     return this.getLoadedTokens(network).find((token) => token.extensions?.isNative);
+  }
+
+  /**
+   * Gets all hLP compatiable tokens for a network
+   * @param network the network from which to get the tokens
+   * @returns all tokens that are hlp tokens in the handle vault contract
+   */
+  public getHlpTokens(network: Network | number) {
+    return this.getLoadedTokens(network).filter((token) => token.extensions?.isHlpToken);
   }
 
   /**

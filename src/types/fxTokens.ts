@@ -1,9 +1,13 @@
+import { TokenInfo } from "@uniswap/token-lists";
 import { ethers } from "ethers";
-import { Token } from "./tokens";
 
 export type FxTokenSymbol = "fxAUD" | "fxPHP" | "fxUSD" | "fxEUR";
 export type FxTokenSymbolMap<T> = { [key in FxTokenSymbol]: T };
 
-export type FxToken = Token<FxTokenSymbol> & {
+export type FxToken = TokenInfo & {
+  symbol: FxTokenSymbol;
+};
+
+export type FxTokenPriced = FxToken & {
   price: ethers.BigNumber;
 };

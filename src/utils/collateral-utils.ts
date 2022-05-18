@@ -1,10 +1,9 @@
 import { CollateralDetails } from "../config";
-import { Collateral, CollateralSymbol } from "../types/collaterals";
-import { Token } from "../types/tokens";
+import { Collateral, CollateralSymbol, CollateralToken } from "../types/collaterals";
 
 export const getTokensFromConfig = (
   details: Partial<CollateralDetails>
-): Token<CollateralSymbol>[] => {
+): Partial<CollateralToken> => {
   return (Object.keys(details) as []).map((key) => {
     const k = key as CollateralSymbol;
     const detail = (details as CollateralDetails)[k];

@@ -2,7 +2,7 @@ import config, { KashiPoolConfig } from "./config";
 import { FxTokenSymbol, FxTokenSymbolMap } from "./types/fxTokens";
 import { Vault, SingleCollateralVaultSymbol, SingleCollateralVault } from "./types/vaults";
 import { Collateral, CollateralSymbol, CollateralSymbolWithNative } from "./types/collaterals";
-import { FxToken } from "./types/fxTokens";
+import { FxTokenPriced } from "./types/fxTokens";
 import {
   Network,
   NetworkMap,
@@ -89,7 +89,7 @@ export type {
   Collateral,
   CollateralSymbol,
   CollateralSymbolWithNative,
-  FxToken,
+  FxTokenPriced as FxToken,
   Price,
   ProtocolParameters,
   Network,
