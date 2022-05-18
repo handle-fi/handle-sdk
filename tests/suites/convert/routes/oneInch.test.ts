@@ -19,7 +19,6 @@ describe("oneInch route", () => {
       const quote = await Convert.getQuote({
         fromToken: usdc,
         toToken: usdt,
-        network: "arbitrum",
         connectedAccount: ethers.constants.AddressZero,
         fromAmount: ethers.utils.parseEther("1"),
         gasPrice: ethers.constants.One,
@@ -39,7 +38,6 @@ describe("oneInch route", () => {
       const tx = await Convert.getSwap({
         fromToken: eth,
         toToken: usdt,
-        network: "arbitrum",
         connectedAccount: "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
         gasPrice: ethers.utils.parseUnits("100", "gwei"), // very high gas price
         hlpMethods: sampleHlpTokenMethods,

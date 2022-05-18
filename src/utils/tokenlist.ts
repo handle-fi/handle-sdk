@@ -3,6 +3,11 @@ import Ajv from "ajv";
 import addFormats from "ajv-formats";
 import { Network, NETWORK_NAME_TO_CHAIN_ID } from "..";
 
+/* construct validators */
+const ajv = new Ajv({ allErrors: true, verbose: true });
+addFormats(ajv);
+const tokenSchemeValidator = ajv.compile(schema);
+
 export const isSameNetwork = (network1: Network | number, network2: Network | number) => {
   if (network1 === network2) return true;
   if (typeof network1 === "number" && typeof network2 === "string") {
@@ -16,24 +21,21 @@ export const isSameNetwork = (network1: Network | number, network2: Network | nu
   return false;
 };
 
-/* construct validators */
-const ajv = new Ajv({ allErrors: true, verbose: true });
-addFormats(ajv);
-const tokenSchemeValidator = ajv.compile(schema);
-
 /**
  * validates a tokenList and returns it if it is valid, throws otherwise
  * @param tokenList the tokenList to validate
  * @returns the tokenList, if valid
  * @throws if the tokenList is not valid
  */
-export const validateTokenList = (tokenList: unknown) => {
+export const validateTokenList = (tokenList: any) => {
   if (!tokenSchemeValidator(tokenList)) {
     console.error(tokenSchemeValidator.errors);
     throw new Error("Failed to validate token list");
   }
-  return tokenList as unknown as TokenList;
+  return tokenList as any as TokenList;
 };
+
+export const log = () => console.log("huiasfhfdhjklfdhklj");
 
 export const getTokenFromTokenList = (
   tokenList: TokenList,

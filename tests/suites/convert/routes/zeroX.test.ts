@@ -14,7 +14,6 @@ describe("zeroX route", () => {
         const quote = await Convert.getQuote({
           fromToken: usdc,
           toToken: usdt,
-          network,
           connectedAccount: ethers.constants.AddressZero,
           fromAmount: ethers.utils.parseEther("1"),
           gasPrice: ethers.constants.One,

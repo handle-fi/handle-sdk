@@ -10,6 +10,28 @@ import _handleTokens from "../components/TokenManager/handle-tokens.json";
 import { getTokenFromTokenList, validateTokenList } from "../utils/tokenlist";
 import { mustExist } from "../utils/general-utils";
 
+// import Ajv from "ajv";
+// import addFormats from "ajv-formats";
+// import { schema, TokenList } from "@uniswap/token-lists";
+// /* construct validators */
+// const ajv = new Ajv({ allErrors: true, verbose: true });
+// addFormats(ajv);
+// const tokenSchemeValidator = ajv.compile(schema);
+
+// /**
+//  * validates a tokenList and returns it if it is valid, throws otherwise
+//  * @param tokenList the tokenList to validate
+//  * @returns the tokenList, if valid
+//  * @throws if the tokenList is not valid
+//  */
+// export const validateTokenList = (tokenList: any) => {
+//   if (!tokenSchemeValidator(tokenList)) {
+//     console.error(tokenSchemeValidator.errors);
+//     throw new Error("Failed to validate token list");
+//   }
+//   return tokenList as any as TokenList;
+// };
+
 const stakingTokens = validateTokenList(_stakingTokens);
 const handleTokens = validateTokenList(_handleTokens);
 

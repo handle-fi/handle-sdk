@@ -13,7 +13,6 @@ describe("weth route", () => {
       const quote = await Convert.getQuote({
         fromToken: weth,
         toToken: eth,
-        network: "arbitrum",
         connectedAccount: ethers.constants.AddressZero,
         fromAmount: ethers.constants.One,
         gasPrice: ethers.constants.One,
@@ -28,7 +27,6 @@ describe("weth route", () => {
       const quote = await Convert.getQuote({
         fromToken: weth,
         toToken: eth,
-        network: "arbitrum",
         connectedAccount: ethers.constants.AddressZero,
         fromAmount: ethers.constants.One,
         gasPrice: ethers.constants.One,
@@ -46,7 +44,6 @@ describe("weth route", () => {
         const tx = await Convert.getSwap({
           fromToken: eth,
           toToken: weth,
-          network: "arbitrum",
           connectedAccount: await signer.getAddress(),
           gasPrice: ethers.constants.One,
           hlpMethods: sampleHlpTokenMethods,
@@ -62,7 +59,6 @@ describe("weth route", () => {
         const tx = await Convert.getSwap({
           fromToken: weth,
           toToken: eth,
-          network: "arbitrum",
           connectedAccount: await signer.getAddress(),
           gasPrice: ethers.utils.parseUnits("1", "gwei"),
           hlpMethods: sampleHlpTokenMethods,

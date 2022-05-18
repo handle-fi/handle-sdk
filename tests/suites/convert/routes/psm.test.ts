@@ -29,7 +29,6 @@ describe("psm", () => {
       const quote = await Convert.getQuote({
         toToken: { ...usdt, name: "" },
         fromToken: fxUsd,
-        network: "arbitrum",
         connectedAccount: ethers.constants.AddressZero,
         fromAmount: ethers.utils.parseEther("5"),
         gasPrice: ethers.constants.One,
@@ -46,7 +45,6 @@ describe("psm", () => {
       const quote = await Convert.getQuote({
         fromToken: { ...usdt, name: "" },
         toToken: fxUsd,
-        network: "arbitrum",
         connectedAccount: ethers.constants.AddressZero,
         fromAmount: ethers.utils.parseUnits("5", usdt.decimals),
         gasPrice: ethers.constants.One,
@@ -67,7 +65,6 @@ describe("psm", () => {
       const quote = await Convert.getQuote({
         fromToken: usdt,
         toToken: usdc,
-        network: "ethereum",
         connectedAccount: ethers.constants.AddressZero,
         fromAmount: ethers.utils.parseUnits("5", usdt.decimals),
         gasPrice: ethers.constants.One,
@@ -83,7 +80,6 @@ describe("psm", () => {
       const tx = await Convert.getSwap({
         fromToken: usdt,
         toToken: fxUsd,
-        network: "arbitrum",
         connectedAccount: await signer.getAddress(),
         gasPrice: ethers.utils.parseUnits("1", "gwei"),
         hlpMethods: sampleHlpTokenMethods,
@@ -104,7 +100,6 @@ describe("psm", () => {
       const tx = await Convert.getSwap({
         toToken: usdt,
         fromToken: fxUsd,
-        network: "arbitrum",
         connectedAccount: await signer.getAddress(),
         gasPrice: ethers.utils.parseUnits("1", "gwei"),
         hlpMethods: sampleHlpTokenMethods,
@@ -126,7 +121,6 @@ describe("psm", () => {
       const tx = await Convert.getSwap({
         toToken: usdt,
         fromToken: eth,
-        network: "ethereum",
         connectedAccount: ethers.constants.AddressZero,
         gasPrice: ethers.utils.parseUnits("100", "gwei"),
         hlpMethods: sampleHlpTokenMethods,

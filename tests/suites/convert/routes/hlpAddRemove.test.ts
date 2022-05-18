@@ -20,7 +20,6 @@ describe("hLPAddRemove", () => {
       const quote = await Convert.getQuote({
         fromToken: hlp,
         toToken: fxUsd,
-        network: "arbitrum",
         connectedAccount: ethers.constants.AddressZero,
         fromAmount: ethers.utils.parseEther("1"),
         gasPrice: ethers.constants.One,
@@ -41,7 +40,6 @@ describe("hLPAddRemove", () => {
       const quote = await Convert.getQuote({
         fromToken: hlp,
         toToken: eth,
-        network: "arbitrum",
         connectedAccount: ethers.constants.AddressZero,
         fromAmount: ethers.utils.parseEther("1"),
         gasPrice: ethers.constants.One,
@@ -62,7 +60,6 @@ describe("hLPAddRemove", () => {
       const quote = await Convert.getQuote({
         toToken: hlp,
         fromToken: fxUsd,
-        network: "arbitrum",
         connectedAccount: ethers.constants.AddressZero,
         fromAmount: ethers.utils.parseEther("5"),
         gasPrice: ethers.constants.One,
@@ -83,7 +80,6 @@ describe("hLPAddRemove", () => {
       const quote = await Convert.getQuote({
         toToken: hlp,
         fromToken: eth,
-        network: "arbitrum",
         connectedAccount: ethers.constants.AddressZero,
         fromAmount: ethers.utils.parseEther("5"),
         gasPrice: ethers.constants.One,
@@ -99,7 +95,6 @@ describe("hLPAddRemove", () => {
       const tx = await Convert.getSwap({
         fromToken: hlp,
         toToken: fxUsd,
-        network: "arbitrum",
         connectedAccount: await signer.getAddress(),
         gasPrice: ethers.utils.parseUnits("1", "gwei"),
         hlpMethods: sampleHlpTokenMethods,
@@ -115,7 +110,6 @@ describe("hLPAddRemove", () => {
       const tx = await Convert.getSwap({
         fromToken: hlp,
         toToken: eth,
-        network: "arbitrum",
         connectedAccount: await signer.getAddress(),
         gasPrice: ethers.utils.parseUnits("1", "gwei"),
         hlpMethods: sampleHlpTokenMethods,
@@ -132,7 +126,6 @@ describe("hLPAddRemove", () => {
       const tx = await Convert.getSwap({
         fromToken: fxUsd,
         toToken: hlp,
-        network: "arbitrum",
         connectedAccount: await signer.getAddress(),
         gasPrice: ethers.utils.parseUnits("1", "gwei"),
         hlpMethods: sampleHlpTokenMethods,
@@ -148,7 +141,6 @@ describe("hLPAddRemove", () => {
       const tx = await Convert.getSwap({
         fromToken: eth,
         toToken: hlp,
-        network: "arbitrum",
         connectedAccount: await signer.getAddress(),
         gasPrice: ethers.utils.parseUnits("1", "gwei"),
         hlpMethods: sampleHlpTokenMethods,
