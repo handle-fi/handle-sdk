@@ -20,8 +20,8 @@ const hlpAddRemoveWeight = async (input: WeightInput) => {
     input.fromToken.extensions?.isNative;
 
   if (
-    (input.toToken.symbol === "hLP" && isFromValidHlp) ||
-    (input.fromToken.symbol === "hLP" && isToValidHlp)
+    (input.toToken.extensions?.isLiquidityToken && isFromValidHlp) ||
+    (input.fromToken.extensions?.isLiquidityToken && isToValidHlp)
   ) {
     return HLP_ADD_REMOVE_WEIGHT;
   }
@@ -39,8 +39,8 @@ const hlpAddRemoveQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote
   // Parse ETH address into WETH address.
   const { hlpAddress: parsedFromTokenAddress } = tokenManager.checkForHlpNativeToken(fromToken);
   const { hlpAddress: parsedToTokenAddress } = tokenManager.checkForHlpNativeToken(toToken);
-  const isBuyingHlp = toToken.symbol === "hLP";
-  const hLPPrice = hlpMethods.getHlpPrice(isBuyingHlp);
+  const isBuyingHlp = toToken.extensions?.isLiquidityToken;
+  const hLPPrice = hlpMethods.getHlpPrice(!!isBuyingHlp);
 
   // If buying hlp, then usdHlp delta is the price of the swap token (mul by the amount)
   let usdHlpDelta = hlpMethods
@@ -56,7 +56,7 @@ const hlpAddRemoveQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote
   const feeBasisPoints = getHlpFeeBasisPoints({
     token: isBuyingHlp ? parsedFromTokenAddress : parsedToTokenAddress,
     usdHlpDelta,
-    isBuy: isBuyingHlp,
+    isBuy: !!isBuyingHlp,
     totalTokenWeights: hlpMethods.getTotalTokenWeights(),
     targetUsdHlpAmount: hlpMethods.getTargetUsdHlpAmount(
       isBuyingHlp ? parsedFromTokenAddress : parsedToTokenAddress
@@ -130,14 +130,14 @@ const hlpAddRemoveTransactionHandler = async (
   const { hlpAddress: toAddress } = tokenManager.checkForHlpNativeToken(toToken);
 
   // If selling Hlp and toToken is native
-  if (fromToken.symbol === "hLP" && toToken.extensions?.isNative) {
+  if (fromToken.extensions?.isLiquidityToken && toToken.extensions?.isNative) {
     return hlpManagerRouter.populateTransaction.removeLiquidityETH(
       BigNumber.from(sellAmount),
       buyAmountWithTolerance,
       connectedAccount
     );
   }
-  if (fromToken.symbol === "hLP" && !toToken.extensions?.isNative) {
+  if (fromToken.extensions?.isLiquidityToken && !toToken.extensions?.isNative) {
     // If selling Hlp and toToken is not native
     return hlpManager.populateTransaction.removeLiquidity(
       toAddress,

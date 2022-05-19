@@ -110,7 +110,7 @@ class HandleTokenManager extends TokenManager {
    */
   public getHandleLiquidityToken(network: Network | number): TokenInfo | undefined {
     const tokens = this.getLoadedTokens(network);
-    return tokens.find((token) => token.symbol === "hLP");
+    return tokens.find((token) => token.extensions?.isLiquidityToken);
   }
 
   /**
