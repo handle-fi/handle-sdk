@@ -29,12 +29,11 @@ describe("psm", () => {
       const quote = await Convert.getQuote({
         toToken: { ...usdt, name: "" },
         fromToken: fxUsd,
-        connectedAccount: ethers.constants.AddressZero,
-        fromAmount: ethers.utils.parseEther("5"),
+        receivingAccount: ethers.constants.AddressZero,
+        sellAmount: ethers.utils.parseEther("5"),
         gasPrice: ethers.constants.One,
-        provider: arbitrumProvider,
-        hlpMethods: sampleHlpTokenMethods,
-        tokenList: testTokenList.getLoadedTokens()
+        signerOrProvider: arbitrumProvider,
+        hlpMethods: sampleHlpTokenMethods
       });
       expect(quote.sellAmount).to.eq(ethers.utils.parseEther("5").toString());
       expect(quote.buyAmount).to.eq(ethers.utils.parseUnits("5", usdt.decimals).toString());
@@ -45,12 +44,11 @@ describe("psm", () => {
       const quote = await Convert.getQuote({
         fromToken: { ...usdt, name: "" },
         toToken: fxUsd,
-        connectedAccount: ethers.constants.AddressZero,
-        fromAmount: ethers.utils.parseUnits("5", usdt.decimals),
+        receivingAccount: ethers.constants.AddressZero,
+        sellAmount: ethers.utils.parseUnits("5", usdt.decimals),
         gasPrice: ethers.constants.One,
-        provider: arbitrumProvider,
-        hlpMethods: sampleHlpTokenMethods,
-        tokenList: testTokenList.getLoadedTokens()
+        signerOrProvider: arbitrumProvider,
+        hlpMethods: sampleHlpTokenMethods
       });
       expect(quote.sellAmount).to.eq(ethers.utils.parseUnits("5", usdt.decimals).toString());
       expect(quote.buyAmount).to.eq(ethers.utils.parseEther("5").toString());
@@ -65,12 +63,11 @@ describe("psm", () => {
       const quote = await Convert.getQuote({
         fromToken: usdt,
         toToken: usdc,
-        connectedAccount: ethers.constants.AddressZero,
-        fromAmount: ethers.utils.parseUnits("5", usdt.decimals),
+        receivingAccount: ethers.constants.AddressZero,
+        sellAmount: ethers.utils.parseUnits("5", usdt.decimals),
         gasPrice: ethers.constants.One,
-        provider: arbitrumProvider,
-        hlpMethods: sampleHlpTokenMethods,
-        tokenList: testTokenList.getLoadedTokens()
+        signerOrProvider: arbitrumProvider,
+        hlpMethods: sampleHlpTokenMethods
       });
       expect(quote).to.be.an("object");
     });
@@ -80,14 +77,13 @@ describe("psm", () => {
       const tx = await Convert.getSwap({
         fromToken: usdt,
         toToken: fxUsd,
-        connectedAccount: await signer.getAddress(),
+        receivingAccount: await signer.getAddress(),
         gasPrice: ethers.utils.parseUnits("1", "gwei"),
         hlpMethods: sampleHlpTokenMethods,
         sellAmount: ethers.utils.parseUnits("1", usdt.decimals),
         buyAmount: ethers.utils.parseUnits("1", fxUsd.decimals),
         signer: signer,
-        slippage: 0.05,
-        tokenList: testTokenList.getLoadedTokens()
+        slippage: 0.05
       });
       expect(tx).to.be.an("object");
       expect(tx.to).to.eq(config.protocol.arbitrum?.protocol.hPsm);
@@ -100,14 +96,13 @@ describe("psm", () => {
       const tx = await Convert.getSwap({
         toToken: usdt,
         fromToken: fxUsd,
-        connectedAccount: await signer.getAddress(),
+        receivingAccount: await signer.getAddress(),
         gasPrice: ethers.utils.parseUnits("1", "gwei"),
         hlpMethods: sampleHlpTokenMethods,
         sellAmount: ethers.utils.parseUnits("1", usdt.decimals),
         buyAmount: ethers.utils.parseUnits("1", fxUsd.decimals),
         signer: signer,
-        slippage: 0.05,
-        tokenList: testTokenList.getLoadedTokens()
+        slippage: 0.05
       });
       expect(tx).to.be.an("object");
       expect(tx.to).to.eq(config.protocol.arbitrum?.protocol.hPsm);
@@ -121,14 +116,13 @@ describe("psm", () => {
       const tx = await Convert.getSwap({
         toToken: usdt,
         fromToken: eth,
-        connectedAccount: ethers.constants.AddressZero,
+        receivingAccount: ethers.constants.AddressZero,
         gasPrice: ethers.utils.parseUnits("100", "gwei"),
         hlpMethods: sampleHlpTokenMethods,
         sellAmount: ethers.utils.parseUnits("1", eth.decimals),
         buyAmount: ethers.utils.parseUnits("3000", usdt.decimals),
         signer: signer,
-        slippage: 0.05,
-        tokenList: testTokenList.getLoadedTokens()
+        slippage: 0.05
       });
       expect(tx).to.be.an("object");
     });

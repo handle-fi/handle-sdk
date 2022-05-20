@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import { Quote, config, HandleTokenManager } from "../../..";
 import { WETH__factory } from "../../../contracts";
-import { ConvertQuoteInput, ConvertTransactionInput } from "../Convert";
+import { ConvertQuoteRouteArgs, ConvertTransactionRouteArgs } from "../Convert";
 import { WeightInput, WETH_WEIGHT } from "./weights";
 
 const wethWeight = async (input: WeightInput): Promise<number> => {
@@ -18,18 +18,18 @@ const wethWeight = async (input: WeightInput): Promise<number> => {
   return 0;
 };
 
-const wethQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote> => {
+const wethQuoteHandler = async (input: ConvertQuoteRouteArgs): Promise<Quote> => {
   return {
     allowanceTarget: null,
-    buyAmount: input.fromAmount.toString(), // WETH swap is always 1 to 1
-    sellAmount: input.fromAmount.toString(),
+    buyAmount: input.sellAmount.toString(), // WETH swap is always 1 to 1
+    sellAmount: input.sellAmount.toString(),
     gas: config.convert.gasEstimates.weth,
     feeBasisPoints: 0
   };
 };
 
 const wethTransactionHandler = async (
-  input: ConvertTransactionInput
+  input: ConvertTransactionRouteArgs
 ): Promise<ethers.PopulatedTransaction> => {
   const { fromToken, toToken, network, sellAmount, signer } = input;
   const weth = new HandleTokenManager().getHlpWrappedNativeToken(input.network)?.address;

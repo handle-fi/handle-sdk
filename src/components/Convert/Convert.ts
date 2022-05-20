@@ -5,17 +5,39 @@ import routes from "./routes";
 import { WeightInput } from "./routes/weights";
 import { TokenInfo } from "@uniswap/token-lists";
 import { CHAIN_ID_TO_NETWORK_NAME } from "../../constants";
+import TokenManager from "../TokenManager";
 
-export type ConvertQuoteInput = {
+type ConvertRouteArgs = {
   fromToken: TokenInfo;
   toToken: TokenInfo;
-  fromAmount: BigNumber;
-  connectedAccount: string | undefined;
+  sellAmount: BigNumber;
+  receivingAccount: string;
   gasPrice: BigNumber | undefined;
   hlpMethods?: HlpInfoMethods;
-  provider?: ethers.providers.Provider | Signer;
-  tokenList: TokenInfo[];
   network: Network;
+  tokenList: TokenInfo[];
+};
+
+export type ConvertQuoteRouteArgs = ConvertRouteArgs & {
+  signerOrProvider?: ethers.providers.Provider | Signer;
+};
+
+export type ConvertTransactionRouteArgs = ConvertRouteArgs & {
+  buyAmount: BigNumber;
+  slippage: number;
+  signer: Signer;
+};
+
+type ConvertInput = Omit<ConvertRouteArgs, "network" | "tokenList">;
+
+type ConvertQuoteInput = ConvertInput & {
+  signerOrProvider?: ethers.providers.Provider | Signer;
+};
+
+type ConvertTransactionInput = ConvertInput & {
+  buyAmount: BigNumber;
+  slippage: number;
+  signer: Signer;
 };
 
 export type Quote = {
@@ -26,21 +48,15 @@ export type Quote = {
   feeBasisPoints: number;
 };
 
-export type ConvertTransactionInput = {
-  fromToken: TokenInfo;
-  toToken: TokenInfo;
-  buyAmount: BigNumber;
-  sellAmount: BigNumber;
-  slippage: number;
-  hlpMethods?: HlpInfoMethods;
-  gasPrice: BigNumber;
-  connectedAccount: string;
-  signer: Signer;
-  tokenList: TokenInfo[];
-  network: Network;
-};
-
 export default class Convert {
+  protected static tokenList: TokenInfo[] | undefined = undefined;
+
+  public static loadTokens = async () => {
+    const tokenManager = new TokenManager();
+    await tokenManager.initialLoad;
+    Convert.tokenList = tokenManager.getLoadedTokens();
+  };
+
   private static getHighestWeightRoute = async (weightInfo: WeightInput) => {
     const weightedRoutes = await Promise.all(
       routes.map((route) =>
@@ -72,20 +88,30 @@ export default class Convert {
     return network;
   };
 
-  public static getQuote = async (input: Omit<ConvertQuoteInput, "network">): Promise<Quote> => {
+  public static getQuote = async (input: ConvertQuoteInput): Promise<Quote> => {
+    if (!this.tokenList) await this.loadTokens();
+
     const network = Convert.getNetwork(input.fromToken, input.toToken);
     const route = await this.getHighestWeightRoute({
       fromToken: input.fromToken,
       toToken: input.toToken,
-      signerOrProvider: input.provider,
+      signerOrProvider: input.signerOrProvider,
       network: network
     });
-    return route.quote({ ...input, network });
+
+    return route.quote({
+      ...input,
+      network,
+      // token list will be loaded by now due to the call to loadTokens
+      tokenList: this.tokenList!
+    });
   };
 
   public static getSwap = async (
-    input: Omit<ConvertTransactionInput, "network">
+    input: ConvertTransactionInput
   ): Promise<ethers.PopulatedTransaction> => {
+    if (!this.tokenList) await this.loadTokens();
+
     const network = Convert.getNetwork(input.fromToken, input.toToken);
     const route = await this.getHighestWeightRoute({
       fromToken: input.fromToken,
@@ -93,6 +119,11 @@ export default class Convert {
       signerOrProvider: input.signer,
       network: network
     });
-    return route.transaction({ ...input, network });
+    return route.transaction({
+      ...input,
+      network,
+      // token list will be loaded by now due to the call to loadTokens
+      tokenList: this.tokenList!
+    });
   };
 }

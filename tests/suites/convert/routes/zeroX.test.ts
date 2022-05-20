@@ -14,11 +14,10 @@ describe("zeroX route", () => {
         const quote = await Convert.getQuote({
           fromToken: usdc,
           toToken: usdt,
-          connectedAccount: ethers.constants.AddressZero,
-          fromAmount: ethers.utils.parseEther("1"),
+          receivingAccount: ethers.constants.AddressZero,
+          sellAmount: ethers.utils.parseEther("1"),
           gasPrice: ethers.constants.One,
-          hlpMethods: sampleHlpTokenMethods,
-          tokenList: testTokenList.getLoadedTokens()
+          hlpMethods: sampleHlpTokenMethods
         });
         expect(quote).to.have.property("buyAmount");
         expect(quote).to.have.property("sellAmount");

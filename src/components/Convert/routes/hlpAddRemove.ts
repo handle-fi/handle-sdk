@@ -3,7 +3,7 @@ import { config, HandleTokenManager, HlpConfig } from "../../..";
 import { BASIS_POINTS_DIVISOR, HLP_CONTRACTS, PRICE_DECIMALS } from "../../../config/hlp";
 import { HlpManagerRouter__factory, HlpManager__factory } from "../../../contracts";
 import { getHlpFeeBasisPoints } from "../../Trade";
-import { ConvertQuoteInput, ConvertTransactionInput, Quote } from "../Convert";
+import { ConvertQuoteRouteArgs, ConvertTransactionRouteArgs, Quote } from "../Convert";
 import { HLP_ADD_REMOVE_WEIGHT, WeightInput } from "./weights";
 
 const hlpAddRemoveWeight = async (input: WeightInput) => {
@@ -28,8 +28,8 @@ const hlpAddRemoveWeight = async (input: WeightInput) => {
   return 0;
 };
 
-const hlpAddRemoveQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote> => {
-  const { network, fromToken, toToken, hlpMethods, fromAmount } = input;
+const hlpAddRemoveQuoteHandler = async (input: ConvertQuoteRouteArgs): Promise<Quote> => {
+  const { network, fromToken, toToken, hlpMethods, sellAmount: fromAmount } = input;
   const hlpManagerAddress = HLP_CONTRACTS[network]?.HlpManager;
   const tokenManager = new HandleTokenManager();
 
@@ -95,14 +95,14 @@ const hlpAddRemoveQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote
 };
 
 const hlpAddRemoveTransactionHandler = async (
-  input: ConvertTransactionInput
+  input: ConvertTransactionRouteArgs
 ): Promise<ethers.PopulatedTransaction> => {
   const {
     network,
     signer,
     fromToken,
     toToken,
-    connectedAccount,
+    receivingAccount: connectedAccount,
     sellAmount,
     buyAmount,
     slippage,

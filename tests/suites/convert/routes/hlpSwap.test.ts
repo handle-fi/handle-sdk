@@ -4,7 +4,6 @@ import Convert from "../../../../src/components/Convert";
 import { PRICE_DECIMALS } from "../../../../src/config/hlp";
 import { sampleHlpTokenMethods } from "../sampleHlpTokenMethods";
 import { eth, fxAud, fxUsd } from "../test-tokens";
-import { testTokenList } from "../../../mock-data/token-list";
 
 const signer = ethers.provider.getSigner(0);
 
@@ -27,11 +26,10 @@ describe("hlpSwap", () => {
       const quote = await Convert.getQuote({
         toToken: fxAud,
         fromToken: fxUsd,
-        connectedAccount: ethers.constants.AddressZero,
-        fromAmount: ethers.utils.parseEther("5"),
+        receivingAccount: ethers.constants.AddressZero,
+        sellAmount: ethers.utils.parseEther("5"),
         gasPrice: ethers.constants.One,
-        hlpMethods: hlpTokenMethods,
-        tokenList: testTokenList.getLoadedTokens()
+        hlpMethods: hlpTokenMethods
       });
       expect(quote.sellAmount).to.eq(ethers.utils.parseEther("5").toString());
       expect(quote.buyAmount).to.eq(ethers.utils.parseEther("10").toString());
@@ -53,11 +51,10 @@ describe("hlpSwap", () => {
       const quote = await Convert.getQuote({
         toToken: fxAud,
         fromToken: eth,
-        connectedAccount: ethers.constants.AddressZero,
-        fromAmount: ethers.utils.parseEther("5"),
+        receivingAccount: ethers.constants.AddressZero,
+        sellAmount: ethers.utils.parseEther("5"),
         gasPrice: ethers.constants.One,
-        hlpMethods: hlpTokenMethods,
-        tokenList: testTokenList.getLoadedTokens()
+        hlpMethods: hlpTokenMethods
       });
       expect(quote.sellAmount).to.eq(ethers.utils.parseEther("5").toString());
       expect(quote.buyAmount).to.eq(ethers.utils.parseEther("10").toString());
@@ -68,15 +65,14 @@ describe("hlpSwap", () => {
       const tx = await Convert.getSwap({
         fromToken: fxUsd,
         toToken: fxAud,
-        connectedAccount: await signer.getAddress(),
+        receivingAccount: await signer.getAddress(),
         gasPrice: ethers.utils.parseUnits("1", "gwei"),
         hlpMethods: sampleHlpTokenMethods,
         sellAmount: ethers.utils.parseUnits("1", fxUsd.decimals),
         // price of fxUsd / fxAud fluctuates, so set buy amount to zero
         buyAmount: ethers.utils.parseUnits("0", fxAud.decimals),
         signer: signer,
-        slippage: 0.05,
-        tokenList: testTokenList.getLoadedTokens()
+        slippage: 0.05
       });
       expect(tx).to.be.an("object");
     });
@@ -84,15 +80,14 @@ describe("hlpSwap", () => {
       const tx = await Convert.getSwap({
         fromToken: fxUsd,
         toToken: eth,
-        connectedAccount: await signer.getAddress(),
+        receivingAccount: await signer.getAddress(),
         gasPrice: ethers.utils.parseUnits("1", "gwei"),
         hlpMethods: sampleHlpTokenMethods,
         sellAmount: ethers.utils.parseUnits("1", fxUsd.decimals),
         // price of fxUsd / eth fluctuates, so set buy amount to zero
         buyAmount: ethers.utils.parseUnits("0", eth.decimals),
         signer: signer,
-        slippage: 0.05,
-        tokenList: testTokenList.getLoadedTokens()
+        slippage: 0.05
       });
       expect(tx).to.be.an("object");
     });

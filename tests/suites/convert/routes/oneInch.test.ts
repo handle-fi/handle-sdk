@@ -19,11 +19,10 @@ describe("oneInch route", () => {
       const quote = await Convert.getQuote({
         fromToken: usdc,
         toToken: usdt,
-        connectedAccount: ethers.constants.AddressZero,
-        fromAmount: ethers.utils.parseEther("1"),
+        receivingAccount: ethers.constants.AddressZero,
+        sellAmount: ethers.utils.parseEther("1"),
         gasPrice: ethers.constants.One,
-        hlpMethods: sampleHlpTokenMethods,
-        tokenList: testTokenList.getLoadedTokens()
+        hlpMethods: sampleHlpTokenMethods
       });
       expect(quote).to.have.property("buyAmount");
       expect(quote).to.have.property("sellAmount");
@@ -38,14 +37,13 @@ describe("oneInch route", () => {
       const tx = await Convert.getSwap({
         fromToken: eth,
         toToken: usdt,
-        connectedAccount: "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+        receivingAccount: "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
         gasPrice: ethers.utils.parseUnits("100", "gwei"), // very high gas price
         hlpMethods: sampleHlpTokenMethods,
         sellAmount: ethers.utils.parseUnits("1", eth.decimals),
         buyAmount: ethers.utils.parseUnits("1", usdt.decimals),
         signer,
-        slippage: 0.05,
-        tokenList: testTokenList.getLoadedTokens()
+        slippage: 0.05
       });
       expect(tx).to.be.an("object");
     });

@@ -2,7 +2,7 @@ import { BigNumber, ethers } from "ethers";
 import { config, HandleTokenManager, HlpConfig } from "../../..";
 import { Router__factory } from "../../../contracts";
 import { getSwapFeeBasisPoints } from "../../Trade";
-import { ConvertQuoteInput, ConvertTransactionInput, Quote } from "../Convert";
+import { ConvertQuoteRouteArgs, ConvertTransactionRouteArgs, Quote } from "../Convert";
 import { HLP_SWAP_WEIGHT, WeightInput } from "./weights";
 
 const hlpSwapWeight = async (input: WeightInput): Promise<number> => {
@@ -20,8 +20,8 @@ const hlpSwapWeight = async (input: WeightInput): Promise<number> => {
   return 0;
 };
 
-const hlpSwapQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote> => {
-  const { network, fromToken, toToken, hlpMethods, fromAmount } = input;
+const hlpSwapQuoteHandler = async (input: ConvertQuoteRouteArgs): Promise<Quote> => {
+  const { network, fromToken, toToken, hlpMethods, sellAmount: fromAmount } = input;
   const routerAddress = HlpConfig.HLP_CONTRACTS[network]?.Router;
 
   if (!routerAddress) throw new Error(`Network ${network} does not have a Router contract`);
@@ -61,10 +61,18 @@ const hlpSwapQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote> => 
 };
 
 const hlpSwapTransactionHandler = async (
-  input: ConvertTransactionInput
+  input: ConvertTransactionRouteArgs
 ): Promise<ethers.PopulatedTransaction> => {
-  const { network, connectedAccount, signer, fromToken, toToken, buyAmount, slippage, sellAmount } =
-    input;
+  const {
+    network,
+    receivingAccount: connectedAccount,
+    signer,
+    fromToken,
+    toToken,
+    buyAmount,
+    slippage,
+    sellAmount
+  } = input;
   const router = Router__factory.connect(
     HlpConfig.HLP_CONTRACTS[network]?.Router ?? ethers.constants.AddressZero,
     signer
