@@ -18,8 +18,8 @@ export const createMockCollateral = (overides: Partial<Collateral> = {}): Collat
   };
 };
 
-export const createMockCollaterals = (overides: Partial<Collateral>[]) => {
-  return overides.map(createMockCollateral);
+export const createMockCollaterals = (overrides: Partial<Collateral>[]) => {
+  return overrides.map(createMockCollateral);
 };
 
 export const createMockFxToken = (overrides: Partial<FxTokenPriced> = {}): FxTokenPriced => {

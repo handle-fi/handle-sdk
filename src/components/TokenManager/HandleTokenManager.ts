@@ -119,19 +119,23 @@ class HandleTokenManager extends TokenManager {
    * @returns an object with the properties isNative and hlpAddress. If the token is native, isNative is
    * true and hlpAddress is the address of a hlp compatible wrapped native token. If the token is a hLP
    * token, isNative is false and hlpAddress is the address of the hLP token.
-   * @throws if the token is neither native, nor a hLP token
+   * @throws if the token is neither native, nor a hLP supported token, nor the handle liquidity token
    * @throws if the token is native, and no hLP compatible wrapped native token exists
    */
   public checkForHlpNativeToken(token: TokenInfo): { isNative: boolean; hlpAddress: string } {
     if (token.extensions?.isNative) {
       const wrappedNative = this.getHlpWrappedNativeToken(token.chainId);
       if (!wrappedNative) {
-        throw new Error("Token is native but no hlp compatible wrapped native token found");
+        throw new Error(
+          `Token '${token.symbol}' is native but no hlp compatible wrapped native token found`
+        );
       }
       return { isNative: true, hlpAddress: wrappedNative.address };
     }
     if (!token.extensions?.isHlpToken && !token.extensions?.isLiquidityToken) {
-      throw new Error("Token is neither a hLP, a hLP token, or a native token");
+      throw new Error(
+        `Token '${token.symbol}' is neither the handle liquidity token, a hLP supported token, or a native token`
+      );
     }
     return { isNative: false, hlpAddress: token.address };
   }

@@ -30,6 +30,7 @@ describe("calculateTotalCollateralBalanceAsEth", () => {
   });
 
   it("It calculates the correct value with two collaterals", async () => {
+    // TODO figure out why this test randomly fails
     const collaterals = createMockCollaterals([
       { price: ethers.constants.WeiPerEther.div(2) },
       { price: ethers.constants.WeiPerEther }
