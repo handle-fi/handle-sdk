@@ -106,7 +106,7 @@ export default class Convert {
       input.signerOrProvider &&
       network !== (await getNetworkFromProviderOrSigner(input.signerOrProvider))
     ) {
-      throw new Error(`Signer/Provider is on a different network than the token`);
+      throw new Error(`Signer/Provider is on a different network than the tokens`);
     }
 
     const route = await this.getHighestWeightRoute({
@@ -130,7 +130,7 @@ export default class Convert {
     const network = Convert.getNetwork(input.fromToken, input.toToken);
 
     if (network !== (await getNetworkFromProviderOrSigner(input.signer))) {
-      throw new Error(`Signer is on a different network than the token`);
+      throw new Error(`Signer is on a different network than the tokens`);
     }
 
     const route = await this.getHighestWeightRoute({
