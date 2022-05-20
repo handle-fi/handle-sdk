@@ -6,6 +6,7 @@ import { WeightInput } from "./routes/weights";
 import { TokenInfo } from "@uniswap/token-lists";
 import { CHAIN_ID_TO_NETWORK_NAME } from "../../constants";
 import TokenManager from "../TokenManager";
+import { getNetworkFromProviderOrSigner } from "../../utils/general-utils";
 
 type ConvertRouteArgs = {
   fromToken: TokenInfo;
@@ -100,6 +101,14 @@ export default class Convert {
     if (!this.tokenList) await this.loadTokens();
 
     const network = Convert.getNetwork(input.fromToken, input.toToken);
+
+    if (
+      input.signerOrProvider &&
+      network !== (await getNetworkFromProviderOrSigner(input.signerOrProvider))
+    ) {
+      throw new Error(`Signer/Provider is on a different network than the token`);
+    }
+
     const route = await this.getHighestWeightRoute({
       fromToken: input.fromToken,
       toToken: input.toToken,
@@ -119,6 +128,11 @@ export default class Convert {
     if (!this.tokenList) await this.loadTokens();
 
     const network = Convert.getNetwork(input.fromToken, input.toToken);
+
+    if (network !== (await getNetworkFromProviderOrSigner(input.signer))) {
+      throw new Error(`Signer is on a different network than the token`);
+    }
+
     const route = await this.getHighestWeightRoute({
       fromToken: input.fromToken,
       toToken: input.toToken,

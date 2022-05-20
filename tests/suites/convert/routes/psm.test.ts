@@ -27,7 +27,7 @@ describe("psm", () => {
     it("should return a quote to pegged tokens", async () => {
       // fxUSD is assumed to be pegged to USDT
       const quote = await Convert.getQuote({
-        toToken: { ...usdt, name: "" },
+        toToken: usdt,
         fromToken: fxUsd,
         receivingAccount: ethers.constants.AddressZero,
         sellAmount: ethers.utils.parseEther("5"),
@@ -42,7 +42,7 @@ describe("psm", () => {
     it("should return a quote from pegged tokens", async () => {
       // fxUSD is assumed to be pegged to USDT
       const quote = await Convert.getQuote({
-        fromToken: { ...usdt, name: "" },
+        fromToken: usdt,
         toToken: fxUsd,
         receivingAccount: ethers.constants.AddressZero,
         sellAmount: ethers.utils.parseUnits("5", usdt.decimals),
@@ -53,23 +53,6 @@ describe("psm", () => {
       expect(quote.sellAmount).to.eq(ethers.utils.parseUnits("5", usdt.decimals).toString());
       expect(quote.buyAmount).to.eq(ethers.utils.parseEther("5").toString());
       expect(quote.allowanceTarget).to.eq(config.protocol.arbitrum?.protocol.hPsm);
-    });
-    it("should return a quote for unsupported networks even if conditions are met", async () => {
-      const usdt = testTokenList.getTokenBySymbol("USDT", "ethereum");
-      const usdc = testTokenList.getTokenBySymbol("USDC", "ethereum");
-      if (!usdt || !usdc) {
-        throw new Error("Could not find USDT or USDC on ethereum");
-      }
-      const quote = await Convert.getQuote({
-        fromToken: usdt,
-        toToken: usdc,
-        receivingAccount: ethers.constants.AddressZero,
-        sellAmount: ethers.utils.parseUnits("5", usdt.decimals),
-        gasPrice: ethers.constants.One,
-        signerOrProvider: arbitrumProvider,
-        hlpMethods: sampleHlpTokenMethods
-      });
-      expect(quote).to.be.an("object");
     });
   });
   describe("swap", () => {
@@ -106,25 +89,6 @@ describe("psm", () => {
       });
       expect(tx).to.be.an("object");
       expect(tx.to).to.eq(config.protocol.arbitrum?.protocol.hPsm);
-    });
-    it("should return a swap for unsupported networks even if conditions are met", async () => {
-      const usdt = testTokenList.getTokenBySymbol("USDT", "ethereum");
-      const eth = testTokenList.getTokenBySymbol("ETH", "ethereum");
-      if (!usdt || !eth) {
-        throw new Error("Could not find USDT or ETH on ethereum");
-      }
-      const tx = await Convert.getSwap({
-        toToken: usdt,
-        fromToken: eth,
-        receivingAccount: ethers.constants.AddressZero,
-        gasPrice: ethers.utils.parseUnits("100", "gwei"),
-        hlpMethods: sampleHlpTokenMethods,
-        sellAmount: ethers.utils.parseUnits("1", eth.decimals),
-        buyAmount: ethers.utils.parseUnits("3000", usdt.decimals),
-        signer: signer,
-        slippage: 0.05
-      });
-      expect(tx).to.be.an("object");
     });
   });
 });
