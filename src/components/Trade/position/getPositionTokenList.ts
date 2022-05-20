@@ -1,5 +1,12 @@
 import { HlpConfig, Network } from "../../..";
 
+/**
+ * Gets all viable combinatins of collateral tokens, index tokens
+ * and whether the position is long or short
+ * @param network the network from which to fetch the list
+ * @returns an object with the list of collateral tokens, index tokens,
+ * and whether or not the position is long
+ */
 export const getPositionTokenList = (network: Network) => {
   // These arrays will represent the possible positions that a user can be in.
   // This is used to fetch the positions from the contract.

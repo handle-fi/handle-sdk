@@ -6,6 +6,15 @@ import {
 } from "../../../config/hlp";
 import { Position } from ".";
 
+/**
+ * Gets the delta for a position given the current price of the index token.
+ * @param indexPrice the price of the index token (in price decimals)
+ * @param position the position from which to calculate the delta
+ * @returns the current delta, and delta percentage, and pending delta of
+ * the position as well as whether the position has profit. Pending delta
+ * refers to the delta of the position before the minimum profit time has
+ * passed, or the minimum profit delta has been exceeded.
+ */
 export const getPositionDelta = (
   indexPrice: BigNumber,
   { size, collateral, isLong, averagePrice, lastIncreasedTime }: Position
