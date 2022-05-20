@@ -23,6 +23,11 @@ type SearchTokenAddress = {
   network?: Network | number;
 };
 
+type SearchTokenSymbols = {
+  symbol: string;
+  network?: Network | number;
+};
+
 /**
  * The TokenList class is used to fetch and validate token lists.
  */
@@ -125,6 +130,31 @@ class TokenManager {
     search.forEach((searchToken) => {
       const token = this.getLoadedTokens().find((token) =>
         token.address.toLowerCase() === searchToken.address.toLowerCase() && searchToken.network
+          ? isSameNetwork(token.chainId, searchToken.network)
+          : true
+      );
+      if (token) {
+        returnTokens.push(token);
+      }
+    });
+    return returnTokens;
+  }
+
+  /**
+   * Returns an array of tokens with the given symbol. Order is not guaranteed.
+   * If a token cannot be found with the given address, it will be omitted from the array.
+   * If multiple tokens are found with the same address and network, they will all be included.
+   * @param search an array of objects with address as the address of the token, and network as the
+   * network of the token
+   * @returns an array of tokens with the given symbol.
+   * @note this is not optimised for large symbol arrays
+   */
+  public getTokensBySymbols(search: SearchTokenSymbols[]): TokenInfo[] {
+    const returnTokens: TokenInfo[] = [];
+
+    search.forEach((searchToken) => {
+      const token = this.getLoadedTokens().find((token) =>
+        token.symbol === searchToken.symbol && searchToken.network
           ? isSameNetwork(token.chainId, searchToken.network)
           : true
       );
