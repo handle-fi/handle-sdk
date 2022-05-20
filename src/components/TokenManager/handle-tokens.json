@@ -60,6 +60,36 @@
       }
     },
     {
+      "name": "handle CNY",
+      "symbol": "fxCNY",
+      "decimals": 18,
+      "address": "0x2C29daAce6Aa05e3b65743EFd61f8A2C448302a3",
+      "chainId": 1,
+      "extensions": {
+        "isFxToken": true
+      }
+    },
+    {
+      "name": "handle KRW",
+      "symbol": "fxKRW",
+      "decimals": 18,
+      "address": "0xF4E8BA79d058fFf263Fd043Ef50e1010c1BdF991",
+      "chainId": 1,
+      "extensions": {
+        "isFxToken": true
+      }
+    },
+    {
+      "name": "handle CHF",
+      "symbol": "fxCHF",
+      "decimals": 18,
+      "address": "0x8C414cB8A9Af9F7B03673e93DF73c23C1aa05b4e",
+      "chainId": 1,
+      "extensions": {
+        "isFxToken": true
+      }
+    },
+    {
       "chainId": 137,
       "symbol": "FOREX",
       "name": "handle.fi",
@@ -107,6 +137,36 @@
       "address": "0x8616E8EA83f048ab9A5eC513c9412Dd2993bcE3F",
       "decimals": 18,
       "logoURI": "https://app.handle.fi/assets/images/handle/fxUSDLogo.png",
+      "extensions": {
+        "isFxToken": true
+      }
+    },
+    {
+      "name": "handle CNY",
+      "symbol": "fxCNY",
+      "decimals": 18,
+      "address": "0x2C29daAce6Aa05e3b65743EFd61f8A2C448302a3",
+      "chainId": 137,
+      "extensions": {
+        "isFxToken": true
+      }
+    },
+    {
+      "name": "handle KRW",
+      "symbol": "fxKRW",
+      "decimals": 18,
+      "address": "0xF4E8BA79d058fFf263Fd043Ef50e1010c1BdF991",
+      "chainId": 137,
+      "extensions": {
+        "isFxToken": true
+      }
+    },
+    {
+      "name": "handle CHF",
+      "symbol": "fxCHF",
+      "decimals": 18,
+      "address": "0x8C414cB8A9Af9F7B03673e93DF73c23C1aa05b4e",
+      "chainId": 137,
       "extensions": {
         "isFxToken": true
       }
@@ -166,6 +226,39 @@
         "isHlpToken": true,
         "isStable": true,
         "isFxToken": true
+      }
+    },
+    {
+      "name": "handle CNY",
+      "symbol": "fxCNY",
+      "decimals": 18,
+      "address": "0x2C29daAce6Aa05e3b65743EFd61f8A2C448302a3",
+      "chainId": 42161,
+      "extensions": {
+        "isFxToken": true,
+        "isHlpToken": true
+      }
+    },
+    {
+      "name": "handle KRW",
+      "symbol": "fxKRW",
+      "decimals": 18,
+      "address": "0xF4E8BA79d058fFf263Fd043Ef50e1010c1BdF991",
+      "chainId": 42161,
+      "extensions": {
+        "isFxToken": true,
+        "isHlpToken": true
+      }
+    },
+    {
+      "name": "handle CHF",
+      "symbol": "fxCHF",
+      "decimals": 18,
+      "address": "0x8C414cB8A9Af9F7B03673e93DF73c23C1aa05b4e",
+      "chainId": 42161,
+      "extensions": {
+        "isFxToken": true,
+        "isHlpToken": true
       }
     },
     {
