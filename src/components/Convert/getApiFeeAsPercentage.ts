@@ -1,14 +1,15 @@
 import config from "../../config";
-import { TokenInfo } from "@uniswap/token-lists";
+import Convert from "./Convert";
 
 export const getApiFeeAsPercentage = async (
   sellTokenAddress: string,
-  buyTokenAddress: string,
-  tokenList: TokenInfo[]
+  buyTokenAddress: string
 ): Promise<number> => {
   const SAME_CURRENCY_STABLE_TO_SAME_CURRENCY_STABLE_FEE = 0.04;
   const STABLE_TO_STABLE_FEE = 0.1;
   const NON_STABLE_FEE = 0.3;
+
+  const tokenList = await Convert.getTokenList();
 
   const sellToken = tokenList.find(
     (token) => token.address.toLowerCase() === sellTokenAddress.toLowerCase()

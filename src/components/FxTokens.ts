@@ -3,7 +3,6 @@ import { FxTokenAddresses, ProtocolAddresses } from "../config";
 import { ERC20__factory } from "../contracts";
 import { FxTokenPriced, FxTokenSymbol, FxToken } from "../types/fxTokens";
 import { callMulticallObjects, createMulticallProtocolContracts } from "../utils/contract-utils";
-// import { getTokensFromAddresses } from "../utils/fxToken-utils";
 import sdkConfig from "../config";
 import { Promisified } from "../types/general";
 import Graph, { IndexedFxToken } from "./Graph";

@@ -42,7 +42,7 @@ const zeroXQuoteHandler = async (input: ConvertQuoteRouteArgs): Promise<Quote> =
     gasPrice,
     receivingAccount: connectedAccount
   } = input;
-  const feePercentage = await getApiFeeAsPercentage(sellToken, buyToken, input.tokenList);
+  const feePercentage = await getApiFeeAsPercentage(sellToken, buyToken);
 
   const params: ZeroXQuoteParams = {
     buyToken,
@@ -79,7 +79,7 @@ const zeroXTransactionHandler = async (
     sellAmount,
     slippage
   } = input;
-  const feePercentage = await getApiFeeAsPercentage(sellToken, buyToken, input.tokenList);
+  const feePercentage = await getApiFeeAsPercentage(sellToken, buyToken);
 
   const params: ZeroXSwapParams = {
     buyToken,

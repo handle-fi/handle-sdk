@@ -15,7 +15,6 @@ type ConvertRouteArgs = {
   gasPrice: BigNumber | undefined;
   hlpMethods?: HlpInfoMethods;
   network: Network;
-  tokenList: TokenInfo[];
 };
 
 export type ConvertQuoteRouteArgs = ConvertRouteArgs & {
@@ -55,6 +54,15 @@ export default class Convert {
     const tokenManager = new TokenManager();
     await tokenManager.initialLoad;
     Convert.tokenList = tokenManager.getLoadedTokens();
+  };
+
+  public static getTokenList = async (): Promise<TokenInfo[]> => {
+    if (!Convert.tokenList) {
+      await Convert.loadTokens();
+    }
+
+    // token list will be loaded by now, so it is not undefined
+    return Convert.tokenList!;
   };
 
   private static getHighestWeightRoute = async (weightInfo: WeightInput) => {
@@ -101,9 +109,7 @@ export default class Convert {
 
     return route.quote({
       ...input,
-      network,
-      // token list will be loaded by now due to the call to loadTokens
-      tokenList: this.tokenList!
+      network
     });
   };
 
@@ -121,9 +127,7 @@ export default class Convert {
     });
     return route.transaction({
       ...input,
-      network,
-      // token list will be loaded by now due to the call to loadTokens
-      tokenList: this.tokenList!
+      network
     });
   };
 }

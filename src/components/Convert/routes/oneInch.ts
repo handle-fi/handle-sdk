@@ -40,7 +40,7 @@ const oneInchQuoteHandler = async (input: ConvertQuoteRouteArgs): Promise<Quote>
     sellAmount: fromAmount,
     gasPrice
   } = input;
-  const feePercentage = await getApiFeeAsPercentage(sellToken, buyToken, input.tokenList);
+  const feePercentage = await getApiFeeAsPercentage(sellToken, buyToken);
 
   const params: OneInchQuoteParams = {
     fromTokenAddress: sellToken,
@@ -79,7 +79,7 @@ const oneInchTransactionHandler = async (
     slippage,
     receivingAccount: connectedAccount
   } = input;
-  const feePercentage = await getApiFeeAsPercentage(sellToken, buyToken, input.tokenList);
+  const feePercentage = await getApiFeeAsPercentage(sellToken, buyToken);
 
   const params: OneInchSwapParams = {
     fromTokenAddress: sellToken,
