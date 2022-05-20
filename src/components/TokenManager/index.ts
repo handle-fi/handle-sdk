@@ -29,6 +29,7 @@ type SearchTokenAddress = {
 class TokenManager {
   /** Caches fetched results indefinetely */
   protected cache: TokenListCache;
+  protected customTokens: TokenInfo[];
 
   public initialLoad: Promise<TokenListType[]>;
 
@@ -38,6 +39,7 @@ class TokenManager {
     includeNativeTokens = true
   ) {
     this.cache = {};
+    this.customTokens = [];
     if (includeHandleTokens) this.setTokenList("handle-tokens", HandleTokenList);
     if (includeNativeTokens) this.setTokenList("native-tokens", NativeTokenList);
     this.initialLoad = Promise.all(tokenListUrls.map((url) => this.fetchTokenList(url)));
@@ -65,12 +67,11 @@ class TokenManager {
    * @returns all tokens from all cached token lists
    */
   public getLoadedTokens(network?: Network | number): TokenInfo[] {
+    const allTokens = [...this.customTokens, ...this.getTokensFromLists(Object.values(this.cache))];
     if (network === undefined) {
-      return this.getTokensFromLists(Object.values(this.cache));
+      return allTokens;
     }
-    return this.getTokensFromLists(Object.values(this.cache)).filter((token) =>
-      isSameNetwork(token.chainId, network)
-    );
+    return allTokens.filter((token) => isSameNetwork(token.chainId, network));
   }
 
   /**
@@ -159,6 +160,36 @@ class TokenManager {
   public async fetchTokenLists(urls: string[]) {
     return Promise.all(urls.map((url) => this.fetchTokenList(url)));
   }
+
+  /**
+   * Adds custom tokens to the token manager
+   * @param tokens tokens to add
+   */
+  public addCustomTokens(tokens: TokenInfo[]) {
+    this.customTokens.push(...tokens);
+  }
+
+  /**
+   * Clears all custom tokens
+   */
+  public clearCustomTokens = () => {
+    this.customTokens = [];
+  };
+
+  /**
+   * Sets custom tokens as a list of tokens
+   * @param tokens tokens to set
+   */
+  public setCustomTokens = (tokens: TokenInfo[]) => {
+    this.customTokens = tokens;
+  };
+
+  /**
+   * @returns all custom tokens
+   */
+  public getCustomTokens = () => {
+    return this.customTokens;
+  };
 
   /**
    * Gets a token list from the cache
