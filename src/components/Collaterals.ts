@@ -80,7 +80,7 @@ export default class Collaterals {
     return raw.map((c, index) => this.toCollateral(this.tokens[index], c));
   };
 
-  public getIndexedCollaterals = async (): Promise<Omit<Collateral, "name" | "chainId">[]> => {
+  public getIndexedCollaterals = async (): Promise<Collateral[]> => {
     const collaterals = await this.graph.collateralGraphClient.query({});
     return collaterals.map(this.indexedToCollateral).filter((col) => {
       return this.tokens.find((t) => t.address.toLowerCase() === col.address.toLowerCase());
@@ -203,9 +203,7 @@ export default class Collaterals {
     };
   };
 
-  private indexedToCollateral = (
-    collateral: IndexedCollateral
-  ): Omit<Collateral, "chainId" | "name"> => {
+  private indexedToCollateral = (collateral: IndexedCollateral): Collateral => {
     return {
       symbol: collateral.symbol,
       address: collateral.address,
@@ -213,7 +211,9 @@ export default class Collaterals {
       mintCR: collateral.mintCollateralRatio,
       liquidationFee: collateral.liquidationFee,
       interestRate: collateral.interestRate,
-      price: collateral.rate
+      price: collateral.rate,
+      name: collateral.name,
+      chainId: collateral.chainId
     };
   };
 

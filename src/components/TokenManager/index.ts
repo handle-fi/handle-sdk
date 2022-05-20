@@ -6,35 +6,40 @@ import { Network } from "../../types/network";
 import { isSameNetwork, validateTokenList } from "../../utils/tokenlist-utils";
 
 const HandleTokenList = validateTokenList(handleTokenList);
-const NATIVE_TOKENS = validateTokenList(nativeTokenList);
+const NativeTokenList = validateTokenList(nativeTokenList);
 
 type TokenListCache = {
   [url: string]: TokenListType;
 };
 
-export const DEFAULT_FETCH_URLS: string[] = [
+export const DEFAULT_TOKEN_LIST_URLS: string[] = [
   "https://api-polygon-tokens.polygon.technology/tokenlists/default.tokenlist.json", // polygon
   "https://bridge.arbitrum.io/token-list-42161.json", // arbitrum
   "https://api.coinmarketcap.com/data-api/v3/uniswap/all.json" // ethereum
 ];
+
+type SearchTokenAddress = {
+  address: string;
+  network?: Network | number;
+};
 
 /**
  * The TokenList class is used to fetch and validate token lists.
  */
 class TokenManager {
   /** Caches fetched results indefinetely */
-  public cache: TokenListCache;
+  protected cache: TokenListCache;
 
   public initialLoad: Promise<TokenListType[]>;
 
   constructor(
-    tokenListUrls: string[] = DEFAULT_FETCH_URLS,
+    tokenListUrls: string[] = DEFAULT_TOKEN_LIST_URLS,
     includeHandleTokens = true,
     includeNativeTokens = true
   ) {
     this.cache = {};
-    if (includeHandleTokens) this.cache["handle-tokens"] = HandleTokenList;
-    if (includeNativeTokens) this.cache["native-tokens"] = NATIVE_TOKENS;
+    if (includeHandleTokens) this.setTokenList("handle-tokens", HandleTokenList);
+    if (includeNativeTokens) this.setTokenList("native-tokens", NativeTokenList);
     this.initialLoad = Promise.all(tokenListUrls.map((url) => this.fetchTokenList(url)));
   }
 
@@ -107,22 +112,23 @@ class TokenManager {
   /**
    * Returns an array of tokens with the given addresses. Order is not guaranteed.
    * If a token cannot be found with the given address, it will be omitted from the array.
-   * If multiple tokens are found with the same address, only the first found will be included.
-   * @param addresses addresses of the tokens to get
+   * If multiple tokens are found with the same address and network, they will all be included.
+   * @param search an array of objects with address as the address of the token, and network as the
+   * network of the token
    * @returns an array of tokens with the given addresses.
    * @note this is not optimised for large addresses arrays
    */
-  public getTokensByAddresses(addresses: string[]): TokenInfo[] {
-    const seenAddresses: string[] = [];
+  public getTokensByAddresses(search: SearchTokenAddress[]): TokenInfo[] {
     const returnTokens: TokenInfo[] = [];
-    this.getLoadedTokens().forEach((token) => {
-      if (addresses.some((address) => address.toLowerCase() === token.address.toLowerCase())) {
-        if (
-          !seenAddresses.some((address) => address.toLowerCase() === token.address.toLowerCase())
-        ) {
-          returnTokens.push(token);
-          seenAddresses.push(token.address);
-        }
+
+    search.forEach((searchToken) => {
+      const token = this.getLoadedTokens().find((token) =>
+        token.address.toLowerCase() === searchToken.address.toLowerCase() && searchToken.network
+          ? isSameNetwork(token.chainId, searchToken.network)
+          : true
+      );
+      if (token) {
+        returnTokens.push(token);
       }
     });
     return returnTokens;
@@ -143,6 +149,57 @@ class TokenManager {
     const tokenList = validateTokenList(data);
     this.cache[url] = tokenList;
     return tokenList;
+  }
+
+  /**
+   * Fetches a list of tokenLists from the given urls
+   * @param urls urls to fetch
+   * @returns The fetched token lists
+   */
+  public async fetchTokenLists(urls: string[]) {
+    return Promise.all(urls.map((url) => this.fetchTokenList(url)));
+  }
+
+  /**
+   * Gets a token list from the cache
+   * @param key the key of the token list in the cache
+   * @returns the token list with the given key
+   */
+  public getFromCache(key: string): TokenListType | undefined {
+    return this.cache[key];
+  }
+
+  /**
+   * Sets a cache key to a token list
+   * @param key the key in the cache for which to set the tokenList
+   * @param tokenList the tokenList to set
+   */
+  public setTokenList(key: string, tokenList: TokenListType) {
+    validateTokenList(tokenList);
+    this.cache[key] = tokenList;
+  }
+
+  /**
+   * Deletes a tokenList in the cache
+   * @param key the key in the cache to delete
+   */
+  public deleteTokenList(key: string) {
+    delete this.cache[key];
+  }
+
+  /**
+   * Clears the token list cache
+   */
+  public clearCache() {
+    this.cache = {};
+  }
+
+  /**
+   * Gets the cache
+   * @returns the cache
+   */
+  public getCache() {
+    return this.cache;
   }
 }
 

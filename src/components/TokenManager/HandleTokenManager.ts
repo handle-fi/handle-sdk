@@ -15,18 +15,18 @@ import { Network } from "../..";
  * Instead, it has isLiquidityToken set to true
  */
 class HandleTokenManager extends TokenManager {
-  constructor(tokenListUrls: string[] = [], includeNativeTokens = true) {
-    super(tokenListUrls, true, includeNativeTokens);
+  constructor(tokenListUrls: string[] = []) {
+    super(tokenListUrls, true, true);
   }
 
   /**
    * Creates an instance of HandleTokenList from a TokenList instance.
-   * @param tokenList the tokenList from which to construct the HandleTokenList
+   * @param tokenManager the tokenList from which to construct the HandleTokenList
    * @returns an instance of HandleTokenList with the cache of the tokenList
    */
-  public static from(tokenList: TokenManager): HandleTokenManager {
+  public static from(tokenManager: TokenManager): HandleTokenManager {
     const handleList = new HandleTokenManager();
-    Object.assign(handleList.cache, tokenList.cache);
+    Object.assign(handleList.cache, tokenManager.getCache());
     return handleList;
   }
 

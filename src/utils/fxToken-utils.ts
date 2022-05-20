@@ -3,7 +3,7 @@ import { FxTokenPriced } from "../types/fxTokens";
 import { HandleTokenManager } from "..";
 
 export const getFxTokensFromAddresses = (addresses: string[]): TokenInfo[] => {
-  return new HandleTokenManager([]).getTokensByAddresses(addresses);
+  return new HandleTokenManager([]).getTokensByAddresses(addresses.map((address) => ({ address })));
 };
 
 export const getFxTokenSymbolFromAddress = (

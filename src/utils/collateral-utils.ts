@@ -3,7 +3,9 @@ import { Collateral, CollateralSymbol, CollateralToken } from "../types/collater
 
 export const getTokensFromConfig = (addresses: string[]): CollateralToken[] => {
   const tokenManager = new HandleTokenManager();
-  return tokenManager.getTokensByAddresses(addresses) as CollateralToken[];
+  return tokenManager.getTokensByAddresses(
+    addresses.map((address) => ({ address }))
+  ) as CollateralToken[];
 };
 
 export const getCollateralByAddress = (collaterals: Collateral[], address: string): Collateral => {
