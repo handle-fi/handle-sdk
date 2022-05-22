@@ -38,6 +38,9 @@ class TokenManager {
 
   public initialLoad: Promise<TokenListType[]>;
 
+  /** Called whenever the cache, or custom tokens changes */
+  public onTokensChange: () => void;
+
   constructor(
     tokenListUrls: string[] = DEFAULT_TOKEN_LIST_URLS,
     includeHandleTokens = true,
@@ -45,6 +48,7 @@ class TokenManager {
   ) {
     this.cache = {};
     this.customTokens = [];
+    this.onTokensChange = () => {};
     if (includeHandleTokens) this.setTokenList("handle-tokens", HandleTokenList);
     if (includeNativeTokens) this.setTokenList("native-tokens", NativeTokenList);
     this.initialLoad = Promise.all(tokenListUrls.map((url) => this.fetchTokenList(url)));
@@ -179,6 +183,7 @@ class TokenManager {
     const { data } = await axios.get(url);
     const tokenList = validateTokenList(data);
     this.cache[url] = tokenList;
+    this.onTokensChange();
     return tokenList;
   }
 
@@ -197,6 +202,7 @@ class TokenManager {
    */
   public addCustomTokens(tokens: TokenInfo[]) {
     this.customTokens.push(...tokens);
+    this.onTokensChange();
   }
 
   /**
@@ -204,6 +210,7 @@ class TokenManager {
    */
   public clearCustomTokens = () => {
     this.customTokens = [];
+    this.onTokensChange();
   };
 
   /**
@@ -212,6 +219,7 @@ class TokenManager {
    */
   public setCustomTokens = (tokens: TokenInfo[]) => {
     this.customTokens = tokens;
+    this.onTokensChange();
   };
 
   /**
@@ -238,6 +246,7 @@ class TokenManager {
   public setTokenList(key: string, tokenList: TokenListType) {
     validateTokenList(tokenList);
     this.cache[key] = tokenList;
+    this.onTokensChange();
   }
 
   /**
@@ -246,6 +255,7 @@ class TokenManager {
    */
   public deleteTokenList(key: string) {
     delete this.cache[key];
+    this.onTokensChange();
   }
 
   /**
@@ -253,6 +263,7 @@ class TokenManager {
    */
   public clearCache() {
     this.cache = {};
+    this.onTokensChange();
   }
 
   /**
