@@ -14,7 +14,9 @@ export const getPositionTokenList = (network: Network) => {
   const indexTokens: string[] = [];
   const isLong: boolean[] = [];
 
-  const hlpTokens = new HandleTokenManager().getHlpTokens(network);
+  const tokenManager = new HandleTokenManager();
+  const hlpTokens = tokenManager.getHlpTokens(network);
+
   if (!hlpTokens) {
     return {
       collateralTokens,
@@ -24,12 +26,8 @@ export const getPositionTokenList = (network: Network) => {
   }
 
   // push tokens for long positions
-  const nonStableTokens = hlpTokens.filter(
-    (token) => !token.extensions?.isStable && !token.extensions?.isWrappedNative
-  );
-  const stableTokens = hlpTokens.filter(
-    (token) => token.extensions?.isStable && !token.extensions?.isWrappedNative
-  );
+  const nonStableTokens = hlpTokens.filter((token) => !token.extensions?.isStable);
+  const stableTokens = hlpTokens.filter((token) => token.extensions?.isStable);
   nonStableTokens.forEach((token) => {
     collateralTokens.push(token.address);
     indexTokens.push(token.address);
