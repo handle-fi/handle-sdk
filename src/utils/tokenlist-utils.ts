@@ -34,7 +34,9 @@ export const validateTokenList = (tokenList: any) => {
     console.error(tokenSchemeValidator.errors);
     throw new Error("Failed to validate token list");
   }
-  return tokenList as any as TokenList;
+  const validatedList = tokenList as any as TokenList;
+  validatedList.tokens.forEach(Object.freeze);
+  return validatedList;
 };
 
 export const getTokenFromTokenList = (
