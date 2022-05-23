@@ -7,20 +7,24 @@ import { getTradeFee } from "./getTradeFee";
 import { getFeeBasisPoints } from "./getFeeBasisPoints";
 import { getLiquidationPriceFromDelta } from "./getLiquidationPriceFromDelta";
 import { Position, contractPositionToPosition } from "./position";
-import { splitPositionArray } from "./splitPositionArray";
-import { getPositionTokenList } from "./getPositionTokenList";
-import { getNextAveragePrice } from "./getNextAveragePrice";
+import { splitPositionArray } from "./position/splitPositionArray";
+import { getPositionTokenList } from "./position/getPositionTokenList";
+import { getNextAveragePrice } from "./position/getNextAveragePrice";
 import { getMarginFee } from "./getMarginFee";
+import { getLeverage } from "./position/getLeverage";
+import { getPositionDelta } from "./position/getPositionDelta";
 
 export {
   contractPositionToPosition,
   getFeeBasisPoints,
   getFundingFee,
   getHlpFeeBasisPoints,
+  getLeverage,
   getLiquidationPrice,
   getLiquidationPriceFromDelta,
   getMarginFee,
   getNextAveragePrice,
+  getPositionDelta,
   getPositionTokenList,
   getSwapFee,
   getSwapFeeBasisPoints,
