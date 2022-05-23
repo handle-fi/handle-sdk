@@ -30,7 +30,7 @@ export const getFxTokenByAddress = (fxTokens: FxToken[], address: string): FxTok
   return fxToken;
 };
 
-export const getFxTokenPricedBySymbol = (fxTokens: FxToken[], symbol: FxTokenSymbol): FxToken => {
+export const getFxTokenBySymbol = (fxTokens: FxToken[], symbol: FxTokenSymbol): FxToken => {
   const fxToken = fxTokens.find((fxToken) => fxToken.symbol === symbol);
 
   if (!fxToken) {

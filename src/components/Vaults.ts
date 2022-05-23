@@ -23,7 +23,7 @@ import CollateralsSDK from "./Collaterals";
 import FxTokensSDK from "./FxTokens";
 import { getDeadline } from "../utils/general-utils";
 import { createSingleCollateralVault, createVault } from "../utils/vault-utils";
-import { getFxTokenByAddress, getFxTokenPricedBySymbol } from "../utils/fxToken-utils";
+import { getFxTokenByAddress, getFxTokenBySymbol } from "../utils/fxToken-utils";
 import { getCollateralByAddress, getCollateralBySymbol } from "../utils/collateral-utils";
 import { ProtocolSDK } from "..";
 import { ProtocolParameters } from "./Protocol";
@@ -240,7 +240,7 @@ export default class Vaults {
       throw new Error(`Unable to find vault: ${network}-${vaultSymbol}`);
     }
 
-    const fxToken = getFxTokenPricedBySymbol(this.fxTokens, pool.fxToken);
+    const fxToken = getFxTokenBySymbol(this.fxTokens, pool.fxToken);
     const multicall = getKashiPoolMulticall(account, pool, chainId);
     const result = await callMulticallObject(multicall, provider);
 
@@ -256,7 +256,7 @@ export default class Vaults {
   ): Promise<Vault> => {
     this.initialisationCheck();
 
-    const fxToken = getFxTokenPricedBySymbol(this.fxTokens, fxTokenSymbol);
+    const fxToken = getFxTokenBySymbol(this.fxTokens, fxTokenSymbol);
 
     const indexedVault = await this.graph.vaults.queryOne({
       where: { account: account.toLowerCase(), fxToken: fxToken.address.toLowerCase() }
@@ -305,7 +305,7 @@ export default class Vaults {
     return results.map((r, index) => {
       const poolConfig = poolConfigs[vaultsSymbols[index]];
 
-      const fxToken = getFxTokenPricedBySymbol(this.fxTokens, poolConfig.fxToken);
+      const fxToken = getFxTokenBySymbol(this.fxTokens, poolConfig.fxToken);
 
       return createSingleCollateralVault(
         kashiMulticallResultToSingleCollateralVaultData(account, poolConfig, r),
@@ -324,7 +324,7 @@ export default class Vaults {
 
     const contract = protocolContracts.comptroller;
 
-    const fxToken = getFxTokenPricedBySymbol(this.fxTokens, args.fxToken);
+    const fxToken = getFxTokenBySymbol(this.fxTokens, args.fxToken);
     const deadline = getDeadline(args.deadline);
     const referral = args.referral ?? ethers.constants.AddressZero;
 
@@ -379,7 +379,7 @@ export default class Vaults {
 
     const account = await signer.getAddress();
     const chainId = NETWORK_NAME_TO_CHAIN_ID[args.network];
-    const fxToken = getFxTokenPricedBySymbol(this.fxTokens, kashiPool.fxToken);
+    const fxToken = getFxTokenBySymbol(this.fxTokens, kashiPool.fxToken);
     const cooker = new KashiCooker(kashiPool, account, fxToken, chainId);
 
     if (args.approveKashiSignature) {
@@ -418,7 +418,7 @@ export default class Vaults {
 
     const account = await signer.getAddress();
     const chainId = NETWORK_NAME_TO_CHAIN_ID[args.network];
-    const fxToken = getFxTokenPricedBySymbol(this.fxTokens, kashiPool.fxToken);
+    const fxToken = getFxTokenBySymbol(this.fxTokens, kashiPool.fxToken);
     const cooker = new KashiCooker(kashiPool, account, fxToken, chainId);
 
     if (args.burnAmount?.gt(0)) {
@@ -445,7 +445,7 @@ export default class Vaults {
 
     const account = await signer.getAddress();
     const chainId = NETWORK_NAME_TO_CHAIN_ID[args.network];
-    const fxToken = getFxTokenPricedBySymbol(this.fxTokens, kashiPool.fxToken);
+    const fxToken = getFxTokenBySymbol(this.fxTokens, kashiPool.fxToken);
     const cooker = new KashiCooker(kashiPool, account, fxToken, chainId);
 
     if (args.approveKashiSignature) {
@@ -464,7 +464,7 @@ export default class Vaults {
   ): Promise<ethers.ContractTransaction> => {
     this.initialisationCheck();
     const protocolContracts = createProtocolContracts(this.config.protocolAddresses, signer);
-    const fxToken = getFxTokenPricedBySymbol(this.fxTokens, args.fxToken);
+    const fxToken = getFxTokenBySymbol(this.fxTokens, args.fxToken);
 
     const contract = protocolContracts.treasury;
 
@@ -497,7 +497,7 @@ export default class Vaults {
     this.initialisationCheck();
 
     const protocolContracts = createProtocolContracts(this.config.protocolAddresses, signer);
-    const fxToken = getFxTokenPricedBySymbol(this.fxTokens, args.fxToken);
+    const fxToken = getFxTokenBySymbol(this.fxTokens, args.fxToken);
 
     return protocolContracts.comptroller.burn(
       args.amount,
@@ -516,7 +516,7 @@ export default class Vaults {
     this.initialisationCheck();
 
     const protocolContracts = createProtocolContracts(this.config.protocolAddresses, signer);
-    const fxToken = getFxTokenPricedBySymbol(this.fxTokens, args.fxToken);
+    const fxToken = getFxTokenBySymbol(this.fxTokens, args.fxToken);
 
     const contract = protocolContracts.treasury;
 
