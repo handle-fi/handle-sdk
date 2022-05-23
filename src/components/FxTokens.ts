@@ -23,7 +23,7 @@ type Price = {
 };
 
 export default class FxTokens {
-  public tokens: FxToken[];
+  public tokens: Omit<FxToken, "price">[];
   private config: FxTokensConfig;
   private graph: Graph;
 
@@ -35,9 +35,10 @@ export default class FxTokens {
       graphEndpoint: sdkConfig.theGraphEndpoints.arbitrum
     };
 
-    this.tokens = getFxTokensFromAddresses(
-      Object.values(this.config.fxTokenAddresses)
-    ) as FxToken[];
+    this.tokens = getFxTokensFromAddresses(Object.values(this.config.fxTokenAddresses)) as Omit<
+      FxToken,
+      "price"
+    >[];
     this.graph = new Graph(this.config.graphEndpoint);
   }
 
@@ -120,7 +121,7 @@ export default class FxTokens {
     };
   };
 
-  private includeTokenPrice = (token: FxToken, price: ethers.BigNumber): FxToken => {
+  private includeTokenPrice = (token: Omit<FxToken, "price">, price: ethers.BigNumber): FxToken => {
     return {
       ...token,
       price

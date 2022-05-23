@@ -132,10 +132,10 @@ class TokenManager {
     const returnTokens: TokenInfo[] = [];
 
     search.forEach((searchToken) => {
-      const token = this.getLoadedTokens().find((token) =>
-        token.address.toLowerCase() === searchToken.address.toLowerCase() && searchToken.network
-          ? isSameNetwork(token.chainId, searchToken.network)
-          : true
+      const token = this.getLoadedTokens().find(
+        (token) =>
+          token.address.toLowerCase() === searchToken.address.toLowerCase() &&
+          (searchToken.network ? isSameNetwork(token.chainId, searchToken.network) : true)
       );
       if (token) {
         returnTokens.push(token);
@@ -157,10 +157,10 @@ class TokenManager {
     const returnTokens: TokenInfo[] = [];
 
     search.forEach((searchToken) => {
-      const token = this.getLoadedTokens().find((token) =>
-        token.symbol === searchToken.symbol && searchToken.network
-          ? isSameNetwork(token.chainId, searchToken.network)
-          : true
+      const token = this.getLoadedTokens().find(
+        (token) =>
+          token.symbol === searchToken.symbol &&
+          (searchToken.network ? isSameNetwork(token.chainId, searchToken.network) : true)
       );
       if (token) {
         returnTokens.push(token);
