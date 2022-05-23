@@ -28,7 +28,7 @@ export type ConvertTransactionRouteArgs = ConvertRouteArgs & {
   signer: Signer;
 };
 
-type ConvertInput = Omit<ConvertRouteArgs, "network" | "tokenList">;
+type ConvertInput = Omit<ConvertRouteArgs, "network"">;
 
 type ConvertQuoteInput = ConvertInput & {
   signerOrProvider?: ethers.providers.Provider | Signer;
