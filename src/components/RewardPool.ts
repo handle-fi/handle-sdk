@@ -202,6 +202,13 @@ export default class RewardPool {
         )
       };
 
+      for (let [symbol, address] of Object.entries(this.config.fxTokenAddresses)) {
+        const keeperName = "fxKeeper" + symbol.replace("fx", "");
+        multicall[keeperName] = contracts.rewardPool.getPoolIdByAlias(
+          this.getKeeperPoolAlias(symbol)
+        );
+      }
+
       const multicallResponse = await callMulticallObject(multicall, provider);
 
       this.rewardPoolIds = Object.keys(multicallResponse).reduce((progress, pn) => {
