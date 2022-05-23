@@ -37,10 +37,6 @@ export const validateTokenList = (tokenList: any) => {
   return tokenList as any as TokenList;
 };
 
-export function doSomething() {
-  console.log("huiasfhfdhjklfdhklj");
-}
-
 export const getTokenFromTokenList = (
   tokenList: TokenList,
   symbol: string,
