@@ -22,6 +22,8 @@ export const FUNDING_RATE_PRECISION = 1_000_000;
 export const MINT_BURN_FEE_BASIS_POINTS = 20;
 export const TAX_BASIS_POINTS = 10;
 export const STABLE_TAX_BASIS_POINTS = 5;
+export const MIN_PROFIT_TIME = 10_800;
+export const MIN_PROFIT_BASIS_POINTS = 150;
 
 /** Symbols that can be used in the hlp price chart against USD. */
 export const UsdHlpChartSymbols = ["AUD", "JPY", "CNY", "EUR", "KRW", "BTC", "BNB", "ETH"] as const;
