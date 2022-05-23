@@ -266,6 +266,7 @@
       "symbol": "WETH",
       "decimals": 18,
       "address": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+      "logoURI": "https://tokens.1inch.io/0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2.png",
       "chainId": 42161,
       "extensions": {
         "isHlpToken": true,
@@ -277,6 +278,7 @@
       "symbol": "hLP",
       "decimals": 18,
       "address": "0xB666b08609b2E69A8ba51AA720770053AeC0d2d3",
+      "logoURI": "https://app.handle.fi/assets/images/handle.fiLogoLightNewCut.png",
       "chainId": 42161,
       "extensions": {
         "isLiquidityToken": true

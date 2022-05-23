@@ -30,6 +30,8 @@ type SearchTokenSymbols = {
 
 /**
  * The TokenList class is used to fetch and validate token lists.
+ * @dev By default, native tokens are stored in the cache as "native-tokens"
+ * and handle tokens are stored in the cache as "handle-tokens".
  */
 class TokenManager {
   /** Caches fetched results indefinetely */
