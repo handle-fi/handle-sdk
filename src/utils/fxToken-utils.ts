@@ -1,4 +1,4 @@
-import { FxTokenSymbolMap, TokenInfo } from "..";
+import { TokenInfo } from "..";
 import { FxToken } from "../types/fxTokens";
 import { HandleTokenManager } from "..";
 
@@ -8,7 +8,7 @@ export const getFxTokensFromAddresses = (addresses: string[]): TokenInfo[] => {
 
 export const getFxTokenSymbolFromAddress = (
   address: string,
-  config: FxTokenSymbolMap<string>
+  config: Record<string, string>
 ): string => {
   const keys = Object.keys(config);
 

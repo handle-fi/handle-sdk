@@ -1,6 +1,5 @@
 import { ethers } from "ethers";
 import { CollateralSymbolMap } from "./../types/collaterals";
-import { FxTokenSymbolMap } from "./../types/fxTokens";
 import { BridgeConfigByNetwork } from "./../components/Bridge";
 import { StableType } from "./../types/tokens";
 import { LPStakingPoolNameMap, LPStakingPlatformName } from "./../types/lpStaking";
@@ -13,7 +12,7 @@ import { mustExist } from "../utils/general-utils";
 const stakingTokens = validateTokenList(_stakingTokens);
 const handleTokens = validateTokenList(_handleTokens);
 
-export type FxTokenAddresses = FxTokenSymbolMap<string>;
+export type FxTokenAddresses = Record<string, string>;
 export type CollateralDetails = CollateralSymbolMap<{ address: string; decimals: number }>;
 export type LPStakingPoolDetails = {
   platform: LPStakingPlatformName;

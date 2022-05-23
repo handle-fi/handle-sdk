@@ -1,5 +1,4 @@
 import config, { KashiPoolConfig } from "./config";
-import { FxTokenSymbolMap } from "./types/fxTokens";
 import { Vault, SingleCollateralVaultSymbol, SingleCollateralVault } from "./types/vaults";
 import { Collateral, CollateralSymbol, CollateralSymbolWithNative } from "./types/collaterals";
 import { FxToken } from "./types/fxTokens";
@@ -77,7 +76,6 @@ export {
 };
 
 export type {
-  FxTokenSymbolMap,
   IndexedFxToken,
   IndexedVault,
   IndexedFxKeeperPool,
