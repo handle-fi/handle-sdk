@@ -1,4 +1,4 @@
-import { FxTokenSymbol, FxTokenSymbolMap, TokenInfo } from "..";
+import { FxTokenSymbolMap, TokenInfo } from "..";
 import { FxToken } from "../types/fxTokens";
 import { HandleTokenManager } from "..";
 
@@ -9,11 +9,11 @@ export const getFxTokensFromAddresses = (addresses: string[]): TokenInfo[] => {
 export const getFxTokenSymbolFromAddress = (
   address: string,
   config: FxTokenSymbolMap<string>
-): FxTokenSymbol => {
-  const keys = Object.keys(config) as FxTokenSymbol[];
+): string => {
+  const keys = Object.keys(config);
 
   return keys.find((k) => {
-    const symbol = k as FxTokenSymbol;
+    const symbol = k;
     return config[symbol].toLowerCase() === address.toLowerCase();
   })!;
 };
@@ -30,7 +30,7 @@ export const getFxTokenByAddress = (fxTokens: FxToken[], address: string): FxTok
   return fxToken;
 };
 
-export const getFxTokenBySymbol = (fxTokens: FxToken[], symbol: FxTokenSymbol): FxToken => {
+export const getFxTokenBySymbol = (fxTokens: FxToken[], symbol: string): FxToken => {
   const fxToken = fxTokens.find((fxToken) => fxToken.symbol === symbol);
 
   if (!fxToken) {

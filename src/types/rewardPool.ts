@@ -1,22 +1,12 @@
 import { ethers } from "ethers";
 
-export type RewardPoolName =
-  | "governanceLock"
-  | "fxKeeperAUD"
-  | "fxKeeperPHP"
-  | "fxKeeperUSD"
-  | "fxKeeperEUR";
-export type RewardPoolNameMap<T> = {
-  [key in RewardPoolName]: T;
-};
-
 export type RewardPoolDataPool = {
   ratio: ethers.BigNumber;
   accruedAmount: ethers.BigNumber;
   deltaS: ethers.BigNumber;
 };
 
-export type RewardPoolDataPools = RewardPoolNameMap<RewardPoolDataPool>;
+export type RewardPoolDataPools = Record<string, RewardPoolDataPool>;
 
 export type RewardPoolData = {
   pools: RewardPoolDataPools;
@@ -27,7 +17,7 @@ export type RewardPoolData = {
 };
 
 export type RewardPoolPool = {
-  name: RewardPoolName;
+  name: string;
   weight: ethers.BigNumber;
   assetType: number;
   assetAddress: string;

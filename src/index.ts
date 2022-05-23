@@ -1,5 +1,5 @@
 import config, { KashiPoolConfig } from "./config";
-import { FxTokenSymbol, FxTokenSymbolMap } from "./types/fxTokens";
+import { FxTokenSymbolMap } from "./types/fxTokens";
 import { Vault, SingleCollateralVaultSymbol, SingleCollateralVault } from "./types/vaults";
 import { Collateral, CollateralSymbol, CollateralSymbolWithNative } from "./types/collaterals";
 import { FxToken } from "./types/fxTokens";
@@ -11,12 +11,7 @@ import {
 } from "./types/network";
 import { FxKeeperPoolPool } from "./types/fxKeeperPool";
 import { GovernanceLockData } from "./types/governanceLock";
-import {
-  RewardPoolData,
-  RewardPoolNameMap,
-  RewardPoolPool,
-  RewardPoolName
-} from "./types/rewardPool";
+import { RewardPoolData, RewardPoolPool } from "./types/rewardPool";
 import {
   LPStakingPool,
   LPStakingPoolName,
@@ -82,7 +77,6 @@ export {
 };
 
 export type {
-  FxTokenSymbol,
   FxTokenSymbolMap,
   IndexedFxToken,
   IndexedVault,
@@ -105,9 +99,7 @@ export type {
   FxKeeperPoolPool,
   GovernanceLockData,
   RewardPoolData,
-  RewardPoolNameMap,
   RewardPoolPool,
-  RewardPoolName,
   LPStakingPool,
   LPStakingPoolName,
   LPStakingPoolNameMap,

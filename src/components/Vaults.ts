@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import Graph, { IndexedVault } from "./Graph";
 import { Provider as MultiCallProvider } from "ethers-multicall";
-import { FxToken, FxTokenSymbol } from "../types/fxTokens";
+import { FxToken } from "../types/fxTokens";
 import { Collateral, CollateralSymbolWithNative } from "../types/collaterals";
 import {
   SingleCollateralVault,
@@ -52,7 +52,7 @@ type VaultMulticall = {
 type vaultCollateralMulticall = Promisified<CollateralSymbolMap<ethers.BigNumber>>;
 
 type MintArguments = {
-  fxToken: FxTokenSymbol;
+  fxToken: string;
   amount: ethers.BigNumber;
   collateral?: {
     symbol: CollateralSymbolWithNative;
@@ -64,7 +64,7 @@ type MintArguments = {
 
 type DepositCollateralArguments = {
   account: string;
-  fxToken: FxTokenSymbol;
+  fxToken: string;
   collateral: CollateralSymbolWithNative;
   amount: ethers.BigNumber;
   referral?: string;
@@ -72,13 +72,13 @@ type DepositCollateralArguments = {
 
 type BurnArguments = {
   amount: ethers.BigNumber;
-  fxToken: FxTokenSymbol;
+  fxToken: string;
   deadline?: number;
 };
 
 type WithdrawCollateralArguments = {
   account: string;
-  fxToken: FxTokenSymbol;
+  fxToken: string;
   collateral: CollateralSymbolWithNative;
   amount: ethers.BigNumber;
 };
@@ -189,7 +189,7 @@ export default class Vaults {
 
   public getVault = async (
     account: string,
-    fxTokenSymbol: FxTokenSymbol,
+    fxTokenSymbol: string,
     signer: ethers.Signer
   ): Promise<Vault> => {
     this.initialisationCheck();
@@ -250,10 +250,7 @@ export default class Vaults {
     );
   };
 
-  public getIndexedVault = async (
-    account: string,
-    fxTokenSymbol: FxTokenSymbol
-  ): Promise<Vault> => {
+  public getIndexedVault = async (account: string, fxTokenSymbol: string): Promise<Vault> => {
     this.initialisationCheck();
 
     const fxToken = getFxTokenBySymbol(this.fxTokens, fxTokenSymbol);

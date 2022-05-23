@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import { FxTokenAddresses, ProtocolAddresses } from "../config";
 import { ERC20__factory } from "../contracts";
-import { FxToken, FxTokenSymbol } from "../types/fxTokens";
+import { FxToken } from "../types/fxTokens";
 import { callMulticallObjects, createMulticallProtocolContracts } from "../utils/contract-utils";
 import sdkConfig from "../config";
 import { Promisified } from "../types/general";
@@ -63,13 +63,13 @@ export default class FxTokens {
       );
   };
 
-  public getRepayAllowance = (fxToken: FxTokenSymbol, account: string, signer: ethers.Signer) => {
+  public getRepayAllowance = (fxToken: string, account: string, signer: ethers.Signer) => {
     const contract = this.getFxTokenContract(fxToken, signer);
     return contract.allowance(account, this.config.protocolAddresses.comptroller);
   };
 
   public getSingleCollateralRepayAllowance = (
-    fxToken: FxTokenSymbol,
+    fxToken: string,
     account: string,
     network: SingleCollateralVaultNetwork,
     signer: ethers.Signer
@@ -80,7 +80,7 @@ export default class FxTokens {
   };
 
   public setRepayAllowance = (
-    fxTokenSymbol: FxTokenSymbol,
+    fxTokenSymbol: string,
     amount: ethers.BigNumber,
     signer: ethers.Signer,
     options: ethers.Overrides = {}
@@ -90,7 +90,7 @@ export default class FxTokens {
   };
 
   public setSingleCollateralRepayAllowance = (
-    fxTokenSymbol: FxTokenSymbol,
+    fxTokenSymbol: string,
     amount: ethers.BigNumber,
     network: SingleCollateralVaultNetwork,
     signer: ethers.Signer,
@@ -102,7 +102,7 @@ export default class FxTokens {
   };
 
   private getFxTokenMulticall = (
-    fxTokenSymbol: FxTokenSymbol,
+    fxTokenSymbol: string,
     signer: ethers.Signer
   ): Promisified<Price> => {
     const tokenAddress = this.config.fxTokenAddresses[fxTokenSymbol];
@@ -139,7 +139,7 @@ export default class FxTokens {
     };
   };
 
-  private getFxTokenContract = (fxTokenSymbol: FxTokenSymbol, signer: ethers.Signer) => {
+  private getFxTokenContract = (fxTokenSymbol: string, signer: ethers.Signer) => {
     const tokenAddress = this.config.fxTokenAddresses[fxTokenSymbol];
     if (!tokenAddress) {
       throw new Error(`fxTokens not initialised with token that matches: ${fxTokenSymbol}`);

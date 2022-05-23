@@ -1,12 +1,11 @@
 ﻿import { ethers } from "ethers";
 import { GraphQLClient, gql } from "graphql-request/dist";
-import { FxTokenSymbol } from "../../..";
 import { buildFilter } from "../utils";
 
 export type IndexedFxToken = {
   address: string;
   name: string;
-  symbol: FxTokenSymbol;
+  symbol: string;
   totalSupply: ethers.BigNumber;
   rate: ethers.BigNumber;
   decimals: number;
@@ -17,7 +16,7 @@ type QueryResponse = {
   fxTokens: {
     id: string;
     name: string;
-    symbol: FxTokenSymbol;
+    symbol: string;
     totalSupply: string;
     rate: string;
     decimals: number;

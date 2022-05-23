@@ -1,8 +1,7 @@
 import { ethers } from "ethers";
-import { FxTokenSymbol } from "..";
 
 export type FxKeeperPoolPool = {
-  fxToken: FxTokenSymbol;
+  fxToken: string;
   totalDeposited: ethers.BigNumber;
   account?: {
     fxLocked: ethers.BigNumber;

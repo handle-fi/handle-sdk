@@ -1,14 +1,12 @@
 import axios from "axios";
 import { ethers } from "ethers";
 import sdkConfig, { FxTokenAddresses } from "../config";
-import { FxTokenSymbol, Network, NetworkMap } from "..";
+import { Network, NetworkMap } from "..";
 import { Bridge__factory, ERC20__factory } from "../contracts";
 import { DepositEvent } from "../contracts/Bridge";
 import { getFxTokenSymbolFromAddress } from "../utils/fxToken-utils";
 
 export type BridgeConfigByNetwork = NetworkMap<{ address: string; id: number }>;
-
-export type BridgeToken = FxTokenSymbol | "FOREX";
 
 export type BridgeConfig = {
   apiBaseUrl: string;
@@ -20,12 +18,12 @@ export type BridgeConfig = {
 export type BridgeDepositArguments = {
   fromNetwork: Network;
   toNetwork: Network;
-  tokenSymbol: BridgeToken;
+  tokenSymbol: string;
   amount: ethers.BigNumber;
 };
 
 export type BridgeWithdrawArguments = {
-  tokenSymbol: BridgeToken;
+  tokenSymbol: string;
   amount: ethers.BigNumber;
   nonce: ethers.BigNumber;
   fromNetwork: Network;
@@ -46,7 +44,7 @@ type DepositEventData = DepositEvent["args"] & {
 
 export type PendingWithdrawal = {
   txHash: string;
-  tokenSymbol: BridgeToken;
+  tokenSymbol: string;
   amount: ethers.BigNumber;
   nonce: ethers.BigNumber;
   fromNetwork: Network;
@@ -102,7 +100,7 @@ export default class Bridge {
 
   public getDepositAllowance = (
     account: string,
-    token: BridgeToken,
+    token: string,
     network: Network,
     signer: ethers.Signer
   ): Promise<ethers.BigNumber> => {
@@ -113,7 +111,7 @@ export default class Bridge {
   };
 
   public setDepositAllowance = (
-    token: BridgeToken,
+    token: string,
     network: Network,
     amount: ethers.BigNumber,
     signer: ethers.Signer,
@@ -223,7 +221,7 @@ export default class Bridge {
     }));
   };
 
-  private getTokenAddress = (token: BridgeToken) => {
+  private getTokenAddress = (token: string) => {
     const tokenAddress =
       token === "FOREX" ? this.config.forexAddress : this.config.fxTokenAddresses[token];
 
@@ -234,7 +232,7 @@ export default class Bridge {
     return tokenAddress;
   };
 
-  private getTokenSymbolFromAddress = (tokenAddress: string): BridgeToken => {
+  private getTokenSymbolFromAddress = (tokenAddress: string): string => {
     if (tokenAddress === this.config.forexAddress) {
       return "FOREX";
     }

@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import { FxTokenSymbolMap, FxTokenSymbol } from "../types/fxTokens";
+import { FxTokenSymbolMap } from "../types/fxTokens";
 import config, { ChainlinkFeeds } from "../config";
 import { ChainlinkAggregator__factory, ChainlinkAggregator } from "../contracts";
 import { createMultiCallContract } from "../utils/contract-utils";
@@ -57,7 +57,7 @@ export default class Prices {
     const calls = fxTokenSymbols
       .filter((fx) => fx !== "fxUSD")
       .map((fx) => {
-        const fxSymbol = fx as FxTokenSymbol;
+        const fxSymbol = fx as string;
         const multicall = createMultiCallContract<ChainlinkAggregator>(
           fxTokenSymbolToFeedAddressMap[fxSymbol],
           chainlinkAggregatorAbi

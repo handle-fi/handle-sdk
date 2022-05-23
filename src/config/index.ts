@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import { CollateralSymbolMap } from "./../types/collaterals";
-import { FxTokenSymbolMap, FxTokenSymbol } from "./../types/fxTokens";
+import { FxTokenSymbolMap } from "./../types/fxTokens";
 import { BridgeConfigByNetwork } from "./../components/Bridge";
 import { StableType } from "./../types/tokens";
 import { LPStakingPoolNameMap, LPStakingPlatformName } from "./../types/lpStaking";
@@ -29,7 +29,7 @@ export type LPStakingPoolDetails = {
 
 export type KashiPoolConfig = {
   address: string;
-  fxToken: FxTokenSymbol;
+  fxToken: string;
   collateral: TokenInfo;
 };
 
