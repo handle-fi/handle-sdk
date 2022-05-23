@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import { Collateral, CollateralSymbol, FxTokenSymbol, ProtocolParameters } from "../../src";
-import { FxTokenPriced } from "../../src/types/fxTokens";
+import { FxToken } from "../../src/types/fxTokens";
 import { VaultCollateralToken, VaultData } from "../../src/types/vaults";
 
 export const createMockCollateral = (overides: Partial<Collateral> = {}): Collateral => {
@@ -22,7 +22,7 @@ export const createMockCollaterals = (overrides: Partial<Collateral>[]) => {
   return overrides.map(createMockCollateral);
 };
 
-export const createMockFxToken = (overrides: Partial<FxTokenPriced> = {}): FxTokenPriced => {
+export const createMockFxToken = (overrides: Partial<FxToken> = {}): FxToken => {
   const id = randomId();
   return {
     name: `FX_TOKEN_${id}` as unknown as string,

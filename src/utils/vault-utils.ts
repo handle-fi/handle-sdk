@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import { ProtocolParameters } from "../components/Protocol";
 import { Collateral, CollateralSymbol } from "../types/collaterals";
-import { FxTokenPriced } from "../types/fxTokens";
+import { FxToken } from "../types/fxTokens";
 import { SingleCollateralVaultSymbol, VaultCollateralToken } from "../types/vaults";
 import {
   VaultData,
@@ -96,13 +96,13 @@ export const calculateCollateralShares = (
   });
 };
 
-export const calculateDebtAsEth = (vault: VaultData, fxToken: FxTokenPriced): ethers.BigNumber =>
+export const calculateDebtAsEth = (vault: VaultData, fxToken: FxToken): ethers.BigNumber =>
   vault.debt.mul(fxToken.price).div(ethers.constants.WeiPerEther);
 
 export const calculateCollateralAsFxToken = (
   vault: VaultData,
   collaterals: Collateral[],
-  fxToken: FxTokenPriced
+  fxToken: FxToken
 ): ethers.BigNumber => {
   const collateralAsEth = calculateCollateralAsEth(vault, collaterals);
   return collateralAsEth.mul(ethers.constants.WeiPerEther).div(fxToken.price);
@@ -111,7 +111,7 @@ export const calculateCollateralAsFxToken = (
 export const calculateCollateralRatio = (
   vault: VaultData,
   collaterals: Collateral[],
-  fxToken: FxTokenPriced
+  fxToken: FxToken
 ): ethers.BigNumber => {
   const collateralAsEth = calculateCollateralAsEth(vault, collaterals);
   const debtAsEth = calculateDebtAsEth(vault, fxToken);
@@ -124,7 +124,7 @@ export const calculateCollateralRatio = (
 export const calculateReedmable = (
   vault: VaultData,
   collaterals: Collateral[],
-  fxToken: FxTokenPriced
+  fxToken: FxToken
 ) => {
   const collateralAsEth = calculateCollateralAsEth(vault, collaterals);
   const collateralRatio = calculateCollateralRatio(vault, collaterals, fxToken);
@@ -158,11 +158,7 @@ export const calculateReedmable = (
   };
 };
 
-const calculateUtilisation = (
-  vault: VaultData,
-  collaterals: Collateral[],
-  fxToken: FxTokenPriced
-) => {
+const calculateUtilisation = (vault: VaultData, collaterals: Collateral[], fxToken: FxToken) => {
   const collateralAsEth = calculateCollateralAsEth(vault, collaterals);
   const minimumRatio = calculateMinimumMintingRatio(vault, collaterals);
 
@@ -184,7 +180,7 @@ const calculateAvailableToMint = (
   vault: VaultData,
   protocolParameters: ProtocolParameters,
   collaterals: Collateral[],
-  fxToken: FxTokenPriced
+  fxToken: FxToken
 ) => {
   const collateralAsEth = calculateCollateralAsEth(vault, collaterals);
   const minimumRatio = calculateMinimumMintingRatio(vault, collaterals);
@@ -206,7 +202,7 @@ const calculateAvailableToMint = (
     : ethers.constants.Zero;
 };
 
-const calculateMinimumDebt = (protocolParamters: ProtocolParameters, fxToken: FxTokenPriced) => {
+const calculateMinimumDebt = (protocolParamters: ProtocolParameters, fxToken: FxToken) => {
   const fxAmount = protocolParamters.minimumMintingAmountAsEth
     .mul(ethers.constants.WeiPerEther)
     .div(fxToken.price);
@@ -243,7 +239,7 @@ const getCollateral = (symbol: CollateralSymbol, collaterals: Collateral[]): Col
 export const createVault = (
   vault: VaultData,
   protocolParamters: ProtocolParameters,
-  fxToken: FxTokenPriced,
+  fxToken: FxToken,
   collaterals: Collateral[]
 ): Vault => {
   const collateralAsEth = calculateCollateralAsEth(vault, collaterals);
@@ -275,7 +271,7 @@ export const createVault = (
 
 export const createSingleCollateralVault = (
   vaultData: SingleCollateralVaultData,
-  fxToken: FxTokenPriced
+  fxToken: FxToken
 ): SingleCollateralVault => {
   const debtAsEth = fxToken.price.mul(vaultData.debt).div(ethers.constants.WeiPerEther);
 
@@ -380,7 +376,7 @@ const calculateAdditionalCollateralRequired = (
   vault: Vault,
   collateralSymbol: CollateralSymbol,
   collaterals: Collateral[],
-  fxToken: FxTokenPriced,
+  fxToken: FxToken,
   _protocolParams: ProtocolParameters
 ): ethers.BigNumber => {
   const collateral = collaterals.find((c) => c.symbol === collateralSymbol);

@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import Graph, { IndexedVault } from "./Graph";
 import { Provider as MultiCallProvider } from "ethers-multicall";
-import { FxTokenPriced, FxTokenSymbol } from "../types/fxTokens";
+import { FxToken, FxTokenSymbol } from "../types/fxTokens";
 import { Collateral, CollateralSymbolWithNative } from "../types/collaterals";
 import {
   SingleCollateralVault,
@@ -107,7 +107,7 @@ type SingleCollateralSupplyFxToken = {
 
 export default class Vaults {
   private config: VaultsConfig;
-  private fxTokens: FxTokenPriced[] = [];
+  private fxTokens: FxToken[] = [];
   private collaterals: Collateral[] = [];
   private protocolParameters!: ProtocolParameters;
   private fxTokensSDK: FxTokensSDK;
@@ -151,7 +151,7 @@ export default class Vaults {
 
   public initSync = (
     protocolParamters: ProtocolParameters,
-    fxTokens: FxTokenPriced[],
+    fxTokens: FxToken[],
     collaterals: Collateral[]
   ) => {
     this.protocolParameters = protocolParamters;

@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import { FxTokenAddresses, ProtocolAddresses } from "../config";
 import { ERC20__factory } from "../contracts";
-import { FxTokenPriced, FxTokenSymbol, FxToken } from "../types/fxTokens";
+import { FxToken, FxTokenSymbol } from "../types/fxTokens";
 import { callMulticallObjects, createMulticallProtocolContracts } from "../utils/contract-utils";
 import sdkConfig from "../config";
 import { Promisified } from "../types/general";
@@ -41,7 +41,7 @@ export default class FxTokens {
     this.graph = new Graph(this.config.graphEndpoint);
   }
 
-  public getFxTokens = async (signer: ethers.Signer): Promise<FxTokenPriced[]> => {
+  public getFxTokens = async (signer: ethers.Signer): Promise<FxToken[]> => {
     const { provider } = createMulticallProtocolContracts(
       this.config.protocolAddresses,
       this.config.chainId,
@@ -53,7 +53,7 @@ export default class FxTokens {
     return raw.map((t, index) => this.includeTokenPrice(this.tokens[index], t.price));
   };
 
-  public getIndexedFxTokens = async (): Promise<FxTokenPriced[]> => {
+  public getIndexedFxTokens = async (): Promise<FxToken[]> => {
     const fxTokens = await this.graph.fxTokens.query({});
     return fxTokens
       .map(this.indexedToFxToken)
@@ -120,14 +120,14 @@ export default class FxTokens {
     };
   };
 
-  private includeTokenPrice = (token: FxToken, price: ethers.BigNumber): FxTokenPriced => {
+  private includeTokenPrice = (token: FxToken, price: ethers.BigNumber): FxToken => {
     return {
       ...token,
       price
     };
   };
 
-  private indexedToFxToken = (fxToken: IndexedFxToken): FxTokenPriced => {
+  private indexedToFxToken = (fxToken: IndexedFxToken): FxToken => {
     // note that address does not matter in this case, as all fx tokens have the same addresses across chains
     const fullFxToken = new HandleTokenManager([]).getTokenByAddress(fxToken.address, 1);
     if (!fullFxToken) throw new Error("Could not find fxToken to match indexed fxToken");

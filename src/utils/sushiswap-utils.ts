@@ -10,12 +10,12 @@ import { TokenInfo } from "@uniswap/token-lists";
 
 import { KashiPoolConfig } from "../config";
 import { SingleCollateralVaultData } from "../types/vaults";
-import { FxTokenPriced } from "../types/fxTokens";
+import { FxToken } from "../types/fxTokens";
 
 export type KashiPair = {
   account: string;
   collateralAsset: TokenInfo;
-  borrowAsset: FxTokenPriced;
+  borrowAsset: FxToken;
   interestPerYear: ethers.BigNumber;
   availableToBorrow: ethers.BigNumber;
   currentBorrowAmount: ethers.BigNumber;

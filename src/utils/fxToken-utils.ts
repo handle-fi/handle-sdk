@@ -1,5 +1,5 @@
 import { FxTokenSymbol, FxTokenSymbolMap, TokenInfo } from "..";
-import { FxTokenPriced } from "../types/fxTokens";
+import { FxToken } from "../types/fxTokens";
 import { HandleTokenManager } from "..";
 
 export const getFxTokensFromAddresses = (addresses: string[]): TokenInfo[] => {
@@ -18,7 +18,7 @@ export const getFxTokenSymbolFromAddress = (
   })!;
 };
 
-export const getFxTokenByAddress = (fxTokens: FxTokenPriced[], address: string): FxTokenPriced => {
+export const getFxTokenByAddress = (fxTokens: FxToken[], address: string): FxToken => {
   const fxToken = fxTokens.find(
     (fxToken) => fxToken.address.toLowerCase() === address.toLowerCase()
   );
@@ -30,10 +30,7 @@ export const getFxTokenByAddress = (fxTokens: FxTokenPriced[], address: string):
   return fxToken;
 };
 
-export const getFxTokenPricedBySymbol = (
-  fxTokens: FxTokenPriced[],
-  symbol: FxTokenSymbol
-): FxTokenPriced => {
+export const getFxTokenPricedBySymbol = (fxTokens: FxToken[], symbol: FxTokenSymbol): FxToken => {
   const fxToken = fxTokens.find((fxToken) => fxToken.symbol === symbol);
 
   if (!fxToken) {

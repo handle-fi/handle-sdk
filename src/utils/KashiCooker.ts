@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import { ChainId, WNATIVE, KASHI_ADDRESS } from "@sushiswap/core-sdk";
 import { SushiKashi__factory } from "../contracts";
 import { KashiPoolConfig } from "../config";
-import { FxTokenPriced } from "../types/fxTokens";
+import { FxToken } from "../types/fxTokens";
 
 // This file is a simplied version of
 // https://github.com/sushiswap/sushiswap-interface/blob/canary/src/entities/KashiCooker.ts
@@ -27,7 +27,7 @@ export default class KashiCooker {
   constructor(
     private pool: KashiPoolConfig, // add this back in once moved to sdk
     private account: string,
-    private fxToken: FxTokenPriced,
+    private fxToken: FxToken,
     private chainId: ChainId
   ) {
     this.useNativeCollateral = pool.collateral.address === WNATIVE[this.chainId].address;

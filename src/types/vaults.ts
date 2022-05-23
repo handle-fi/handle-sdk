@@ -1,11 +1,11 @@
 import { TokenInfo } from "@uniswap/token-lists";
 import { ethers } from "ethers";
 import { CollateralSymbol } from "./collaterals";
-import { FxTokenPriced } from "./fxTokens";
+import { FxToken } from "./fxTokens";
 
 export type SingleCollateralVaultSymbol = "fxAUD-WETH" | "fxAUD-WBTC";
 
-type VaultFxToken = FxTokenPriced;
+type VaultFxToken = FxToken;
 
 export type VaultCollateralToken<T> = TokenInfo & {
   amount: ethers.BigNumber;
