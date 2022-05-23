@@ -65,7 +65,6 @@ describe("hlpSwap", () => {
       const tx = await Convert.getSwap({
         fromToken: fxUsd,
         toToken: fxAud,
-        receivingAccount: await signer.getAddress(),
         gasPrice: ethers.utils.parseUnits("1", "gwei"),
         hlpMethods: sampleHlpTokenMethods,
         sellAmount: ethers.utils.parseUnits("1", fxUsd.decimals),
@@ -80,7 +79,6 @@ describe("hlpSwap", () => {
       const tx = await Convert.getSwap({
         fromToken: fxUsd,
         toToken: eth,
-        receivingAccount: await signer.getAddress(),
         gasPrice: ethers.utils.parseUnits("1", "gwei"),
         hlpMethods: sampleHlpTokenMethods,
         sellAmount: ethers.utils.parseUnits("1", fxUsd.decimals),

@@ -60,7 +60,6 @@ describe("psm", () => {
       const tx = await Convert.getSwap({
         fromToken: usdt,
         toToken: fxUsd,
-        receivingAccount: await signer.getAddress(),
         gasPrice: ethers.utils.parseUnits("1", "gwei"),
         hlpMethods: sampleHlpTokenMethods,
         sellAmount: ethers.utils.parseUnits("1", usdt.decimals),
@@ -79,7 +78,6 @@ describe("psm", () => {
       const tx = await Convert.getSwap({
         toToken: usdt,
         fromToken: fxUsd,
-        receivingAccount: await signer.getAddress(),
         gasPrice: ethers.utils.parseUnits("1", "gwei"),
         hlpMethods: sampleHlpTokenMethods,
         sellAmount: ethers.utils.parseUnits("1", usdt.decimals),

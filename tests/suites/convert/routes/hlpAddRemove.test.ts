@@ -92,7 +92,6 @@ describe("hLPAddRemove", () => {
       const tx = await Convert.getSwap({
         fromToken: hlp,
         toToken: fxUsd,
-        receivingAccount: await signer.getAddress(),
         gasPrice: ethers.utils.parseUnits("1", "gwei"),
         hlpMethods: sampleHlpTokenMethods,
         sellAmount: ethers.utils.parseUnits("1", hlp.decimals),
@@ -106,7 +105,6 @@ describe("hLPAddRemove", () => {
       const tx = await Convert.getSwap({
         fromToken: hlp,
         toToken: eth,
-        receivingAccount: await signer.getAddress(),
         gasPrice: ethers.utils.parseUnits("1", "gwei"),
         hlpMethods: sampleHlpTokenMethods,
         sellAmount: ethers.utils.parseUnits("1", hlp.decimals),
@@ -121,7 +119,6 @@ describe("hLPAddRemove", () => {
       const tx = await Convert.getSwap({
         fromToken: fxUsd,
         toToken: hlp,
-        receivingAccount: await signer.getAddress(),
         gasPrice: ethers.utils.parseUnits("1", "gwei"),
         hlpMethods: sampleHlpTokenMethods,
         sellAmount: ethers.utils.parseUnits("1", fxUsd.decimals),
@@ -135,7 +132,6 @@ describe("hLPAddRemove", () => {
       const tx = await Convert.getSwap({
         fromToken: eth,
         toToken: hlp,
-        receivingAccount: await signer.getAddress(),
         gasPrice: ethers.utils.parseUnits("1", "gwei"),
         hlpMethods: sampleHlpTokenMethods,
         sellAmount: ethers.utils.parseUnits("1", eth.decimals),

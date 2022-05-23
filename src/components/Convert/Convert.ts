@@ -12,7 +12,6 @@ type ConvertRouteArgs = {
   fromToken: TokenInfo;
   toToken: TokenInfo;
   sellAmount: BigNumber;
-  receivingAccount: string;
   gasPrice: BigNumber | undefined;
   hlpMethods?: HlpInfoMethods;
   network: Network;
@@ -20,18 +19,21 @@ type ConvertRouteArgs = {
 
 export type ConvertQuoteRouteArgs = ConvertRouteArgs & {
   signerOrProvider?: ethers.providers.Provider | Signer;
+  receivingAccount?: string;
 };
 
 export type ConvertTransactionRouteArgs = ConvertRouteArgs & {
   buyAmount: BigNumber;
   slippage: number;
   signer: Signer;
+  receivingAccount: string;
 };
 
-type ConvertInput = Omit<ConvertRouteArgs, "network"">;
+type ConvertInput = Omit<ConvertRouteArgs, "network">;
 
 type ConvertQuoteInput = ConvertInput & {
   signerOrProvider?: ethers.providers.Provider | Signer;
+  receivingAccount?: string;
 };
 
 type ConvertTransactionInput = ConvertInput & {
@@ -142,9 +144,13 @@ export default class Convert {
       signerOrProvider: input.signer,
       network: network
     });
+
+    const receivingAccount = await input.signer.getAddress();
+
     return route.transaction({
       ...input,
-      network
+      network,
+      receivingAccount
     });
   };
 }

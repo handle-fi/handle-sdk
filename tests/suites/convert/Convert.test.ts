@@ -44,7 +44,6 @@ describe("Convert class", () => {
         await Convert.getSwap({
           fromToken: { ...fxAud, chainId: 1 },
           toToken: { ...fxUsd, chainId: 1 },
-          receivingAccount: await signer.getAddress(),
           gasPrice: ethers.utils.parseUnits("1", "gwei"),
           sellAmount: ethers.utils.parseUnits("1", fxAud.decimals),
           buyAmount: ethers.utils.parseUnits("1", fxUsd.decimals),
@@ -61,7 +60,6 @@ describe("Convert class", () => {
         await Convert.getSwap({
           fromToken: { ...fxAud, chainId: 1 },
           toToken: fxUsd,
-          receivingAccount: await signer.getAddress(),
           gasPrice: ethers.utils.parseUnits("1", "gwei"),
           sellAmount: ethers.utils.parseUnits("1", fxAud.decimals),
           buyAmount: ethers.utils.parseUnits("1", fxUsd.decimals),

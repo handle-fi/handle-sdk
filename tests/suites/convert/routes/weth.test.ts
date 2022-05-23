@@ -40,7 +40,6 @@ describe("weth route", () => {
       const tx = await Convert.getSwap({
         fromToken: eth,
         toToken: weth,
-        receivingAccount: await signer.getAddress(),
         gasPrice: ethers.constants.One,
         hlpMethods: sampleHlpTokenMethods,
         buyAmount: ethers.utils.parseEther("0.01"),
@@ -54,7 +53,6 @@ describe("weth route", () => {
       const tx = await Convert.getSwap({
         fromToken: weth,
         toToken: eth,
-        receivingAccount: await signer.getAddress(),
         gasPrice: ethers.utils.parseUnits("1", "gwei"),
         hlpMethods: sampleHlpTokenMethods,
         buyAmount: ethers.utils.parseEther("0.01"),
