@@ -29,13 +29,13 @@ export function mustExist<Type>(value: Type | undefined | null, name: string): T
   return value;
 }
 
-export const getNetworkFromProviderOrSigner = async (
-  providerOrSigner: ethers.providers.Provider | ethers.Signer
+export const getNetworkFromSignerOrProvider = async (
+  signerOrProvider: ethers.providers.Provider | ethers.Signer
 ): Promise<Network> => {
-  if (providerOrSigner instanceof ethers.providers.Provider) {
-    const chainId = (await providerOrSigner.getNetwork()).chainId;
+  if (signerOrProvider instanceof ethers.providers.Provider) {
+    const chainId = (await signerOrProvider.getNetwork()).chainId;
     return CHAIN_ID_TO_NETWORK_NAME[chainId];
   }
-  const chainId = await providerOrSigner.getChainId();
+  const chainId = await signerOrProvider.getChainId();
   return CHAIN_ID_TO_NETWORK_NAME[chainId];
 };

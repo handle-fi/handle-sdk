@@ -6,7 +6,7 @@ import { WeightInput } from "./routes/weights";
 import { TokenInfo } from "@uniswap/token-lists";
 import { CHAIN_ID_TO_NETWORK_NAME } from "../../constants";
 import TokenManager from "../TokenManager";
-import { getNetworkFromProviderOrSigner } from "../../utils/general-utils";
+import { getNetworkFromSignerOrProvider } from "../../utils/general-utils";
 
 type ConvertRouteArgs = {
   fromToken: TokenInfo;
@@ -103,7 +103,7 @@ export default class Convert {
       throw new Error(`Token ${token1.symbol} is on an unsupported chain`);
     }
     // if there is a signer or provider, make sure it is on the same chain as the token
-    if (signerOrProvider && network !== (await getNetworkFromProviderOrSigner(signerOrProvider))) {
+    if (signerOrProvider && network !== (await getNetworkFromSignerOrProvider(signerOrProvider))) {
       throw new Error(`Signer/Provider is on a different network than the tokens`);
     }
     return network;
