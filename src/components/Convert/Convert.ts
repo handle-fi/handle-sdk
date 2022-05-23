@@ -86,7 +86,7 @@ export default class Convert {
     return route;
   };
 
-  private static validateNetwork = async (
+  private static getValidatedNetwork = async (
     token1: TokenInfo,
     token2: TokenInfo,
     signerOrProvider?: Signer | ethers.providers.Provider
@@ -110,7 +110,7 @@ export default class Convert {
   public static getQuote = async (input: ConvertQuoteInput): Promise<Quote> => {
     if (!this.tokenList) await this.loadTokens();
 
-    const network = await Convert.validateNetwork(
+    const network = await Convert.getValidatedNetwork(
       input.fromToken,
       input.toToken,
       input.signerOrProvider
@@ -134,7 +134,7 @@ export default class Convert {
   ): Promise<ethers.PopulatedTransaction> => {
     if (!this.tokenList) await this.loadTokens();
 
-    const network = await Convert.validateNetwork(input.fromToken, input.toToken, input.signer);
+    const network = await Convert.getValidatedNetwork(input.fromToken, input.toToken, input.signer);
 
     const route = await this.getHighestWeightRoute({
       fromToken: input.fromToken,
