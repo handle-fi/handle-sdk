@@ -188,7 +188,8 @@
       "logoURI": "https://app.handle.fi/assets/images/handle/fxAUDLogo.png",
       "extensions": {
         "isHlpToken": true,
-        "isFxToken": true
+        "isFxToken": true,
+        "isShortable": true
       }
     },
     {
@@ -200,7 +201,8 @@
       "logoURI": "https://app.handle.fi/assets/images/handle/fxEURLogo.png",
       "extensions": {
         "isHlpToken": true,
-        "isFxToken": true
+        "isFxToken": true,
+        "isShortable": true
       }
     },
     {
@@ -212,7 +214,8 @@
       "logoURI": "https://app.handle.fi/assets/images/handle/fxPHPLogo.png",
       "extensions": {
         "isHlpToken": true,
-        "isFxToken": true
+        "isFxToken": true,
+        "isShortable": true
       }
     },
     {
@@ -236,7 +239,8 @@
       "chainId": 42161,
       "extensions": {
         "isFxToken": true,
-        "isHlpToken": true
+        "isHlpToken": true,
+        "isShortable": true
       }
     },
     {
@@ -247,7 +251,8 @@
       "chainId": 42161,
       "extensions": {
         "isFxToken": true,
-        "isHlpToken": true
+        "isHlpToken": true,
+        "isShortable": true
       }
     },
     {
@@ -258,7 +263,8 @@
       "chainId": 42161,
       "extensions": {
         "isFxToken": true,
-        "isHlpToken": true
+        "isHlpToken": true,
+        "isShortable": true
       }
     },
     {
@@ -270,7 +276,8 @@
       "chainId": 42161,
       "extensions": {
         "isHlpToken": true,
-        "isWrappedNative": true
+        "isWrappedNative": true,
+        "isShortable": true
       }
     },
     {

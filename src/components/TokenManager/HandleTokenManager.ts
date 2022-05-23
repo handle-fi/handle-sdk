@@ -8,7 +8,8 @@ import { Network } from "../..";
  * - isNative: true if token is native for that network (e.g. ETH, MATIC)
  * - isHlpToken: true if the token is a hlp token in a handle Vault contract
  * - isWrappedNative: true if the token is a wrapped version of a native token (e.g. WETH)
- * - isStable: true if the token is a USD stablecoin, false otherwise
+ * - isStable: true if the token is a USD stablecoin, false otherwise,
+ * - isShortable: true if the token is shortable, false otherwise
  * - isFxToken: true if token is a fx token, false otherwise
  * - isLiquidityToken: true if token is the Handle Liquidity Token (symbol hLP), false otherwise
  * @note the Handle Liquidity Token (symbol hLP) has isHlpToken set to false, as it is not technically in the liquidity pool.
