@@ -86,13 +86,23 @@ export default class Convert {
     return route;
   };
 
-  private static getNetwork = (token1: TokenInfo, token2: TokenInfo): Network => {
+  private static validateNetwork = async (
+    token1: TokenInfo,
+    token2: TokenInfo,
+    signerOrProvider?: Signer | ethers.providers.Provider
+  ): Promise<Network> => {
+    // ensures tokens are on same network
     if (token1.chainId !== token2.chainId) {
       throw new Error(`Tokens ${token1.symbol} and ${token2.symbol} are on different chains`);
     }
     const network = CHAIN_ID_TO_NETWORK_NAME[token1.chainId];
+    // ensures network is supported
     if (!network) {
       throw new Error(`Token ${token1.symbol} is on an unsupported chain`);
+    }
+    // if there is a signer or provider, make sure it is on the same chain as the token
+    if (signerOrProvider && network !== (await getNetworkFromProviderOrSigner(signerOrProvider))) {
+      throw new Error(`Signer/Provider is on a different network than the tokens`);
     }
     return network;
   };
@@ -100,14 +110,11 @@ export default class Convert {
   public static getQuote = async (input: ConvertQuoteInput): Promise<Quote> => {
     if (!this.tokenList) await this.loadTokens();
 
-    const network = Convert.getNetwork(input.fromToken, input.toToken);
-
-    if (
-      input.signerOrProvider &&
-      network !== (await getNetworkFromProviderOrSigner(input.signerOrProvider))
-    ) {
-      throw new Error(`Signer/Provider is on a different network than the tokens`);
-    }
+    const network = await Convert.validateNetwork(
+      input.fromToken,
+      input.toToken,
+      input.signerOrProvider
+    );
 
     const route = await this.getHighestWeightRoute({
       fromToken: input.fromToken,
@@ -127,11 +134,7 @@ export default class Convert {
   ): Promise<ethers.PopulatedTransaction> => {
     if (!this.tokenList) await this.loadTokens();
 
-    const network = Convert.getNetwork(input.fromToken, input.toToken);
-
-    if (network !== (await getNetworkFromProviderOrSigner(input.signer))) {
-      throw new Error(`Signer is on a different network than the tokens`);
-    }
+    const network = await Convert.validateNetwork(input.fromToken, input.toToken, input.signer);
 
     const route = await this.getHighestWeightRoute({
       fromToken: input.fromToken,
