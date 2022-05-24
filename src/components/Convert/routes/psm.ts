@@ -2,7 +2,7 @@ import { BigNumber, ethers, providers, Signer } from "ethers";
 import { config, HlpConfig, Network } from "../../..";
 import { HPSM__factory } from "../../../contracts";
 import { transformDecimals } from "../../../utils/general-utils";
-import { ConvertQuoteInput, ConvertTransactionInput, Quote } from "../Convert";
+import { ConvertQuoteRouteArgs, ConvertTransactionRouteArgs, Quote } from "../Convert";
 import { PSM_WEIGHT, WeightInput } from "./weights";
 
 const transactionFeeCache: Record<Network, BigNumber | null> = {
@@ -52,17 +52,17 @@ export const psmWeight = async (input: WeightInput) => {
   return isWithdraw || isDeposit ? PSM_WEIGHT : 0;
 };
 
-export const psmQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote> => {
-  const { fromToken, toToken, provider, network, fromAmount } = input;
+export const psmQuoteHandler = async (input: ConvertQuoteRouteArgs): Promise<Quote> => {
+  const { fromToken, toToken, signerOrProvider, network, sellAmount: fromAmount } = input;
   const hpsmAddress = config.protocol[network]?.protocol.hPsm;
   if (!hpsmAddress) {
     throw new Error(`No HPSM for network ${network}`);
   }
-  if (!provider) {
+  if (!signerOrProvider) {
     throw new Error(`Provider missing. Provider must be given for HPSM quote.`);
   }
   if (!transactionFeeCache[network]) {
-    const hpsm = HPSM__factory.connect(hpsmAddress, provider);
+    const hpsm = HPSM__factory.connect(hpsmAddress, signerOrProvider);
     transactionFeeCache[network] = await hpsm.transactionFee();
   }
   // convert transaction fee to basis points
@@ -70,7 +70,12 @@ export const psmQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote> 
     HlpConfig.BASIS_POINTS_DIVISOR
   ).div(TRANSACTION_FEE_UNIT);
 
-  const isDeposit = await isTokenPegged(toToken.address, fromToken.address, provider, network);
+  const isDeposit = await isTokenPegged(
+    toToken.address,
+    fromToken.address,
+    signerOrProvider,
+    network
+  );
 
   const buyAmount = transformDecimals(fromAmount, fromToken.decimals, toToken.decimals);
 
@@ -86,7 +91,7 @@ export const psmQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote> 
 };
 
 export const psmTransactionHandler = async (
-  input: ConvertTransactionInput
+  input: ConvertTransactionRouteArgs
 ): Promise<ethers.PopulatedTransaction> => {
   const { network, signer, fromToken, toToken, sellAmount } = input;
   const hpsmAddress = config.protocol[network]?.protocol.hPsm;

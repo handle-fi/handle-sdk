@@ -6,16 +6,16 @@ import { SushiBento, SushiKashi } from "../contracts";
 import sushiKashiAbi from "../abis/sushi/SushiKashi.json";
 import sushiBentoAbi from "../abis/sushi/SushiBento.json";
 import { Promisified } from "../types/general";
-import { Token } from "../types/tokens";
+import { TokenInfo } from "@uniswap/token-lists";
 
-import { FxTokenSymbol } from "..";
 import { KashiPoolConfig } from "../config";
 import { SingleCollateralVaultData } from "../types/vaults";
+import { FxToken } from "../types/fxTokens";
 
 export type KashiPair = {
   account: string;
-  collateralAsset: Token<string>;
-  borrowAsset: Token<FxTokenSymbol>;
+  collateralAsset: TokenInfo;
+  borrowAsset: FxToken;
   interestPerYear: ethers.BigNumber;
   availableToBorrow: ethers.BigNumber;
   currentBorrowAmount: ethers.BigNumber;
@@ -129,4 +129,3 @@ export const kashiMulticallResultToSingleCollateralVaultData = (
     exchangeRate
   };
 };
-

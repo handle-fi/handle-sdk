@@ -26,9 +26,8 @@ describe("hlpSwap", () => {
       const quote = await Convert.getQuote({
         toToken: fxAud,
         fromToken: fxUsd,
-        network: "arbitrum",
-        connectedAccount: ethers.constants.AddressZero,
-        fromAmount: ethers.utils.parseEther("5"),
+        receivingAccount: ethers.constants.AddressZero,
+        sellAmount: ethers.utils.parseEther("5"),
         gasPrice: ethers.constants.One,
         hlpMethods: hlpTokenMethods
       });
@@ -52,9 +51,8 @@ describe("hlpSwap", () => {
       const quote = await Convert.getQuote({
         toToken: fxAud,
         fromToken: eth,
-        network: "arbitrum",
-        connectedAccount: ethers.constants.AddressZero,
-        fromAmount: ethers.utils.parseEther("5"),
+        receivingAccount: ethers.constants.AddressZero,
+        sellAmount: ethers.utils.parseEther("5"),
         gasPrice: ethers.constants.One,
         hlpMethods: hlpTokenMethods
       });
@@ -67,8 +65,6 @@ describe("hlpSwap", () => {
       const tx = await Convert.getSwap({
         fromToken: fxUsd,
         toToken: fxAud,
-        network: "arbitrum",
-        connectedAccount: await signer.getAddress(),
         gasPrice: ethers.utils.parseUnits("1", "gwei"),
         hlpMethods: sampleHlpTokenMethods,
         sellAmount: ethers.utils.parseUnits("1", fxUsd.decimals),
@@ -83,8 +79,6 @@ describe("hlpSwap", () => {
       const tx = await Convert.getSwap({
         fromToken: fxUsd,
         toToken: eth,
-        network: "arbitrum",
-        connectedAccount: await signer.getAddress(),
         gasPrice: ethers.utils.parseUnits("1", "gwei"),
         hlpMethods: sampleHlpTokenMethods,
         sellAmount: ethers.utils.parseUnits("1", fxUsd.decimals),

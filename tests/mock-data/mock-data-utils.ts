@@ -1,18 +1,15 @@
 import { ethers } from "ethers";
-import {
-  Collateral,
-  CollateralSymbol,
-  FxToken,
-  FxTokenSymbol,
-  ProtocolParameters
-} from "../../src";
-import { VaultCollateral, VaultData } from "../../src/types/vaults";
+import { Collateral, CollateralSymbol, ProtocolParameters } from "../../src";
+import { FxToken } from "../../src/types/fxTokens";
+import { VaultCollateralToken, VaultData } from "../../src/types/vaults";
 
 export const createMockCollateral = (overides: Partial<Collateral> = {}): Collateral => {
   return {
     symbol: `COLLATERAL_${randomId()}` as unknown as CollateralSymbol,
     address: ethers.Wallet.createRandom().address,
     decimals: 18,
+    chainId: 1,
+    name: "Mock Collateral",
     mintCR: ethers.BigNumber.from("200"),
     liquidationFee: ethers.BigNumber.from("1250"),
     interestRate: ethers.BigNumber.from("25"),
@@ -21,42 +18,50 @@ export const createMockCollateral = (overides: Partial<Collateral> = {}): Collat
   };
 };
 
-export const createMockCollaterals = (overides: Partial<Collateral>[]) => {
-  return overides.map(createMockCollateral);
+export const createMockCollaterals = (overrides: Partial<Collateral>[]) => {
+  return overrides.map(createMockCollateral);
 };
 
-export const createMockFxToken = (overides: Partial<FxToken> = {}): FxToken => {
+export const createMockFxToken = (overrides: Partial<FxToken> = {}): FxToken => {
+  const id = randomId();
   return {
-    symbol: `FX_${randomId()}` as unknown as FxTokenSymbol,
+    name: `FX_TOKEN_${id}`,
+    symbol: `FX_${id}`,
     address: ethers.Wallet.createRandom().address,
     decimals: 18,
+    chainId: 1,
     price: ethers.constants.WeiPerEther,
-    ...overides
+    ...overrides
   };
 };
 
 export const createVaultCollateralFromCollateral = (
   collateral: Collateral,
   amount: ethers.BigNumber
-): VaultCollateral<CollateralSymbol> => {
+): VaultCollateralToken<CollateralSymbol> => {
   return {
     symbol: collateral.symbol,
     decimals: collateral.decimals,
     address: collateral.address,
-    amount
+    amount,
+    chainId: 1,
+    name: "Vault Collateral Token"
   };
 };
 
 export const createMockVaultData = (
   debt: ethers.BigNumber,
-  collateral: VaultCollateral<CollateralSymbol>[]
+  collateral: VaultCollateralToken<CollateralSymbol>[]
 ): VaultData => {
   return {
     account: "0x3e5c9ced70887166612ced5b537fb294dcecb357",
     fxToken: {
-      symbol: "MOCK_FX_TOKEN" as unknown as FxTokenSymbol,
+      symbol: "MOCK_FX_TOKEN",
       address: ethers.Wallet.createRandom().address,
-      decimals: 18
+      decimals: 18,
+      chainId: 1,
+      name: "Mock Fx Token",
+      price: ethers.constants.WeiPerEther
     },
     debt,
     collateral
@@ -89,4 +94,3 @@ export const createMockProtocolParams = (
 };
 
 const randomId = () => Math.floor(Math.random() * 100);
-

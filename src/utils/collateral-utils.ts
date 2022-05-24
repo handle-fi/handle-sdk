@@ -1,19 +1,11 @@
-import { CollateralDetails } from "../config";
-import { Collateral, CollateralSymbol } from "../types/collaterals";
-import { Token } from "../types/tokens";
+import HandleTokenManager from "../components/TokenManager/HandleTokenManager";
+import { Collateral, CollateralSymbol, CollateralToken } from "../types/collaterals";
 
-export const getTokensFromConfig = (
-  details: Partial<CollateralDetails>
-): Token<CollateralSymbol>[] => {
-  return (Object.keys(details) as []).map((key) => {
-    const k = key as CollateralSymbol;
-    const detail = (details as CollateralDetails)[k];
-
-    return {
-      symbol: key,
-      ...detail
-    };
-  });
+export const getTokensFromConfig = (addresses: string[]): CollateralToken[] => {
+  const tokenManager = new HandleTokenManager();
+  return tokenManager.getTokensByAddresses(
+    addresses.map((address) => ({ address }))
+  ) as CollateralToken[];
 };
 
 export const getCollateralByAddress = (collaterals: Collateral[], address: string): Collateral => {

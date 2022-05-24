@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import { FxToken } from "..";
+import { FxToken } from "../types/fxTokens";
 import { SingleCollateralVault, SingleCollateralVaultData } from "../types/vaults";
 import { createSingleCollateralVault } from "../utils/vault-utils";
 

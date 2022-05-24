@@ -3,8 +3,10 @@ import { ProtocolAddresses } from "../config";
 import sdkConfig from "../config";
 import { callMulticallObject, createMulticallProtocolContracts } from "../utils/contract-utils";
 import { Promisified } from "../types/general";
-import { Token } from "../types/tokens";
 import { NETWORK_NAME_TO_CHAIN_ID } from "../constants";
+import { TokenInfo } from "@uniswap/token-lists";
+import HandleTokenManager from "./TokenManager/HandleTokenManager";
+import { mustExist } from "../utils/general-utils";
 
 export type ProtocolConfig = {
   forexTokenAddress: string;
@@ -22,7 +24,7 @@ export type ProtocolParameters = {
 
 export default class Vaults {
   private config: ProtocolConfig;
-  public forexToken: Token<"FOREX">;
+  public forexToken: TokenInfo & { symbol: "FOREX" };
 
   constructor(c?: ProtocolConfig) {
     this.config = c || {
@@ -31,11 +33,11 @@ export default class Vaults {
       chainId: NETWORK_NAME_TO_CHAIN_ID.arbitrum
     };
 
-    this.forexToken = {
-      symbol: "FOREX",
-      address: this.config.forexTokenAddress,
-      decimals: 18
-    };
+    // Protocol on arbitrum
+    this.forexToken = mustExist(
+      new HandleTokenManager([]).getTokenBySymbol("FOREX", "arbitrum"),
+      "Forex on arbitrum"
+    );
   }
 
   public getProtocolParameters = async (signer: ethers.Signer): Promise<ProtocolParameters> => {
@@ -56,4 +58,3 @@ export default class Vaults {
     return callMulticallObject(multicall, provider);
   };
 }
-

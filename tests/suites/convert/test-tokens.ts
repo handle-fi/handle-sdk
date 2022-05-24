@@ -1,8 +1,23 @@
-import { HLP_TOKENS } from "../../../src/config/hlp";
-import { getHlpToken, getNativeWrappedToken } from "../../../src/utils/hlp";
+import { TokenInfo } from "@uniswap/token-lists";
+import { exit } from "process";
+import { mustExist } from "../../../src/utils/general-utils";
+import { testTokenList } from "../../mock-data/token-list";
 
-export const weth = getNativeWrappedToken("arbitrum")!;
-export const eth = HLP_TOKENS["arbitrum"].find((x) => x.isNative)!;
-export const hlp = getHlpToken("arbitrum")!;
-export const fxUsd = HLP_TOKENS["arbitrum"].find((x) => x.symbol === "fxUSD")!;
-export const fxAud = HLP_TOKENS["arbitrum"].find((x) => x.symbol === "fxAUD")!;
+export let weth: TokenInfo;
+export let eth: TokenInfo;
+export let hlp: TokenInfo;
+export let fxUsd: TokenInfo;
+export let fxAud: TokenInfo;
+
+export const loadTokens = () => {
+  try {
+    weth = mustExist(testTokenList.getHlpWrappedNativeToken("arbitrum"), "Weth on arbitrum");
+    eth = mustExist(testTokenList.getNativeToken("arbitrum"), "ETH on arbitrum");
+    hlp = mustExist(testTokenList.getTokenBySymbol("hLP", "arbitrum"), "hLP on arbitrum");
+    fxUsd = mustExist(testTokenList.getTokenBySymbol("fxUSD", "arbitrum"), "fxUSD on arbitrum");
+    fxAud = mustExist(testTokenList.getTokenBySymbol("fxAUD", "arbitrum"), "fxAUD on arbitrum");
+  } catch (e) {
+    console.error(e);
+    exit(1);
+  }
+};

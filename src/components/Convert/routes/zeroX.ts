@@ -1,5 +1,5 @@
 import axios from "axios";
-import { ConvertQuoteInput, ConvertTransactionInput, Quote } from "../Convert";
+import { ConvertQuoteRouteArgs, ConvertTransactionRouteArgs, Quote } from "../Convert";
 import { getApiFeeAsPercentage } from "../getApiFeeAsPercentage";
 import config from "../../../config";
 import { BASIS_POINTS_DIVISOR } from "../../../config/hlp";
@@ -33,16 +33,16 @@ const zeroXWeight = async (input: WeightInput) => {
   return 0;
 };
 
-const zeroXQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote> => {
+const zeroXQuoteHandler = async (input: ConvertQuoteRouteArgs): Promise<Quote> => {
   const {
     network,
     fromToken: { address: sellToken },
     toToken: { address: buyToken },
-    fromAmount,
+    sellAmount: fromAmount,
     gasPrice,
-    connectedAccount
+    receivingAccount: connectedAccount
   } = input;
-  const feePercentage = await getApiFeeAsPercentage(network, sellToken, buyToken);
+  const feePercentage = await getApiFeeAsPercentage(sellToken, buyToken);
 
   const params: ZeroXQuoteParams = {
     buyToken,
@@ -68,18 +68,18 @@ const zeroXQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote> => {
 };
 
 const zeroXTransactionHandler = async (
-  input: ConvertTransactionInput
+  input: ConvertTransactionRouteArgs
 ): Promise<ethers.PopulatedTransaction> => {
   const {
     network,
     fromToken: { address: sellToken },
     toToken: { address: buyToken },
     gasPrice,
-    connectedAccount,
+    receivingAccount: connectedAccount,
     sellAmount,
     slippage
   } = input;
-  const feePercentage = await getApiFeeAsPercentage(network, sellToken, buyToken);
+  const feePercentage = await getApiFeeAsPercentage(sellToken, buyToken);
 
   const params: ZeroXSwapParams = {
     buyToken,
@@ -87,7 +87,7 @@ const zeroXTransactionHandler = async (
     sellAmount: sellAmount?.toString(),
     affiliateAddress: config.convert.feeAddress,
     slippagePercentage: slippage.toString(),
-    gasPrice: gasPrice.toString(),
+    gasPrice: gasPrice?.toString(),
     buyTokenPercentageFee: (feePercentage / 100).toString(),
     feeRecipient: config.convert.feeAddress,
     takerAddress: connectedAccount

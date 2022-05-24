@@ -1,5 +1,4 @@
 import { ethers } from "ethers";
-import { FxTokenSymbolMap, FxTokenSymbol } from "../types/fxTokens";
 import config, { ChainlinkFeeds } from "../config";
 import { ChainlinkAggregator__factory, ChainlinkAggregator } from "../contracts";
 import { createMultiCallContract } from "../utils/contract-utils";
@@ -39,15 +38,16 @@ export default class Prices {
 
   public getFxTokenTargetUsdPrices = async (
     signer: ethers.Signer
-  ): Promise<FxTokenSymbolMap<Price>> => {
+  ): Promise<Record<string, Price>> => {
     const provider = new MultiCallProvider(signer.provider!, this.config.chainId);
 
-    const fxTokenSymbolToFeedAddressMap: FxTokenSymbolMap<string> = {
+    const fxTokenSymbolToFeedAddressMap: Record<string, string> = {
       fxAUD: this.config.feeds.aud_usd,
       fxPHP: this.config.feeds.php_usd,
       fxEUR: this.config.feeds.eur_usd,
-      // fxKRW: this.config.feeds.krw_usd,
-      // fxCNY: this.config.feeds.cny_usd,
+      fxKRW: this.config.feeds.krw_usd,
+      fxCNY: this.config.feeds.cny_usd,
+      fxCHF: this.config.feeds.chf_usd,
       fxUSD: ""
     };
 
@@ -57,7 +57,7 @@ export default class Prices {
     const calls = fxTokenSymbols
       .filter((fx) => fx !== "fxUSD")
       .map((fx) => {
-        const fxSymbol = fx as FxTokenSymbol;
+        const fxSymbol = fx as string;
         const multicall = createMultiCallContract<ChainlinkAggregator>(
           fxTokenSymbolToFeedAddressMap[fxSymbol],
           chainlinkAggregatorAbi
@@ -76,7 +76,7 @@ export default class Prices {
           number: this.chainlinkPriceToNumber(bn)
         }
       };
-    }, {} as FxTokenSymbolMap<Price>);
+    }, {} as Record<string, Price>);
 
     return {
       ...result,

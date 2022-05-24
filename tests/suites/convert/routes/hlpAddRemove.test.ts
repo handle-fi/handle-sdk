@@ -3,6 +3,7 @@ import { expect } from "chai";
 import Convert from "../../../../src/components/Convert";
 import { FIVE_DOLLARS, ONE_DOLLAR, sampleHlpTokenMethods } from "../sampleHlpTokenMethods";
 import { eth, fxUsd, hlp } from "../test-tokens";
+import { HLP_CONTRACTS } from "../../../../src/config/hlp";
 
 const signer = ethers.provider.getSigner(0);
 
@@ -19,14 +20,14 @@ describe("hLPAddRemove", () => {
       const quote = await Convert.getQuote({
         fromToken: hlp,
         toToken: fxUsd,
-        network: "arbitrum",
-        connectedAccount: ethers.constants.AddressZero,
-        fromAmount: ethers.utils.parseEther("1"),
+        receivingAccount: ethers.constants.AddressZero,
+        sellAmount: ethers.utils.parseEther("1"),
         gasPrice: ethers.constants.One,
         hlpMethods: hlpTokenMethods
       });
       expect(quote.sellAmount).to.eq(ethers.utils.parseEther("1").toString());
       expect(quote.buyAmount).to.eq(ethers.utils.parseEther("5").toString());
+      expect(quote.allowanceTarget).to.eq(HLP_CONTRACTS.arbitrum?.HlpManager);
     });
     it("should correctly calculate from hlp to eth ", async () => {
       const hlpTokenMethods = {
@@ -39,9 +40,8 @@ describe("hLPAddRemove", () => {
       const quote = await Convert.getQuote({
         fromToken: hlp,
         toToken: eth,
-        network: "arbitrum",
-        connectedAccount: ethers.constants.AddressZero,
-        fromAmount: ethers.utils.parseEther("1"),
+        receivingAccount: ethers.constants.AddressZero,
+        sellAmount: ethers.utils.parseEther("1"),
         gasPrice: ethers.constants.One,
         hlpMethods: hlpTokenMethods
       });
@@ -59,9 +59,8 @@ describe("hLPAddRemove", () => {
       const quote = await Convert.getQuote({
         toToken: hlp,
         fromToken: fxUsd,
-        network: "arbitrum",
-        connectedAccount: ethers.constants.AddressZero,
-        fromAmount: ethers.utils.parseEther("5"),
+        receivingAccount: ethers.constants.AddressZero,
+        sellAmount: ethers.utils.parseEther("5"),
         gasPrice: ethers.constants.One,
         hlpMethods: hlpTokenMethods
       });
@@ -79,9 +78,8 @@ describe("hLPAddRemove", () => {
       const quote = await Convert.getQuote({
         toToken: hlp,
         fromToken: eth,
-        network: "arbitrum",
-        connectedAccount: ethers.constants.AddressZero,
-        fromAmount: ethers.utils.parseEther("5"),
+        receivingAccount: ethers.constants.AddressZero,
+        sellAmount: ethers.utils.parseEther("5"),
         gasPrice: ethers.constants.One,
         hlpMethods: hlpTokenMethods
       });
@@ -94,8 +92,6 @@ describe("hLPAddRemove", () => {
       const tx = await Convert.getSwap({
         fromToken: hlp,
         toToken: fxUsd,
-        network: "arbitrum",
-        connectedAccount: await signer.getAddress(),
         gasPrice: ethers.utils.parseUnits("1", "gwei"),
         hlpMethods: sampleHlpTokenMethods,
         sellAmount: ethers.utils.parseUnits("1", hlp.decimals),
@@ -109,8 +105,6 @@ describe("hLPAddRemove", () => {
       const tx = await Convert.getSwap({
         fromToken: hlp,
         toToken: eth,
-        network: "arbitrum",
-        connectedAccount: await signer.getAddress(),
         gasPrice: ethers.utils.parseUnits("1", "gwei"),
         hlpMethods: sampleHlpTokenMethods,
         sellAmount: ethers.utils.parseUnits("1", hlp.decimals),
@@ -125,8 +119,6 @@ describe("hLPAddRemove", () => {
       const tx = await Convert.getSwap({
         fromToken: fxUsd,
         toToken: hlp,
-        network: "arbitrum",
-        connectedAccount: await signer.getAddress(),
         gasPrice: ethers.utils.parseUnits("1", "gwei"),
         hlpMethods: sampleHlpTokenMethods,
         sellAmount: ethers.utils.parseUnits("1", fxUsd.decimals),
@@ -140,8 +132,6 @@ describe("hLPAddRemove", () => {
       const tx = await Convert.getSwap({
         fromToken: eth,
         toToken: hlp,
-        network: "arbitrum",
-        connectedAccount: await signer.getAddress(),
         gasPrice: ethers.utils.parseUnits("1", "gwei"),
         hlpMethods: sampleHlpTokenMethods,
         sellAmount: ethers.utils.parseUnits("1", eth.decimals),

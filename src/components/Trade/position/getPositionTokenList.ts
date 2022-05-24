@@ -1,4 +1,4 @@
-import { HlpConfig, Network } from "../../..";
+import { HandleTokenManager, Network } from "../../..";
 
 /**
  * Gets all viable combinatins of collateral tokens, index tokens
@@ -14,7 +14,9 @@ export const getPositionTokenList = (network: Network) => {
   const indexTokens: string[] = [];
   const isLong: boolean[] = [];
 
-  const hlpTokens = HlpConfig.HLP_TOKENS[network];
+  const tokenManager = new HandleTokenManager();
+  const hlpTokens = tokenManager.getHlpTokens(network);
+
   if (!hlpTokens) {
     return {
       collateralTokens,
@@ -24,8 +26,8 @@ export const getPositionTokenList = (network: Network) => {
   }
 
   // push tokens for long positions
-  const nonStableTokens = hlpTokens.filter((token) => !token.isStable && !token.isWrapped);
-  const stableTokens = hlpTokens.filter((token) => token.isStable && !token.isWrapped);
+  const nonStableTokens = hlpTokens.filter((token) => !token.extensions?.isStable);
+  const stableTokens = hlpTokens.filter((token) => token.extensions?.isStable);
   nonStableTokens.forEach((token) => {
     collateralTokens.push(token.address);
     indexTokens.push(token.address);
@@ -35,7 +37,7 @@ export const getPositionTokenList = (network: Network) => {
   // push tokens for short positions
   stableTokens.forEach((stableToken) => {
     nonStableTokens.forEach((nonStableToken) => {
-      if (nonStableToken.isShortable) {
+      if (nonStableToken.extensions?.isShortable) {
         collateralTokens.push(stableToken.address);
         indexTokens.push(nonStableToken.address);
         isLong.push(false);

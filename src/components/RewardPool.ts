@@ -6,11 +6,9 @@ import { RewardPool__factory } from "../contracts";
 import { Promisified } from "../types/general";
 import {
   RewardPoolData,
-  RewardPoolName,
   RewardPoolDataPools,
   RewardPoolDataPool,
-  RewardPoolPool,
-  RewardPoolNameMap
+  RewardPoolPool
 } from "../types/rewardPool";
 import { callMulticallObject, createMulticallProtocolContracts } from "../utils/contract-utils";
 
@@ -30,19 +28,22 @@ type RewardsPoolDataMulticall = {
   claimableRewards?: ethers.BigNumber;
 };
 
-type RewardsPoolsMulticall = RewardPoolNameMap<{
-  weight: ethers.BigNumber;
-  assetType: number;
-  assetAddress: string;
-  totalDeposits: ethers.BigNumber;
-  S: ethers.BigNumber;
-}>;
+type RewardsPoolsMulticall = Record<
+  string,
+  {
+    weight: ethers.BigNumber;
+    assetType: number;
+    assetAddress: string;
+    totalDeposits: ethers.BigNumber;
+    S: ethers.BigNumber;
+  }
+>;
 
-type RewardPoolIdsMulticall = RewardPoolNameMap<{ found: boolean; poolId: ethers.BigNumber }>;
+type RewardPoolIdsMulticall = Record<string, { found: boolean; poolId: ethers.BigNumber }>;
 
 export default class RewardPool {
   private config: RewardsPoolConfig;
-  private rewardPoolIds: RewardPoolNameMap<number> | undefined;
+  private rewardPoolIds: Record<string, number> | undefined;
 
   constructor(c?: RewardsPoolConfig) {
     this.config = c || {
@@ -69,7 +70,7 @@ export default class RewardPool {
     return this.toRewardPoolData(multicallResponse, rewardPoolIds);
   };
 
-  public getPool = async (poolName: RewardPoolName, signer: Signer): Promise<RewardPoolPool> => {
+  public getPool = async (poolName: string, signer: Signer): Promise<RewardPoolPool> => {
     const contract = this.getContract(signer);
     const rewardPoolIds = await this.getRewardPoolsId(signer);
     const poolId = rewardPoolIds[poolName];
@@ -80,7 +81,7 @@ export default class RewardPool {
     };
   };
 
-  public getPools = async (signer: Signer): Promise<RewardPoolNameMap<RewardPoolPool>> => {
+  public getPools = async (signer: Signer): Promise<Record<string, RewardPoolPool>> => {
     const { contracts, provider } = createMulticallProtocolContracts(
       this.config.protocolAddresses,
       this.config.chainId,
@@ -88,7 +89,7 @@ export default class RewardPool {
     );
 
     const rewardPoolIds = await this.getRewardPoolsId(signer);
-    const poolNames = Object.keys(rewardPoolIds) as RewardPoolName[];
+    const poolNames = Object.keys(rewardPoolIds);
 
     const multicall: Promisified<RewardsPoolsMulticall> = poolNames.reduce((progress, poolName) => {
       const poolId = rewardPoolIds[poolName];
@@ -110,7 +111,7 @@ export default class RewardPool {
           name: poolName
         }
       };
-    }, {} as RewardPoolNameMap<RewardPoolPool>);
+    }, {} as Record<string, RewardPoolPool>);
   };
 
   public claim = (
@@ -148,9 +149,9 @@ export default class RewardPool {
 
   private toRewardPoolData = (
     multicallResponse: RewardsPoolDataMulticall,
-    poolIds: RewardPoolNameMap<number>
+    poolIds: Record<string, number>
   ): RewardPoolData => {
-    const poolNames = Object.keys(poolIds) as RewardPoolName[];
+    const poolNames = Object.keys(poolIds);
 
     return {
       forexDistributionRate: multicallResponse.forexDistributionRate,
@@ -160,7 +161,7 @@ export default class RewardPool {
           }
         : undefined,
       pools: poolNames.reduce((progress, pn) => {
-        const poolName = pn as RewardPoolName;
+        const poolName = pn;
         const poolId = poolIds[poolName];
         const rewardPool: RewardPoolDataPool = {
           ratio: multicallResponse.pools.poolRatios[poolId],
@@ -176,7 +177,7 @@ export default class RewardPool {
     };
   };
 
-  private getRewardPoolsId = async (signer: ethers.Signer): Promise<RewardPoolNameMap<number>> => {
+  private getRewardPoolsId = async (signer: ethers.Signer): Promise<Record<string, number>> => {
     if (!this.rewardPoolIds) {
       const { contracts, provider } = createMulticallProtocolContracts(
         this.config.protocolAddresses,
@@ -187,30 +188,25 @@ export default class RewardPool {
       const multicall: Promisified<RewardPoolIdsMulticall> = {
         governanceLock: contracts.rewardPool.getPoolIdByAlias(
           ethers.utils.keccak256(ethers.utils.toUtf8Bytes("governancelock"))
-        ),
-        fxKeeperAUD: contracts.rewardPool.getPoolIdByAlias(
-          this.getKeeperPoolAlias(this.config.fxTokenAddresses["fxAUD"])
-        ),
-        fxKeeperEUR: contracts.rewardPool.getPoolIdByAlias(
-          this.getKeeperPoolAlias(this.config.fxTokenAddresses["fxEUR"])
-        ),
-        fxKeeperPHP: contracts.rewardPool.getPoolIdByAlias(
-          this.getKeeperPoolAlias(this.config.fxTokenAddresses["fxPHP"])
-        ),
-        fxKeeperUSD: contracts.rewardPool.getPoolIdByAlias(
-          this.getKeeperPoolAlias(this.config.fxTokenAddresses["fxUSD"])
         )
       };
+
+      for (let [symbol, address] of Object.entries(this.config.fxTokenAddresses)) {
+        const keeperName = "fxKeeper" + symbol.replace("fx", "");
+        multicall[keeperName] = contracts.rewardPool.getPoolIdByAlias(
+          this.getKeeperPoolAlias(address)
+        );
+      }
 
       const multicallResponse = await callMulticallObject(multicall, provider);
 
       this.rewardPoolIds = Object.keys(multicallResponse).reduce((progress, pn) => {
-        const poolName = pn as RewardPoolName;
+        const poolName = pn;
         return {
           ...progress,
           [poolName]: multicallResponse[poolName].poolId
         };
-      }, {} as RewardPoolNameMap<number>);
+      }, {});
     }
     return this.rewardPoolIds;
   };

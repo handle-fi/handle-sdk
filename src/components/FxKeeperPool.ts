@@ -1,5 +1,4 @@
 import { ethers } from "ethers";
-import { FxTokenSymbol } from "..";
 import sdkConfig, { FxTokenAddresses } from "../config";
 import { ProtocolAddresses } from "../config";
 import { NETWORK_NAME_TO_CHAIN_ID } from "../constants";
@@ -26,7 +25,7 @@ type KeeperPoolMulticall = {
 
 type StakeArgs = {
   amount: ethers.BigNumber;
-  fxTokenSymbol: FxTokenSymbol;
+  fxTokenSymbol: string;
 };
 
 export default class FxKeeperPool {
@@ -42,7 +41,7 @@ export default class FxKeeperPool {
 
   public getPool = async (
     account: string | undefined,
-    fxTokenSymbol: FxTokenSymbol,
+    fxTokenSymbol: string,
     signer: ethers.Signer
   ): Promise<FxKeeperPoolPool> => {
     const { provider } = createMulticallProtocolContracts(
@@ -66,7 +65,7 @@ export default class FxKeeperPool {
       signer
     );
 
-    const fxTokenSymbols = Object.keys(this.config.fxTokenAddresses) as FxTokenSymbol[];
+    const fxTokenSymbols = Object.keys(this.config.fxTokenAddresses);
     const multicalls = fxTokenSymbols.map((fx) =>
       this.getFxKeeperPoolMulticall(account, fx, signer)
     );
@@ -96,7 +95,7 @@ export default class FxKeeperPool {
 
   private getFxKeeperPoolMulticall = (
     account: string | undefined,
-    fxTokenSymbol: FxTokenSymbol,
+    fxTokenSymbol: string,
     signer: ethers.Signer
   ): Promisified<KeeperPoolMulticall> => {
     const { contracts } = createMulticallProtocolContracts(
@@ -129,7 +128,7 @@ export default class FxKeeperPool {
   };
 
   private toFxKeeperPoolPool = (
-    fxTokenSymbol: FxTokenSymbol,
+    fxTokenSymbol: string,
     multicallResponse: KeeperPoolMulticall
   ): FxKeeperPoolPool => {
     return {
