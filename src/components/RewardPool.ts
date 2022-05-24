@@ -28,7 +28,7 @@ type RewardsPoolDataMulticallResponse = {
   claimableRewards?: ethers.BigNumber;
 };
 
-type RewardsPoolsMulticall = Record<
+type RewardsPoolsMulticallResponse = Record<
   string,
   {
     weight: ethers.BigNumber;
@@ -39,7 +39,7 @@ type RewardsPoolsMulticall = Record<
   }
 >;
 
-type RewardPoolIdsMulticall = Record<string, { found: boolean; poolId: ethers.BigNumber }>;
+type RewardPoolIdsMulticallResponse = Record<string, { found: boolean; poolId: ethers.BigNumber }>;
 
 export default class RewardPool {
   private config: RewardsPoolConfig;
@@ -91,13 +91,16 @@ export default class RewardPool {
     const rewardPoolIds = await this.getRewardPoolsId(signer);
     const poolNames = Object.keys(rewardPoolIds);
 
-    const multicall: Promisified<RewardsPoolsMulticall> = poolNames.reduce((progress, poolName) => {
-      const poolId = rewardPoolIds[poolName];
-      return {
-        ...progress,
-        [poolName]: contracts.rewardPool.getPool(poolId)
-      };
-    }, {} as Promisified<RewardsPoolsMulticall>);
+    const multicall: Promisified<RewardsPoolsMulticallResponse> = poolNames.reduce(
+      (progress, poolName) => {
+        const poolId = rewardPoolIds[poolName];
+        return {
+          ...progress,
+          [poolName]: contracts.rewardPool.getPool(poolId)
+        };
+      },
+      {} as Promisified<RewardsPoolsMulticallResponse>
+    );
 
     const multicallResponse = await callMulticallObject(multicall, provider);
 
@@ -185,7 +188,7 @@ export default class RewardPool {
         signer
       );
 
-      const multicall: Promisified<RewardPoolIdsMulticall> = {
+      const multicall: Promisified<RewardPoolIdsMulticallResponse> = {
         governanceLock: contracts.rewardPool.getPoolIdByAlias(
           ethers.utils.keccak256(ethers.utils.toUtf8Bytes("governancelock"))
         ),
