@@ -18,7 +18,7 @@ export type RewardsPoolConfig = {
   chainId: number;
 };
 
-type RewardsPoolDataMulticall = {
+type RewardsPoolDataMulticallResponse = {
   pools: {
     poolRatios: ethers.BigNumber[];
     accruedAmounts: ethers.BigNumber[];
@@ -125,7 +125,7 @@ export default class RewardPool {
   private getDataMulticall = (
     account: string | undefined,
     signer: ethers.Signer
-  ): Promisified<RewardsPoolDataMulticall> => {
+  ): Promisified<RewardsPoolDataMulticallResponse> => {
     const { contracts } = createMulticallProtocolContracts(
       this.config.protocolAddresses,
       this.config.chainId,
@@ -148,7 +148,7 @@ export default class RewardPool {
   };
 
   private toRewardPoolData = (
-    multicallResponse: RewardsPoolDataMulticall,
+    multicallResponse: RewardsPoolDataMulticallResponse,
     poolIds: Record<string, number>
   ): RewardPoolData => {
     const poolNames = Object.keys(poolIds);
