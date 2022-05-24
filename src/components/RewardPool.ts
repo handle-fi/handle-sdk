@@ -39,7 +39,7 @@ type RewardsPoolsMulticall = Record<
   }
 >;
 
-type RewardPoolIdsMulticallResponse = Record<string, { found: boolean; poolId: ethers.BigNumber }>;
+type RewardPoolIdsMulticall = Record<string, { found: boolean; poolId: ethers.BigNumber }>;
 
 export default class RewardPool {
   private config: RewardsPoolConfig;
@@ -185,7 +185,7 @@ export default class RewardPool {
         signer
       );
 
-      const multicall: Promisified<RewardPoolIdsMulticallResponse> = {
+      const multicall: Promisified<RewardPoolIdsMulticall> = {
         governanceLock: contracts.rewardPool.getPoolIdByAlias(
           ethers.utils.keccak256(ethers.utils.toUtf8Bytes("governancelock"))
         )
