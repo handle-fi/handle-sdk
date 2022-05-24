@@ -1,5 +1,4 @@
 import { ethers } from "ethers";
-// import config from ".";
 import { Network, NetworkMap } from "../types/network";
 
 /** Currently the only avaliable handle liquidity pool network */
