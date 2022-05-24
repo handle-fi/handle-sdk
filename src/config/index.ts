@@ -99,6 +99,7 @@ export type ChainlinkFeeds = {
   eur_usd: string;
   krw_usd: string;
   cny_usd: string;
+  chf_usd: string;
 };
 
 const forexAddress = mustExist(
@@ -133,7 +134,8 @@ const config: Config = {
         php_usd: "0xff82aaf635645fd0bcc7b619c3f28004cdb58574",
         eur_usd: "0xa14d53bc1f1c0f31b4aa3bd109344e5009051a84",
         krw_usd: "0x85bb02e0ae286600d1c68bb6ce22cc998d411916",
-        cny_usd: "0xcc3370bde6afe51e1205a5038947b9836371eccb"
+        cny_usd: "0xcc3370bde6afe51e1205a5038947b9836371eccb",
+        chf_usd: "0xe32accc8c4ec03f6e75bd3621bfc9fbb234e1fc3"
       },
       collaterals: {
         FOREX: {
