@@ -18,7 +18,7 @@ export type FxTokensConfig = {
   graphEndpoint: string;
 };
 
-type Price = {
+type FxTokenMulticallResponse = {
   price: ethers.BigNumber;
 };
 
@@ -104,7 +104,7 @@ export default class FxTokens {
   private getFxTokenMulticall = (
     fxTokenSymbol: string,
     signer: ethers.Signer
-  ): Promisified<Price> => {
+  ): Promisified<FxTokenMulticallResponse> => {
     const tokenAddress = this.config.fxTokenAddresses[fxTokenSymbol];
     if (!tokenAddress) {
       throw new Error(`fxTokens not initialised with token that matches: ${fxTokenSymbol}`);
