@@ -1,0 +1,4 @@
+The schema is the same as specified https://github.com/Uniswap/token-lists/blob/main/src/tokenlist.schema.json as at 18/05/2022, with the exceptions listed below:
+- TagIdentifiers can have a maxLength of 40, instead of 10
+- TagDefinitions can have a maxLenth of 40, instead of 20
+- The name of the tokenlist can have a maxLength of 40, up from 20

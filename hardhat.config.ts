@@ -15,6 +15,7 @@ export default {
     }
   },
   mocha: {
-    timeout: 1000000
+    timeout: 1000000,
+    delay: true
   }
 };

@@ -1,5 +1,4 @@
 import { ethers } from "ethers";
-import config from ".";
 import { Network, NetworkMap } from "../types/network";
 
 /** Currently the only avaliable handle liquidity pool network */
@@ -56,19 +55,6 @@ export type HlpContracts = {
   HlpManagerRouter: string;
 };
 
-export type HlpToken = {
-  name: string;
-  symbol: string;
-  decimals: number;
-  address: string;
-  isStable?: boolean;
-  isNative?: boolean;
-  isShortable?: boolean;
-  isWrapped?: boolean;
-  /** Only used if isWrapped is true */
-  baseSymbol?: string;
-};
-
 /** Perp contracts for each network chain ID. */
 export const HLP_CONTRACTS: NetworkMap<HlpContracts | undefined> = {
   // Arbitrum One
@@ -84,84 +70,3 @@ export const HLP_CONTRACTS: NetworkMap<HlpContracts | undefined> = {
   ethereum: undefined,
   polygon: undefined
 };
-
-export const HLP_CHAIN_TO_NETWORK: { [chainId: number]: Network } = {
-  42161: "arbitrum"
-};
-
-/** Tokens configured in the Vault contract. */
-export const HLP_TOKENS: Record<Network, HlpToken[]> = {
-  // Arbitrum One
-  arbitrum: [
-    {
-      name: "ETH",
-      symbol: "ETH",
-      decimals: 18,
-      address: "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
-      isNative: true,
-      isShortable: true
-    },
-    {
-      name: "Wrapped ETH",
-      symbol: "WETH",
-      decimals: 18,
-      address: "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
-      isWrapped: true,
-      baseSymbol: "ETH"
-    },
-    {
-      name: "handle USD",
-      symbol: "fxUSD",
-      decimals: 18,
-      address: config.fxTokenAddresses.fxUSD,
-      isStable: true
-    },
-    {
-      name: "handle AUD",
-      symbol: "fxAUD",
-      decimals: 18,
-      address: config.fxTokenAddresses.fxAUD,
-      isShortable: true
-    },
-    {
-      name: "handle EUR",
-      symbol: "fxEUR",
-      decimals: 18,
-      address: config.fxTokenAddresses.fxEUR,
-      isShortable: true
-    },
-    {
-      name: "handle PHP",
-      symbol: "fxPHP",
-      decimals: 18,
-      address: config.fxTokenAddresses.fxPHP,
-      isShortable: true
-    },
-    {
-      name: "handle CNY",
-      symbol: "fxCNY",
-      decimals: 18,
-      address: "0x2C29daAce6Aa05e3b65743EFd61f8A2C448302a3",
-      isShortable: true
-    },
-    {
-      name: "handle KRW",
-      symbol: "fxKRW",
-      decimals: 18,
-      address: "0xF4E8BA79d058fFf263Fd043Ef50e1010c1BdF991",
-      isShortable: true
-    },
-    {
-      name: "handle CHF",
-      symbol: "fxCHF",
-      decimals: 18,
-      address: "0x8C414cB8A9Af9F7B03673e93DF73c23C1aa05b4e",
-      isShortable: true
-    }
-  ],
-  ethereum: [],
-  polygon: []
-};
-
-export const getHlpTokenSymbols = (network: Network): string[] =>
-  HLP_TOKENS[network]?.map((x) => x.symbol) || [];

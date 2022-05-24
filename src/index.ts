@@ -1,9 +1,7 @@
 import config, { KashiPoolConfig } from "./config";
-import { FxTokenSymbol, FxTokenSymbolMap } from "./types/fxTokens";
 import { Vault, SingleCollateralVaultSymbol, SingleCollateralVault } from "./types/vaults";
 import { Collateral, CollateralSymbol, CollateralSymbolWithNative } from "./types/collaterals";
 import { FxToken } from "./types/fxTokens";
-import { Token, TokenExtended } from "./types/tokens";
 import {
   Network,
   NetworkMap,
@@ -12,12 +10,7 @@ import {
 } from "./types/network";
 import { FxKeeperPoolPool } from "./types/fxKeeperPool";
 import { GovernanceLockData } from "./types/governanceLock";
-import {
-  RewardPoolData,
-  RewardPoolNameMap,
-  RewardPoolPool,
-  RewardPoolName
-} from "./types/rewardPool";
+import { RewardPoolData, RewardPoolPool } from "./types/rewardPool";
 import {
   LPStakingPool,
   LPStakingPoolName,
@@ -40,17 +33,17 @@ import GovernanceLockSDK from "./components/GovernanceLock";
 import RewardPoolSDK from "./components/RewardPool";
 import { getIsKashiApproved, signKashiApproval } from "./utils/allowance-utils";
 import { getNetworkName } from "./utils/web3-utils";
-import {
-  NETWORK_NAMES,
-  SINGLE_COLLATERAL_NETWORK_NAMES,
-  NETWORK_NAME_TO_CHAIN_ID,
-  SECONDS_IN_A_YEAR_BN
-} from "./constants";
-import { ETHEREUM_TOKEN_LIST, ARBITRUM_TOKEN_LIST, POLYGON_TOKEN_LIST } from "./data/tokens";
+import { NETWORK_NAMES, NETWORK_NAME_TO_CHAIN_ID, SECONDS_IN_A_YEAR_BN } from "./constants";
 import { vaultUtils } from "./utils/vault-utils";
 import * as HlpConfig from "./config/hlp";
 import * as TradeUtils from "./components/Trade";
-import * as HlpUtils from "./utils/hlp";
+import TokenManager from "./components/TokenManager";
+import HandleTokenManager from "./components/TokenManager/HandleTokenManager";
+import { TokenInfo, TokenList } from "@uniswap/token-lists";
+
+const SINGLE_COLLATERAL_NETWORK_NAMES = Object.keys(
+  config.singleCollateralVaults
+) as SingleCollateralVaultNetwork[];
 
 export {
   FxTokensSDK,
@@ -70,9 +63,6 @@ export {
   config,
   NETWORK_NAMES,
   SINGLE_COLLATERAL_NETWORK_NAMES,
-  ETHEREUM_TOKEN_LIST,
-  ARBITRUM_TOKEN_LIST,
-  POLYGON_TOKEN_LIST,
   NETWORK_NAME_TO_CHAIN_ID,
   SECONDS_IN_A_YEAR_BN,
   getNetworkName,
@@ -80,13 +70,12 @@ export {
   signKashiApproval,
   vaultUtils,
   HlpConfig,
-  HlpUtils,
-  TradeUtils
+  TradeUtils,
+  TokenManager,
+  HandleTokenManager
 };
 
 export type {
-  FxTokenSymbol,
-  FxTokenSymbolMap,
   IndexedFxToken,
   IndexedVault,
   IndexedFxKeeperPool,
@@ -104,18 +93,16 @@ export type {
   SingleCollateralVaultSymbol,
   SingleCollateralVault,
   PendingWithdrawal,
-  Token,
-  TokenExtended,
   Quote,
   FxKeeperPoolPool,
   GovernanceLockData,
   RewardPoolData,
-  RewardPoolNameMap,
   RewardPoolPool,
-  RewardPoolName,
   LPStakingPool,
   LPStakingPoolName,
   LPStakingPoolNameMap,
   LPStakingPlatformName,
-  KashiPoolConfig
+  KashiPoolConfig,
+  TokenInfo,
+  TokenList
 };

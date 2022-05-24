@@ -1,27 +1,29 @@
+import { TokenInfo } from "@uniswap/token-lists";
 import { ethers } from "ethers";
-import { FxTokenSymbol } from "..";
 import { CollateralSymbol } from "./collaterals";
-import { Token } from "../types/tokens";
+import { FxToken } from "./fxTokens";
 
 export type SingleCollateralVaultSymbol = "fxAUD-WETH" | "fxAUD-WBTC";
 
-type VaultFxToken = Token<FxTokenSymbol>;
+type VaultFxToken = FxToken;
 
-export type VaultCollateral<T> = Token<T> & {
+export type VaultCollateralToken<T> = TokenInfo & {
   amount: ethers.BigNumber;
+} & {
+  symbol: T;
 };
 
 export type VaultData = {
   account: string;
   debt: ethers.BigNumber;
   fxToken: VaultFxToken;
-  collateral: VaultCollateral<CollateralSymbol>[];
+  collateral: VaultCollateralToken<CollateralSymbol>[];
 };
 
 export type SingleCollateralVaultData = {
   account: string;
   debt: ethers.BigNumber;
-  collateral: VaultCollateral<string>;
+  collateral: VaultCollateralToken<string>;
   interestPerYear: ethers.BigNumber;
   availableToBorrow: ethers.BigNumber;
   currentBorrowAmount: ethers.BigNumber;
@@ -46,7 +48,7 @@ export type Vault = VaultData &
   VaultBase & {
     isRedeemable: boolean;
     redeemableTokens: ethers.BigNumber;
-    collateral: VaultCollateral<CollateralSymbol>[];
+    collateral: VaultCollateralToken<CollateralSymbol>[];
   };
 
 export type SingleCollateralVault = SingleCollateralVaultData &
@@ -54,4 +56,3 @@ export type SingleCollateralVault = SingleCollateralVaultData &
     vaultSymbol: SingleCollateralVaultSymbol;
     liquidationPrice: ethers.BigNumber;
   };
-

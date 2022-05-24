@@ -2,21 +2,20 @@ import { expect } from "chai";
 import { ethers } from "ethers";
 import { Network } from "../../../../src";
 import Convert from "../../../../src/components/Convert";
-import { getTokenDetails } from "../../../../src/utils/token-utils";
+import { testTokenList } from "../../../mock-data/token-list";
 import { sampleHlpTokenMethods } from "../sampleHlpTokenMethods";
 
 describe("zeroX route", () => {
   describe("quote", () => {
     (["ethereum", "polygon"] as Network[]).forEach((network) => {
       it(`should return an api quote for ${network}`, async () => {
-        const usdc = getTokenDetails("USDC", network);
-        const usdt = getTokenDetails("USDT", network);
+        const usdc = testTokenList.getTokenBySymbol("USDC", network)!;
+        const usdt = testTokenList.getTokenBySymbol("USDT", network)!;
         const quote = await Convert.getQuote({
-          fromToken: { ...usdc, name: "" },
-          toToken: { ...usdt, name: "" },
-          network,
-          connectedAccount: ethers.constants.AddressZero,
-          fromAmount: ethers.utils.parseEther("1"),
+          fromToken: usdc,
+          toToken: usdt,
+          receivingAccount: ethers.constants.AddressZero,
+          sellAmount: ethers.utils.parseEther("1"),
           gasPrice: ethers.constants.One,
           hlpMethods: sampleHlpTokenMethods
         });

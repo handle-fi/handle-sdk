@@ -7,6 +7,7 @@ export type IndexedCollateral = {
   address: string;
   name: string;
   symbol: CollateralSymbol;
+  chainId: number;
   mintCollateralRatio: ethers.BigNumber;
   interestRate: ethers.BigNumber;
   liquidationFee: ethers.BigNumber;
@@ -31,8 +32,8 @@ type QueryResponse = {
   }[];
 };
 
-export default class FxTokenGraphClient {
-  constructor(private client: GraphQLClient) {}
+export default class CollateralGraphClient {
+  constructor(private client: GraphQLClient, private chainId: number) {}
 
   public query = async (filter: any): Promise<IndexedCollateral[]> => {
     const data = await this.client.request<QueryResponse>(this.getQueryString(filter));
@@ -47,7 +48,9 @@ export default class FxTokenGraphClient {
       interestRate: ethers.BigNumber.from(t.interestRate),
       liquidationFee: ethers.BigNumber.from(t.liquidationFee),
       totalBalance: ethers.BigNumber.from(t.totalBalance),
-      rate: ethers.BigNumber.from(t.rate)
+      rate: ethers.BigNumber.from(t.rate),
+      name: t.name,
+      chainId: this.chainId
     }));
   };
 

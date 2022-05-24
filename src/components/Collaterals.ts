@@ -1,8 +1,7 @@
 import { ethers } from "ethers";
 import { CollateralDetails, ProtocolAddresses } from "../config";
 import { Promisified } from "../types/general";
-import { Token } from "../types/tokens";
-import { Collateral, CollateralSymbol } from "../types/collaterals";
+import { Collateral, CollateralSymbol, CollateralToken } from "../types/collaterals";
 import sdkConfig from "../config";
 import {
   createERC20MulticallContract,
@@ -35,7 +34,7 @@ type CollateralMulticall = {
 };
 
 export default class Collaterals {
-  public tokens: Token<CollateralSymbol>[];
+  public tokens: CollateralToken[];
   private config: CollateralsConfig;
   private graph: Graph;
 
@@ -46,7 +45,9 @@ export default class Collaterals {
       chainId: NETWORK_NAME_TO_CHAIN_ID.arbitrum,
       graphEndpoint: sdkConfig.theGraphEndpoints.arbitrum
     };
-    this.tokens = getTokensFromConfig(this.config.collaterals);
+    this.tokens = getTokensFromConfig(
+      Object.values(this.config.collaterals).map(({ address }) => address)
+    );
     this.graph = new Graph(this.config.graphEndpoint);
   }
 
@@ -186,10 +187,7 @@ export default class Collaterals {
     };
   };
 
-  private toCollateral = (
-    token: Token<CollateralSymbol>,
-    collateral: CollateralMulticall
-  ): Collateral => {
+  private toCollateral = (token: CollateralToken, collateral: CollateralMulticall): Collateral => {
     const { decimals, collateralDetails, price } = collateral;
 
     return {
@@ -199,7 +197,9 @@ export default class Collaterals {
       price,
       mintCR: collateralDetails.mintCR,
       liquidationFee: collateralDetails.liquidationFee,
-      interestRate: collateralDetails.interestRate
+      interestRate: collateralDetails.interestRate,
+      chainId: token.chainId,
+      name: token.name
     };
   };
 
@@ -211,11 +211,13 @@ export default class Collaterals {
       mintCR: collateral.mintCollateralRatio,
       liquidationFee: collateral.liquidationFee,
       interestRate: collateral.interestRate,
-      price: collateral.rate
+      price: collateral.rate,
+      name: collateral.name,
+      chainId: collateral.chainId
     };
   };
 
-  private findAvailable = (collateralSymbol: CollateralSymbol): Token<CollateralSymbol> => {
+  private findAvailable = (collateralSymbol: CollateralSymbol): CollateralToken => {
     const avail = this.tokens.find((a) => a.symbol === collateralSymbol);
 
     if (!avail) {

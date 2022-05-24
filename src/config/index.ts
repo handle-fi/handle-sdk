@@ -1,13 +1,19 @@
 import { ethers } from "ethers";
-import { CollateralSymbolMap, CollateralSymbol } from "./../types/collaterals";
-import { FxTokenSymbolMap, FxTokenSymbol } from "./../types/fxTokens";
+import { CollateralSymbolMap } from "./../types/collaterals";
 import { BridgeConfigByNetwork } from "./../components/Bridge";
-import { StableType, Token } from "./../types/tokens";
+import { StableType } from "./../types/tokens";
 import { LPStakingPoolNameMap, LPStakingPlatformName } from "./../types/lpStaking";
-import { getTokenDetails } from "./../utils/token-utils";
+import { TokenInfo } from "@uniswap/token-lists";
+import _stakingTokens from "../components/TokenManager/staking-tokens.json";
+import _handleTokens from "../components/TokenManager/handle-tokens.json";
+import { validateTokenList, getTokenFromTokenList } from "../utils/tokenlist-utils";
+import { mustExist } from "../utils/general-utils";
 
-export type FxTokenAddresses = FxTokenSymbolMap<string>;
-export type CollateralDetails = CollateralSymbolMap<Omit<Token<CollateralSymbol>, "symbol">>;
+const stakingTokens = validateTokenList(_stakingTokens);
+const handleTokens = validateTokenList(_handleTokens);
+
+export type FxTokenAddresses = Record<string, string>;
+export type CollateralDetails = CollateralSymbolMap<{ address: string; decimals: number }>;
 export type LPStakingPoolDetails = {
   platform: LPStakingPlatformName;
   title: string;
@@ -16,14 +22,14 @@ export type LPStakingPoolDetails = {
     symbol: string;
     address: string;
   };
-  tokensInLp: Token<string>[];
+  tokensInLp: TokenInfo[];
   url: string;
 };
 
 export type KashiPoolConfig = {
   address: string;
-  fxToken: FxTokenSymbol;
-  collateral: Token<string>;
+  fxToken: string;
+  collateral: TokenInfo;
 };
 
 export type SingleCollateralVaults = {
@@ -93,18 +99,23 @@ export type ChainlinkFeeds = {
   eur_usd: string;
   krw_usd: string;
   cny_usd: string;
+  chf_usd: string;
 };
 
+const forexAddress = mustExist(
+  getTokenFromTokenList(handleTokens, "FOREX", "arbitrum"),
+  "FOREX on arbitrum"
+).address;
+
 const config: Config = {
-  forexAddress: "0xDb298285FE4C5410B05390cA80e8Fbe9DE1F259B",
-  fxTokenAddresses: {
-    fxAUD: "0x7E141940932E3D13bfa54B224cb4a16510519308",
-    fxPHP: "0x3d147cD9aC957B2a5F968dE9d1c6B9d0872286a0",
-    fxUSD: "0x8616E8EA83f048ab9A5eC513c9412Dd2993bcE3F",
-    fxEUR: "0x116172B2482c5dC3E6f445C16Ac13367aC3FCd35"
-    // fxKRW: "0xF4E8BA79d058fFf263Fd043Ef50e1010c1BdF991",
-    // fxCNY: "0x2C29daAce6Aa05e3b65743EFd61f8A2C448302a3"
-  },
+  forexAddress: forexAddress,
+  fxTokenAddresses: handleTokens.tokens.reduce((acc: any, token: any) => {
+    if (!token.extensions?.isFxToken) return acc;
+    return {
+      ...acc,
+      [token.symbol]: token.address
+    };
+  }, {}) as FxTokenAddresses,
   protocol: {
     arbitrum: {
       protocol: {
@@ -123,11 +134,12 @@ const config: Config = {
         php_usd: "0xff82aaf635645fd0bcc7b619c3f28004cdb58574",
         eur_usd: "0xa14d53bc1f1c0f31b4aa3bd109344e5009051a84",
         krw_usd: "0x85bb02e0ae286600d1c68bb6ce22cc998d411916",
-        cny_usd: "0xcc3370bde6afe51e1205a5038947b9836371eccb"
+        cny_usd: "0xcc3370bde6afe51e1205a5038947b9836371eccb",
+        chf_usd: "0xe32accc8c4ec03f6e75bd3621bfc9fbb234e1fc3"
       },
       collaterals: {
         FOREX: {
-          address: "0xdb298285fe4c5410b05390ca80e8fbe9de1f259b",
+          address: forexAddress,
           decimals: 18
         },
         WETH: {
@@ -160,7 +172,10 @@ const config: Config = {
           address: "0x9745e5CC0522827958eE3Fc2C03247276D359186",
           symbol: "SP-WETH-FOREX"
         },
-        tokensInLp: [getTokenDetails("FOREX", "arbitrum"), getTokenDetails("WETH", "arbitrum")],
+        tokensInLp: [
+          mustExist(getTokenFromTokenList(handleTokens, "FOREX", "arbitrum"), "FOREX on arbitrum"),
+          mustExist(getTokenFromTokenList(handleTokens, "WETH", "arbitrum"), "WETH on arbitrum")
+        ],
         url: "https://app.sushi.com/add/ETH/0xDb298285FE4C5410B05390cA80e8Fbe9DE1F259B"
       },
       curveEursFxEUR: {
@@ -172,8 +187,8 @@ const config: Config = {
           symbol: "CRV-fxEUR-EURS"
         },
         tokensInLp: [
-          getTokenDetails("fxEUR", "arbitrum"),
-          { symbol: "EURS", decimals: 2, address: "0xD22a58f79e9481D1a88e00c343885A588b34b68B" }
+          mustExist(getTokenFromTokenList(handleTokens, "fxEUR", "arbitrum"), "fxEUR on arbitrum"),
+          mustExist(getTokenFromTokenList(stakingTokens, "EURS", "arbitrum"), "EURS on arbitrum")
         ],
         url: "https://arbitrum.curve.fi/factory/7/deposit"
       },
@@ -186,12 +201,8 @@ const config: Config = {
           symbol: "CRV-handle3"
         },
         tokensInLp: [
-          getTokenDetails("fxUSD", "arbitrum"),
-          {
-            symbol: "2CRV",
-            address: "0xbf7e49483881c76487b0989cd7d9a8239b20ca41",
-            decimals: 18
-          }
+          mustExist(getTokenFromTokenList(handleTokens, "fxUSD", "arbitrum"), "fxUSD on arbitrum"),
+          mustExist(getTokenFromTokenList(stakingTokens, "2CRV", "arbitrum"), "2CRV on arbitrum")
         ],
         url: "https://arbitrum.curve.fi/factory/12/deposit"
       }
@@ -202,19 +213,28 @@ const config: Config = {
       "fxAUD-WETH": {
         address: "0x78c2b09973363f8111cc122AdAefB1Ae5623feBD",
         fxToken: "fxAUD",
-        collateral: getTokenDetails("WETH", "polygon")
+        collateral: mustExist(
+          getTokenFromTokenList(stakingTokens, "WETH", "polygon"),
+          "WETH on polygon"
+        )
       },
       "fxUSD-WMATIC": {
         address: "0xcAd5da38B07CB5dA10d0Cc15783C7a8679Ba0f49",
         fxToken: "fxUSD",
-        collateral: getTokenDetails("WMATIC", "polygon")
+        collateral: mustExist(
+          getTokenFromTokenList(stakingTokens, "WMATIC", "polygon"),
+          "WMATIC on polygon"
+        )
       }
     },
     arbitrum: {
       "fxAUD-WBTC": {
         address: "0x5b5906ba677f32075b3dd478d730c46eaaa48c3e",
         fxToken: "fxAUD",
-        collateral: getTokenDetails("WBTC", "arbitrum")
+        collateral: mustExist(
+          getTokenFromTokenList(stakingTokens, "WBTC", "arbitrum"),
+          "WBTC on arbitrum"
+        )
       }
     }
   },

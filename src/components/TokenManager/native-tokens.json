@@ -1,0 +1,44 @@
+{
+  "name": "Native Tokens",
+  "timestamp": "2022-05-18T01:09:39+0000",
+  "version": {
+    "major": 1,
+    "minor": 0,
+    "patch": 0
+  },
+  "tokens": [
+    {
+      "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "chainId": 1,
+      "decimals": 18,
+      "name": "Ethereum",
+      "symbol": "ETH",
+      "logoURI": "https://tokens.1inch.io/0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee.png",
+      "extensions": {
+        "isNative": true
+      }
+    },
+    {
+      "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "chainId": 42161,
+      "decimals": 18,
+      "name": "Ethereum",
+      "symbol": "ETH",
+      "logoURI": "https://tokens.1inch.io/0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee.png",
+      "extensions": {
+        "isNative": true
+      }
+    },
+    {
+      "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "chainId": 137,
+      "decimals": 18,
+      "name": "Polygon Matic",
+      "symbol": "MATIC",
+      "logoURI": "https://tokens.1inch.exchange/0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0.png",
+      "extensions": {
+        "isNative": true
+      }
+    }
+  ]
+}

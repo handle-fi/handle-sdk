@@ -1,4 +1,6 @@
-import { BigNumber } from "ethers";
+import { BigNumber, ethers } from "ethers";
+import { CHAIN_ID_TO_NETWORK_NAME } from "../constants";
+import { Network } from "../types/network";
 
 export const getDeadline = (deadline?: number) => deadline ?? Math.floor(Date.now() / 1000) + 300;
 
@@ -18,4 +20,22 @@ export const transformDecimals = (value: BigNumber, fromDecimals: number, toDeci
     return value.div(TEN.pow(fromDecimals - toDecimals));
   }
   return value;
+};
+
+export function mustExist<Type>(value: Type | undefined | null, name: string): Type {
+  if (value == null) {
+    throw new Error(`'${name}' is required`);
+  }
+  return value;
+}
+
+export const getNetworkFromSignerOrProvider = async (
+  signerOrProvider: ethers.providers.Provider | ethers.Signer
+): Promise<Network> => {
+  if (signerOrProvider instanceof ethers.providers.Provider) {
+    const chainId = (await signerOrProvider.getNetwork()).chainId;
+    return CHAIN_ID_TO_NETWORK_NAME[chainId];
+  }
+  const chainId = await signerOrProvider.getChainId();
+  return CHAIN_ID_TO_NETWORK_NAME[chainId];
 };

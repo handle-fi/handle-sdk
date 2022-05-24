@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import { ProtocolParameters } from "../components/Protocol";
 import { Collateral, CollateralSymbol } from "../types/collaterals";
 import { FxToken } from "../types/fxTokens";
-import { SingleCollateralVaultSymbol, VaultCollateral } from "../types/vaults";
+import { SingleCollateralVaultSymbol, VaultCollateralToken } from "../types/vaults";
 import {
   VaultData,
   Vault,
@@ -404,7 +404,7 @@ const calculateAdditionalCollateralRequired = (
 
 export const calculateSingleCollateralVaultLiquidationPrice = (
   debt: ethers.BigNumber,
-  collateral: VaultCollateral<string>,
+  collateral: VaultCollateralToken<string>,
   collateralValueInFx: ethers.BigNumber,
   minCollateralRatio: ethers.BigNumber
 ) => {
@@ -473,4 +473,3 @@ const sqrt = (value: BigInt) => {
   };
   return newtonIteration(value, 1n);
 };
-

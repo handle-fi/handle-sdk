@@ -1,38 +1,46 @@
 import { BigNumber, ethers } from "ethers";
-import { config, HlpConfig } from "../../..";
+import { config, HandleTokenManager, HlpConfig } from "../../..";
 import { BASIS_POINTS_DIVISOR, HLP_CONTRACTS, PRICE_DECIMALS } from "../../../config/hlp";
 import { HlpManagerRouter__factory, HlpManager__factory } from "../../../contracts";
-import { isHlpSupportedToken, tryParseNativeHlpToken } from "../../../utils/hlp";
 import { getHlpFeeBasisPoints } from "../../Trade";
-import { ConvertQuoteInput, ConvertTransactionInput, Quote } from "../Convert";
+import { ConvertQuoteRouteArgs, ConvertTransactionRouteArgs, Quote } from "../Convert";
 import { HLP_ADD_REMOVE_WEIGHT, WeightInput } from "./weights";
 
 const hlpAddRemoveWeight = async (input: WeightInput) => {
   if (!HlpConfig.HLP_CONTRACTS[input.network]?.HlpManager) {
     return 0;
   }
+  const tokenManager = new HandleTokenManager();
+
+  const isToValidHlp =
+    tokenManager.isHlpTokenByAddress(input.toToken.address, input.network) ||
+    input.toToken.extensions?.isNative;
+  const isFromValidHlp =
+    tokenManager.isHlpTokenByAddress(input.fromToken.address, input.network) ||
+    input.fromToken.extensions?.isNative;
+
   if (
-    (input.toToken.symbol === "hLP" &&
-      isHlpSupportedToken(input.fromToken.symbol, input.network)) ||
-    (input.fromToken.symbol === "hLP" && isHlpSupportedToken(input.toToken.symbol, input.network))
+    (input.toToken.extensions?.isLiquidityToken && isFromValidHlp) ||
+    (input.fromToken.extensions?.isLiquidityToken && isToValidHlp)
   ) {
     return HLP_ADD_REMOVE_WEIGHT;
   }
   return 0;
 };
 
-const hlpAddRemoveQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote> => {
-  const { network, fromToken, toToken, hlpMethods, fromAmount } = input;
+const hlpAddRemoveQuoteHandler = async (input: ConvertQuoteRouteArgs): Promise<Quote> => {
+  const { network, fromToken, toToken, hlpMethods, sellAmount: fromAmount } = input;
   const hlpManagerAddress = HLP_CONTRACTS[network]?.HlpManager;
+  const tokenManager = new HandleTokenManager();
 
   if (!hlpManagerAddress) throw new Error(`Network ${network} does not have a HlpManager contract`);
   if (!hlpMethods) throw new Error("hlpMethods is required for a hlpToken quote");
 
   // Parse ETH address into WETH address.
-  const { address: parsedFromTokenAddress } = tryParseNativeHlpToken(fromToken, network);
-  const { address: parsedToTokenAddress } = tryParseNativeHlpToken(toToken, network);
-  const isBuyingHlp = toToken.symbol === "hLP";
-  const hLPPrice = hlpMethods.getHlpPrice(isBuyingHlp);
+  const { hlpAddress: parsedFromTokenAddress } = tokenManager.checkForHlpNativeToken(fromToken);
+  const { hlpAddress: parsedToTokenAddress } = tokenManager.checkForHlpNativeToken(toToken);
+  const isBuyingHlp = toToken.extensions?.isLiquidityToken;
+  const hLPPrice = hlpMethods.getHlpPrice(!!isBuyingHlp);
 
   // If buying hlp, then usdHlp delta is the price of the swap token (mul by the amount)
   let usdHlpDelta = hlpMethods
@@ -48,7 +56,7 @@ const hlpAddRemoveQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote
   const feeBasisPoints = getHlpFeeBasisPoints({
     token: isBuyingHlp ? parsedFromTokenAddress : parsedToTokenAddress,
     usdHlpDelta,
-    isBuy: isBuyingHlp,
+    isBuy: !!isBuyingHlp,
     totalTokenWeights: hlpMethods.getTotalTokenWeights(),
     targetUsdHlpAmount: hlpMethods.getTargetUsdHlpAmount(
       isBuyingHlp ? parsedFromTokenAddress : parsedToTokenAddress
@@ -87,14 +95,14 @@ const hlpAddRemoveQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote
 };
 
 const hlpAddRemoveTransactionHandler = async (
-  input: ConvertTransactionInput
+  input: ConvertTransactionRouteArgs
 ): Promise<ethers.PopulatedTransaction> => {
   const {
     network,
     signer,
     fromToken,
     toToken,
-    connectedAccount,
+    receivingAccount: connectedAccount,
     sellAmount,
     buyAmount,
     slippage,
@@ -102,6 +110,7 @@ const hlpAddRemoveTransactionHandler = async (
   } = input;
 
   if (!hlpInfo) throw new Error("hlpInfo is required for a hlpToken transaction");
+  const tokenManager = new HandleTokenManager();
 
   const buyAmountWithTolerance = BigNumber.from(buyAmount)
     .mul(BASIS_POINTS_DIVISOR - slippage * 100)
@@ -117,18 +126,18 @@ const hlpAddRemoveTransactionHandler = async (
     signer
   );
 
-  const { address: fromAddress } = tryParseNativeHlpToken(fromToken, network);
-  const { address: toAddress } = tryParseNativeHlpToken(toToken, network);
+  const { hlpAddress: fromAddress } = tokenManager.checkForHlpNativeToken(fromToken);
+  const { hlpAddress: toAddress } = tokenManager.checkForHlpNativeToken(toToken);
 
   // If selling Hlp and toToken is native
-  if (fromToken.symbol === "hLP" && toToken.isNative) {
+  if (fromToken.extensions?.isLiquidityToken && toToken.extensions?.isNative) {
     return hlpManagerRouter.populateTransaction.removeLiquidityETH(
       BigNumber.from(sellAmount),
       buyAmountWithTolerance,
       connectedAccount
     );
   }
-  if (fromToken.symbol === "hLP" && !toToken.isNative) {
+  if (fromToken.extensions?.isLiquidityToken && !toToken.extensions?.isNative) {
     // If selling Hlp and toToken is not native
     return hlpManager.populateTransaction.removeLiquidity(
       toAddress,
@@ -145,7 +154,7 @@ const hlpAddRemoveTransactionHandler = async (
     .div(ethers.utils.parseUnits("1", PRICE_DECIMALS - 18))
     .div(BASIS_POINTS_DIVISOR);
 
-  if (fromToken.isNative) {
+  if (fromToken.extensions?.isNative) {
     return hlpManagerRouter.populateTransaction.addLiquidityETH(
       minPriceInUsdHlp,
       buyAmountWithTolerance,

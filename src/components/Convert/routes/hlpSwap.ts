@@ -1,33 +1,36 @@
 import { BigNumber, ethers } from "ethers";
-import { config, HlpConfig, HlpUtils } from "../../..";
+import { config, HandleTokenManager, HlpConfig } from "../../..";
 import { Router__factory } from "../../../contracts";
-import { tryParseNativeHlpToken } from "../../../utils/hlp";
 import { getSwapFeeBasisPoints } from "../../Trade";
-import { ConvertQuoteInput, ConvertTransactionInput, Quote } from "../Convert";
+import { ConvertQuoteRouteArgs, ConvertTransactionRouteArgs, Quote } from "../Convert";
 import { HLP_SWAP_WEIGHT, WeightInput } from "./weights";
 
 const hlpSwapWeight = async (input: WeightInput): Promise<number> => {
   const routerAddress = HlpConfig.HLP_CONTRACTS[input.network]?.Router;
-  if (
-    routerAddress &&
-    HlpUtils.isHlpSupportedToken(input.toToken.symbol, input.network) &&
-    HlpUtils.isHlpSupportedToken(input.fromToken.symbol, input.network)
-  ) {
+  const tokenManager = new HandleTokenManager();
+  const isToTokenValid =
+    tokenManager.isHlpTokenBySymbol(input.toToken.symbol, input.network) ||
+    input.toToken.extensions?.isNative;
+  const isFromTokenValid =
+    tokenManager.isHlpTokenBySymbol(input.fromToken.symbol, input.network) ||
+    input.fromToken.extensions?.isNative;
+  if (routerAddress && isToTokenValid && isFromTokenValid) {
     return HLP_SWAP_WEIGHT;
   }
   return 0;
 };
 
-const hlpSwapQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote> => {
-  const { network, fromToken, toToken, hlpMethods, fromAmount } = input;
+const hlpSwapQuoteHandler = async (input: ConvertQuoteRouteArgs): Promise<Quote> => {
+  const { network, fromToken, toToken, hlpMethods, sellAmount: fromAmount } = input;
   const routerAddress = HlpConfig.HLP_CONTRACTS[network]?.Router;
 
   if (!routerAddress) throw new Error(`Network ${network} does not have a Router contract`);
   if (!hlpMethods) throw new Error("hlpMethods is required for a hlpSwap quote");
+  const tokenManager = new HandleTokenManager();
 
   // Parse ETH address into WETH address.
-  const { address: parsedFromTokenAddress } = tryParseNativeHlpToken(fromToken, network);
-  const { address: parsedToTokenAddress } = tryParseNativeHlpToken(toToken, network);
+  const { hlpAddress: parsedFromTokenAddress } = tokenManager.checkForHlpNativeToken(fromToken);
+  const { hlpAddress: parsedToTokenAddress } = tokenManager.checkForHlpNativeToken(toToken);
 
   const priceIn = hlpMethods.getMinPrice(parsedFromTokenAddress);
   const priceOut = hlpMethods.getMaxPrice(parsedToTokenAddress);
@@ -58,19 +61,27 @@ const hlpSwapQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote> => 
 };
 
 const hlpSwapTransactionHandler = async (
-  input: ConvertTransactionInput
+  input: ConvertTransactionRouteArgs
 ): Promise<ethers.PopulatedTransaction> => {
-  const { network, connectedAccount, signer, fromToken, toToken, buyAmount, slippage, sellAmount } =
-    input;
+  const {
+    network,
+    receivingAccount: connectedAccount,
+    signer,
+    fromToken,
+    toToken,
+    buyAmount,
+    slippage,
+    sellAmount
+  } = input;
   const router = Router__factory.connect(
     HlpConfig.HLP_CONTRACTS[network]?.Router ?? ethers.constants.AddressZero,
     signer
   );
-  const { address: fromAddress, isNative: isFromNative } = tryParseNativeHlpToken(
-    fromToken,
-    network
-  );
-  const { address: toAddress, isNative: isToNative } = tryParseNativeHlpToken(toToken, network);
+  const tokenManager = new HandleTokenManager();
+  const { hlpAddress: fromAddress, isNative: isFromNative } =
+    tokenManager.checkForHlpNativeToken(fromToken);
+  const { hlpAddress: toAddress, isNative: isToNative } =
+    tokenManager.checkForHlpNativeToken(toToken);
 
   const buyAmountWithTolerance = BigNumber.from(buyAmount)
     .mul(HlpConfig.BASIS_POINTS_DIVISOR - slippage * 100)

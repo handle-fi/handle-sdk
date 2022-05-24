@@ -2,7 +2,7 @@ import axios from "axios";
 import { BigNumber, ethers } from "ethers";
 import { config, Network, NETWORK_NAME_TO_CHAIN_ID } from "../../..";
 import { BASIS_POINTS_DIVISOR } from "../../../config/hlp";
-import { ConvertQuoteInput, ConvertTransactionInput, Quote } from "../Convert";
+import { ConvertQuoteRouteArgs, ConvertTransactionRouteArgs, Quote } from "../Convert";
 import { getApiFeeAsPercentage } from "../getApiFeeAsPercentage";
 import { ONE_INCH_WEIGHT, WeightInput } from "./weights";
 
@@ -32,15 +32,15 @@ const oneInchWeight = async (input: WeightInput) => {
   return 0;
 };
 
-const oneInchQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote> => {
+const oneInchQuoteHandler = async (input: ConvertQuoteRouteArgs): Promise<Quote> => {
   const {
     network,
     fromToken: { address: sellToken },
     toToken: { address: buyToken },
-    fromAmount,
+    sellAmount: fromAmount,
     gasPrice
   } = input;
-  const feePercentage = await getApiFeeAsPercentage(network, sellToken, buyToken);
+  const feePercentage = await getApiFeeAsPercentage(sellToken, buyToken);
 
   const params: OneInchQuoteParams = {
     fromTokenAddress: sellToken,
@@ -69,7 +69,7 @@ const oneInchQuoteHandler = async (input: ConvertQuoteInput): Promise<Quote> => 
 };
 
 const oneInchTransactionHandler = async (
-  input: ConvertTransactionInput
+  input: ConvertTransactionRouteArgs
 ): Promise<ethers.PopulatedTransaction> => {
   const {
     network,
@@ -78,9 +78,9 @@ const oneInchTransactionHandler = async (
     gasPrice,
     sellAmount,
     slippage,
-    connectedAccount
+    receivingAccount: connectedAccount
   } = input;
-  const feePercentage = await getApiFeeAsPercentage(network, sellToken, buyToken);
+  const feePercentage = await getApiFeeAsPercentage(sellToken, buyToken);
 
   const params: OneInchSwapParams = {
     fromTokenAddress: sellToken,
@@ -90,7 +90,7 @@ const oneInchTransactionHandler = async (
     slippage: slippage.toString(),
     referrerAddress: config.convert.feeAddress,
     fee: feePercentage.toString(),
-    gasPrice: gasPrice.toString()
+    gasPrice: gasPrice?.toString()
   };
 
   const { data } = await axios.get(`${get1InchBaseUrl(network)}/swap`, {

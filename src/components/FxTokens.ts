@@ -1,16 +1,15 @@
 import { ethers } from "ethers";
 import { FxTokenAddresses, ProtocolAddresses } from "../config";
 import { ERC20__factory } from "../contracts";
-import { FxToken, FxTokenSymbol } from "../types/fxTokens";
+import { FxToken } from "../types/fxTokens";
 import { callMulticallObjects, createMulticallProtocolContracts } from "../utils/contract-utils";
-import { getTokensFromAddresses } from "../utils/fxToken-utils";
 import sdkConfig from "../config";
 import { Promisified } from "../types/general";
-import { Token } from "../types/tokens";
 import Graph, { IndexedFxToken } from "./Graph";
-import { SingleCollateralVaultNetwork } from "..";
+import { HandleTokenManager, SingleCollateralVaultNetwork } from "..";
 import { BENTOBOX_ADDRESS } from "@sushiswap/core-sdk";
 import { NETWORK_NAME_TO_CHAIN_ID } from "../constants";
+import { getFxTokensFromAddresses } from "../utils/fxToken-utils";
 
 export type FxTokensConfig = {
   protocolAddresses: ProtocolAddresses;
@@ -19,12 +18,12 @@ export type FxTokensConfig = {
   graphEndpoint: string;
 };
 
-type FxTokenMulticallMulticall = {
+type FxTokenMulticall = {
   price: ethers.BigNumber;
 };
 
 export default class FxTokens {
-  public tokens: Token<FxTokenSymbol>[];
+  public tokens: Omit<FxToken, "price">[];
   private config: FxTokensConfig;
   private graph: Graph;
 
@@ -36,10 +35,10 @@ export default class FxTokens {
       graphEndpoint: sdkConfig.theGraphEndpoints.arbitrum
     };
 
-    this.tokens = getTokensFromAddresses(this.config.fxTokenAddresses).map((t) => ({
-      ...t,
-      decimals: 18
-    }));
+    this.tokens = getFxTokensFromAddresses(Object.values(this.config.fxTokenAddresses)) as Omit<
+      FxToken,
+      "price"
+    >[];
     this.graph = new Graph(this.config.graphEndpoint);
   }
 
@@ -52,7 +51,7 @@ export default class FxTokens {
 
     const multicalls = this.tokens.map((a) => this.getFxTokenMulticall(a.symbol, signer));
     const raw = await callMulticallObjects(multicalls, provider);
-    return raw.map((t, index) => this.onChainToFxToken(this.tokens[index], t));
+    return raw.map((t, index) => this.includeTokenPrice(this.tokens[index], t.price));
   };
 
   public getIndexedFxTokens = async (): Promise<FxToken[]> => {
@@ -64,13 +63,13 @@ export default class FxTokens {
       );
   };
 
-  public getRepayAllowance = (fxToken: FxTokenSymbol, account: string, signer: ethers.Signer) => {
+  public getRepayAllowance = (fxToken: string, account: string, signer: ethers.Signer) => {
     const contract = this.getFxTokenContract(fxToken, signer);
     return contract.allowance(account, this.config.protocolAddresses.comptroller);
   };
 
   public getSingleCollateralRepayAllowance = (
-    fxToken: FxTokenSymbol,
+    fxToken: string,
     account: string,
     network: SingleCollateralVaultNetwork,
     signer: ethers.Signer
@@ -81,7 +80,7 @@ export default class FxTokens {
   };
 
   public setRepayAllowance = (
-    fxTokenSymbol: FxTokenSymbol,
+    fxTokenSymbol: string,
     amount: ethers.BigNumber,
     signer: ethers.Signer,
     options: ethers.Overrides = {}
@@ -91,7 +90,7 @@ export default class FxTokens {
   };
 
   public setSingleCollateralRepayAllowance = (
-    fxTokenSymbol: FxTokenSymbol,
+    fxTokenSymbol: string,
     amount: ethers.BigNumber,
     network: SingleCollateralVaultNetwork,
     signer: ethers.Signer,
@@ -103,9 +102,9 @@ export default class FxTokens {
   };
 
   private getFxTokenMulticall = (
-    fxTokenSymbol: FxTokenSymbol,
+    fxTokenSymbol: string,
     signer: ethers.Signer
-  ): Promisified<FxTokenMulticallMulticall> => {
+  ): Promisified<FxTokenMulticall> => {
     const tokenAddress = this.config.fxTokenAddresses[fxTokenSymbol];
     if (!tokenAddress) {
       throw new Error(`fxTokens not initialised with token that matches: ${fxTokenSymbol}`);
@@ -122,30 +121,25 @@ export default class FxTokens {
     };
   };
 
-  private onChainToFxToken = (
-    token: Token<FxTokenSymbol>,
-    fxToken: FxTokenMulticallMulticall
-  ): FxToken => {
-    const { price } = fxToken;
-
+  private includeTokenPrice = (token: Omit<FxToken, "price">, price: ethers.BigNumber): FxToken => {
     return {
-      symbol: token.symbol,
-      address: token.address,
-      decimals: token.decimals,
+      ...token,
       price
     };
   };
 
   private indexedToFxToken = (fxToken: IndexedFxToken): FxToken => {
+    // note that address does not matter in this case, as all fx tokens have the same addresses across chains
+    const fullFxToken = new HandleTokenManager([]).getTokenByAddress(fxToken.address, 1);
+    if (!fullFxToken) throw new Error("Could not find fxToken to match indexed fxToken");
     return {
-      symbol: fxToken.symbol,
-      address: fxToken.address,
-      decimals: fxToken.decimals,
+      ...fullFxToken,
+      ...fxToken,
       price: fxToken.rate
     };
   };
 
-  private getFxTokenContract = (fxTokenSymbol: FxTokenSymbol, signer: ethers.Signer) => {
+  private getFxTokenContract = (fxTokenSymbol: string, signer: ethers.Signer) => {
     const tokenAddress = this.config.fxTokenAddresses[fxTokenSymbol];
     if (!tokenAddress) {
       throw new Error(`fxTokens not initialised with token that matches: ${fxTokenSymbol}`);

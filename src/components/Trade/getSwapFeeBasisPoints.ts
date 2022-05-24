@@ -1,5 +1,4 @@
 import { BigNumber } from "ethers";
-import { HLP_TOKENS } from "../../config/hlp";
 import {
   STABLE_SWAP_FEE_BASIS_POINTS,
   STABLE_TAX_BASIS_POINTS,
@@ -9,6 +8,7 @@ import {
 import { VaultTokenInfo } from "./types";
 import { getFeeBasisPoints } from "./getFeeBasisPoints";
 import { Network } from "../../types/network";
+import HandleTokenManager from "../TokenManager/HandleTokenManager";
 
 export const getSwapFeeBasisPoints = (
   args: {
@@ -22,9 +22,10 @@ export const getSwapFeeBasisPoints = (
   },
   network: Network = "arbitrum"
 ) => {
+  const tokenManager = new HandleTokenManager([]);
   const isStableSwap =
-    HLP_TOKENS[network].some((token) => token.address === args.tokenIn && token.isStable) &&
-    HLP_TOKENS[network].some((token) => token.address === args.tokenOut && token.isStable);
+    tokenManager.isHlpStableTokenByAddress(args.tokenIn, network) &&
+    tokenManager.isHlpStableTokenByAddress(args.tokenOut, network);
   const swapBasisPoints = isStableSwap ? STABLE_SWAP_FEE_BASIS_POINTS : SWAP_FEE_BASIS_POINTS;
   const taxBasisPoints = isStableSwap ? STABLE_TAX_BASIS_POINTS : TAX_BASIS_POINTS;
 
