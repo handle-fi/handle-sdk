@@ -191,18 +191,6 @@ export default class RewardPool {
       const multicall: Promisified<RewardPoolIdsMulticallResponse> = {
         governanceLock: contracts.rewardPool.getPoolIdByAlias(
           ethers.utils.keccak256(ethers.utils.toUtf8Bytes("governancelock"))
-        ),
-        fxKeeperAUD: contracts.rewardPool.getPoolIdByAlias(
-          this.getKeeperPoolAlias(this.config.fxTokenAddresses["fxAUD"])
-        ),
-        fxKeeperEUR: contracts.rewardPool.getPoolIdByAlias(
-          this.getKeeperPoolAlias(this.config.fxTokenAddresses["fxEUR"])
-        ),
-        fxKeeperPHP: contracts.rewardPool.getPoolIdByAlias(
-          this.getKeeperPoolAlias(this.config.fxTokenAddresses["fxPHP"])
-        ),
-        fxKeeperUSD: contracts.rewardPool.getPoolIdByAlias(
-          this.getKeeperPoolAlias(this.config.fxTokenAddresses["fxUSD"])
         )
       };
 
