@@ -18,7 +18,7 @@ export type RewardsPoolConfig = {
   chainId: number;
 };
 
-type RewardsPoolDataMulticallResponse = {
+type RewardsPoolDataMulticall = {
   pools: {
     poolRatios: ethers.BigNumber[];
     accruedAmounts: ethers.BigNumber[];
@@ -28,7 +28,7 @@ type RewardsPoolDataMulticallResponse = {
   claimableRewards?: ethers.BigNumber;
 };
 
-type RewardsPoolsMulticallResponse = Record<
+type RewardsPoolsMulticall = Record<
   string,
   {
     weight: ethers.BigNumber;
@@ -91,16 +91,13 @@ export default class RewardPool {
     const rewardPoolIds = await this.getRewardPoolsId(signer);
     const poolNames = Object.keys(rewardPoolIds);
 
-    const multicall: Promisified<RewardsPoolsMulticallResponse> = poolNames.reduce(
-      (progress, poolName) => {
-        const poolId = rewardPoolIds[poolName];
-        return {
-          ...progress,
-          [poolName]: contracts.rewardPool.getPool(poolId)
-        };
-      },
-      {} as Promisified<RewardsPoolsMulticallResponse>
-    );
+    const multicall: Promisified<RewardsPoolsMulticall> = poolNames.reduce((progress, poolName) => {
+      const poolId = rewardPoolIds[poolName];
+      return {
+        ...progress,
+        [poolName]: contracts.rewardPool.getPool(poolId)
+      };
+    }, {} as Promisified<RewardsPoolsMulticall>);
 
     const multicallResponse = await callMulticallObject(multicall, provider);
 
@@ -128,7 +125,7 @@ export default class RewardPool {
   private getDataMulticall = (
     account: string | undefined,
     signer: ethers.Signer
-  ): Promisified<RewardsPoolDataMulticallResponse> => {
+  ): Promisified<RewardsPoolDataMulticall> => {
     const { contracts } = createMulticallProtocolContracts(
       this.config.protocolAddresses,
       this.config.chainId,
@@ -151,7 +148,7 @@ export default class RewardPool {
   };
 
   private toRewardPoolData = (
-    multicallResponse: RewardsPoolDataMulticallResponse,
+    multicallResponse: RewardsPoolDataMulticall,
     poolIds: Record<string, number>
   ): RewardPoolData => {
     const poolNames = Object.keys(poolIds);
