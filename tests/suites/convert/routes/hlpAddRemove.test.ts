@@ -27,6 +27,7 @@ describe("hLPAddRemove", () => {
       });
       expect(quote.sellAmount).to.eq(ethers.utils.parseEther("1").toString());
       expect(quote.buyAmount).to.eq(ethers.utils.parseEther("5").toString());
+      expect(!!quote.feeChargedBeforeConvert).to.be.false;
     });
     it("should correctly calculate from hlp to eth ", async () => {
       const hlpTokenMethods = {
@@ -47,6 +48,7 @@ describe("hLPAddRemove", () => {
       });
       expect(quote.sellAmount).to.eq(ethers.utils.parseEther("1").toString());
       expect(quote.buyAmount).to.eq(ethers.utils.parseEther("5").toString());
+      expect(!!quote.feeChargedBeforeConvert).to.be.false;
     });
     it("should correctly calculate a token to hlp", async () => {
       const hlpTokenMethods = {
@@ -67,6 +69,7 @@ describe("hLPAddRemove", () => {
       });
       expect(quote.sellAmount).to.eq(ethers.utils.parseEther("5").toString());
       expect(quote.buyAmount).to.eq(ethers.utils.parseEther("1").toString());
+      expect(!!quote.feeChargedBeforeConvert).to.be.false;
     });
     it("should correctly calculate eth to hlp", async () => {
       const hlpTokenMethods = {
@@ -87,6 +90,7 @@ describe("hLPAddRemove", () => {
       });
       expect(quote.sellAmount).to.eq(ethers.utils.parseEther("5").toString());
       expect(quote.buyAmount).to.eq(ethers.utils.parseEther("1").toString());
+      expect(!!quote.feeChargedBeforeConvert).to.be.false;
     });
   });
   describe("swap", () => {

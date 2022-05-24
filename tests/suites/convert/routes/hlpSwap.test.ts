@@ -34,6 +34,7 @@ describe("hlpSwap", () => {
       });
       expect(quote.sellAmount).to.eq(ethers.utils.parseEther("5").toString());
       expect(quote.buyAmount).to.eq(ethers.utils.parseEther("10").toString());
+      expect(!!quote.feeChargedBeforeConvert).to.be.false;
     });
     it("should return a quote for a token and eth", async () => {
       const getPrice = (address: string) => {
@@ -60,6 +61,7 @@ describe("hlpSwap", () => {
       });
       expect(quote.sellAmount).to.eq(ethers.utils.parseEther("5").toString());
       expect(quote.buyAmount).to.eq(ethers.utils.parseEther("10").toString());
+      expect(!!quote.feeChargedBeforeConvert).to.be.false;
     });
   });
   describe("swap", () => {

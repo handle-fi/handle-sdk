@@ -22,6 +22,7 @@ describe("zeroX route", () => {
         });
         expect(quote).to.have.property("buyAmount");
         expect(quote).to.have.property("sellAmount");
+        expect(!!quote.feeChargedBeforeConvert).to.be.false;
       });
     });
   });
