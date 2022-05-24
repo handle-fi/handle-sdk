@@ -22,6 +22,7 @@ export type Quote = {
   gas: number;
   allowanceTarget: string | null;
   feeBasisPoints: number;
+  feeChargedBeforeConvert?: boolean;
 };
 
 export type ConvertTransactionInput = {
