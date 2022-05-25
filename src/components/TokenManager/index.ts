@@ -37,7 +37,6 @@ class TokenManager {
   /** Caches fetched results indefinetely */
   protected cache: TokenListCache;
   protected customTokens: TokenInfo[];
-  private seenTokens: Record<string, boolean> = {};
 
   public initialLoad: Promise<TokenList[]>;
 
@@ -55,38 +54,6 @@ class TokenManager {
     if (includeHandleTokens) this.setTokenList("handle-tokens", HandleTokenList);
     if (includeNativeTokens) this.setTokenList("native-tokens", NativeTokenList);
     this.initialLoad = Promise.all(tokenListUrls.map((url) => this.fetchTokenList(url)));
-  }
-
-  /**
-   * Gets the key of a token in the seenTokens object
-   * @param token the token to add
-   * @returns the key of the token in the seen tokens object
-   */
-  protected getSeenTokenKey(token: TokenInfo) {
-    return `${token.address.toLowerCase()}-${token.chainId}`;
-  }
-
-  /**
-   * Sets a number of tokens as either seen or unseen
-   * @param tokens the tokens to set in the seen tokens object
-   * @param value the value to set them
-   */
-  protected setSeenTokens(tokens: TokenInfo[], value: boolean) {
-    tokens.forEach((token) => {
-      this.seenTokens[this.getSeenTokenKey(token)] = value;
-    });
-  }
-
-  /**
-   * Searches a list of tokens and returns tokens that have not been seen before.
-   * Sets the all the tokens in the list to seen
-   * @param tokens tokens to search
-   * @returns the unseen tokens
-   */
-  protected getUnseenTokens(tokens: TokenInfo[]): TokenInfo[] {
-    const unseenTokens = tokens.filter((token) => !this.seenTokens[this.getSeenTokenKey(token)]);
-    this.setSeenTokens(tokens, true);
-    return unseenTokens;
   }
 
   /**
@@ -112,10 +79,27 @@ class TokenManager {
    */
   public getLoadedTokens(network?: Network | number): TokenInfo[] {
     const allTokens = [...this.customTokens, ...this.getTokensFromLists(Object.values(this.cache))];
+
+    // removes duplicates
+    const tokenKey = (token: TokenInfo) => `${token.address.toLowerCase()}-${token.chainId}`;
+    const seen: Record<string, boolean> = {};
+    const noDuplicates: TokenInfo[] = [];
+
+    allTokens.forEach((token) => {
+      seen[tokenKey(token)] = true;
+    });
+
+    allTokens.forEach((token) => {
+      if (seen[tokenKey(token)]) {
+        noDuplicates.push(token);
+        seen[tokenKey(token)] = false;
+      }
+    });
+
     if (network === undefined) {
-      return allTokens;
+      return noDuplicates;
     }
-    return allTokens.filter((token) => isSameNetwork(token.chainId, network));
+    return noDuplicates.filter((token) => isSameNetwork(token.chainId, network));
   }
 
   /**
@@ -217,11 +201,7 @@ class TokenManager {
 
     const { data } = await axios.get(url);
     const tokenList = validateTokenList(data);
-    const unseenTokenList = {
-      ...tokenList,
-      tokens: this.getUnseenTokens(tokenList.tokens)
-    };
-    this.cache[url] = unseenTokenList;
+    this.cache[url] = tokenList;
     this.onTokensChange();
     return tokenList;
   }
@@ -240,7 +220,7 @@ class TokenManager {
    * @param tokens tokens to add
    */
   public addCustomTokens(tokens: TokenInfo[]) {
-    this.customTokens.push(...this.getUnseenTokens(tokens));
+    this.customTokens.push(...tokens);
     this.onTokensChange();
   }
 
@@ -248,7 +228,6 @@ class TokenManager {
    * Clears all custom tokens
    */
   public clearCustomTokens = () => {
-    this.setSeenTokens(this.customTokens, false);
     this.customTokens = [];
     this.onTokensChange();
   };
@@ -258,7 +237,7 @@ class TokenManager {
    * @param tokens tokens to set
    */
   public setCustomTokens = (tokens: TokenInfo[]) => {
-    this.customTokens = this.getUnseenTokens(tokens);
+    this.customTokens = tokens;
     this.onTokensChange();
   };
 
@@ -286,7 +265,6 @@ class TokenManager {
    */
   public setTokenList(key: string, tokenList: TokenList) {
     validateTokenList(tokenList);
-    this.setSeenTokens(tokenList.tokens, true);
     this.cache[key] = tokenList;
     this.onTokensChange();
   }
@@ -296,7 +274,6 @@ class TokenManager {
    * @param key the key in the cache to delete
    */
   public deleteTokenList(key: string) {
-    this.setSeenTokens(this.cache[key]?.tokens, false);
     delete this.cache[key];
     this.onTokensChange();
   }
@@ -306,8 +283,6 @@ class TokenManager {
    */
   public clearCache() {
     this.cache = {};
-    this.seenTokens = {};
-    this.setSeenTokens(this.customTokens, true);
     this.onTokensChange();
   }
 
