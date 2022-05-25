@@ -38,7 +38,7 @@ describe("psm", () => {
       expect(quote.sellAmount).to.eq(ethers.utils.parseEther("5").toString());
       expect(quote.buyAmount).to.eq(ethers.utils.parseUnits("5", usdt.decimals).toString());
       expect(quote.allowanceTarget).to.eq(null); // no allowance needed on withdraw
-      expect(!!quote.feeChargedBeforeConvert).to.be.false;
+      expect(quote.feeChargedBeforeConvert).to.be.false;
     });
     it("should return a quote from pegged tokens", async () => {
       // fxUSD is assumed to be pegged to USDT
@@ -54,7 +54,7 @@ describe("psm", () => {
       expect(quote.sellAmount).to.eq(ethers.utils.parseUnits("5", usdt.decimals).toString());
       expect(quote.buyAmount).to.eq(ethers.utils.parseEther("5").toString());
       expect(quote.allowanceTarget).to.eq(config.protocol.arbitrum?.protocol.hPsm);
-      expect(!!quote.feeChargedBeforeConvert).to.be.false;
+      expect(quote.feeChargedBeforeConvert).to.be.false;
     });
   });
   describe("swap", () => {
