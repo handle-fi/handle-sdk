@@ -83,7 +83,7 @@ class TokenManager {
 
     if (removeDuplicates) {
       // removes duplicates
-      const tokenKey = (token: TokenInfo) => `${token.address.toLowerCase()}-${token.chainId}`;
+      const tokenKey = (token: TokenInfo) => `${token.symbol}-${token.chainId}`;
       const seen: Record<string, boolean> = {};
       const noDuplicates: TokenInfo[] = [];
 
