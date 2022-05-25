@@ -73,7 +73,8 @@ const hlpAddRemoveQuoteHandler = async (input: ConvertQuoteRouteArgs): Promise<Q
       sellAmount: fromAmount.toString(),
       buyAmount: hlpAmount.toString(),
       gas: config.convert.gasEstimates.hlp,
-      feeBasisPoints: feeBasisPoints.toNumber()
+      feeBasisPoints: feeBasisPoints.toNumber(),
+      feeChargedBeforeConvert: false
     };
   }
   // The buy amount is the usdHlp delta divided by the price of the token (adjusted for decimals)
@@ -90,7 +91,8 @@ const hlpAddRemoveQuoteHandler = async (input: ConvertQuoteRouteArgs): Promise<Q
     sellAmount: fromAmount.toString(),
     buyAmount: buyAmount.toString(),
     gas: config.convert.gasEstimates.hlp,
-    feeBasisPoints: feeBasisPoints.toNumber()
+    feeBasisPoints: feeBasisPoints.toNumber(),
+    feeChargedBeforeConvert: false
   };
 };
 

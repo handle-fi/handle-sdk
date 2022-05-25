@@ -48,6 +48,7 @@ export type Quote = {
   gas: number;
   allowanceTarget: string | null;
   feeBasisPoints: number;
+  feeChargedBeforeConvert: boolean;
 };
 
 export default class Convert {

@@ -63,7 +63,8 @@ const oneInchQuoteHandler = async (input: ConvertQuoteRouteArgs): Promise<Quote>
     sellAmount: data.fromTokenAmount,
     gas: Number(data.estimatedGas),
     allowanceTarget,
-    feeBasisPoints: BASIS_POINTS_DIVISOR * (feePercentage / 100)
+    feeBasisPoints: BASIS_POINTS_DIVISOR * (feePercentage / 100),
+    feeChargedBeforeConvert: true
   };
 };
 

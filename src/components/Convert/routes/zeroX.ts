@@ -63,7 +63,8 @@ const zeroXQuoteHandler = async (input: ConvertQuoteRouteArgs): Promise<Quote> =
     sellAmount: data.sellAmount,
     gas: Number(data.gas),
     allowanceTarget: data.allowanceTarget,
-    feeBasisPoints: BASIS_POINTS_DIVISOR * (feePercentage / 100)
+    feeBasisPoints: BASIS_POINTS_DIVISOR * (feePercentage / 100),
+    feeChargedBeforeConvert: false
   };
 };
 

@@ -24,7 +24,8 @@ const wethQuoteHandler = async (input: ConvertQuoteRouteArgs): Promise<Quote> =>
     buyAmount: input.sellAmount.toString(), // WETH swap is always 1 to 1
     sellAmount: input.sellAmount.toString(),
     gas: config.convert.gasEstimates.weth,
-    feeBasisPoints: 0
+    feeBasisPoints: 0,
+    feeChargedBeforeConvert: false
   };
 };
 

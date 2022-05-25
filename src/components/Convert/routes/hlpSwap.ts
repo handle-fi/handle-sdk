@@ -56,7 +56,8 @@ const hlpSwapQuoteHandler = async (input: ConvertQuoteRouteArgs): Promise<Quote>
     buyAmount: amountOut.toString(),
     sellAmount: fromAmount.toString(),
     gas: config.convert.gasEstimates.hlp,
-    feeBasisPoints: feeBasisPoints.toNumber()
+    feeBasisPoints: feeBasisPoints.toNumber(),
+    feeChargedBeforeConvert: false
   };
 };
 
