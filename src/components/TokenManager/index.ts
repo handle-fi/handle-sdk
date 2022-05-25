@@ -77,29 +77,34 @@ class TokenManager {
   /**
    * @returns all tokens from all cached token lists
    */
-  public getLoadedTokens(network?: Network | number): TokenInfo[] {
+  public getLoadedTokens(network?: Network | number, removeDuplicates = false): TokenInfo[] {
     const allTokens = [...this.customTokens, ...this.getTokensFromLists(Object.values(this.cache))];
+    let returnTokens = allTokens;
 
-    // removes duplicates
-    const tokenKey = (token: TokenInfo) => `${token.address.toLowerCase()}-${token.chainId}`;
-    const seen: Record<string, boolean> = {};
-    const noDuplicates: TokenInfo[] = [];
+    if (removeDuplicates) {
+      // removes duplicates
+      const tokenKey = (token: TokenInfo) => `${token.address.toLowerCase()}-${token.chainId}`;
+      const seen: Record<string, boolean> = {};
+      const noDuplicates: TokenInfo[] = [];
 
-    allTokens.forEach((token) => {
-      seen[tokenKey(token)] = true;
-    });
+      allTokens.forEach((token) => {
+        seen[tokenKey(token)] = true;
+      });
 
-    allTokens.forEach((token) => {
-      if (seen[tokenKey(token)]) {
-        noDuplicates.push(token);
-        seen[tokenKey(token)] = false;
-      }
-    });
+      allTokens.forEach((token) => {
+        if (seen[tokenKey(token)]) {
+          noDuplicates.push(token);
+          seen[tokenKey(token)] = false;
+        }
+      });
+
+      returnTokens = noDuplicates;
+    }
 
     if (network === undefined) {
-      return noDuplicates;
+      return returnTokens;
     }
-    return noDuplicates.filter((token) => isSameNetwork(token.chainId, network));
+    return returnTokens.filter((token) => isSameNetwork(token.chainId, network));
   }
 
   /**

@@ -77,7 +77,7 @@ describe("TokenManager", () => {
 
     expect(tokensByAddresses.length).to.eq(2);
   });
-  it("Should not add duplciate tokens", async () => {
+  it("Should filter for duplicate tokens", async () => {
     const tokenManager = new TokenManager(
       ["https://bridge.arbitrum.io/token-list-42161.json"],
       false,
@@ -86,6 +86,6 @@ describe("TokenManager", () => {
     await tokenManager.initialLoad;
     const tokenCount = tokenManager.getLoadedTokens().length;
     await tokenManager.fetchTokenLists(["https://bridge.arbitrum.io/token-list-42161.json"]);
-    expect(tokenManager.getLoadedTokens().length).to.eq(tokenCount);
+    expect(tokenManager.getLoadedTokens(undefined, true).length).to.eq(tokenCount);
   });
 });
