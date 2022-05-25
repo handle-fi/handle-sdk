@@ -77,4 +77,15 @@ describe("TokenManager", () => {
 
     expect(tokensByAddresses.length).to.eq(2);
   });
+  it("Should not add duplciate tokens", async () => {
+    const tokenManager = new TokenManager(
+      ["https://bridge.arbitrum.io/token-list-42161.json"],
+      false,
+      false
+    );
+    await tokenManager.initialLoad;
+    const tokenCount = tokenManager.getLoadedTokens().length;
+    await tokenManager.fetchTokenLists(["https://bridge.arbitrum.io/token-list-42161.json"]);
+    expect(tokenManager.getLoadedTokens().length).to.eq(tokenCount);
+  });
 });

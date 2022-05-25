@@ -1,7 +1,7 @@
 import axios from "axios";
 import handleTokenList from "./handle-tokens.json";
 import nativeTokenList from "./native-tokens.json";
-import { TokenList as TokenListType, TokenInfo } from "@uniswap/token-lists";
+import { TokenList, TokenInfo } from "@uniswap/token-lists";
 import { Network } from "../../types/network";
 import { isSameNetwork, validateTokenList } from "../../utils/tokenlist-utils";
 
@@ -9,7 +9,7 @@ const HandleTokenList = validateTokenList(handleTokenList);
 const NativeTokenList = validateTokenList(nativeTokenList);
 
 type TokenListCache = {
-  [url: string]: TokenListType;
+  [url: string]: TokenList;
 };
 
 export const DEFAULT_TOKEN_LIST_URLS: string[] = [
@@ -37,8 +37,9 @@ class TokenManager {
   /** Caches fetched results indefinetely */
   protected cache: TokenListCache;
   protected customTokens: TokenInfo[];
+  private seenTokens: Record<string, boolean> = {};
 
-  public initialLoad: Promise<TokenListType[]>;
+  public initialLoad: Promise<TokenList[]>;
 
   /** Called whenever the cache, or custom tokens changes */
   public onTokensChange: () => void;
@@ -57,11 +58,43 @@ class TokenManager {
   }
 
   /**
+   * Gets the key of a token in the seenTokens object
+   * @param token the token to add
+   * @returns the key of the token in the seen tokens object
+   */
+  protected getSeenTokenKey(token: TokenInfo) {
+    return `${token.address.toLowerCase()}-${token.chainId}`;
+  }
+
+  /**
+   * Sets a number of tokens as either seen or unseen
+   * @param tokens the tokens to set in the seen tokens object
+   * @param value the value to set them
+   */
+  protected setSeenTokens(tokens: TokenInfo[], value: boolean) {
+    tokens.forEach((token) => {
+      this.seenTokens[this.getSeenTokenKey(token)] = value;
+    });
+  }
+
+  /**
+   * Searches a list of tokens and returns tokens that have not been seen before.
+   * Sets the all the tokens in the list to seen
+   * @param tokens tokens to search
+   * @returns the unseen tokens
+   */
+  protected getUnseenTokens(tokens: TokenInfo[]): TokenInfo[] {
+    const unseenTokens = tokens.filter((token) => !this.seenTokens[this.getSeenTokenKey(token)]);
+    this.setSeenTokens(tokens, true);
+    return unseenTokens;
+  }
+
+  /**
    * extracts tokens from the token token lists to a flat array of all the tokens
    * @param tokenLists token lists to get tokens from
    * @returns the tokens from all token lists
    */
-  protected getTokensFromLists(tokenLists: TokenListType[]): TokenInfo[] {
+  protected getTokensFromLists(tokenLists: TokenList[]): TokenInfo[] {
     return tokenLists.reduce<TokenInfo[]>((acc, tokenList) => acc.concat(tokenList.tokens), []);
   }
 
@@ -184,7 +217,11 @@ class TokenManager {
 
     const { data } = await axios.get(url);
     const tokenList = validateTokenList(data);
-    this.cache[url] = tokenList;
+    const unseenTokenList = {
+      ...tokenList,
+      tokens: this.getUnseenTokens(tokenList.tokens)
+    };
+    this.cache[url] = unseenTokenList;
     this.onTokensChange();
     return tokenList;
   }
@@ -203,7 +240,7 @@ class TokenManager {
    * @param tokens tokens to add
    */
   public addCustomTokens(tokens: TokenInfo[]) {
-    this.customTokens.push(...tokens);
+    this.customTokens.push(...this.getUnseenTokens(tokens));
     this.onTokensChange();
   }
 
@@ -211,6 +248,7 @@ class TokenManager {
    * Clears all custom tokens
    */
   public clearCustomTokens = () => {
+    this.setSeenTokens(this.customTokens, false);
     this.customTokens = [];
     this.onTokensChange();
   };
@@ -220,7 +258,7 @@ class TokenManager {
    * @param tokens tokens to set
    */
   public setCustomTokens = (tokens: TokenInfo[]) => {
-    this.customTokens = tokens;
+    this.customTokens = this.getUnseenTokens(tokens);
     this.onTokensChange();
   };
 
@@ -236,7 +274,7 @@ class TokenManager {
    * @param key the key of the token list in the cache
    * @returns the token list with the given key
    */
-  public getFromCache(key: string): TokenListType | undefined {
+  public getFromCache(key: string): TokenList | undefined {
     return this.cache[key];
   }
 
@@ -244,9 +282,11 @@ class TokenManager {
    * Sets a cache key to a token list
    * @param key the key in the cache for which to set the tokenList
    * @param tokenList the tokenList to set
+   * @note this method allows duplicates
    */
-  public setTokenList(key: string, tokenList: TokenListType) {
+  public setTokenList(key: string, tokenList: TokenList) {
     validateTokenList(tokenList);
+    this.setSeenTokens(tokenList.tokens, true);
     this.cache[key] = tokenList;
     this.onTokensChange();
   }
@@ -256,6 +296,7 @@ class TokenManager {
    * @param key the key in the cache to delete
    */
   public deleteTokenList(key: string) {
+    this.setSeenTokens(this.cache[key]?.tokens, false);
     delete this.cache[key];
     this.onTokensChange();
   }
@@ -265,6 +306,8 @@ class TokenManager {
    */
   public clearCache() {
     this.cache = {};
+    this.seenTokens = {};
+    this.setSeenTokens(this.customTokens, true);
     this.onTokensChange();
   }
 
