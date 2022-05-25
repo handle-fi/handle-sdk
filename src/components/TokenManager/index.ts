@@ -261,7 +261,6 @@ class TokenManager {
    * Sets a cache key to a token list
    * @param key the key in the cache for which to set the tokenList
    * @param tokenList the tokenList to set
-   * @note this method allows duplicates
    */
   public setTokenList(key: string, tokenList: TokenList) {
     validateTokenList(tokenList);
