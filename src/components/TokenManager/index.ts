@@ -79,7 +79,7 @@ class TokenManager {
    * @param tokens tokens from which to remove duplicates
    * @returns the tokens with duplicates removed
    */
-  public removeDuplicates(tokens: TokenInfo[]): TokenInfo[] {
+  protected static removeDuplicates(tokens: TokenInfo[]): TokenInfo[] {
     const tokenKey = (token: TokenInfo) => `${token.symbol}-${token.chainId}`;
     const seen: Record<string, boolean> = {};
     const noDuplicates: TokenInfo[] = [];
@@ -106,7 +106,7 @@ class TokenManager {
     let returnTokens = allTokens;
 
     if (removeDuplicates) {
-      returnTokens = this.removeDuplicates(allTokens);
+      returnTokens = TokenManager.removeDuplicates(allTokens);
     }
 
     if (network === undefined) {
