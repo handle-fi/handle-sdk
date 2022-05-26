@@ -75,30 +75,38 @@ class TokenManager {
   }
 
   /**
+   * Removes tokens that are duplicates of each other by comparing their symbol and chainId
+   * @param tokens tokens from which to remove duplicates
+   * @returns the tokens with duplicates removed
+   */
+  public removeDuplicates(tokens: TokenInfo[]): TokenInfo[] {
+    const tokenKey = (token: TokenInfo) => `${token.symbol}-${token.chainId}`;
+    const seen: Record<string, boolean> = {};
+    const noDuplicates: TokenInfo[] = [];
+
+    tokens.forEach((token) => {
+      seen[tokenKey(token)] = true;
+    });
+
+    tokens.forEach((token) => {
+      if (seen[tokenKey(token)]) {
+        noDuplicates.push(token);
+        seen[tokenKey(token)] = false;
+      }
+    });
+
+    return noDuplicates;
+  }
+
+  /**
    * @returns all tokens from all cached token lists
    */
-  public getLoadedTokens(network?: Network | number, removeDuplicates = false): TokenInfo[] {
+  public getLoadedTokens(network?: Network | number, removeDuplicates = true): TokenInfo[] {
     const allTokens = [...this.customTokens, ...this.getTokensFromLists(Object.values(this.cache))];
     let returnTokens = allTokens;
 
     if (removeDuplicates) {
-      // removes duplicates
-      const tokenKey = (token: TokenInfo) => `${token.symbol}-${token.chainId}`;
-      const seen: Record<string, boolean> = {};
-      const noDuplicates: TokenInfo[] = [];
-
-      allTokens.forEach((token) => {
-        seen[tokenKey(token)] = true;
-      });
-
-      allTokens.forEach((token) => {
-        if (seen[tokenKey(token)]) {
-          noDuplicates.push(token);
-          seen[tokenKey(token)] = false;
-        }
-      });
-
-      returnTokens = noDuplicates;
+      returnTokens = this.removeDuplicates(allTokens);
     }
 
     if (network === undefined) {
