@@ -1,7 +1,7 @@
 import axios from "axios";
 import handleTokenList from "./handle-tokens.json";
 import nativeTokenList from "./native-tokens.json";
-import { TokenList as TokenListType, TokenInfo } from "@uniswap/token-lists";
+import { TokenList, TokenInfo } from "@uniswap/token-lists";
 import { Network } from "../../types/network";
 import { isSameNetwork, validateTokenList } from "../../utils/tokenlist-utils";
 
@@ -9,7 +9,7 @@ const HandleTokenList = validateTokenList(handleTokenList);
 const NativeTokenList = validateTokenList(nativeTokenList);
 
 type TokenListCache = {
-  [url: string]: TokenListType;
+  [url: string]: TokenList;
 };
 
 export const DEFAULT_TOKEN_LIST_URLS: string[] = [
@@ -38,7 +38,7 @@ class TokenManager {
   protected cache: TokenListCache;
   protected customTokens: TokenInfo[];
 
-  public initialLoad: Promise<TokenListType[]>;
+  public initialLoad: Promise<TokenList[]>;
 
   /** Called whenever the cache, or custom tokens changes */
   public onTokensChange: () => void;
@@ -61,7 +61,7 @@ class TokenManager {
    * @param tokenLists token lists to get tokens from
    * @returns the tokens from all token lists
    */
-  protected getTokensFromLists(tokenLists: TokenListType[]): TokenInfo[] {
+  protected getTokensFromLists(tokenLists: TokenList[]): TokenInfo[] {
     return tokenLists.reduce<TokenInfo[]>((acc, tokenList) => acc.concat(tokenList.tokens), []);
   }
 
@@ -75,14 +75,44 @@ class TokenManager {
   }
 
   /**
+   * Removes tokens that are duplicates of each other by comparing their symbol and chainId
+   * @param tokens tokens from which to remove duplicates
+   * @returns the tokens with duplicates removed
+   */
+  protected static removeDuplicates(tokens: TokenInfo[]): TokenInfo[] {
+    const tokenKey = (token: TokenInfo) => `${token.symbol}-${token.chainId}`;
+    const seen: Record<string, boolean> = {};
+    const noDuplicates: TokenInfo[] = [];
+
+    tokens.forEach((token) => {
+      seen[tokenKey(token)] = true;
+    });
+
+    tokens.forEach((token) => {
+      if (seen[tokenKey(token)]) {
+        noDuplicates.push(token);
+        seen[tokenKey(token)] = false;
+      }
+    });
+
+    return noDuplicates;
+  }
+
+  /**
    * @returns all tokens from all cached token lists
    */
-  public getLoadedTokens(network?: Network | number): TokenInfo[] {
+  public getLoadedTokens(network?: Network | number, removeDuplicates = true): TokenInfo[] {
     const allTokens = [...this.customTokens, ...this.getTokensFromLists(Object.values(this.cache))];
-    if (network === undefined) {
-      return allTokens;
+    let returnTokens = allTokens;
+
+    if (removeDuplicates) {
+      returnTokens = TokenManager.removeDuplicates(allTokens);
     }
-    return allTokens.filter((token) => isSameNetwork(token.chainId, network));
+
+    if (network === undefined) {
+      return returnTokens;
+    }
+    return returnTokens.filter((token) => isSameNetwork(token.chainId, network));
   }
 
   /**
@@ -236,7 +266,7 @@ class TokenManager {
    * @param key the key of the token list in the cache
    * @returns the token list with the given key
    */
-  public getFromCache(key: string): TokenListType | undefined {
+  public getFromCache(key: string): TokenList | undefined {
     return this.cache[key];
   }
 
@@ -245,7 +275,7 @@ class TokenManager {
    * @param key the key in the cache for which to set the tokenList
    * @param tokenList the tokenList to set
    */
-  public setTokenList(key: string, tokenList: TokenListType) {
+  public setTokenList(key: string, tokenList: TokenList) {
     validateTokenList(tokenList);
     this.cache[key] = tokenList;
     this.onTokensChange();
