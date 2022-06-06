@@ -25,7 +25,7 @@ export const getPositionDelta = (
   let delta = size.mul(priceDelta).div(averagePrice);
   const pendingDelta = delta;
 
-  const minProfitExpired = lastIncreasedTime.add(MIN_PROFIT_TIME).lt(Date.now() / 1000);
+  const minProfitExpired = lastIncreasedTime.add(MIN_PROFIT_TIME).lt(Math.floor(Date.now() / 1000));
   const hasProfit = isLong ? indexPrice.gt(averagePrice) : indexPrice.lt(averagePrice);
   const isDeltaTooLow = delta.mul(BASIS_POINTS_DIVISOR).lte(size.mul(MIN_PROFIT_BASIS_POINTS));
   if (!minProfitExpired && hasProfit && isDeltaTooLow) {
