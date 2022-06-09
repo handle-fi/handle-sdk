@@ -17,12 +17,15 @@ export type HlpData = {
 };
 
 export type SignedQuote = {
-  quotePair: string;
+  /// The quote pair. eg: AUD/USD
+  pair: string;
   signatureParams: SignedQuoteParams;
   signature: BytesLike;
 };
 
 export type SignedQuoteParams = {
+  /// The value of the quote, with 8 decimals. eg: 100000000 for 1 AUD/USD
+  value: BigNumber;
   signedTimestamp: BigNumber;
   chainId: number;
   validFromTimestamp: BigNumber;
