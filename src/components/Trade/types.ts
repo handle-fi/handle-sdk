@@ -1,4 +1,4 @@
-import { BigNumber } from "ethers";
+import {BigNumber, BytesLike} from "ethers";
 
 export type HlpInfoMethods = {
   getMinPrice: (address: string) => BigNumber;
@@ -9,6 +9,24 @@ export type HlpInfoMethods = {
   getTargetUsdHlpAmount: (address: string) => BigNumber;
   getTotalTokenWeights: () => BigNumber;
   getHlpPrice: (isBuying: boolean) => BigNumber;
+};
+
+export type HlpData = {
+  infoMethods: HlpInfoMethods;
+  signedQuotes: SignedQuote[];
+};
+
+export type SignedQuote = {
+  quotePair: string;
+  signatureParams: SignedQuoteParams;
+  signature: BytesLike;
+};
+
+export type SignedQuoteParams = {
+  signedTimestamp: BigNumber;
+  chainId: number;
+  validFromTimestamp: BigNumber;
+  durationSeconds: BigNumber;
 };
 
 export type VaultTokenInfo = {
