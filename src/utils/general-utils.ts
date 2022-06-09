@@ -1,6 +1,7 @@
 import { BigNumber, ethers } from "ethers";
 import { CHAIN_ID_TO_NETWORK_NAME } from "../constants";
 import { Network } from "../types/network";
+import {Pair} from "../types/trade";
 
 export const getDeadline = (deadline?: number) => deadline ?? Math.floor(Date.now() / 1000) + 300;
 
@@ -39,3 +40,13 @@ export const getNetworkFromSignerOrProvider = async (
   const chainId = await signerOrProvider.getChainId();
   return CHAIN_ID_TO_NETWORK_NAME[chainId];
 };
+
+export const pair_from_string = (value: string): Pair => {
+  const split = value.split("/");
+  if (split.length !== 2)
+    throw new Error("Pair is not in the format of \"BASE/QUOTE\"");
+  return {
+    base: split[0],
+    quote: split[1]
+  };
+}
