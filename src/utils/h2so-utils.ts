@@ -33,8 +33,12 @@ export const fetchEncodedSignedQuotes = async (
 const fetchSignedQuotes = async (pairs: Pair[]) => {
   const responses: QuoteApiResponse[] = [];
   const requests = pairs.map(async pair => {
+    // The only base symbol that can be requested as fxToken is fxUSD.
+    const base = pair.base.startsWith("fx") && pair.base !== "fxUSD"
+      ? pair.base.substring(2)
+      : pair.base;
     const result = await axios
-      .get(`${DATA_FEED_API_BASE_URL}${pair.base}/${pair.quote}`);
+      .get(`${DATA_FEED_API_BASE_URL}${base}/${pair.quote}?sign=true`);
     responses.push(result.data);
   });
   await Promise.all(requests);
@@ -48,7 +52,9 @@ const quoteApiResponseToSignedQuote = (
 ): SignedQuote => {
   return {
     pair,
-    signature: ethers.utils.arrayify(signature),
+    signature: signature.startsWith("0x")
+      ? ethers.utils.arrayify(signature)
+      : ethers.utils.arrayify(`0x${signature}`),
     signatureParams: {
       value: BigNumber.from(result),
       signedTimestamp: BigNumber.from(signatureParams.signedTimestamp),
