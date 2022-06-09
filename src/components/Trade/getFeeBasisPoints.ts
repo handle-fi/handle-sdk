@@ -1,5 +1,5 @@
 import { BigNumber, ethers } from "ethers";
-import { VaultTokenInfo } from "./types";
+import { VaultTokenInfo } from "../../types/trade";
 
 type FeeBasisPointsArgs = {
   token: string;

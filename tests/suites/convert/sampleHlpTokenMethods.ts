@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import { HlpInfoMethods } from "../../../src/components/Trade/types";
+import { HlpInfoMethods } from "../../../src/types/trade";
 import { PRICE_DECIMALS } from "../../../src/config/hlp";
 
 export const FIVE_DOLLARS = ethers.utils.parseUnits("5", PRICE_DECIMALS);

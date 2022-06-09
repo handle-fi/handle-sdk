@@ -1,6 +1,6 @@
 import { BigNumber } from "ethers";
 import { BASIS_POINTS_DIVISOR } from "../../config/hlp";
-import { VaultTokenInfo } from "./types";
+import { VaultTokenInfo } from "../../types/trade";
 import { getSwapFeeBasisPoints } from "./getSwapFeeBasisPoints";
 
 export const getSwapFee = (args: {
