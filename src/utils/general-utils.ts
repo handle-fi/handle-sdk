@@ -41,7 +41,7 @@ export const getNetworkFromSignerOrProvider = async (
   return CHAIN_ID_TO_NETWORK_NAME[chainId];
 };
 
-export const pair_from_string = (value: string): Pair => {
+export const pairFromString = (value: string): Pair => {
   const split = value.split("/");
   if (split.length !== 2)
     throw new Error("Pair is not in the format of \"BASE/QUOTE\"");
