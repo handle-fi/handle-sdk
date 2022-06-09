@@ -1,4 +1,4 @@
-import {BigNumber, BytesLike} from "ethers";
+import {BigNumber} from "ethers";
 
 export type HlpInfoMethods = {
   getMinPrice: (address: string) => BigNumber;
@@ -20,7 +20,7 @@ export type SignedQuote = {
   /// The quote pair. eg: AUD/USD
   pair: string;
   signatureParams: SignedQuoteParams;
-  signature: BytesLike;
+  signature: Uint8Array;
 };
 
 export type SignedQuoteParams = {
