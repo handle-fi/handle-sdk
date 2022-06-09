@@ -11,9 +11,14 @@ export type HlpInfoMethods = {
   getHlpPrice: (isBuying: boolean) => BigNumber;
 };
 
+export type Pair = {
+  base: string;
+  quote: string;
+};
+
 export type SignedQuote = {
-  /// The quote pair. eg: AUD/USD
-  pair: string;
+  /// The quote pair. eg: Pair { base: "AUD", quote: "USD" } for "AUD/USD"
+  pair: Pair;
   signatureParams: SignedQuoteParams;
   signature: Uint8Array;
 };
