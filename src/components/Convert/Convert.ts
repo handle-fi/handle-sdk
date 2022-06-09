@@ -1,6 +1,6 @@
 import { BigNumber, ethers, Signer } from "ethers";
 import { Network } from "../../types/network";
-import {HlpData} from "../../types/trade";
+import { HlpInfoMethods } from "../Trade/types";
 import routes from "./routes";
 import { WeightInput } from "./routes/weights";
 import { TokenInfo } from "@uniswap/token-lists";
@@ -13,9 +13,8 @@ type ConvertRouteArgs = {
   toToken: TokenInfo;
   sellAmount: BigNumber;
   gasPrice: BigNumber | undefined;
+  hlpMethods?: HlpInfoMethods;
   network: Network;
-  /// hLP-related options.
-  hlp?: HlpData;
 };
 
 export type ConvertQuoteRouteArgs = ConvertRouteArgs & {
