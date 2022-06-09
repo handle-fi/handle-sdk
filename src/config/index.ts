@@ -102,6 +102,8 @@ export type ChainlinkFeeds = {
   chf_usd: string;
 };
 
+export const DATA_FEED_API_BASE_URL = "https://oracle.handle.fi/";
+
 const forexAddress = mustExist(
   getTokenFromTokenList(handleTokens, "FOREX", "arbitrum"),
   "FOREX on arbitrum"

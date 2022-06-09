@@ -1,8 +1,65 @@
 import {Pair, SignedQuote} from "../types/trade";
-import {BytesLike, ethers} from "ethers";
+import {BigNumber, BytesLike, ethers} from "ethers";
 import {config} from "../index";
+import axios from "axios";
+import {DATA_FEED_API_BASE_URL} from "../config";
 
-export const encodeQuotes = (quotes: SignedQuote[]): BytesLike => {
+type QuoteApiResponse = {
+  data: {
+    /// Quote value as an 8 decimal number.
+    result: number,
+    signed: {
+      signatureParams: {
+        signedTimestamp: number,
+        chainId: number,
+        /// Timestamp from which the quote is valid. Seconds since unix epoch.
+        validFromTimestamp: number,
+        durationSeconds: number,
+      },
+      /// Hex-encoded signature.
+      signature: string,
+      /// Hex-encoded unsigned message.
+      message: string,
+    }
+  }
+};
+
+export const fetchEncodedSignedQuotes = async (
+  pairs: Pair[]
+): Promise<BytesLike> => {
+  return encodeQuotes(await fetchSignedQuotes(pairs));
+};
+
+const fetchSignedQuotes = async (pairs: Pair[]) => {
+  const responses: QuoteApiResponse[] = [];
+  const requests = pairs.map(async pair => {
+    const result = await axios
+      .get(`${DATA_FEED_API_BASE_URL}${pair.base}/${pair.quote}`);
+    responses.push(result.data);
+  });
+  await Promise.all(requests);
+  return responses
+    .map((response, i) => quoteApiResponseToSignedQuote(pairs[i], response));
+};
+
+const quoteApiResponseToSignedQuote = (
+  pair: Pair,
+  { data: { result, signed: { signatureParams, signature } } }: QuoteApiResponse
+): SignedQuote => {
+  return {
+    pair,
+    signature: ethers.utils.arrayify(signature),
+    signatureParams: {
+      value: BigNumber.from(result),
+      signedTimestamp: BigNumber.from(signatureParams.signedTimestamp),
+      chainId: signatureParams.chainId,
+      validFromTimestamp: BigNumber.from(signatureParams.validFromTimestamp),
+      durationSeconds: BigNumber.from(signatureParams.durationSeconds),
+    }
+  };
+};
+
+const encodeQuotes = (quotes: SignedQuote[]): BytesLike => {
   const concatenatedSignatures = quotes.reduce((buffer, quote, i) => {
     for (let j = 0; j < 65; j++) {
       const offset = i * 65;
@@ -10,8 +67,7 @@ export const encodeQuotes = (quotes: SignedQuote[]): BytesLike => {
     }
     return buffer;
   }, new Uint8Array(quotes.length * 65));
-  const tokenAddresses = quotes
-    .map(quote => quotePairBaseToTokenAddress(quote.pair));
+  const tokenAddresses = quotes.map(quote => symbolToAddress(quote.pair.quote));
   return ethers.utils.defaultAbiCoder.encode(
     [
       "uint256",
@@ -34,27 +90,24 @@ export const encodeQuotes = (quotes: SignedQuote[]): BytesLike => {
   );
 };
 
-type PairAddressConverter = (pair: Pair) => string | undefined;
+type SymbolAddressConverter = (symbol: string) => string | undefined;
 
-/// Converts a Pair's quote to a token address, or throws.
-export const quotePairBaseToTokenAddress = (pair: Pair): string => {
-  // ETH (WETH on arbitrum) pair/address converter.
-  const eth: PairAddressConverter = (pair: Pair): string | undefined => {
-    if (pair.quote !== "ETH") return;
+const symbolToAddress = (symbol: string): string => {
+  const eth: SymbolAddressConverter = (symbol: string): string | undefined => {
+    if (symbol !== "ETH") return;
     return config.protocol.arbitrum.collaterals.WETH.address;
   };
-  // fxToken pair/address converter.
-  const fxToken: PairAddressConverter = (pair: Pair): string | undefined => {
-    const fxTokenQuote = pair.quote.startsWith("fx")
-      ? pair.quote
-      : `fx${pair.quote}`;
-    return config.fxTokenAddresses[fxTokenQuote];
+  const fxToken: SymbolAddressConverter = (symbol: string): string | undefined => {
+    const fxSymbol = symbol.startsWith("fx")
+      ? symbol
+      : `fx${symbol}`;
+    return config.fxTokenAddresses[fxSymbol];
   };
   // Find a valid address conversion.
   const result = [eth, fxToken]
-    .map(converter => converter(pair))
+    .map(converter => converter(symbol))
     .find(address => address != null);
   if (!result)
-    throw new Error(`Could get address for ${pair.base}/${pair.quote}`);
+    throw new Error(`Could get address for symbol "${symbol}"`);
   return result;
 };
