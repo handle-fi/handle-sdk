@@ -31,12 +31,18 @@ export const fetchEncodedSignedQuotes = async (
 };
 
 const fetchSignedQuotes = async (pairs: Pair[]) => {
+  for (let pair of pairs) {
+    // Replace WETH by ETH.
+    pair.base = pair.base.replace(/WETH/g, "ETH");
+    pair.quote = pair.quote.replace(/WETH/g, "ETH");
+  }
   const responses: QuoteApiResponse[] = [];
   const requests = pairs.map(async pair => {
     // The only base symbol that can be requested as fxToken is fxUSD.
     const base = pair.base.startsWith("fx") && pair.base !== "fxUSD"
       ? pair.base.substring(2)
       : pair.base;
+    console.log(`${DATA_FEED_API_BASE_URL}${base}/${pair.quote}?sign=true`);
     const result = await axios
       .get(`${DATA_FEED_API_BASE_URL}${base}/${pair.quote}?sign=true`);
     responses.push(result.data);
