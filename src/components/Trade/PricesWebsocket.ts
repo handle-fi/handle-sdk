@@ -6,22 +6,24 @@ import { pairFromString } from "../../utils/general-utils";
 class PricesWebsocket {
   public client: websocket.w3cwebsocket;
 
-  public onMessage: (data: WebsocketPrice) => void;
+  protected callback: (data: WebsocketPrice) => void = () => void 0;
 
   constructor(initialPairs: string[]) {
     const socket = new websocket.w3cwebsocket("wss://oracle.handle.fi/quotes");
     this.client = socket;
     socket.onopen = () => {
-      this.client.onmessage = (message) => {
-        if (typeof message.data === "string") {
-          const data = JSON.parse(message.data);
-          this.onMessage(data);
-        }
-      };
       this.subscribe(initialPairs);
     };
+  }
 
-    this.onMessage = () => void 0;
+  public onMessage(callback: (data: WebsocketPrice) => void) {
+    this.callback = callback;
+    this.client.onmessage = (message) => {
+      if (typeof message.data === "string") {
+        const data = JSON.parse(message.data);
+        callback(data);
+      }
+    };
   }
 
   public subscribe(pair: string | string[]) {
@@ -38,7 +40,7 @@ class PricesWebsocket {
     );
     if (typeof pair === "string") {
       axios.get(`https://oracle.handle.fi/${pair}`).then((response) => {
-        this.onMessage({
+        this.callback({
           pair: pairFromString(pair),
           value: response.data.data.result,
           timestamp: Math.floor(Date.now() / 1000)
@@ -47,7 +49,7 @@ class PricesWebsocket {
     } else {
       pair.forEach((_pair) => {
         axios.get(`https://oracle.handle.fi/${_pair}`).then((response) => {
-          this.onMessage({
+          this.callback({
             pair: pairFromString(_pair),
             value: response.data.data.result,
             timestamp: Math.floor(Date.now() / 1000)
