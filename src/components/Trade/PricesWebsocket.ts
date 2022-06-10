@@ -1,5 +1,7 @@
+import axios from "axios";
 import websocket from "websocket";
 import { WebsocketPrice } from "../../types/trade";
+import { pairFromString } from "../../utils/general-utils";
 
 class PricesWebsocket {
   public client: websocket.w3cwebsocket;
@@ -34,6 +36,25 @@ class PricesWebsocket {
         }
       })
     );
+    if (typeof pair === "string") {
+      axios.get(`https://oracle.handle.fi/${pair}`).then((response) => {
+        this.onMessage({
+          pair: pairFromString(pair),
+          value: response.data.data.result,
+          timestamp: Math.floor(Date.now() / 1000)
+        });
+      });
+    } else {
+      pair.forEach((_pair) => {
+        axios.get(`https://oracle.handle.fi/${_pair}`).then((response) => {
+          this.onMessage({
+            pair: pairFromString(_pair),
+            value: response.data.data.result,
+            timestamp: Math.floor(Date.now() / 1000)
+          });
+        });
+      });
+    }
   }
 
   public unsubscribe(pair: string | string[]) {
