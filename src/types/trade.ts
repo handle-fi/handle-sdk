@@ -1,4 +1,4 @@
-import {BigNumber} from "ethers";
+import { BigNumber } from "ethers";
 
 export type HlpInfoMethods = {
   getMinPrice: (address: string) => BigNumber;
@@ -12,8 +12,15 @@ export type HlpInfoMethods = {
 };
 
 export type Pair = {
-  base: string;
-  quote: string;
+  baseSymbol: string;
+  quoteSymbol: string;
+};
+
+export type WebsocketPrice = {
+  type: string;
+  pair: Pair;
+  timestamp: number;
+  value: number;
 };
 
 export type SignedQuote = {
