@@ -45,7 +45,7 @@ export const pairFromString = (value: string): Pair => {
   const split = value.split("/");
   if (split.length !== 2) throw new Error('Pair is not in the format of "BASE/QUOTE"');
   return {
-    baseSymbol: split[0],
-    quoteSymbol: split[1]
+    base: split[0],
+    quote: split[1]
   };
 };

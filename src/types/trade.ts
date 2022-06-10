@@ -12,15 +12,8 @@ export type HlpInfoMethods = {
 };
 
 export type Pair = {
-  baseSymbol: string;
-  quoteSymbol: string;
-};
-
-export type WebsocketPrice = {
-  type: string;
-  pair: Pair;
-  timestamp: number;
-  value: number;
+  base: string;
+  quote: string;
 };
 
 export type SignedQuote = {
