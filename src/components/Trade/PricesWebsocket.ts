@@ -5,7 +5,7 @@ import { WebsocketPrice } from "../../types/trade";
 import { pairFromString } from "../../utils/general-utils";
 
 class PricesWebsocket {
-  protected client: websocket.w3cwebsocket;
+  protected client!: websocket.w3cwebsocket;
 
   protected callback?: (data: WebsocketPrice) => void;
   protected errorCallback?: (error: Error) => void;
@@ -16,10 +16,6 @@ class PricesWebsocket {
   constructor(initialPairs: string[], overrides?: { websocketUrl?: string }) {
     this.overrides = overrides;
     this.initialPairs = initialPairs;
-
-    this.client = new websocket.w3cwebsocket(
-      this.overrides?.websocketUrl ?? HlpConfig.HANDLE_WEBSOCKET_URL
-    );
 
     this.connect();
   }
@@ -42,6 +38,7 @@ class PricesWebsocket {
   }
 
   public close() {
+    if (!this.client) return; // no client to close
     this.client.onclose = () => null;
     this.client.close();
   }
