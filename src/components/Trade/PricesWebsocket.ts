@@ -1,7 +1,7 @@
 import axios from "axios";
 import websocket from "websocket";
 import { HlpConfig } from "../..";
-import { HANDLE_ORACLE_URL } from "../../config/hlp";
+import { DATA_FEED_API_BASE_URL } from "../../config";
 import { WebsocketPrice } from "../../types/trade";
 import { pairFromString } from "../../utils/general-utils";
 
@@ -47,7 +47,7 @@ class PricesWebsocket {
       })
     );
     pairs.forEach(async (_pair) => {
-      const response = await axios.get(`${HANDLE_ORACLE_URL}/${_pair}`);
+      const response = await axios.get(`${DATA_FEED_API_BASE_URL}/${_pair}`);
       this.callback({
         pair: pairFromString(_pair),
         value: response.data.data.result,

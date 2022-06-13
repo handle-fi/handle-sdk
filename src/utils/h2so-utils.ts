@@ -42,7 +42,7 @@ const fetchSignedQuotes = async (pairs: Pair[]) => {
         ? pair.baseSymbol.substring(2)
         : pair.baseSymbol;
     const result = await axios.get(
-      `${DATA_FEED_API_BASE_URL}${base}/${pair.quoteSymbol}?sign=true`
+      `${DATA_FEED_API_BASE_URL}/${base}/${pair.quoteSymbol}?sign=true`
     );
     responses.push(result.data);
   });
