@@ -8,7 +8,7 @@ import { pairFromString } from "../../utils/general-utils";
 class PricesWebsocket {
   public client: websocket.w3cwebsocket;
 
-  protected callback: (data: WebsocketPrice) => void = () => void 0;
+  protected callback?: (data: WebsocketPrice) => void;
 
   constructor(initialPairs: string[], overrides?: { websocketUrl?: string }) {
     const socket = new websocket.w3cwebsocket(
@@ -18,6 +18,9 @@ class PricesWebsocket {
     socket.onopen = () => {
       this.subscribe(initialPairs);
     };
+
+    // Set default error handler
+    socket.onerror = console.error;
   }
 
   public onMessage(callback: (data: WebsocketPrice) => void) {
@@ -48,11 +51,13 @@ class PricesWebsocket {
     );
     pairs.forEach(async (_pair) => {
       const response = await axios.get(`${DATA_FEED_API_BASE_URL}/${_pair}`);
-      this.callback({
-        pair: pairFromString(_pair),
-        value: response.data.data.result,
-        timestamp: Math.floor(Date.now() / 1000)
-      });
+      if (this.callback) {
+        this.callback({
+          pair: pairFromString(_pair),
+          value: response.data.data.result,
+          timestamp: Math.floor(Date.now() / 1000)
+        });
+      }
     });
   }
 
