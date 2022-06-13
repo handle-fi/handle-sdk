@@ -9,9 +9,9 @@ class PricesWebsocket {
 
   protected callback: (data: WebsocketPrice) => void = () => void 0;
 
-  constructor(initialPairs: string[], overrides: { websocketUrl?: string } = {}) {
+  constructor(initialPairs: string[], overrides?: { websocketUrl?: string }) {
     const socket = new websocket.w3cwebsocket(
-      overrides.websocketUrl ?? HlpConfig.HANDLE_WEBSOCKET_URL
+      overrides?.websocketUrl ?? HlpConfig.HANDLE_WEBSOCKET_URL
     );
     this.client = socket;
     socket.onopen = () => {
@@ -33,16 +33,19 @@ class PricesWebsocket {
     if (!this.isConnected()) {
       throw new Error("Websocket not connected");
     }
-    const pairArray = typeof pair === "string" ? [pair] : pair;
+    const pairs = typeof pair === "string" ? [pair] : pair;
+    // Assert that pairs are valid
+    pairs.forEach(pairFromString);
+
     this.client.send(
       JSON.stringify({
         action: "subscribe",
         params: {
-          pairs: pairArray.join(",")
+          pairs: pairs.join(",")
         }
       })
     );
-    pairArray.forEach((_pair) => {
+    pairs.forEach((_pair) => {
       axios.get(`https://oracle.handle.fi/${_pair}`).then((response) => {
         this.callback({
           pair: pairFromString(_pair),
@@ -57,11 +60,16 @@ class PricesWebsocket {
     if (!this.isConnected()) {
       throw new Error("Websocket not connected");
     }
+    const pairs = typeof pair === "string" ? [pair] : pair;
+
+    // Assert that pairs are valid
+    pairs.forEach(pairFromString);
+
     this.client.send(
       JSON.stringify({
         action: "unsubscribe",
         params: {
-          pairs: typeof pair === "string" ? pair : pair.join(",")
+          pairs: pairs.join(",")
         }
       })
     );
