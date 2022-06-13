@@ -37,7 +37,7 @@ class PricesWebsocket {
     // Set default error handler
     socket.onerror = this.errorCallback ?? console.error;
     this.client.onclose = () => {
-      this.connect();
+      setTimeout(this.connect, 1_000);
     };
   }
 
