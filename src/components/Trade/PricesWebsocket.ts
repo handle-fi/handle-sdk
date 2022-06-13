@@ -5,21 +5,54 @@ import { WebsocketPrice } from "../../types/trade";
 import { pairFromString } from "../../utils/general-utils";
 
 class PricesWebsocket {
-  public client: websocket.w3cwebsocket;
+  protected client: websocket.w3cwebsocket;
 
   protected callback?: (data: WebsocketPrice) => void;
+  protected errorCallback?: (error: Error) => void;
+
+  protected overrides?: { websocketUrl?: string };
+  protected initialPairs: string[];
 
   constructor(initialPairs: string[], overrides?: { websocketUrl?: string }) {
+    this.overrides = overrides;
+    this.initialPairs = initialPairs;
+
+    this.client = new websocket.w3cwebsocket(
+      this.overrides?.websocketUrl ?? HlpConfig.HANDLE_WEBSOCKET_URL
+    );
+
+    this.connect();
+  }
+
+  protected connect() {
+    this.close();
     const socket = new websocket.w3cwebsocket(
-      overrides?.websocketUrl ?? HlpConfig.HANDLE_WEBSOCKET_URL
+      this.overrides?.websocketUrl ?? HlpConfig.HANDLE_WEBSOCKET_URL
     );
     this.client = socket;
     socket.onopen = () => {
-      this.subscribe(initialPairs);
+      this.subscribe(this.initialPairs);
     };
 
     // Set default error handler
-    socket.onerror = console.error;
+    socket.onerror = this.errorCallback ?? console.error;
+    this.client.onclose = () => {
+      this.connect();
+    };
+  }
+
+  public close() {
+    this.client.onclose = () => null;
+    this.client.close();
+  }
+
+  public onError(callback: (error: Error) => void) {
+    this.errorCallback = callback;
+    this.client.onerror = (error) => {
+      if (this.errorCallback) {
+        this.errorCallback(error);
+      }
+    };
   }
 
   public onMessage(callback: (data: WebsocketPrice) => void) {
