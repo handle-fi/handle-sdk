@@ -10,11 +10,6 @@ export type HlpInfoMethods = {
   getHlpPrice: (isBuying: boolean) => BigNumber;
 };
 
-export type Pair = {
-  base: string;
-  quote: string;
-};
-
 export type SignedQuote = {
   /// The quote pair. eg: Pair { base: "AUD", quote: "USD" } for "AUD/USD"
   pair: Pair;
@@ -49,4 +44,15 @@ export type GetLiquidationArgs = {
   collateral: BigNumber;
   averagePrice: BigNumber;
   isLong: boolean;
+};
+
+export type Pair = {
+  baseSymbol: string;
+  quoteSymbol: string;
+};
+
+export type WebsocketPrice = {
+  pair: Pair;
+  value: number;
+  timestamp: number;
 };
