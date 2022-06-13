@@ -1,7 +1,6 @@
 import axios from "axios";
 import websocket from "websocket";
 import { HlpConfig } from "../..";
-import { HANDLE_ORACLE_URL } from "../../config/hlp";
 import { WebsocketPrice } from "../../types/trade";
 import { pairFromString } from "../../utils/general-utils";
 
@@ -18,6 +17,14 @@ class PricesWebsocket {
     socket.onopen = () => {
       this.subscribe(initialPairs);
     };
+
+    // Set default error and close handlers
+    this.onError(console.error);
+    this.onClose(() => {
+      this.client = new websocket.w3cwebsocket(
+        overrides?.websocketUrl ?? HlpConfig.HANDLE_WEBSOCKET_URL
+      );
+    });
   }
 
   public onMessage(callback: (data: WebsocketPrice) => void) {
@@ -28,6 +35,14 @@ class PricesWebsocket {
         callback(data);
       }
     };
+  }
+
+  public onError(callback: (error: Error) => void) {
+    this.client.onerror = callback;
+  }
+
+  public onClose(callback: () => void) {
+    this.client.onclose = callback;
   }
 
   public subscribe(pair: string | string[]) {
@@ -47,7 +62,7 @@ class PricesWebsocket {
       })
     );
     pairs.forEach(async (_pair) => {
-      const response = await axios.get(`${HANDLE_ORACLE_URL}/${_pair}`);
+      const response = await axios.get(`${HlpConfig.HANDLE_ORACLE_URL}/${_pair}`);
       this.callback({
         pair: pairFromString(_pair),
         value: response.data.data.result,
