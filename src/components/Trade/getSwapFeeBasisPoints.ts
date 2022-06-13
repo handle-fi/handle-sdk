@@ -5,7 +5,6 @@ import {
   SWAP_FEE_BASIS_POINTS,
   TAX_BASIS_POINTS
 } from "../../config/hlp";
-import { VaultTokenInfo } from "../../types/trade";
 import { getFeeBasisPoints } from "./getFeeBasisPoints";
 import { Network } from "../../types/network";
 import HandleTokenManager from "../TokenManager/HandleTokenManager";
@@ -18,7 +17,6 @@ export const getSwapFeeBasisPoints = (
     usdHlpSupply: BigNumber;
     totalTokenWeights: BigNumber;
     targetUsdHlpAmount: BigNumber;
-    getTokenInfo: (token: string) => VaultTokenInfo | undefined;
   },
   network: Network = "arbitrum"
 ) => {
@@ -33,15 +31,13 @@ export const getSwapFeeBasisPoints = (
     ...args,
     increment: true,
     feeBasisPoints: BigNumber.from(swapBasisPoints),
-    taxBasisPoints: BigNumber.from(taxBasisPoints),
-    token: args.tokenIn
+    taxBasisPoints: BigNumber.from(taxBasisPoints)
   });
   const feeBasisPoints2 = getFeeBasisPoints({
     ...args,
     increment: false,
     feeBasisPoints: BigNumber.from(swapBasisPoints),
-    taxBasisPoints: BigNumber.from(taxBasisPoints),
-    token: args.tokenOut
+    taxBasisPoints: BigNumber.from(taxBasisPoints)
   });
   // return largest fee basis points
   return feeBasisPoints1.gt(feeBasisPoints2) ? feeBasisPoints1 : feeBasisPoints2;
