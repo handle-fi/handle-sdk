@@ -45,13 +45,12 @@ class PricesWebsocket {
         }
       })
     );
-    pairs.forEach((_pair) => {
-      axios.get(`https://oracle.handle.fi/${_pair}`).then((response) => {
-        this.callback({
-          pair: pairFromString(_pair),
-          value: response.data.data.result,
-          timestamp: Math.floor(Date.now() / 1000)
-        });
+    pairs.forEach(async (_pair) => {
+      const response = await axios.get(`https://oracle.handle.fi/${_pair}`);
+      this.callback({
+        pair: pairFromString(_pair),
+        value: response.data.data.result,
+        timestamp: Math.floor(Date.now() / 1000)
       });
     });
   }
