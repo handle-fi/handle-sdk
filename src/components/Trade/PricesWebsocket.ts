@@ -1,5 +1,6 @@
 import axios from "axios";
 import websocket from "websocket";
+import { HlpConfig } from "../..";
 import { WebsocketPrice } from "../../types/trade";
 import { pairFromString } from "../../utils/general-utils";
 
@@ -8,8 +9,10 @@ class PricesWebsocket {
 
   protected callback: (data: WebsocketPrice) => void = () => void 0;
 
-  constructor(initialPairs: string[]) {
-    const socket = new websocket.w3cwebsocket("wss://oracle.handle.fi/quotes");
+  constructor(initialPairs: string[], overrides?: { websocketUrl?: string }) {
+    const socket = new websocket.w3cwebsocket(
+      overrides?.websocketUrl ?? HlpConfig.HANDLE_WEBSOCKET_URL
+    );
     this.client = socket;
     socket.onopen = () => {
       this.subscribe(initialPairs);
@@ -30,44 +33,42 @@ class PricesWebsocket {
     if (!this.isConnected()) {
       throw new Error("Websocket not connected");
     }
+    const pairs = typeof pair === "string" ? [pair] : pair;
+    // Assert that pairs are valid
+    pairs.forEach(pairFromString);
+
     this.client.send(
       JSON.stringify({
         action: "subscribe",
         params: {
-          pairs: typeof pair === "string" ? pair : pair.join(",")
+          pairs: pairs.join(",")
         }
       })
     );
-    if (typeof pair === "string") {
-      axios.get(`https://oracle.handle.fi/${pair}`).then((response) => {
-        this.callback({
-          pair: pairFromString(pair),
-          value: response.data.data.result,
-          timestamp: Math.floor(Date.now() / 1000)
-        });
+    pairs.forEach(async (_pair) => {
+      const response = await axios.get(`https://oracle.handle.fi/${_pair}`);
+      this.callback({
+        pair: pairFromString(_pair),
+        value: response.data.data.result,
+        timestamp: Math.floor(Date.now() / 1000)
       });
-    } else {
-      pair.forEach((_pair) => {
-        axios.get(`https://oracle.handle.fi/${_pair}`).then((response) => {
-          this.callback({
-            pair: pairFromString(_pair),
-            value: response.data.data.result,
-            timestamp: Math.floor(Date.now() / 1000)
-          });
-        });
-      });
-    }
+    });
   }
 
   public unsubscribe(pair: string | string[]) {
     if (!this.isConnected()) {
       throw new Error("Websocket not connected");
     }
+    const pairs = typeof pair === "string" ? [pair] : pair;
+
+    // Assert that pairs are valid
+    pairs.forEach(pairFromString);
+
     this.client.send(
       JSON.stringify({
         action: "unsubscribe",
         params: {
-          pairs: typeof pair === "string" ? pair : pair.join(",")
+          pairs: pairs.join(",")
         }
       })
     );

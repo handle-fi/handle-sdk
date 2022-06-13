@@ -5,6 +5,7 @@ import { Network, NetworkMap } from "../types/network";
 export const DEFAULT_HLP_NETWORK: Network = "arbitrum";
 
 export const HLP_IMAGE_URL = "https://app.handle.fi/assets/images/handle.fiLogoLightNewCut.png";
+export const HANDLE_WEBSOCKET_URL = "wss://oracle.handle.fi/quotes";
 
 /** hlp constants */
 export const BASIS_POINTS_DIVISOR = 10_000;
