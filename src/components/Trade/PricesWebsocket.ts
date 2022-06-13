@@ -19,12 +19,12 @@ class PricesWebsocket {
     };
 
     // Set default error and close handlers
-    this.onError(console.error);
-    this.onClose(() => {
+    socket.onerror = console.error;
+    socket.onclose = () => {
       this.client = new websocket.w3cwebsocket(
         overrides?.websocketUrl ?? HlpConfig.HANDLE_WEBSOCKET_URL
       );
-    });
+    };
   }
 
   public onMessage(callback: (data: WebsocketPrice) => void) {
@@ -35,14 +35,6 @@ class PricesWebsocket {
         callback(data);
       }
     };
-  }
-
-  public onError(callback: (error: Error) => void) {
-    this.client.onerror = callback;
-  }
-
-  public onClose(callback: () => void) {
-    this.client.onclose = callback;
   }
 
   public subscribe(pair: string | string[]) {
