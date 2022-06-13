@@ -39,7 +39,6 @@ const fetchSignedQuotes = async (pairs: Pair[]) => {
     // The only base symbol that can be requested as fxToken is fxUSD.
     const base =
       pair.base.startsWith("fx") && pair.base !== "fxUSD" ? pair.base.substring(2) : pair.base;
-    console.log(`${DATA_FEED_API_BASE_URL}${base}/${pair.quote}?sign=true`);
     const result = await axios.get(`${DATA_FEED_API_BASE_URL}${base}/${pair.quote}?sign=true`);
     responses.push(result.data);
   });

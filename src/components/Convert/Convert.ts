@@ -1,5 +1,5 @@
 import { BigNumber, ethers, Signer } from "ethers";
-import { Network } from "../../types/network"; 
+import { Network } from "../../types/network";
 import { HlpInfoMethods } from "../../types/trade";
 import routes from "./routes";
 import { WeightInput } from "./routes/weights";
@@ -123,7 +123,8 @@ export default class Convert {
       fromToken: input.fromToken,
       toToken: input.toToken,
       signerOrProvider: input.signerOrProvider,
-      network: network
+      network: network,
+      hasHlpMethods: !!input.hlpMethods
     });
 
     return route.quote({
@@ -143,7 +144,8 @@ export default class Convert {
       fromToken: input.fromToken,
       toToken: input.toToken,
       signerOrProvider: input.signer,
-      network: network
+      network: network,
+      hasHlpMethods: !!input.hlpMethods
     });
 
     const receivingAccount = await input.signer.getAddress();
