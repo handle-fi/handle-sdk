@@ -1,4 +1,5 @@
 import "@nomiclabs/hardhat-ethers";
+import "./tasks";
 
 export default {
   paths: {
