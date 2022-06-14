@@ -82,7 +82,7 @@ const encodeQuotes = (quotes: SignedQuote[]): BytesLike => {
     }
     return buffer;
   }, new Uint8Array(quotes.length * 65));
-  const tokenAddresses = quotes.map((quote) => symbolToAddress(quote.pair.quoteSymbol));
+  const tokenAddresses = quotes.map((quote) => symbolToAddress(quote.pair.baseSymbol));
   return ethers.utils.defaultAbiCoder.encode(
     ["uint256", "address[]", "uint256[]", "uint256[]", "uint256[]", "uint256[]", "bytes"],
     [
