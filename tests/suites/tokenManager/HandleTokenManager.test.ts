@@ -4,7 +4,7 @@ import { DEFAULT_TOKEN_LIST_URLS } from "../../../src/components/TokenManager";
 
 describe("Handle Token Manager", () => {
   it("should be able to inherit from a TokenManager", async () => {
-    const tokenManager = new TokenManager(undefined, false, false);
+    const tokenManager = new TokenManager(undefined);
     await tokenManager.initialLoad;
     const handleTokenManager = HandleTokenManager.from(tokenManager);
     // expected to be equal to default token list + handle tokens + native tokens
