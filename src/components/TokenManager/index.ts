@@ -1,6 +1,6 @@
 import axios from "axios";
-import handleTokenList from "./handle-tokens.json";
-import nativeTokenList from "./native-tokens.json";
+import handleTokenList from "../../config/TokenLists/handle-tokens.json";
+import nativeTokenList from "../../config/TokenLists/native-tokens.json";
 import { TokenList, TokenInfo } from "@uniswap/token-lists";
 import { Network } from "../../types/network";
 import { isSameNetwork, validateTokenList } from "../../utils/tokenlist-utils";
