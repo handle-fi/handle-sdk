@@ -6,17 +6,14 @@ import { pairFromString } from "../../utils/general-utils";
 
 class PricesWebsocket {
   protected client!: websocket.w3cwebsocket;
-
   protected callback?: (data: WebsocketPrice) => void;
   protected errorCallback?: (error: Error) => void;
-
   protected overrides?: { websocketUrl?: string };
   protected initialPairs: string[];
 
   constructor(initialPairs: string[], overrides?: { websocketUrl?: string }) {
     this.overrides = overrides;
     this.initialPairs = initialPairs;
-
     this.connect();
   }
 
@@ -29,12 +26,13 @@ class PricesWebsocket {
     socket.onopen = () => {
       this.subscribe(this.initialPairs);
     };
-
-    // Set default error handler
-    socket.onerror = this.errorCallback ?? console.error;
     this.client.onclose = () => {
       setTimeout(this.connect, 1_000);
     };
+    // Set default error handler.
+    this.onError(this.errorCallback ?? console.error);
+    if (this.callback)
+      this.onMessage(this.callback);
   }
 
   public close() {
@@ -45,11 +43,7 @@ class PricesWebsocket {
 
   public onError(callback: (error: Error) => void) {
     this.errorCallback = callback;
-    this.client.onerror = (error) => {
-      if (this.errorCallback) {
-        this.errorCallback(error);
-      }
-    };
+    this.client.onerror = callback;
   }
 
   public onMessage(callback: (data: WebsocketPrice) => void) {
@@ -67,9 +61,8 @@ class PricesWebsocket {
       throw new Error("Websocket not connected");
     }
     const pairs = typeof pair === "string" ? [pair] : pair;
-    // Assert that pairs are valid
+    // Assert that pairs are valid.
     pairs.forEach(pairFromString);
-
     this.client.send(
       JSON.stringify({
         action: "subscribe",
@@ -95,10 +88,8 @@ class PricesWebsocket {
       throw new Error("Websocket not connected");
     }
     const pairs = typeof pair === "string" ? [pair] : pair;
-
-    // Assert that pairs are valid
+    // Assert that pairs are valid.
     pairs.forEach(pairFromString);
-
     this.client.send(
       JSON.stringify({
         action: "unsubscribe",
