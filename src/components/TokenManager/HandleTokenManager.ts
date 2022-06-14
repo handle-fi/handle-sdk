@@ -11,7 +11,7 @@ const HandleTokenList = validateTokenList(handleTokenList);
 const HandleStakingTokenList = validateTokenList(handleStakingTokenList);
 
 /**
- * TokenManager that comes with handle tokens by default.
+ * TokenManager that comes with native and handle tokens by default.
  * Handle supported token extensions:
  * - isNative: true if token is native for that network (e.g. ETH, MATIC)
  * - isHlpToken: true if the token is a hlp token in a handle Vault contract
