@@ -4,6 +4,8 @@ import { HlpConfig } from "../..";
 import { WebsocketPrice } from "../../types/trade";
 import { pairFromString } from "../../utils/general-utils";
 
+const RECONNECT_DELAY = 1_000;
+
 class PricesWebsocket {
   protected client!: websocket.w3cwebsocket;
   protected callback?: (data: WebsocketPrice) => void;
@@ -27,7 +29,7 @@ class PricesWebsocket {
       this.subscribe(this.initialPairs);
     };
     this.client.onclose = () => {
-      setTimeout(this.connect, 1_000);
+      setTimeout(this.connect, RECONNECT_DELAY);
     };
     // Set default error handler.
     this.onError(this.errorCallback ?? console.error);
