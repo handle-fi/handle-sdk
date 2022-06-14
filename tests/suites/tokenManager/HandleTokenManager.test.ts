@@ -8,8 +8,9 @@ describe("Handle Token Manager", () => {
     await tokenManager.initialLoad;
     const handleTokenManager = HandleTokenManager.from(tokenManager);
     // expected to be equal to default token list + handle tokens + native tokens
+    const TOKEN_LISTS_LOADED_BY_HANDLE_MANAGER = 3; // native, handle, handle staking
     expect(Object.keys(handleTokenManager.getCache()).length).to.eq(
-      DEFAULT_TOKEN_LIST_URLS.length + 2
+      DEFAULT_TOKEN_LIST_URLS.length + TOKEN_LISTS_LOADED_BY_HANDLE_MANAGER
     );
   });
   it("should be able to get hLP tokens", () => {
