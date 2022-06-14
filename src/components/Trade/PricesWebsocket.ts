@@ -6,6 +6,11 @@ import { pairFromString } from "../../utils/general-utils";
 
 const RECONNECT_DELAY = 1_000;
 
+export type Overrides = {
+  websocketUrl?: string;
+  reconnectDelayMillis?: number;
+};
+
 class PricesWebsocket {
   protected client!: websocket.w3cwebsocket;
   protected callback?: (data: WebsocketPrice) => void;
@@ -13,13 +18,13 @@ class PricesWebsocket {
   protected overrides?: { websocketUrl?: string };
   protected initialPairs: string[];
 
-  constructor(initialPairs: string[], overrides?: { websocketUrl?: string }) {
+  constructor(initialPairs: string[], overrides?: Overrides) {
     this.overrides = overrides;
     this.initialPairs = initialPairs;
-    this.connect();
+    this.connect(overrides?.reconnectDelayMillis);
   }
 
-  protected connect() {
+  protected connect(reconnectDelayMillis = RECONNECT_DELAY) {
     this.close();
     const socket = new websocket.w3cwebsocket(
       this.overrides?.websocketUrl ?? HlpConfig.HANDLE_WEBSOCKET_URL
@@ -29,7 +34,10 @@ class PricesWebsocket {
       this.subscribe(this.initialPairs);
     };
     this.client.onclose = () => {
-      setTimeout(this.connect.bind(this), RECONNECT_DELAY);
+      setTimeout(
+        () => this.connect(reconnectDelayMillis),
+        reconnectDelayMillis
+      );
     };
     // Set default error handler.
     this.onError(this.errorCallback ?? console.error);
