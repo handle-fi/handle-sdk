@@ -1,55 +1,95 @@
-// import { BigNumber, ethers } from "ethers";
-// import { HlpConfig } from "../..";
-// import { Vault__factory } from "../../contracts/factories/Vault__factory";
+import { BigNumber, ethers } from "ethers";
+import { HlpConfig, Network } from "../..";
+import { HlpManager__factory } from "../../contracts";
+import { Vault__factory } from "../../contracts/factories/Vault__factory";
 
-// export const getAum = (
-//   maximise: boolean,
-//   provider: ethers.providers.Provider | ethers.Signer
-// ): BigNumber => {
-//   const vault = Vault__factory.connect(HlpConfig.HLP_CONTRACTS["arbitrum"]?.Vault!, provider);
+export const getAum = async (
+  maximise: boolean,
+  provider: ethers.providers.Provider | ethers.Signer,
+  network: Network,
+  getMaxPrice: (address: string) => Promise<BigNumber> | BigNumber,
+  getMinPrice: (address: string) => Promise<BigNumber> | BigNumber
+): Promise<BigNumber> => {
+  // This should match the getAum function in HlpManager.sol exactly
+  const vaultAddress = HlpConfig.HLP_CONTRACTS[network]?.Vault;
+  const hlpManagerAddress = HlpConfig.HLP_CONTRACTS[network]?.HlpManager;
 
-//   const length = vault.allWhitelistedTokensLength();
-//   let aum = aumAddition;
-//   const shortProfits = 0;
+  if (!vaultAddress || !hlpManagerAddress) {
+    throw new Error("No HLP contract address found for network");
+  }
 
-//   for (let i = 0; i < length; i++) {
-//     const token = vault.allWhitelistedTokens(i);
-//     const isWhitelisted = vault.whitelistedTokens(token);
+  const vault = Vault__factory.connect(vaultAddress, provider);
+  const hlpManager = HlpManager__factory.connect(hlpManagerAddress, provider);
 
-//     if (!isWhitelisted) {
-//       continue;
-//     }
+  const [aumAddition, aumDeduction, length] = await Promise.all([
+    hlpManager.aumAddition(),
+    hlpManager.aumDeduction(),
+    vault.allWhitelistedTokensLength()
+  ]);
 
-//     const price = maximise ? vault.getMaxPrice(token) : vault.getMinPrice(token);
-//     const poolAmount = vault.poolAmounts(token);
-//     const decimals = vault.tokenDecimals(token);
+  let aum = aumAddition;
+  let shortProfits = ethers.constants.Zero;
 
-//     if (vault.stableTokens(token)) {
-//       aum = aum.add(poolAmount.mul(price).div(10 ** decimals));
-//     } else {
-//       // add global short profit / loss
-//       const size = vault.globalShortSizes(token);
-//       if (size > 0) {
-//         const averagePrice = vault.globalShortAveragePrices(token);
-//         const priceDelta = averagePrice > price ? averagePrice.sub(price) : price.sub(averagePrice);
-//         const delta = size.mul(priceDelta).div(averagePrice);
-//         if (price > averagePrice) {
-//           // add losses from shorts
-//           aum = aum.add(delta);
-//         } else {
-//           shortProfits = shortProfits.add(delta);
-//         }
-//       }
+  const tokens = await Promise.all(
+    new Array(+length).fill(0).map(async (_, i) => {
+      const token = await vault.allWhitelistedTokens(i);
 
-//       aum = aum.add(vault.guaranteedUsd(token));
+      return {
+        isWhiteListed: await vault.whitelistedTokens(token),
+        price: maximise ? await getMaxPrice(token) : await getMinPrice(token),
+        poolAmount: await vault.poolAmounts(token),
+        decimals: await vault.tokenDecimals(token),
+        isStable: await vault.stableTokens(token),
+        size: await vault.globalShortSizes(token),
+        averagePrice: await vault.globalShortAveragePrices(token),
+        guaranteedUsd: await vault.guaranteedUsd(token),
+        reservedAmount: await vault.reservedAmounts(token)
+      };
+    })
+  );
 
-//       const reservedAmount = vault.reservedAmounts(token);
-//       aum = aum.add(
-//         poolAmount
-//           .sub(reservedAmount)
-//           .mul(price)
-//           .div(10 ** decimals)
-//       );
-//     }
-//   }
-// };
+  for (let token of tokens) {
+    const {
+      isWhiteListed,
+      price,
+      poolAmount,
+      decimals,
+      isStable,
+      size,
+      averagePrice,
+      guaranteedUsd,
+      reservedAmount
+    } = token;
+
+    if (!isWhiteListed) {
+      continue;
+    }
+
+    if (isStable) {
+      aum = aum.add(poolAmount.mul(price).div(BigNumber.from(10).pow(decimals)));
+    } else {
+      // add global short profit / loss
+      if (size.gt(0)) {
+        const priceDelta = averagePrice.gt(price)
+          ? averagePrice.sub(price)
+          : price.sub(averagePrice);
+        const delta = size.mul(priceDelta).div(averagePrice);
+        if (price > averagePrice) {
+          // add losses from shorts
+          aum = aum.add(delta);
+        } else {
+          shortProfits = shortProfits.add(delta);
+        }
+      }
+
+      aum = aum.add(guaranteedUsd);
+
+      aum = aum.add(
+        poolAmount.sub(reservedAmount).mul(price).div(BigNumber.from(10).pow(decimals))
+      );
+    }
+  }
+
+  aum = shortProfits.gt(aum) ? ethers.constants.Zero : aum.sub(shortProfits);
+  return aumDeduction.gt(aum) ? ethers.constants.Zero : aum.sub(aumDeduction);
+};
