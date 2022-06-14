@@ -60,7 +60,7 @@
       }
     },
     {
-      "name": "handle CNY",
+      "name": "handleCNY",
       "symbol": "fxCNY",
       "decimals": 18,
       "address": "0x2C29daAce6Aa05e3b65743EFd61f8A2C448302a3",
@@ -70,7 +70,7 @@
       }
     },
     {
-      "name": "handle KRW",
+      "name": "handleKRW",
       "symbol": "fxKRW",
       "decimals": 18,
       "address": "0xF4E8BA79d058fFf263Fd043Ef50e1010c1BdF991",
@@ -80,7 +80,7 @@
       }
     },
     {
-      "name": "handle CHF",
+      "name": "handleCHF",
       "symbol": "fxCHF",
       "decimals": 18,
       "address": "0x8C414cB8A9Af9F7B03673e93DF73c23C1aa05b4e",
@@ -142,7 +142,7 @@
       }
     },
     {
-      "name": "handle CNY",
+      "name": "handleCNY",
       "symbol": "fxCNY",
       "decimals": 18,
       "address": "0x2C29daAce6Aa05e3b65743EFd61f8A2C448302a3",
@@ -152,7 +152,7 @@
       }
     },
     {
-      "name": "handle KRW",
+      "name": "handleKRW",
       "symbol": "fxKRW",
       "decimals": 18,
       "address": "0xF4E8BA79d058fFf263Fd043Ef50e1010c1BdF991",
@@ -162,7 +162,7 @@
       }
     },
     {
-      "name": "handle CHF",
+      "name": "handleCHF",
       "symbol": "fxCHF",
       "decimals": 18,
       "address": "0x8C414cB8A9Af9F7B03673e93DF73c23C1aa05b4e",
@@ -232,7 +232,7 @@
       }
     },
     {
-      "name": "handle CNY",
+      "name": "handleCNY",
       "symbol": "fxCNY",
       "decimals": 18,
       "address": "0x2C29daAce6Aa05e3b65743EFd61f8A2C448302a3",
@@ -244,7 +244,7 @@
       }
     },
     {
-      "name": "handle KRW",
+      "name": "handleKRW",
       "symbol": "fxKRW",
       "decimals": 18,
       "address": "0xF4E8BA79d058fFf263Fd043Ef50e1010c1BdF991",
@@ -256,7 +256,7 @@
       }
     },
     {
-      "name": "handle CHF",
+      "name": "handleCHF",
       "symbol": "fxCHF",
       "decimals": 18,
       "address": "0x8C414cB8A9Af9F7B03673e93DF73c23C1aa05b4e",

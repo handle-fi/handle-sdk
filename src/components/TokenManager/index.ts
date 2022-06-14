@@ -1,12 +1,7 @@
 import axios from "axios";
-import handleTokenList from "../../config/TokenLists/handle-tokens.json";
-import nativeTokenList from "../../config/TokenLists/native-tokens.json";
 import { TokenList, TokenInfo } from "@uniswap/token-lists";
 import { Network } from "../../types/network";
 import { isSameNetwork, validateTokenList } from "../../utils/tokenlist-utils";
-
-const HandleTokenList = validateTokenList(handleTokenList);
-const NativeTokenList = validateTokenList(nativeTokenList);
 
 type TokenListCache = {
   [url: string]: TokenList;
@@ -30,8 +25,6 @@ type SearchTokenSymbols = {
 
 /**
  * The TokenList class is used to fetch and validate token lists.
- * @dev By default, native tokens are stored in the cache as "native-tokens"
- * and handle tokens are stored in the cache as "handle-tokens".
  */
 class TokenManager {
   /** Caches fetched results indefinetely */
@@ -43,16 +36,10 @@ class TokenManager {
   /** Called whenever the cache, or custom tokens changes */
   public onTokensChange: () => void;
 
-  constructor(
-    tokenListUrls: string[] = DEFAULT_TOKEN_LIST_URLS,
-    includeHandleTokens = true,
-    includeNativeTokens = true
-  ) {
+  constructor(tokenListUrls: string[] = DEFAULT_TOKEN_LIST_URLS) {
     this.cache = {};
     this.customTokens = [];
     this.onTokensChange = () => {};
-    if (includeHandleTokens) this.setTokenList("handle-tokens", HandleTokenList);
-    if (includeNativeTokens) this.setTokenList("native-tokens", NativeTokenList);
     this.initialLoad = Promise.all(tokenListUrls.map((url) => this.fetchTokenList(url)));
   }
 
