@@ -24,8 +24,14 @@ type QuoteApiResponse = {
   };
 };
 
-export const fetchEncodedSignedQuotes = async (pairs: Pair[]): Promise<BytesLike> => {
-  return encodeQuotes(await fetchSignedQuotes(pairs));
+export const fetchEncodedSignedQuotes = async (
+  pairs: Pair[]
+): Promise<{ encoded: BytesLike; raw: SignedQuote[] }> => {
+  const signedQuotes = await fetchSignedQuotes(pairs);
+  return {
+    encoded: encodeQuotes(signedQuotes),
+    raw: signedQuotes
+  };
 };
 
 const fetchSignedQuotes = async (pairs: Pair[]) => {

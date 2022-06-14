@@ -100,7 +100,7 @@ const hlpSwapTransactionHandler = async (
       sellAmount,
       buyAmountWithTolerance,
       connectedAccount,
-      encodedSignedQuotes
+      encodedSignedQuotes.encoded
     );
   }
 
@@ -109,7 +109,7 @@ const hlpSwapTransactionHandler = async (
       [fromAddress, toAddress],
       buyAmountWithTolerance,
       connectedAccount,
-      encodedSignedQuotes,
+      encodedSignedQuotes.encoded,
       { value: sellAmount }
     );
   }
@@ -119,7 +119,7 @@ const hlpSwapTransactionHandler = async (
     sellAmount,
     buyAmountWithTolerance,
     connectedAccount,
-    encodedSignedQuotes
+    encodedSignedQuotes.encoded
   );
 };
 
