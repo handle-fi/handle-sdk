@@ -4,23 +4,27 @@ import { HlpConfig } from "../..";
 import { WebsocketPrice } from "../../types/trade";
 import { pairFromString } from "../../utils/general-utils";
 
+const RECONNECT_DELAY = 1_000;
+
+export type Overrides = {
+  websocketUrl?: string;
+  reconnectDelayMillis?: number;
+};
+
 class PricesWebsocket {
   protected client!: websocket.w3cwebsocket;
-
   protected callback?: (data: WebsocketPrice) => void;
   protected errorCallback?: (error: Error) => void;
-
   protected overrides?: { websocketUrl?: string };
   protected initialPairs: string[];
 
-  constructor(initialPairs: string[], overrides?: { websocketUrl?: string }) {
+  constructor(initialPairs: string[], overrides?: Overrides) {
     this.overrides = overrides;
     this.initialPairs = initialPairs;
-
-    this.connect();
+    this.connect(overrides?.reconnectDelayMillis);
   }
 
-  protected connect() {
+  protected connect(reconnectDelayMillis = RECONNECT_DELAY) {
     this.close();
     const socket = new websocket.w3cwebsocket(
       this.overrides?.websocketUrl ?? HlpConfig.HANDLE_WEBSOCKET_URL
@@ -29,12 +33,16 @@ class PricesWebsocket {
     socket.onopen = () => {
       this.subscribe(this.initialPairs);
     };
-
-    // Set default error handler
-    socket.onerror = this.errorCallback ?? console.error;
     this.client.onclose = () => {
-      setTimeout(this.connect, 1_000);
+      setTimeout(
+        () => this.connect(reconnectDelayMillis),
+        reconnectDelayMillis
+      );
     };
+    // Set default error handler.
+    this.onError(this.errorCallback ?? console.error);
+    if (this.callback)
+      this.onMessage(this.callback);
   }
 
   public close() {
@@ -45,11 +53,7 @@ class PricesWebsocket {
 
   public onError(callback: (error: Error) => void) {
     this.errorCallback = callback;
-    this.client.onerror = (error) => {
-      if (this.errorCallback) {
-        this.errorCallback(error);
-      }
-    };
+    this.client.onerror = callback;
   }
 
   public onMessage(callback: (data: WebsocketPrice) => void) {
@@ -67,9 +71,8 @@ class PricesWebsocket {
       throw new Error("Websocket not connected");
     }
     const pairs = typeof pair === "string" ? [pair] : pair;
-    // Assert that pairs are valid
+    // Assert that pairs are valid.
     pairs.forEach(pairFromString);
-
     this.client.send(
       JSON.stringify({
         action: "subscribe",
@@ -95,10 +98,8 @@ class PricesWebsocket {
       throw new Error("Websocket not connected");
     }
     const pairs = typeof pair === "string" ? [pair] : pair;
-
-    // Assert that pairs are valid
+    // Assert that pairs are valid.
     pairs.forEach(pairFromString);
-
     this.client.send(
       JSON.stringify({
         action: "unsubscribe",

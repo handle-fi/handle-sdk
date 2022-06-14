@@ -64,6 +64,7 @@
       "symbol": "fxCNY",
       "decimals": 18,
       "address": "0x2C29daAce6Aa05e3b65743EFd61f8A2C448302a3",
+      "logoURI": "https://app.handle.fi/assets/images/handle/fxCNYLogo.png",
       "chainId": 1,
       "extensions": {
         "isFxToken": true
@@ -74,6 +75,7 @@
       "symbol": "fxKRW",
       "decimals": 18,
       "address": "0xF4E8BA79d058fFf263Fd043Ef50e1010c1BdF991",
+      "logoURI": "https://app.handle.fi/assets/images/handle/fxKRWLogo.png",
       "chainId": 1,
       "extensions": {
         "isFxToken": true
@@ -84,6 +86,7 @@
       "symbol": "fxCHF",
       "decimals": 18,
       "address": "0x8C414cB8A9Af9F7B03673e93DF73c23C1aa05b4e",
+      "logoURI": "https://app.handle.fi/assets/images/handle/fxCHFLogo.png",
       "chainId": 1,
       "extensions": {
         "isFxToken": true
@@ -146,6 +149,7 @@
       "symbol": "fxCNY",
       "decimals": 18,
       "address": "0x2C29daAce6Aa05e3b65743EFd61f8A2C448302a3",
+      "logoURI": "https://app.handle.fi/assets/images/handle/fxCNYLogo.png",
       "chainId": 137,
       "extensions": {
         "isFxToken": true
@@ -156,6 +160,7 @@
       "symbol": "fxKRW",
       "decimals": 18,
       "address": "0xF4E8BA79d058fFf263Fd043Ef50e1010c1BdF991",
+      "logoURI": "https://app.handle.fi/assets/images/handle/fxKRWLogo.png",
       "chainId": 137,
       "extensions": {
         "isFxToken": true
@@ -165,7 +170,8 @@
       "name": "handleCHF",
       "symbol": "fxCHF",
       "decimals": 18,
-      "address": "0x8C414cB8A9Af9F7B03673e93DF73c23C1aa05b4e",
+      "address": "0x8C414cB8A9Af9F7B03673e93DF73c23C1aa05b4e", 
+      "logoURI": "https://app.handle.fi/assets/images/handle/fxCHFLogo.png",
       "chainId": 137,
       "extensions": {
         "isFxToken": true
@@ -232,11 +238,12 @@
       }
     },
     {
+      "chainId": 42161,
       "name": "handleCNY",
       "symbol": "fxCNY",
-      "decimals": 18,
       "address": "0x2C29daAce6Aa05e3b65743EFd61f8A2C448302a3",
-      "chainId": 42161,
+      "logoURI": "https://app.handle.fi/assets/images/handle/fxCNYLogo.png",
+      "decimals": 18,
       "extensions": {
         "isFxToken": true,
         "isHlpToken": true,
@@ -248,6 +255,7 @@
       "symbol": "fxKRW",
       "decimals": 18,
       "address": "0xF4E8BA79d058fFf263Fd043Ef50e1010c1BdF991",
+      "logoURI": "https://app.handle.fi/assets/images/handle/fxKRWLogo.png",
       "chainId": 42161,
       "extensions": {
         "isFxToken": true,
@@ -260,6 +268,7 @@
       "symbol": "fxCHF",
       "decimals": 18,
       "address": "0x8C414cB8A9Af9F7B03673e93DF73c23C1aa05b4e",
+      "logoURI": "https://app.handle.fi/assets/images/handle/fxCHFLogo.png",
       "chainId": 42161,
       "extensions": {
         "isFxToken": true,
