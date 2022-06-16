@@ -5,6 +5,8 @@ import { HlpManagerRouter__factory, HlpManager__factory } from "../../../contrac
 import { getHlpFeeBasisPoints } from "../../Trade";
 import { ConvertQuoteRouteArgs, ConvertTransactionRouteArgs, Quote } from "../Convert";
 import { HLP_ADD_REMOVE_WEIGHT, WeightInput } from "./weights";
+import {fetchEncodedSignedQuotes} from "../../../utils/h2so-utils";
+import {pairFromString} from "../../../utils/general-utils";
 
 const hlpAddRemoveWeight = async (input: WeightInput) => {
   if (!HlpConfig.HLP_CONTRACTS[input.network]?.HlpManager) {
@@ -129,13 +131,19 @@ const hlpAddRemoveTransactionHandler = async (
 
   const { hlpAddress: fromAddress } = tokenManager.checkForHlpNativeToken(fromToken);
   const { hlpAddress: toAddress } = tokenManager.checkForHlpNativeToken(toToken);
+  
+  const { encoded: encodedSignedQuotes } = await fetchEncodedSignedQuotes([
+    pairFromString(`${fromToken.symbol}/USD`),
+    pairFromString(`${toToken.symbol}/USD`)
+  ]);
 
   // If selling Hlp and toToken is native
   if (fromToken.extensions?.isLiquidityToken && toToken.extensions?.isNative) {
     return hlpManagerRouter.populateTransaction.removeLiquidityETH(
       BigNumber.from(sellAmount),
       buyAmountWithTolerance,
-      connectedAccount
+      connectedAccount,
+      encodedSignedQuotes
     );
   }
   if (fromToken.extensions?.isLiquidityToken && !toToken.extensions?.isNative) {
@@ -144,7 +152,8 @@ const hlpAddRemoveTransactionHandler = async (
       toAddress,
       BigNumber.from(sellAmount),
       buyAmountWithTolerance,
-      connectedAccount
+      connectedAccount,
+      encodedSignedQuotes
     );
   }
 
@@ -159,6 +168,7 @@ const hlpAddRemoveTransactionHandler = async (
     return hlpManagerRouter.populateTransaction.addLiquidityETH(
       minPriceInUsdHlp,
       buyAmountWithTolerance,
+      encodedSignedQuotes,
       {
         value: BigNumber.from(sellAmount)
       }
@@ -168,7 +178,8 @@ const hlpAddRemoveTransactionHandler = async (
     fromAddress,
     BigNumber.from(sellAmount),
     minPriceInUsdHlp,
-    buyAmountWithTolerance
+    buyAmountWithTolerance,
+    encodedSignedQuotes
   );
 };
 
