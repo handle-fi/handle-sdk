@@ -4,6 +4,8 @@ import { config } from "../index";
 import axios from "axios";
 import { DATA_FEED_API_BASE_URL } from "../config";
 
+const SIGNER_ADDRESS = "0xfff98D80aCC2CE312225e08eb9fA88F19D737577";
+
 type QuoteApiResponse = {
   data: {
     /// Quote value as an 8 decimal number.
@@ -40,6 +42,7 @@ const fetchSignedQuotes = async (pairs: Pair[]) => {
     pair.baseSymbol = pair.baseSymbol.replace(/WETH/g, "ETH");
     pair.quoteSymbol = pair.quoteSymbol.replace(/WETH/g, "ETH");
   }
+  console.log("pairs: ", pairs);
   const responses: QuoteApiResponse[] = [];
   const requests = pairs.map(async (pair) => {
     // The only base symbol that can be requested as fxToken is fxUSD.
@@ -61,10 +64,19 @@ const quoteApiResponseToSignedQuote = (
   {
     data: {
       result,
-      signed: { signatureParams, signature }
+      signed: { signatureParams, signature, message }
     }
-  }: QuoteApiResponse
+  }: QuoteApiResponse,
+  verifySigner = true
 ): SignedQuote => {
+  if (verifySigner) {
+    const untrustedSigner = ethers.utils.recoverAddress(
+      `0x${message}`,
+      `0x${signature}`
+    );
+    if (untrustedSigner.toLowerCase() !== SIGNER_ADDRESS.toLowerCase())
+      throw new Error(`Message is not signed by authorised signer (signed by "${untrustedSigner}")`);
+  }
   return {
     pair,
     signature: signature.startsWith("0x")
