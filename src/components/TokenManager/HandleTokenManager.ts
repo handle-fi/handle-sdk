@@ -1,9 +1,17 @@
 import { TokenInfo } from "@uniswap/token-lists";
 import TokenManager from ".";
 import { Network } from "../..";
+import { validateTokenList } from "../../utils/tokenlist-utils";
+import nativeTokenList from "../../config/TokenLists/native-tokens.json";
+import handleTokenList from "../../config/TokenLists/handle-tokens.json";
+import handleStakingTokenList from "../../config/TokenLists/staking-tokens.json";
+
+const NativeTokenList = validateTokenList(nativeTokenList);
+const HandleTokenList = validateTokenList(handleTokenList);
+const HandleStakingTokenList = validateTokenList(handleStakingTokenList);
 
 /**
- * TokenManager that comes with handle tokens by default.
+ * TokenManager that comes with native and handle tokens by default.
  * Handle supported token extensions:
  * - isNative: true if token is native for that network (e.g. ETH, MATIC)
  * - isHlpToken: true if the token is a hlp token in a handle Vault contract
@@ -17,7 +25,10 @@ import { Network } from "../..";
  */
 class HandleTokenManager extends TokenManager {
   constructor(tokenListUrls: string[] = []) {
-    super(tokenListUrls, true, true);
+    super(tokenListUrls);
+    this.setTokenList("native-tokens", NativeTokenList);
+    this.setTokenList("handle-tokens", HandleTokenList);
+    this.setTokenList("handle-staking-tokens", HandleStakingTokenList);
   }
 
   /**
