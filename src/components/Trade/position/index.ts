@@ -1,5 +1,5 @@
 import { BigNumber } from "ethers";
-import { getMarginFee } from "./../getMarginFee";
+import { getMarginFee } from "../getMarginFee";
 
 export type Position = {
   collateralToken: string;
