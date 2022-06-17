@@ -67,27 +67,28 @@ export const getAum = async (
 
     if (isStable) {
       aum = aum.add(poolAmount.mul(price).div(BigNumber.from(10).pow(decimals)));
-    } else {
-      // add global short profit / loss
-      if (size.gt(0)) {
-        const priceDelta = averagePrice.gt(price)
-          ? averagePrice.sub(price)
-          : price.sub(averagePrice);
-        const delta = size.mul(priceDelta).div(averagePrice);
-        if (price > averagePrice) {
-          // add losses from shorts
-          aum = aum.add(delta);
-        } else {
-          shortProfits = shortProfits.add(delta);
-        }
-      }
-
-      aum = aum.add(guaranteedUsd);
-
-      aum = aum.add(
-        poolAmount.sub(reservedAmount).mul(price).div(BigNumber.from(10).pow(decimals))
-      );
+      continue;
     }
+
+    // add global short profit / loss
+    if (size.gt(0)) {
+      const priceDelta = averagePrice.gt(price)
+        ? averagePrice.sub(price)
+        : price.sub(averagePrice);
+      const delta = size.mul(priceDelta).div(averagePrice);
+      if (price > averagePrice) {
+        // add losses from shorts
+        aum = aum.add(delta);
+      } else {
+        shortProfits = shortProfits.add(delta);
+      }
+    }
+
+    aum = aum.add(guaranteedUsd);
+
+    aum = aum.add(
+      poolAmount.sub(reservedAmount).mul(price).div(BigNumber.from(10).pow(decimals))
+    );
   }
 
   aum = shortProfits.gt(aum) ? ethers.constants.Zero : aum.sub(shortProfits);
