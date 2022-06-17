@@ -14,6 +14,8 @@ export type Position = {
   realisedPnL: BigNumber;
   lastIncreasedTime: BigNumber;
   reserveAmount: BigNumber;
+  delta?: BigNumber;
+  hasProfit?: boolean;
 };
 
 export const contractPositionToPosition = (
