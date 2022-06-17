@@ -91,7 +91,10 @@ export const getAum = async (
 
     if (isStable) {
       aum = aum.add(poolAmount.mul(price).div(BigNumber.from(10).pow(decimals)));
-    } else if (size.gt(0)) {
+      continue;
+    }
+
+    if (size.gt(0)) {
       // add global short profit / loss
       const priceDelta = averagePrice.gt(price)
         ? averagePrice.sub(price)
