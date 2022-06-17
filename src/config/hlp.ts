@@ -66,7 +66,7 @@ export const HLP_CONTRACTS: NetworkMap<HlpContracts | undefined> = {
     Router: "0x851aBAD9A78609ef44dB07BfBBE55748731513A6",
     Reader: "0xCb7AEB7f471D1c19C78E3cd578ee5Ff0788278B6",
     HLP: "0xB666b08609b2E69A8ba51AA720770053AeC0d2d3",
-    HlpManagerRouter: "0x3ecB21eABEF68a237862E8A003807eE4Fa47509b"
+    HlpManagerRouter: "0xe7EcFcA68aCEdf2aabd016Bc7C587Cc513dDeC22"
   },
   ethereum: undefined,
   polygon: undefined
