@@ -44,6 +44,27 @@
       "decimals": 18,
       "address": "0xbf7e49483881c76487b0989cd7d9a8239b20ca41",
       "chainId": 42161
+    },
+    {
+      "symbol": "SP-WETH-FOREX",
+      "name": "SP-WETH-FOREX",
+      "decimals": 18,
+      "address": "0x9745e5CC0522827958eE3Fc2C03247276D359186",
+      "chainId": 42161
+    },
+    {
+      "symbol": "CRV-fxEUR-EURS",
+      "name": "CRV-fxEUR-EURS",
+      "decimals": 18,
+      "address": "0xb0D2EB3C2cA3c6916FAb8DCbf9d9c165649231AE",
+      "chainId": 42161
+    },
+    {
+      "symbol": "CRV-handle3",
+      "name": "CRV-handle3",
+      "decimals": 18,
+      "address": "0xd0dd5d76cf0fc06dabc48632735566dca241a35e",
+      "chainId": 42161
     }
   ]
 }
