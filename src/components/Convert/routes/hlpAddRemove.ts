@@ -132,10 +132,11 @@ const hlpAddRemoveTransactionHandler = async (
   const { hlpAddress: fromAddress } = tokenManager.checkForHlpNativeToken(fromToken);
   const { hlpAddress: toAddress } = tokenManager.checkForHlpNativeToken(toToken);
   
-  const { encoded: encodedSignedQuotes } = await fetchEncodedSignedQuotes([
-    pairFromString(`${fromToken.symbol}/USD`),
-    pairFromString(`${toToken.symbol}/USD`)
-  ]);
+  const { encoded: encodedSignedQuotes } = await fetchEncodedSignedQuotes(
+    new HandleTokenManager()
+      .getHlpTokens(network)
+      .map(({ symbol }) => pairFromString(`${symbol}/USD`))
+  );
 
   // If selling Hlp and toToken is native
   if (fromToken.extensions?.isLiquidityToken && toToken.extensions?.isNative) {
