@@ -2,7 +2,7 @@ import { Pair, SignedQuote } from "../types/trade";
 import { BigNumber, BytesLike, ethers } from "ethers";
 import { config } from "../index";
 import axios from "axios";
-import { DATA_FEED_API_BASE_URL } from "../config";
+import {DATA_FEED_API_BASE_URL, DATA_FEED_SIGNING_ADDRESS} from "../config";
 
 type QuoteApiResponse = {
   data: {
@@ -40,8 +40,9 @@ const fetchSignedQuotes = async (pairs: Pair[]) => {
     pair.baseSymbol = pair.baseSymbol.replace(/WETH/g, "ETH");
     pair.quoteSymbol = pair.quoteSymbol.replace(/WETH/g, "ETH");
   }
-  const responses: QuoteApiResponse[] = [];
-  const requests = pairs.map(async (pair) => {
+  type Response = QuoteApiResponse & { pairIndex: number };
+  const responses: Response[] = [];
+  const requests = pairs.map(async (pair, i) => {
     // The only base symbol that can be requested as fxToken is fxUSD.
     const base =
       pair.baseSymbol.startsWith("fx") && pair.baseSymbol !== "fxUSD"
@@ -50,10 +51,12 @@ const fetchSignedQuotes = async (pairs: Pair[]) => {
     const result = await axios.get(
       `${DATA_FEED_API_BASE_URL}/${base}/${pair.quoteSymbol}?sign=true`
     );
-    responses.push(result.data);
+    responses.push({ ...result.data, pairIndex: i });
   });
   await Promise.all(requests);
-  return responses.map((response, i) => quoteApiResponseToSignedQuote(pairs[i], response));
+  return responses.map((response) =>  {
+    return quoteApiResponseToSignedQuote(pairs[response.pairIndex], response);
+  });
 };
 
 const quoteApiResponseToSignedQuote = (
@@ -61,10 +64,19 @@ const quoteApiResponseToSignedQuote = (
   {
     data: {
       result,
-      signed: { signatureParams, signature }
+      signed: { signatureParams, signature, message }
     }
-  }: QuoteApiResponse
+  }: QuoteApiResponse,
+  verifySigner = true
 ): SignedQuote => {
+  if (verifySigner) {
+    const untrustedSigner = ethers.utils.verifyMessage(
+      ethers.utils.arrayify(`0x${message}`),
+      `0x${signature}`
+    ).toLowerCase();
+    if (untrustedSigner !== DATA_FEED_SIGNING_ADDRESS.toLowerCase())
+      throw new Error(`Message is not signed by authorised signer (signed by "${untrustedSigner}")`);
+  }
   return {
     pair,
     signature: signature.startsWith("0x")

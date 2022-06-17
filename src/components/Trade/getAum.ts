@@ -37,17 +37,37 @@ export const getAum = async (
   const tokens = await Promise.all(
     new Array(+length).fill(0).map(async (_, i) => {
       const token = await vault.allWhitelistedTokens(i);
-
+      const [
+        isWhiteListed,
+        price,
+        poolAmount,
+        decimals,
+        isStable,
+        size,
+        averagePrice,
+        guaranteedUsd,
+        reservedAmount,
+      ] = await Promise.all([
+        vault.whitelistedTokens(token),
+        maximise ? getMaxPrice(token) : getMinPrice(token),
+        vault.poolAmounts(token),
+        vault.tokenDecimals(token),
+        vault.stableTokens(token),
+        vault.globalShortSizes(token),
+        vault.globalShortAveragePrices(token),
+        vault.guaranteedUsd(token),
+        vault.reservedAmounts(token)
+      ]);
       return {
-        isWhiteListed: await vault.whitelistedTokens(token),
-        price: maximise ? await getMaxPrice(token) : await getMinPrice(token),
-        poolAmount: await vault.poolAmounts(token),
-        decimals: await vault.tokenDecimals(token),
-        isStable: await vault.stableTokens(token),
-        size: await vault.globalShortSizes(token),
-        averagePrice: await vault.globalShortAveragePrices(token),
-        guaranteedUsd: await vault.guaranteedUsd(token),
-        reservedAmount: await vault.reservedAmounts(token)
+        isWhiteListed,
+        price,
+        poolAmount,
+        decimals,
+        isStable,
+        size,
+        averagePrice,
+        guaranteedUsd,
+        reservedAmount,
       };
     })
   );
@@ -71,27 +91,31 @@ export const getAum = async (
 
     if (isStable) {
       aum = aum.add(poolAmount.mul(price).div(BigNumber.from(10).pow(decimals)));
-    } else {
-      // add global short profit / loss
-      if (size.gt(0)) {
-        const priceDelta = averagePrice.gt(price)
-          ? averagePrice.sub(price)
-          : price.sub(averagePrice);
-        const delta = size.mul(priceDelta).div(averagePrice);
-        if (price > averagePrice) {
-          // add losses from shorts
-          aum = aum.add(delta);
-        } else {
-          shortProfits = shortProfits.add(delta);
-        }
-      }
-
-      aum = aum.add(guaranteedUsd);
-
-      aum = aum.add(
-        poolAmount.sub(reservedAmount).mul(price).div(BigNumber.from(10).pow(decimals))
-      );
+      continue;
     }
+
+    if (size.gt(0)) {
+      // add global short profit / loss
+      const priceDelta = averagePrice.gt(price)
+        ? averagePrice.sub(price)
+        : price.sub(averagePrice);
+      const delta = size.mul(priceDelta).div(averagePrice);
+      if (price > averagePrice) {
+        // add losses from shorts
+        aum = aum.add(delta);
+      } else {
+        shortProfits = shortProfits.add(delta);
+      }
+    }
+
+    aum = aum
+      .add(guaranteedUsd)
+      .add(
+        poolAmount
+          .sub(reservedAmount)
+          .mul(price)
+          .div(BigNumber.from(10).pow(decimals))
+      );
   }
 
   aum = shortProfits.gt(aum) ? ethers.constants.Zero : aum.sub(shortProfits);
