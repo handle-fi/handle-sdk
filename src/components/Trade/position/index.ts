@@ -17,7 +17,7 @@ export type Position = {
 };
 
 export const contractPositionToPosition = (
-  _position: [BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, boolean, BigNumber],
+  position: [BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, boolean, BigNumber],
   collateralToken: string,
   indexToken: string,
   isLong: boolean
@@ -31,8 +31,8 @@ export const contractPositionToPosition = (
     realisedPnL,
     hasRealisedProfit,
     lastIncreasedTime
-  ] = _position;
-  let position: Position = {
+  ] = position;
+  return {
     collateralToken,
     indexToken,
     size,
@@ -45,7 +45,5 @@ export const contractPositionToPosition = (
     lastIncreasedTime,
     isLong,
     positionFee: getMarginFee(size)
-  };
-
-  return position as Position;
+  } as Position;
 };
