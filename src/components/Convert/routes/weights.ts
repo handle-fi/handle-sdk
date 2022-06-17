@@ -13,4 +13,5 @@ export type WeightInput = {
   toToken: TokenInfo;
   signerOrProvider?: ethers.providers.Provider | Signer;
   network: Network;
+  hasHlpMethods: boolean;
 };

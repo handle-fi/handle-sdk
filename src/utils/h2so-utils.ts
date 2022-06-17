@@ -24,8 +24,14 @@ type QuoteApiResponse = {
   };
 };
 
-export const fetchEncodedSignedQuotes = async (pairs: Pair[]): Promise<BytesLike> => {
-  return encodeQuotes(await fetchSignedQuotes(pairs));
+export const fetchEncodedSignedQuotes = async (
+  pairs: Pair[]
+): Promise<{ encoded: BytesLike; raw: SignedQuote[] }> => {
+  const signedQuotes = await fetchSignedQuotes(pairs);
+  return {
+    encoded: encodeQuotes(signedQuotes),
+    raw: signedQuotes
+  };
 };
 
 const fetchSignedQuotes = async (pairs: Pair[]) => {
@@ -38,9 +44,12 @@ const fetchSignedQuotes = async (pairs: Pair[]) => {
   const requests = pairs.map(async (pair) => {
     // The only base symbol that can be requested as fxToken is fxUSD.
     const base =
-      pair.baseSymbol.startsWith("fx") && pair.baseSymbol !== "fxUSD" ? pair.baseSymbol.substring(2) : pair.baseSymbol;
-    console.log(`${DATA_FEED_API_BASE_URL}${base}/${pair.quoteSymbol}?sign=true`);
-    const result = await axios.get(`${DATA_FEED_API_BASE_URL}${base}/${pair.quoteSymbol}?sign=true`);
+      pair.baseSymbol.startsWith("fx") && pair.baseSymbol !== "fxUSD"
+        ? pair.baseSymbol.substring(2)
+        : pair.baseSymbol;
+    const result = await axios.get(
+      `${DATA_FEED_API_BASE_URL}/${base}/${pair.quoteSymbol}?sign=true`
+    );
     responses.push(result.data);
   });
   await Promise.all(requests);
@@ -79,7 +88,7 @@ const encodeQuotes = (quotes: SignedQuote[]): BytesLike => {
     }
     return buffer;
   }, new Uint8Array(quotes.length * 65));
-  const tokenAddresses = quotes.map((quote) => symbolToAddress(quote.pair.quoteSymbol));
+  const tokenAddresses = quotes.map((quote) => symbolToAddress(quote.pair.baseSymbol));
   return ethers.utils.defaultAbiCoder.encode(
     ["uint256", "address[]", "uint256[]", "uint256[]", "uint256[]", "uint256[]", "bytes"],
     [

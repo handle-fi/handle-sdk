@@ -9,13 +9,11 @@ export type WebsocketPrice = {
   pair: Pair;
   value: number;
   timestamp: number;
-}
+};
 
 export type HlpInfoMethods = {
   getMinPrice: (address: string) => BigNumber;
   getMaxPrice: (address: string) => BigNumber;
-  getFundingRate: (address: string) => BigNumber;
-  getTokenInfo: (address: string) => VaultTokenInfo | undefined;
   getUsdHlpSupply: () => BigNumber;
   getTargetUsdHlpAmount: (address: string) => BigNumber;
   getTotalTokenWeights: () => BigNumber;

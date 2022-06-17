@@ -61,7 +61,6 @@ const hlpAddRemoveQuoteHandler = async (input: ConvertQuoteRouteArgs): Promise<Q
     targetUsdHlpAmount: hlpMethods.getTargetUsdHlpAmount(
       isBuyingHlp ? parsedFromTokenAddress : parsedToTokenAddress
     ),
-    getTokenInfo: hlpMethods.getTokenInfo,
     usdHlpSupply: hlpMethods.getUsdHlpSupply()
   });
 

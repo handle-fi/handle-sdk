@@ -4,8 +4,8 @@ import { Router__factory } from "../../../contracts";
 import { getSwapFeeBasisPoints } from "../../Trade";
 import { ConvertQuoteRouteArgs, ConvertTransactionRouteArgs, Quote } from "../Convert";
 import { HLP_SWAP_WEIGHT, WeightInput } from "./weights";
-import {fetchEncodedSignedQuotes} from "../../../utils/h2so-utils";
-import {pairFromString} from "../../../utils/general-utils";
+import { fetchEncodedSignedQuotes } from "../../../utils/h2so-utils";
+import { pairFromString } from "../../../utils/general-utils";
 
 const hlpSwapWeight = async (input: WeightInput): Promise<number> => {
   const routerAddress = HlpConfig.HLP_CONTRACTS[input.network]?.Router;
@@ -16,7 +16,7 @@ const hlpSwapWeight = async (input: WeightInput): Promise<number> => {
   const isFromTokenValid =
     tokenManager.isHlpTokenBySymbol(input.fromToken.symbol, input.network) ||
     input.fromToken.extensions?.isNative;
-  if (routerAddress && isToTokenValid && isFromTokenValid) {
+  if (routerAddress && isToTokenValid && isFromTokenValid && input.hasHlpMethods) {
     return HLP_SWAP_WEIGHT;
   }
   return 0;
@@ -49,8 +49,7 @@ const hlpSwapQuoteHandler = async (input: ConvertQuoteRouteArgs): Promise<Quote>
       .div(ethers.utils.parseUnits("1", fromToken.decimals)),
     usdHlpSupply: hlpMethods.getUsdHlpSupply(),
     totalTokenWeights: hlpMethods.getTotalTokenWeights(),
-    targetUsdHlpAmount: hlpMethods.getTargetUsdHlpAmount(parsedFromTokenAddress),
-    getTokenInfo: hlpMethods.getTokenInfo
+    targetUsdHlpAmount: hlpMethods.getTargetUsdHlpAmount(parsedFromTokenAddress)
   });
 
   return {
@@ -92,7 +91,7 @@ const hlpSwapTransactionHandler = async (
 
   const encodedSignedQuotes = await fetchEncodedSignedQuotes([
     pairFromString(`${fromToken.symbol}/USD`),
-    pairFromString(`${toToken.symbol}/USD`),
+    pairFromString(`${toToken.symbol}/USD`)
   ]);
 
   if (!isFromNative && !isToNative) {
@@ -101,7 +100,7 @@ const hlpSwapTransactionHandler = async (
       sellAmount,
       buyAmountWithTolerance,
       connectedAccount,
-      encodedSignedQuotes
+      encodedSignedQuotes.encoded
     );
   }
 
@@ -110,7 +109,7 @@ const hlpSwapTransactionHandler = async (
       [fromAddress, toAddress],
       buyAmountWithTolerance,
       connectedAccount,
-      encodedSignedQuotes,
+      encodedSignedQuotes.encoded,
       { value: sellAmount }
     );
   }
@@ -120,7 +119,7 @@ const hlpSwapTransactionHandler = async (
     sellAmount,
     buyAmountWithTolerance,
     connectedAccount,
-    encodedSignedQuotes
+    encodedSignedQuotes.encoded
   );
 };
 

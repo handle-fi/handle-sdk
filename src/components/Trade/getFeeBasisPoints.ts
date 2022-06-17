@@ -1,8 +1,6 @@
 import { BigNumber, ethers } from "ethers";
-import { VaultTokenInfo } from "../../types/trade";
 
 type FeeBasisPointsArgs = {
-  token: string;
   usdHlpDelta: BigNumber;
   feeBasisPoints: BigNumber;
   taxBasisPoints: BigNumber;
@@ -10,22 +8,17 @@ type FeeBasisPointsArgs = {
   usdHlpSupply: BigNumber;
   totalTokenWeights: BigNumber;
   targetUsdHlpAmount: BigNumber;
-  getTokenInfo: (token: string) => VaultTokenInfo | undefined;
 };
 
 export const getFeeBasisPoints = ({
-  token,
   usdHlpDelta,
   feeBasisPoints,
   taxBasisPoints,
   increment,
-  getTokenInfo,
+  usdHlpSupply,
   targetUsdHlpAmount
 }: FeeBasisPointsArgs) => {
-  const tokenInfo = getTokenInfo(token);
-  if (!tokenInfo) return ethers.constants.Zero;
-
-  const initialAmount = tokenInfo.usdHlpAmount;
+  const initialAmount = usdHlpSupply;
   let nextAmount = initialAmount.add(usdHlpDelta);
   if (!increment) {
     nextAmount = usdHlpDelta.gt(initialAmount)

@@ -1,6 +1,7 @@
 import axios from "axios";
 import websocket from "websocket";
 import { HlpConfig } from "../..";
+import { DATA_FEED_API_BASE_URL } from "../../config";
 import { WebsocketPrice } from "../../types/trade";
 import { pairFromString } from "../../utils/general-utils";
 
@@ -34,15 +35,11 @@ class PricesWebsocket {
       this.subscribe(this.initialPairs);
     };
     this.client.onclose = () => {
-      setTimeout(
-        () => this.connect(reconnectDelayMillis),
-        reconnectDelayMillis
-      );
+      setTimeout(() => this.connect(reconnectDelayMillis), reconnectDelayMillis);
     };
     // Set default error handler.
     this.onError(this.errorCallback ?? console.error);
-    if (this.callback)
-      this.onMessage(this.callback);
+    if (this.callback) this.onMessage(this.callback);
   }
 
   public close() {
@@ -82,7 +79,7 @@ class PricesWebsocket {
       })
     );
     pairs.forEach(async (_pair) => {
-      const response = await axios.get(`${HlpConfig.HANDLE_ORACLE_URL}/${_pair}`);
+      const response = await axios.get(`${DATA_FEED_API_BASE_URL}/${_pair}`);
       if (this.callback) {
         this.callback({
           pair: pairFromString(_pair),

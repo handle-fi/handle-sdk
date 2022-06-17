@@ -13,9 +13,11 @@ import { getNextAveragePrice } from "./position/getNextAveragePrice";
 import { getMarginFee } from "./getMarginFee";
 import { getLeverage } from "./position/getLeverage";
 import { getPositionDelta } from "./position/getPositionDelta";
+import { getAum } from "./getAum";
 
 export {
   contractPositionToPosition,
+  getAum,
   getFeeBasisPoints,
   getFundingFee,
   getHlpFeeBasisPoints,

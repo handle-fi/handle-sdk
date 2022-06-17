@@ -17,7 +17,7 @@ type LiquidationDelta = {
 };
 
 export const getLiquidationPrice = (
-  position: Position,
+  position: Required<Position>,
   indexTokenCumulativeFundingRate: BigNumber,
   deltaInfo?: LiquidationDelta
 ): BigNumber => {

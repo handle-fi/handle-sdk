@@ -11,17 +11,14 @@ const ZERO_POSITION = (
   collateral: ethers.constants.Zero,
   collateralToken,
   indexToken,
-  delta: ethers.constants.Zero,
   entryFundingRate: ethers.constants.Zero,
-  hasProfit: false,
   hasRealisedProfit: false,
   isLong: false,
   lastIncreasedTime: ethers.constants.Zero,
-  leverage: ethers.constants.Zero,
-  netValue: ethers.constants.Zero,
   positionFee: ethers.constants.Zero,
   realisedPnL: ethers.constants.Zero,
-  size: ethers.constants.Zero
+  size: ethers.constants.Zero,
+  reserveAmount: ethers.constants.Zero
 });
 
 const EXISTING_POSITION = () => {
@@ -49,7 +46,15 @@ describe("getLiquidationPrice", () => {
         increaseSize: true
       };
 
-      const price = TradeUtils.getLiquidationPrice(position, ethers.constants.Zero, delta);
+      const price = TradeUtils.getLiquidationPrice(
+        {
+          ...position,
+          delta: ethers.constants.Zero,
+          hasProfit: false
+        },
+        ethers.constants.Zero,
+        delta
+      );
       expect(ethers.utils.formatUnits(price, 30)).to.equal("1712.433666666666666382475964222223");
     });
     it("can calculate liquidation price for a short position", async () => {
@@ -63,7 +68,15 @@ describe("getLiquidationPrice", () => {
         increaseSize: true
       };
 
-      const price = TradeUtils.getLiquidationPrice(position, ethers.constants.Zero, delta);
+      const price = TradeUtils.getLiquidationPrice(
+        {
+          ...position,
+          delta: ethers.constants.Zero,
+          hasProfit: false
+        },
+        ethers.constants.Zero,
+        delta
+      );
       expect(ethers.utils.formatUnits(price, 30)).to.equal("3968.115433333333340091773551376522");
     });
   });
@@ -71,12 +84,26 @@ describe("getLiquidationPrice", () => {
     it("can calculate liquidation price for a long position", async () => {
       const position = EXISTING_POSITION();
       position.isLong = true;
-      const price = getLiquidationPrice(position, bn(100));
+      const price = getLiquidationPrice(
+        {
+          ...position,
+          delta: ethers.constants.Zero,
+          hasProfit: false
+        },
+        bn(100)
+      );
       expect(ethers.utils.formatUnits(price, 30)).to.equal("0.541");
     });
     it("can calculate liquidation price for a short position", async () => {
       const position = EXISTING_POSITION();
-      const price = getLiquidationPrice(position, bn(100));
+      const price = getLiquidationPrice(
+        {
+          ...position,
+          delta: ethers.constants.Zero,
+          hasProfit: false
+        },
+        bn(100)
+      );
       expect(ethers.utils.formatUnits(price, 30)).to.equal("1.459");
     });
   });
@@ -93,7 +120,15 @@ describe("getLiquidationPrice", () => {
           collateralDelta: ethers.utils.parseUnits("10", 30)
         };
 
-        const price = getLiquidationPrice(position, bn(100), delta);
+        const price = getLiquidationPrice(
+          {
+            ...position,
+            delta: ethers.constants.Zero,
+            hasProfit: false
+          },
+          bn(100),
+          delta
+        );
         expect(ethers.utils.formatUnits(price, 30)).to.equal("0.482");
       });
       it("is correct when adding position size and collateral", async () => {
@@ -107,7 +142,15 @@ describe("getLiquidationPrice", () => {
           collateralDelta: ethers.utils.parseUnits("10", 30)
         };
 
-        const price = getLiquidationPrice(position, bn(100), delta);
+        const price = getLiquidationPrice(
+          {
+            ...position,
+            delta: ethers.constants.Zero,
+            hasProfit: false
+          },
+          bn(100),
+          delta
+        );
         expect(ethers.utils.formatUnits(price, 30)).to.equal("0.560666666666666666666666666667");
       });
     });
@@ -122,7 +165,15 @@ describe("getLiquidationPrice", () => {
           collateralDelta: ethers.utils.parseUnits("10", 30)
         };
 
-        const price = getLiquidationPrice(position, bn(100), delta);
+        const price = getLiquidationPrice(
+          {
+            ...position,
+            delta: ethers.constants.Zero,
+            hasProfit: false
+          },
+          bn(100),
+          delta
+        );
         expect(ethers.utils.formatUnits(price, 30)).to.equal("1.518");
       });
       it("is correct when adding position size and collateral", async () => {
@@ -135,7 +186,15 @@ describe("getLiquidationPrice", () => {
           collateralDelta: ethers.utils.parseUnits("10", 30)
         };
 
-        const price = getLiquidationPrice(position, bn(100), delta);
+        const price = getLiquidationPrice(
+          {
+            ...position,
+            delta: ethers.constants.Zero,
+            hasProfit: false
+          },
+          bn(100),
+          delta
+        );
         expect(ethers.utils.formatUnits(price, 30)).to.equal("1.439333333333333333333333333333");
       });
     });

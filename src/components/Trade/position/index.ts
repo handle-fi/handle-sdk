@@ -1,5 +1,4 @@
-import { BigNumber, ethers } from "ethers";
-import { getLeverage } from "./getLeverage";
+import { BigNumber } from "ethers";
 import { getMarginFee } from "./../getMarginFee";
 
 export type Position = {
@@ -14,14 +13,13 @@ export type Position = {
   hasRealisedProfit: boolean;
   realisedPnL: BigNumber;
   lastIncreasedTime: BigNumber;
-  hasProfit: boolean;
-  delta: BigNumber;
-  netValue: BigNumber;
-  leverage: BigNumber;
+  reserveAmount: BigNumber;
+  delta?: BigNumber;
+  hasProfit?: boolean;
 };
 
 export const contractPositionToPosition = (
-  _position: BigNumber[],
+  _position: [BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber, boolean, BigNumber],
   collateralToken: string,
   indexToken: string,
   isLong: boolean
@@ -31,38 +29,25 @@ export const contractPositionToPosition = (
     collateral,
     averagePrice,
     entryFundingRate,
-    hasRealisedProfit,
+    reserveAmount,
     realisedPnL,
-    lastIncreasedTime,
-    hasProfit,
-    delta
+    hasRealisedProfit,
+    lastIncreasedTime
   ] = _position;
-  let position: Partial<Position> = {
+  let position: Position = {
     collateralToken,
     indexToken,
     size,
     collateral,
     averagePrice,
+    reserveAmount,
     entryFundingRate,
-    hasRealisedProfit: hasRealisedProfit.eq(1),
+    hasRealisedProfit,
     realisedPnL,
     lastIncreasedTime,
-    hasProfit: hasProfit.eq(1),
-    delta,
-    isLong
+    isLong,
+    positionFee: getMarginFee(size)
   };
-  position.positionFee = getMarginFee(size);
-
-  if (position.collateral && position.collateral.gt(0)) {
-    position.leverage = getLeverage({
-      size,
-      collateral,
-      hasProfit: !!position.hasProfit,
-      delta: position.delta
-    });
-  } else {
-    position.leverage = ethers.constants.Zero;
-  }
 
   return position as Position;
 };

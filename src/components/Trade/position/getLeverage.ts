@@ -90,7 +90,7 @@ export const getLeverage = (
  * @returns the new leverage in basis points
  */
 export const getLeverageFromPosition = (
-  position: Omit<Position, "leverage">,
+  position: Required<Position>,
   positionDelta: PositionDelta = DEFAULT_POSITION_DELTA,
   cumulativeFundingRate?: BigNumber
 ) => {
