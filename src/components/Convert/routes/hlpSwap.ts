@@ -4,6 +4,8 @@ import { Router__factory } from "../../../contracts";
 import { getSwapFeeBasisPoints } from "../../Trade";
 import { ConvertQuoteRouteArgs, ConvertTransactionRouteArgs, Quote } from "../Convert";
 import { HLP_SWAP_WEIGHT, WeightInput } from "./weights";
+import {fetchEncodedSignedQuotes} from "../../../utils/h2so-utils";
+import {pairFromString} from "../../../utils/general-utils";
 
 const hlpSwapWeight = async (input: WeightInput): Promise<number> => {
   const routerAddress = HlpConfig.HLP_CONTRACTS[input.network]?.Router;
@@ -88,12 +90,18 @@ const hlpSwapTransactionHandler = async (
     .mul(HlpConfig.BASIS_POINTS_DIVISOR - slippage * 100)
     .div(HlpConfig.BASIS_POINTS_DIVISOR);
 
+  const encodedSignedQuotes = await fetchEncodedSignedQuotes([
+    pairFromString(`${fromToken.symbol}/USD`),
+    pairFromString(`${toToken.symbol}/USD`),
+  ]);
+
   if (!isFromNative && !isToNative) {
     return router.populateTransaction.swap(
       [fromAddress, toAddress],
       sellAmount,
       buyAmountWithTolerance,
-      connectedAccount
+      connectedAccount,
+      encodedSignedQuotes
     );
   }
 
@@ -102,6 +110,7 @@ const hlpSwapTransactionHandler = async (
       [fromAddress, toAddress],
       buyAmountWithTolerance,
       connectedAccount,
+      encodedSignedQuotes,
       { value: sellAmount }
     );
   }
@@ -110,7 +119,8 @@ const hlpSwapTransactionHandler = async (
     [fromAddress, toAddress],
     sellAmount,
     buyAmountWithTolerance,
-    connectedAccount
+    connectedAccount,
+    encodedSignedQuotes
   );
 };
 

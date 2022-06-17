@@ -1,6 +1,6 @@
 import { BigNumber, ethers, Signer } from "ethers";
-import { Network } from "../../types/network";
-import { HlpInfoMethods } from "../Trade/types";
+import { Network } from "../../types/network"; 
+import { HlpInfoMethods } from "../../types/trade";
 import routes from "./routes";
 import { WeightInput } from "./routes/weights";
 import { TokenInfo } from "@uniswap/token-lists";

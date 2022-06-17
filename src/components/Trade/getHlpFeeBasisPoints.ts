@@ -1,7 +1,7 @@
 import { BigNumber } from "ethers";
 import { MINT_BURN_FEE_BASIS_POINTS } from "../../config/hlp";
 import { TAX_BASIS_POINTS } from "../../config/hlp";
-import { VaultTokenInfo } from "./types";
+import { VaultTokenInfo } from "../../types/trade";
 import { getFeeBasisPoints } from "./getFeeBasisPoints";
 
 export const getHlpFeeBasisPoints = (args: {

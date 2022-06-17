@@ -5,7 +5,7 @@ import {
   SWAP_FEE_BASIS_POINTS,
   TAX_BASIS_POINTS
 } from "../../config/hlp";
-import { VaultTokenInfo } from "./types";
+import { VaultTokenInfo } from "../../types/trade";
 import { getFeeBasisPoints } from "./getFeeBasisPoints";
 import { Network } from "../../types/network";
 import HandleTokenManager from "../TokenManager/HandleTokenManager";

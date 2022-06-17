@@ -1,4 +1,4 @@
-import { GetLiquidationArgs } from "./types";
+import { GetLiquidationArgs } from "../../types/trade";
 
 export const getLiquidationPriceFromDelta = ({
   liquidationAmount,
