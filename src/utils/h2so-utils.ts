@@ -1,32 +1,30 @@
-import {Pair, SignedQuote} from "../types/trade";
-import {BigNumber, BytesLike, ethers} from "ethers";
-import {config} from "../index";
+import { Pair, SignedQuote } from "../types/trade";
+import { BigNumber, BytesLike, ethers } from "ethers";
+import { config } from "../index";
 import axios from "axios";
-import {DATA_FEED_API_BASE_URL} from "../config";
+import { DATA_FEED_API_BASE_URL } from "../config";
 
 type QuoteApiResponse = {
   data: {
     /// Quote value as an 8 decimal number.
-    result: number,
+    result: number;
     signed: {
       signatureParams: {
-        signedTimestamp: number,
-        chainId: number,
+        signedTimestamp: number;
+        chainId: number;
         /// Timestamp from which the quote is valid. Seconds since unix epoch.
-        validFromTimestamp: number,
-        durationSeconds: number,
-      },
+        validFromTimestamp: number;
+        durationSeconds: number;
+      };
       /// Hex-encoded signature.
-      signature: string,
+      signature: string;
       /// Hex-encoded unsigned message.
-      message: string,
-    }
-  }
+      message: string;
+    };
+  };
 };
 
-export const fetchEncodedSignedQuotes = async (
-  pairs: Pair[]
-): Promise<BytesLike> => {
+export const fetchEncodedSignedQuotes = async (pairs: Pair[]): Promise<BytesLike> => {
   return encodeQuotes(await fetchSignedQuotes(pairs));
 };
 
@@ -37,24 +35,26 @@ const fetchSignedQuotes = async (pairs: Pair[]) => {
     pair.quote = pair.quote.replace(/WETH/g, "ETH");
   }
   const responses: QuoteApiResponse[] = [];
-  const requests = pairs.map(async pair => {
+  const requests = pairs.map(async (pair) => {
     // The only base symbol that can be requested as fxToken is fxUSD.
-    const base = pair.base.startsWith("fx") && pair.base !== "fxUSD"
-      ? pair.base.substring(2)
-      : pair.base;
+    const base =
+      pair.base.startsWith("fx") && pair.base !== "fxUSD" ? pair.base.substring(2) : pair.base;
     console.log(`${DATA_FEED_API_BASE_URL}${base}/${pair.quote}?sign=true`);
-    const result = await axios
-      .get(`${DATA_FEED_API_BASE_URL}${base}/${pair.quote}?sign=true`);
+    const result = await axios.get(`${DATA_FEED_API_BASE_URL}${base}/${pair.quote}?sign=true`);
     responses.push(result.data);
   });
   await Promise.all(requests);
-  return responses
-    .map((response, i) => quoteApiResponseToSignedQuote(pairs[i], response));
+  return responses.map((response, i) => quoteApiResponseToSignedQuote(pairs[i], response));
 };
 
 const quoteApiResponseToSignedQuote = (
   pair: Pair,
-  { data: { result, signed: { signatureParams, signature } } }: QuoteApiResponse
+  {
+    data: {
+      result,
+      signed: { signatureParams, signature }
+    }
+  }: QuoteApiResponse
 ): SignedQuote => {
   return {
     pair,
@@ -66,7 +66,7 @@ const quoteApiResponseToSignedQuote = (
       signedTimestamp: BigNumber.from(signatureParams.signedTimestamp),
       chainId: signatureParams.chainId,
       validFromTimestamp: BigNumber.from(signatureParams.validFromTimestamp),
-      durationSeconds: BigNumber.from(signatureParams.durationSeconds),
+      durationSeconds: BigNumber.from(signatureParams.durationSeconds)
     }
   };
 };
@@ -79,17 +79,9 @@ const encodeQuotes = (quotes: SignedQuote[]): BytesLike => {
     }
     return buffer;
   }, new Uint8Array(quotes.length * 65));
-  const tokenAddresses = quotes.map(quote => symbolToAddress(quote.pair.quote));
+  const tokenAddresses = quotes.map((quote) => symbolToAddress(quote.pair.quote));
   return ethers.utils.defaultAbiCoder.encode(
-    [
-      "uint256",
-      "address[]",
-      "uint256[]",
-      "uint256[]",
-      "uint256[]",
-      "uint256[]",
-      "bytes"
-    ],
+    ["uint256", "address[]", "uint256[]", "uint256[]", "uint256[]", "uint256[]", "bytes"],
     [
       tokenAddresses.length,
       tokenAddresses,
@@ -110,16 +102,13 @@ const symbolToAddress = (symbol: string): string => {
     return config.protocol.arbitrum.collaterals.WETH.address;
   };
   const fxToken: SymbolAddressConverter = (symbol: string): string | undefined => {
-    const fxSymbol = symbol.startsWith("fx")
-      ? symbol
-      : `fx${symbol}`;
+    const fxSymbol = symbol.startsWith("fx") ? symbol : `fx${symbol}`;
     return config.fxTokenAddresses[fxSymbol];
   };
   // Find a valid address conversion.
   const result = [eth, fxToken]
-    .map(converter => converter(symbol))
-    .find(address => address != null);
-  if (!result)
-    throw new Error(`Could get address for symbol "${symbol}"`);
+    .map((converter) => converter(symbol))
+    .find((address) => address != null);
+  if (!result) throw new Error(`Could get address for symbol "${symbol}"`);
   return result;
 };
