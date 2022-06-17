@@ -170,7 +170,7 @@
       "name": "handleCHF",
       "symbol": "fxCHF",
       "decimals": 18,
-      "address": "0x8C414cB8A9Af9F7B03673e93DF73c23C1aa05b4e", 
+      "address": "0x8C414cB8A9Af9F7B03673e93DF73c23C1aa05b4e",
       "logoURI": "https://app.handle.fi/assets/images/handle/fxCHFLogo.png",
       "chainId": 137,
       "extensions": {

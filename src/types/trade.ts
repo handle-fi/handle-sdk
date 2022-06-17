@@ -1,5 +1,16 @@
 import { BigNumber } from "ethers";
 
+export type Pair = {
+  baseSymbol: string;
+  quoteSymbol: string;
+};
+
+export type WebsocketPrice = {
+  pair: Pair;
+  value: number;
+  timestamp: number;
+};
+
 export type HlpInfoMethods = {
   getMinPrice: (address: string) => BigNumber;
   getMaxPrice: (address: string) => BigNumber;
@@ -43,15 +54,4 @@ export type GetLiquidationArgs = {
   collateral: BigNumber;
   averagePrice: BigNumber;
   isLong: boolean;
-};
-
-export type Pair = {
-  baseSymbol: string;
-  quoteSymbol: string;
-};
-
-export type WebsocketPrice = {
-  pair: Pair;
-  value: number;
-  timestamp: number;
 };

@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import {HandleTokenManager, TokenManager} from "../../../src";
+import { HandleTokenManager, TokenManager } from "../../../src";
 import { DEFAULT_TOKEN_LIST_URLS } from "../../../src/components/TokenManager";
 
 describe("TokenManager", () => {
@@ -73,9 +73,7 @@ describe("TokenManager", () => {
     expect(tokensByAddresses.length).to.eq(2);
   });
   it("Should filter for duplicate tokens", async () => {
-    const tokenManager = new TokenManager(
-      ["https://bridge.arbitrum.io/token-list-42161.json"],
-    );
+    const tokenManager = new TokenManager(["https://bridge.arbitrum.io/token-list-42161.json"]);
     await tokenManager.initialLoad;
     const tokenCount = tokenManager.getLoadedTokens().length;
     await tokenManager.fetchTokenLists(["https://bridge.arbitrum.io/token-list-42161.json"]);

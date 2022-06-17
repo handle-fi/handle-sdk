@@ -35,15 +35,11 @@ class PricesWebsocket {
       this.subscribe(this.initialPairs);
     };
     this.client.onclose = () => {
-      setTimeout(
-        () => this.connect(reconnectDelayMillis),
-        reconnectDelayMillis
-      );
+      setTimeout(() => this.connect(reconnectDelayMillis), reconnectDelayMillis);
     };
     // Set default error handler.
     this.onError(this.errorCallback ?? console.error);
-    if (this.callback)
-      this.onMessage(this.callback);
+    if (this.callback) this.onMessage(this.callback);
   }
 
   public close() {

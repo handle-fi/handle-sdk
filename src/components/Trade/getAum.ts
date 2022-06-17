@@ -3,6 +3,11 @@ import { HlpConfig, Network } from "../..";
 import { HlpManager__factory } from "../../contracts";
 import { Vault__factory } from "../../contracts/factories/Vault__factory";
 
+/**
+ * This function aims to do the same as the `HlpManager` contract's `getAum`,
+ * but using the oracle server price directly instead of fetching the `Vault` contract's
+ * `getMinPrice` or `getMaxPrice`.
+ */
 export const getAum = async (
   maximise: boolean,
   provider: ethers.providers.Provider | ethers.Signer,
@@ -10,7 +15,6 @@ export const getAum = async (
   getMaxPrice: (address: string) => Promise<BigNumber> | BigNumber,
   getMinPrice: (address: string) => Promise<BigNumber> | BigNumber
 ): Promise<BigNumber> => {
-  // This should match the getAum function in HlpManager.sol exactly
   const vaultAddress = HlpConfig.HLP_CONTRACTS[network]?.Vault;
   const hlpManagerAddress = HlpConfig.HLP_CONTRACTS[network]?.HlpManager;
 
