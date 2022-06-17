@@ -4,13 +4,13 @@ import { BridgeConfigByNetwork } from "./../components/Bridge";
 import { StableType } from "./../types/tokens";
 import { LPStakingPoolNameMap, LPStakingPlatformName } from "./../types/lpStaking";
 import { TokenInfo } from "@uniswap/token-lists";
-import _stakingTokens from "../components/TokenManager/staking-tokens.json";
-import _handleTokens from "../components/TokenManager/handle-tokens.json";
+import StakingTokens from "./TokenLists/staking-tokens.json";
+import HandleTokens from "./TokenLists/handle-tokens.json";
 import { validateTokenList, getTokenFromTokenList } from "../utils/tokenlist-utils";
 import { mustExist } from "../utils/general-utils";
 
-const stakingTokens = validateTokenList(_stakingTokens);
-const handleTokens = validateTokenList(_handleTokens);
+const stakingTokens = validateTokenList(StakingTokens);
+const handleTokens = validateTokenList(HandleTokens);
 
 export type FxTokenAddresses = Record<string, string>;
 export type CollateralDetails = CollateralSymbolMap<{ address: string; decimals: number }>;

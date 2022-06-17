@@ -40,6 +40,7 @@ import * as TradeUtils from "./components/Trade";
 import TokenManager from "./components/TokenManager";
 import HandleTokenManager from "./components/TokenManager/HandleTokenManager";
 import { TokenInfo, TokenList } from "@uniswap/token-lists";
+import PricesWebsocket from "./components/Trade/PricesWebsocket";
 
 const SINGLE_COLLATERAL_NETWORK_NAMES = Object.keys(
   config.singleCollateralVaults
@@ -72,7 +73,8 @@ export {
   HlpConfig,
   TradeUtils,
   TokenManager,
-  HandleTokenManager
+  HandleTokenManager,
+  PricesWebsocket
 };
 
 export type {

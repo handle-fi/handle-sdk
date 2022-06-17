@@ -1,5 +1,16 @@
 import {BigNumber} from "ethers";
 
+export type Pair = {
+  baseSymbol: string;
+  quoteSymbol: string;
+};
+
+export type WebsocketPrice = {
+  pair: Pair;
+  value: number;
+  timestamp: number;
+}
+
 export type HlpInfoMethods = {
   getMinPrice: (address: string) => BigNumber;
   getMaxPrice: (address: string) => BigNumber;
@@ -9,11 +20,6 @@ export type HlpInfoMethods = {
   getTargetUsdHlpAmount: (address: string) => BigNumber;
   getTotalTokenWeights: () => BigNumber;
   getHlpPrice: (isBuying: boolean) => BigNumber;
-};
-
-export type Pair = {
-  base: string;
-  quote: string;
 };
 
 export type SignedQuote = {
