@@ -23,9 +23,12 @@ type KeeperPoolMulticall = {
   accountRewards?: { collateralTypes: string[]; collateralAmounts: ethers.BigNumber[] };
 };
 
-type StakeArgs = {
-  amount: ethers.BigNumber;
+type FxTokenArg = {
   fxTokenSymbol: string;
+}
+
+type StakeArgs = FxTokenArg & {
+  amount: ethers.BigNumber;
 };
 
 export default class FxKeeperPool {
@@ -91,6 +94,16 @@ export default class FxKeeperPool {
     const contract = this.getContract(signer);
     const fxTokenAddress = this.config.fxTokenAddresses[args.fxTokenSymbol];
     return contract.unstake(args.amount, fxTokenAddress, options);
+  };
+  
+  public claim = (
+    args: FxTokenArg,
+    signer: ethers.Signer,
+    options: ethers.Overrides = {}
+  ): Promise<ethers.ContractTransaction> => {
+    const contract = this.getContract(signer);
+    const fxTokenAddress = this.config.fxTokenAddresses[args.fxTokenSymbol];
+    return contract.withdrawCollateralReward(fxTokenAddress, options);
   };
 
   private getFxKeeperPoolMulticall = (
