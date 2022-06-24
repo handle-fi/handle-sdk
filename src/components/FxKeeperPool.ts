@@ -23,9 +23,12 @@ type KeeperPoolMulticall = {
   accountRewards?: { collateralTypes: string[]; collateralAmounts: ethers.BigNumber[] };
 };
 
-type StakeArgs = {
-  amount: ethers.BigNumber;
+type FxTokenArg = {
   fxTokenSymbol: string;
+}
+
+type StakeArgs = FxTokenArg & {
+  amount: ethers.BigNumber;
 };
 
 export default class FxKeeperPool {
@@ -94,7 +97,7 @@ export default class FxKeeperPool {
   };
   
   public claim = (
-    args: StakeArgs,
+    args: FxTokenArg,
     signer: ethers.Signer,
     options: ethers.Overrides = {}
   ): Promise<ethers.ContractTransaction> => {
