@@ -3,9 +3,8 @@
 .nyc-output
 cache
 coverage
-node_modules
 src
 tasks
 tests
-hardhat.config.tasks
+hardhat.config.ts
 .prettierrc
