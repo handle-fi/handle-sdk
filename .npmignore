@@ -3,7 +3,6 @@
 .nyc-output
 cache
 coverage
-node_modules
 src
 tasks
 tests
