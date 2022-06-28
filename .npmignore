@@ -1,0 +1,11 @@
+.github
+.husky
+.nyc-output
+cache
+coverage
+node_modules
+src
+tasks
+tests
+hardhat.config.tasks
+.prettierrc
