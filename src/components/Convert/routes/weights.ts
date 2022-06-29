@@ -7,6 +7,7 @@ export const ZERO_X_WEIGHT = 5;
 export const HLP_ADD_REMOVE_WEIGHT = 100;
 export const HLP_SWAP_WEIGHT = 110;
 export const WETH_WEIGHT = 200;
+export const PSM_TO_HLP = 100;
 
 export type WeightInput = {
   fromToken: TokenInfo;
