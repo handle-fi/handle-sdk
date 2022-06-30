@@ -2,7 +2,7 @@ import "@nomiclabs/hardhat-ethers";
 import "./tasks";
 import "dotenv/config";
 
-const ARBITRUM_RPC_URL = process.env.ALCHEMY_ARBITRUM_URL;
+const ARBITRUM_RPC_URL = process.env.ARBITRUM_URL;
 
 export default {
   paths: {
