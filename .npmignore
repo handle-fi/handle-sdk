@@ -4,7 +4,6 @@
 cache
 coverage
 src
-!src/abis/**
 tasks
 tests
 hardhat.config.ts
