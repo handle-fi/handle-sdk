@@ -7,7 +7,7 @@ import { config } from "../../../../src";
 import { testTokenList } from "../../../mock-data/token-list";
 import { TokenInfo } from "@uniswap/token-lists";
 
-const arbitrumProvider = new ethers.providers.JsonRpcProvider(process.env.ALCHEMY_ARBITRUM_URL);
+const arbitrumProvider = new ethers.providers.JsonRpcProvider(process.env.ARBITRUM_URL);
 
 let usdt: TokenInfo;
 
