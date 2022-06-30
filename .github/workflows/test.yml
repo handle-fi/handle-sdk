@@ -12,6 +12,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Run unit tests
         run: |
+          export ALCHEMY_ARBITRUM_URL=${{ secrets.ALCHEMY_ARBITRUM_URL }}
           yarn install
           yarn test
       - name: Post coverage report
