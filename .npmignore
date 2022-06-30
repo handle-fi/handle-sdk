@@ -6,5 +6,5 @@ coverage
 src
 tasks
 tests
-hardhat.config.ts
+hardhat.config.tasks
 .prettierrc
