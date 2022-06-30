@@ -11,7 +11,7 @@
     "prepare": "husky install",
     "build": "yarn generate-contract-types && npx tsc",
     "prepublish": "tsc",
-    "test": "nyc --reporter=lcov npx hardhat test",
+    "test": "yarn generate-contract-types && nyc --reporter=lcov npx hardhat test",
     "watch-build": "tsc-watch",
     "watch-dist": "copy-and-watch --watch dist/** ../handle-react/node_modules/handle-sdk/dist",
     "watch": "npm-run-all -p -r watch-build watch-dist",
