@@ -1,7 +1,8 @@
 import "@nomiclabs/hardhat-ethers";
 import "./tasks";
+import "dotenv/config";
 
-const ARBITRUM_RPC_URL = "https://arb-mainnet.g.alchemy.com/v2/HORad5Nv96-kPzIx9oEPU0tCEiIVp-Oz";
+const ARBITRUM_RPC_URL = process.env.ARBITRUM_URL ?? "https://arb1.arbitrum.io/rpc";
 
 export default {
   paths: {
@@ -18,7 +19,7 @@ export default {
     },
     arbitrum: {
       chainid: 42161,
-      url: ARBITRUM_RPC_URL,
+      url: ARBITRUM_RPC_URL
     }
   },
   mocha: {

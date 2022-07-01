@@ -13,6 +13,7 @@ jobs:
           registry-url: "https://registry.npmjs.org"
       - name: Run unit tests
         run: |
+          export ARBITRUM_URL=${{ secrets.ARBITRUM_URL }}
           yarn install
           yarn test
       - name: Publish to NPM

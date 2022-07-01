@@ -12,6 +12,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Run unit tests
         run: |
+          export ARBITRUM_URL=${{ secrets.ARBITRUM_URL }}
           yarn install
           yarn test
       - name: Post coverage report
