@@ -132,7 +132,7 @@ const config: Config = {
         governanceLock: "0xC6008E6baD8c2c0814A32f6F494fa419E95593b6",
         rewardPool: "0xDE17Af0E4A6c870762508DcB7dCc20719584CBd0",
         hPsm: "0xa2b81201F92b2F3081e9e2900Cf01942e0BCCeD3",
-        routerHpsmHlp: ethers.constants.AddressZero // not deployed yet
+        routerHpsmHlp: "NOT_DEPLOYED_YET"
       },
       chainlinkFeeds: {
         eth_usd: "0x639Fe6ab55C921f74e7fac1ee960C0B6293ba612",
