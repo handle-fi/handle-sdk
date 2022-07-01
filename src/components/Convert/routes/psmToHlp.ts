@@ -7,6 +7,9 @@ import hlpSwap from "./hlpSwap";
 import HandleTokenManager from "../../TokenManager/HandleTokenManager";
 import config from "../../../config";
 import { HlpConfig } from "../../..";
+import { RouterHpsmHlp__factory } from "../../../contracts";
+import { fetchEncodedSignedQuotes } from "../../../utils/h2so-utils";
+import { Pair } from "../../../types/trade";
 
 const psmToHlpWeight = async (input: WeightInput): Promise<number> => {
   const pegs = await getTokenPegs();
@@ -57,10 +60,59 @@ const psmToHlpQuoteHandler = async (input: ConvertQuoteRouteArgs): Promise<Quote
   };
 };
 
-const psmToHlpTransactionHandler = (
-  _input: ConvertTransactionRouteArgs
+const psmToHlpTransactionHandler = async (
+  input: ConvertTransactionRouteArgs
 ): Promise<ethers.PopulatedTransaction> => {
-  throw new Error("Not Implemented Yet");
+  const address = config.protocol.arbitrum.protocol.routerHpsmHlp;
+  const routerHpsmHlp = RouterHpsmHlp__factory.connect(address, input.signer);
+
+  const pegs = await getTokenPegs();
+  const validPeg = pegs.find(
+    (peg) => peg.peggedToken.toLowerCase() === input.fromToken.address.toLowerCase()
+  );
+  if (!validPeg) throw new Error("No Valid Peg");
+
+  const minOut = input.sellAmount
+    .mul(input.slippage * HlpConfig.BASIS_POINTS_DIVISOR)
+    .div(HlpConfig.BASIS_POINTS_DIVISOR);
+
+  const TokenManager = new HandleTokenManager();
+  const fxToken = TokenManager.getTokenByAddress(validPeg.fxToken, input.network);
+  if (!fxToken) throw new Error("Could not find fxToken");
+
+  const pairs: Pair[] = [
+    {
+      baseSymbol: fxToken.symbol,
+      quoteSymbol: "USD"
+    },
+    {
+      baseSymbol: input.toToken.symbol,
+      quoteSymbol: "USD"
+    }
+  ];
+
+  const { encoded } = await fetchEncodedSignedQuotes(pairs);
+
+  if (input.toToken.extensions?.isNative) {
+    return routerHpsmHlp.populateTransaction.swapPeggedTokenToEth(
+      input.fromToken.address,
+      validPeg.fxToken,
+      input.sellAmount,
+      minOut,
+      input.receivingAccount,
+      encoded
+    );
+  }
+
+  return routerHpsmHlp.populateTransaction.swapPeggedTokenToHlpToken(
+    input.fromToken.address,
+    validPeg.fxToken,
+    input.toToken.address,
+    input.sellAmount,
+    minOut,
+    input.receivingAccount,
+    encoded
+  );
 };
 
 export default {

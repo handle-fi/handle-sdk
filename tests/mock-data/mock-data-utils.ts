@@ -3,7 +3,7 @@ import { Collateral, CollateralSymbol, ProtocolParameters } from "../../src";
 import { FxToken } from "../../src/types/fxTokens";
 import { VaultCollateralToken, VaultData } from "../../src/types/vaults";
 
-export const createMockCollateral = (overides: Partial<Collateral> = {}): Collateral => {
+export const createMockCollateral = (overrides: Partial<Collateral> = {}): Collateral => {
   return {
     symbol: `COLLATERAL_${randomId()}` as unknown as CollateralSymbol,
     address: ethers.Wallet.createRandom().address,
@@ -14,7 +14,7 @@ export const createMockCollateral = (overides: Partial<Collateral> = {}): Collat
     liquidationFee: ethers.BigNumber.from("1250"),
     interestRate: ethers.BigNumber.from("25"),
     price: ethers.constants.WeiPerEther,
-    ...overides
+    ...overrides
   };
 };
 

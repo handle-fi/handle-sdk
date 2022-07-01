@@ -1,7 +1,7 @@
 import { ethers } from "hardhat";
 import { expect } from "chai";
 import { sampleHlpTokenMethods } from "../sampleHlpTokenMethods";
-import { fxAud } from "../test-tokens";
+import { eth, fxAud } from "../test-tokens";
 import { config, ConvertSDK } from "../../../../src";
 import { testTokenList } from "../../../mock-data/token-list";
 import { TokenInfo } from "@uniswap/token-lists";
@@ -10,7 +10,7 @@ const arbitrumProvider = new ethers.providers.JsonRpcProvider(process.env.ARBITR
 
 let usdt: TokenInfo;
 
-// const signer = ethers.provider.getSigner(0);
+const signer = ethers.provider.getSigner(0);
 
 describe("psmToHlp", () => {
   before(() => {
@@ -39,6 +39,42 @@ describe("psmToHlp", () => {
       expect(quote.sellAmount.toString()).to.eq(sellAmount.toString());
       expect(quote.buyAmount.toString()).to.eq(expectedBuyAmount.toString());
     });
+    it("should get a quote from a pegged token to ETH", async () => {
+      // usdt has 6 decimals
+      const sellAmount = ethers.utils.parseUnits("5", 6);
+      // sample hlp methods havea 1:1 ratio of token prices
+      const expectedBuyAmount = ethers.utils.parseUnits("5", 18);
+      const quote = await ConvertSDK.getQuote({
+        fromToken: usdt,
+        toToken: eth,
+        receivingAccount: ethers.constants.AddressZero,
+        sellAmount,
+        gasPrice: ethers.constants.One,
+        signerOrProvider: arbitrumProvider,
+        hlpMethods: sampleHlpTokenMethods
+      });
+      expect(quote.allowanceTarget).to.eq(config.protocol.arbitrum.protocol.routerHpsmHlp);
+      expect(quote.sellAmount.toString()).to.eq(sellAmount.toString());
+      expect(quote.buyAmount.toString()).to.eq(expectedBuyAmount.toString());
+    });
   });
-  describe("swap", () => {});
+  describe("swap", () => {
+    it("should get a transaction from a pegged token to a hlp token", async () => {
+      // usdt has 6 decimals
+      const sellAmount = ethers.utils.parseUnits("5", 6);
+      // sample hlp methods havea 1:1 ratio of token prices
+      const expectedBuyAmount = ethers.utils.parseUnits("5", 18);
+      const tx = await ConvertSDK.getSwap({
+        fromToken: usdt,
+        toToken: fxAud,
+        sellAmount,
+        gasPrice: ethers.constants.One,
+        signer,
+        hlpMethods: sampleHlpTokenMethods,
+        buyAmount: expectedBuyAmount,
+        slippage: 0.05
+      });
+      expect(tx.to).to.eq(config.protocol.arbitrum.protocol.routerHpsmHlp);
+    });
+  });
 });
