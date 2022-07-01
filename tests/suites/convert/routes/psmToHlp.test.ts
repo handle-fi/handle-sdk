@@ -35,7 +35,6 @@ describe("psmToHlp", () => {
         signerOrProvider: arbitrumProvider,
         hlpMethods: sampleHlpTokenMethods
       });
-      console.log(quote);
       expect(quote.allowanceTarget).to.eq(config.protocol.arbitrum.protocol.routerHpsmHlp);
       expect(quote.sellAmount.toString()).to.eq(sellAmount.toString());
       expect(quote.buyAmount.toString()).to.eq(expectedBuyAmount.toString());

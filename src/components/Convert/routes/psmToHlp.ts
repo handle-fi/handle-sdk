@@ -60,7 +60,7 @@ const psmToHlpQuoteHandler = async (input: ConvertQuoteRouteArgs): Promise<Quote
 const psmToHlpTransactionHandler = (
   _input: ConvertTransactionRouteArgs
 ): Promise<ethers.PopulatedTransaction> => {
-  return {} as any;
+  throw new Error("Not Implemented Yet");
 };
 
 export default {
