@@ -9,7 +9,7 @@ type Peg = {
 };
 
 export const getTokenPegs = async (): Promise<Peg[]> => {
-  return request(
+  const response = await request(
     hpsmGraphEndpoint,
     gql`
       query {
@@ -20,6 +20,7 @@ export const getTokenPegs = async (): Promise<Peg[]> => {
       }
     `
   );
+  return response.pairs;
 };
 
 export const isTokenPegged = async (
