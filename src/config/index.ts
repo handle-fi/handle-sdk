@@ -53,7 +53,10 @@ export type Config = {
     arbitrum: LPStakingPoolNameMap<LPStakingPoolDetails>;
   };
   theGraphEndpoints: {
-    arbitrum: string;
+    arbitrum: {
+      fx: string;
+      hpsm: string;
+    };
   };
   bridge: {
     apiBaseUrl: string;
@@ -75,6 +78,7 @@ export type Config = {
     tokenSymbolToStableType: { [key: string]: StableType };
     gasEstimates: {
       hpsm: number;
+      hpsmToHlp: number;
       hlp: number;
       weth: number;
     };
@@ -89,7 +93,8 @@ export type ProtocolAddresses = {
   fxKeeperPool: string;
   governanceLock: string;
   rewardPool: string;
-  hPsm: string;
+  hpsm: string;
+  routerHpsmHlp: string;
 };
 
 export type ChainlinkFeeds = {
@@ -103,8 +108,7 @@ export type ChainlinkFeeds = {
 };
 
 export const DATA_FEED_API_BASE_URL = "https://oracle.handle.fi";
-export const DATA_FEED_SIGNING_ADDRESS
-  = "0xfff98D80aCC2CE312225e08eb9fA88F19D737577";
+export const DATA_FEED_SIGNING_ADDRESS = "0xfff98D80aCC2CE312225e08eb9fA88F19D737577";
 
 const forexAddress = mustExist(
   getTokenFromTokenList(handleTokens, "FOREX", "arbitrum"),
@@ -130,7 +134,8 @@ const config: Config = {
         fxKeeperPool: "0xc55204d4699dCce457DBF63d4B0074E6E1fa4412",
         governanceLock: "0xC6008E6baD8c2c0814A32f6F494fa419E95593b6",
         rewardPool: "0xDE17Af0E4A6c870762508DcB7dCc20719584CBd0",
-        hPsm: "0xa2b81201F92b2F3081e9e2900Cf01942e0BCCeD3"
+        hpsm: "0xa2b81201F92b2F3081e9e2900Cf01942e0BCCeD3",
+        routerHpsmHlp: "0x69328f23A090e57378e3120f622ed0697f0E7ECF"
       },
       chainlinkFeeds: {
         eth_usd: "0x639Fe6ab55C921f74e7fac1ee960C0B6293ba612",
@@ -156,7 +161,10 @@ const config: Config = {
     polygon: null
   },
   theGraphEndpoints: {
-    arbitrum: "https://api.thegraph.com/subgraphs/name/handle-fi/handle"
+    arbitrum: {
+      fx: "https://api.thegraph.com/subgraphs/name/handle-fi/handle",
+      hpsm: "https://api.thegraph.com/subgraphs/name/handle-fi/handle-psm"
+    }
   },
   bridge: {
     apiBaseUrl: "https://handle-bridge.herokuapp.com/bridge",
@@ -266,6 +274,7 @@ const config: Config = {
     gasEstimates: {
       hlp: 800_000,
       hpsm: 800_000,
+      hpsmToHlp: 1_600_000,
       weth: 500_000
     }
   }

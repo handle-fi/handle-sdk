@@ -15,7 +15,7 @@ export default class Graph {
   public collateralGraphClient: CollateralGraphClient;
 
   constructor(endpoint?: string) {
-    const url = endpoint || config.theGraphEndpoints[graphNetwork];
+    const url = endpoint || config.theGraphEndpoints[graphNetwork].fx;
     const client = new GraphQLClient(url);
 
     this.fxTokens = new FxTokenGraphClient(client);

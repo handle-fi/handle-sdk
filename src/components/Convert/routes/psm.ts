@@ -1,6 +1,7 @@
-import { BigNumber, ethers, providers, Signer } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import { config, HlpConfig, Network } from "../../..";
 import { HPSM__factory } from "../../../contracts";
+import { isTokenPegged } from "../../../utils/convert-utils";
 import { transformDecimals } from "../../../utils/general-utils";
 import { ConvertQuoteRouteArgs, ConvertTransactionRouteArgs, Quote } from "../Convert";
 import { PSM_WEIGHT, WeightInput } from "./weights";
@@ -13,40 +14,12 @@ const transactionFeeCache: Record<Network, BigNumber | null> = {
 
 const TRANSACTION_FEE_UNIT = ethers.utils.parseEther("1");
 
-const pegCache: Record<Network, Record<string, boolean>> = {
-  arbitrum: {},
-  ethereum: {},
-  polygon: {}
-};
-
-export const isTokenPegged = async (
-  fxToken: string,
-  pegToken: string,
-  provider: Signer | providers.Provider,
-  network: Network
-): Promise<boolean> => {
-  const cacheKey = `${fxToken}-${pegToken}`;
-  if (pegCache[network][cacheKey] !== undefined) {
-    return pegCache[network][cacheKey];
-  }
-  const hpsmAddress = config.protocol[network]?.protocol.hPsm;
-  if (!hpsmAddress) {
-    return false;
-  }
-  const hpsm = HPSM__factory.connect(hpsmAddress, provider);
-  const isPegged = await hpsm.isFxTokenPegged(fxToken, pegToken);
-  pegCache[network][cacheKey] = isPegged;
-  return isPegged;
-};
-
 export const psmWeight = async (input: WeightInput) => {
-  const { fromToken, toToken, signerOrProvider, network } = input;
-
-  if (!signerOrProvider) return 0;
+  const { fromToken, toToken, network } = input;
 
   const [isWithdraw, isDeposit] = await Promise.all([
-    isTokenPegged(fromToken.address, toToken.address, signerOrProvider, network),
-    isTokenPegged(toToken.address, fromToken.address, signerOrProvider, network)
+    isTokenPegged(fromToken.address, toToken.address, network),
+    isTokenPegged(toToken.address, fromToken.address, network)
   ]);
 
   return isWithdraw || isDeposit ? PSM_WEIGHT : 0;
@@ -54,7 +27,7 @@ export const psmWeight = async (input: WeightInput) => {
 
 export const psmQuoteHandler = async (input: ConvertQuoteRouteArgs): Promise<Quote> => {
   const { fromToken, toToken, signerOrProvider, network, sellAmount: fromAmount } = input;
-  const hpsmAddress = config.protocol[network]?.protocol.hPsm;
+  const hpsmAddress = config.protocol[network]?.protocol.hpsm;
   if (!hpsmAddress) {
     throw new Error(`No HPSM for network ${network}`);
   }
@@ -70,12 +43,7 @@ export const psmQuoteHandler = async (input: ConvertQuoteRouteArgs): Promise<Quo
     HlpConfig.BASIS_POINTS_DIVISOR
   ).div(TRANSACTION_FEE_UNIT);
 
-  const isDeposit = await isTokenPegged(
-    toToken.address,
-    fromToken.address,
-    signerOrProvider,
-    network
-  );
+  const isDeposit = await isTokenPegged(toToken.address, fromToken.address, network);
 
   const buyAmount = transformDecimals(fromAmount, fromToken.decimals, toToken.decimals);
 
@@ -95,14 +63,14 @@ export const psmTransactionHandler = async (
   input: ConvertTransactionRouteArgs
 ): Promise<ethers.PopulatedTransaction> => {
   const { network, signer, fromToken, toToken, sellAmount } = input;
-  const hpsmAddress = config.protocol[network]?.protocol.hPsm;
+  const hpsmAddress = config.protocol[network]?.protocol.hpsm;
   if (!hpsmAddress) {
     throw new Error(`No HPSM for network ${network}`);
   }
   const hpsm = HPSM__factory.connect(hpsmAddress, signer);
   const [isWithdraw, isDeposit] = await Promise.all([
-    isTokenPegged(fromToken.address, toToken.address, signer, network),
-    isTokenPegged(toToken.address, fromToken.address, signer, network)
+    isTokenPegged(fromToken.address, toToken.address, network),
+    isTokenPegged(toToken.address, fromToken.address, network)
   ]);
   if (isDeposit) {
     return hpsm.populateTransaction.deposit(toToken.address, fromToken.address, sellAmount);
