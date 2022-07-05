@@ -1,38 +1,46 @@
 import { gql, request } from "graphql-request";
+import config from "../config";
 import { Network } from "../types/network";
-
-const hpsmGraphEndpoint = "https://api.thegraph.com/subgraphs/name/handle-fi/handle-psm";
 
 type Peg = {
   fxToken: string;
   peggedToken: string;
 };
 
-export const getTokenPegs = async (): Promise<Peg[]> => {
+export const getTokenPegs = async (network: Network): Promise<Peg[]> => {
+  if (network !== "arbitrum") return [];
   const response = await request(
-    hpsmGraphEndpoint,
+    config.theGraphEndpoints[network].hpsm,
     gql`
       query {
-        pairs {
+        pairs(first: 1000) {
           fxToken
           peggedToken
         }
       }
     `
   );
-  return response.pairs;
+  if (response && Array.isArray(response.pairs)) {
+    return response.pairs;
+  }
+  throw new Error(
+    `Response does not contain property 'pairs' of type array. Response: ${response}`
+  );
 };
 
 export const isTokenPegged = async (
   fxToken: string,
-  pegToken: string,
+  peggedToken: string,
   network: Network
 ): Promise<boolean> => {
-  if (network !== "arbitrum") return false;
-  const pegged = await getTokenPegs();
-  return !!pegged.find(
-    (peg) =>
-      peg.fxToken.toLowerCase() == fxToken.toLowerCase() &&
-      peg.peggedToken.toLowerCase() == pegToken.toLowerCase()
-  );
+  try {
+    const pegged = await getTokenPegs(network);
+    return !!pegged.find(
+      (peg) =>
+        peg.fxToken.toLowerCase() == fxToken.toLowerCase() &&
+        peg.peggedToken.toLowerCase() == peggedToken.toLowerCase()
+    );
+  } catch (e) {
+    return false;
+  }
 };

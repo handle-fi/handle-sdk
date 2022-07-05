@@ -32,7 +32,7 @@ export default class FxTokens {
       protocolAddresses: sdkConfig.protocol.arbitrum.protocol,
       fxTokenAddresses: sdkConfig.fxTokenAddresses,
       chainId: NETWORK_NAME_TO_CHAIN_ID.arbitrum,
-      graphEndpoint: sdkConfig.theGraphEndpoints.arbitrum
+      graphEndpoint: sdkConfig.theGraphEndpoints.arbitrum.handle
     };
 
     this.tokens = getFxTokensFromAddresses(Object.values(this.config.fxTokenAddresses)) as Omit<

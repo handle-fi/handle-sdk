@@ -27,7 +27,7 @@ export const psmWeight = async (input: WeightInput) => {
 
 export const psmQuoteHandler = async (input: ConvertQuoteRouteArgs): Promise<Quote> => {
   const { fromToken, toToken, signerOrProvider, network, sellAmount: fromAmount } = input;
-  const hpsmAddress = config.protocol[network]?.protocol.hPsm;
+  const hpsmAddress = config.protocol[network]?.protocol.hpsm;
   if (!hpsmAddress) {
     throw new Error(`No HPSM for network ${network}`);
   }
@@ -63,7 +63,7 @@ export const psmTransactionHandler = async (
   input: ConvertTransactionRouteArgs
 ): Promise<ethers.PopulatedTransaction> => {
   const { network, signer, fromToken, toToken, sellAmount } = input;
-  const hpsmAddress = config.protocol[network]?.protocol.hPsm;
+  const hpsmAddress = config.protocol[network]?.protocol.hpsm;
   if (!hpsmAddress) {
     throw new Error(`No HPSM for network ${network}`);
   }

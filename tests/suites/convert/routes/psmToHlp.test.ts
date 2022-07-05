@@ -6,8 +6,6 @@ import { config, ConvertSDK } from "../../../../src";
 import { testTokenList } from "../../../mock-data/token-list";
 import { TokenInfo } from "@uniswap/token-lists";
 
-const arbitrumProvider = new ethers.providers.JsonRpcProvider(process.env.ARBITRUM_URL);
-
 let usdt: TokenInfo;
 
 const signer = ethers.provider.getSigner(0);
@@ -32,7 +30,7 @@ describe("psmToHlp", () => {
         receivingAccount: ethers.constants.AddressZero,
         sellAmount,
         gasPrice: ethers.constants.One,
-        signerOrProvider: arbitrumProvider,
+        signerOrProvider: signer,
         hlpMethods: sampleHlpTokenMethods
       });
       expect(quote.allowanceTarget).to.eq(config.protocol.arbitrum.protocol.routerHpsmHlp);
@@ -50,7 +48,7 @@ describe("psmToHlp", () => {
         receivingAccount: ethers.constants.AddressZero,
         sellAmount,
         gasPrice: ethers.constants.One,
-        signerOrProvider: arbitrumProvider,
+        signerOrProvider: signer,
         hlpMethods: sampleHlpTokenMethods
       });
       expect(quote.allowanceTarget).to.eq(config.protocol.arbitrum.protocol.routerHpsmHlp);

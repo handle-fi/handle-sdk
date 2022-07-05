@@ -12,7 +12,7 @@ import { fetchEncodedSignedQuotes } from "../../../utils/h2so-utils";
 import { Pair } from "../../../types/trade";
 
 const psmToHlpWeight = async (input: WeightInput): Promise<number> => {
-  const pegs = await getTokenPegs();
+  const pegs = await getTokenPegs(input.network);
   const validPeg = pegs.find(
     (peg) => peg.peggedToken.toLowerCase() === input.fromToken.address.toLowerCase()
   );
@@ -21,7 +21,7 @@ const psmToHlpWeight = async (input: WeightInput): Promise<number> => {
 };
 
 const psmToHlpQuoteHandler = async (input: ConvertQuoteRouteArgs): Promise<Quote> => {
-  const pegs = await getTokenPegs();
+  const pegs = await getTokenPegs(input.network);
   const validPeg = pegs.find(
     (peg) => peg.peggedToken.toLowerCase() === input.fromToken.address.toLowerCase()
   );
@@ -66,7 +66,7 @@ const psmToHlpTransactionHandler = async (
   const address = config.protocol.arbitrum.protocol.routerHpsmHlp;
   const routerHpsmHlp = RouterHpsmHlp__factory.connect(address, input.signer);
 
-  const pegs = await getTokenPegs();
+  const pegs = await getTokenPegs(input.network);
   const validPeg = pegs.find(
     (peg) => peg.peggedToken.toLowerCase() === input.fromToken.address.toLowerCase()
   );

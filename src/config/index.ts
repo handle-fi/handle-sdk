@@ -53,7 +53,10 @@ export type Config = {
     arbitrum: LPStakingPoolNameMap<LPStakingPoolDetails>;
   };
   theGraphEndpoints: {
-    arbitrum: string;
+    arbitrum: {
+      handle: string;
+      hpsm: string;
+    };
   };
   bridge: {
     apiBaseUrl: string;
@@ -90,7 +93,7 @@ export type ProtocolAddresses = {
   fxKeeperPool: string;
   governanceLock: string;
   rewardPool: string;
-  hPsm: string;
+  hpsm: string;
   routerHpsmHlp: string;
 };
 
@@ -131,7 +134,7 @@ const config: Config = {
         fxKeeperPool: "0xc55204d4699dCce457DBF63d4B0074E6E1fa4412",
         governanceLock: "0xC6008E6baD8c2c0814A32f6F494fa419E95593b6",
         rewardPool: "0xDE17Af0E4A6c870762508DcB7dCc20719584CBd0",
-        hPsm: "0xa2b81201F92b2F3081e9e2900Cf01942e0BCCeD3",
+        hpsm: "0xa2b81201F92b2F3081e9e2900Cf01942e0BCCeD3",
         routerHpsmHlp: "0x69328f23A090e57378e3120f622ed0697f0E7ECF"
       },
       chainlinkFeeds: {
@@ -158,7 +161,10 @@ const config: Config = {
     polygon: null
   },
   theGraphEndpoints: {
-    arbitrum: "https://api.thegraph.com/subgraphs/name/handle-fi/handle"
+    arbitrum: {
+      handle: "https://api.thegraph.com/subgraphs/name/handle-fi/handle",
+      hpsm: "https://api.thegraph.com/subgraphs/name/handle-fi/handle-psm"
+    }
   },
   bridge: {
     apiBaseUrl: "https://handle-bridge.herokuapp.com/bridge",
