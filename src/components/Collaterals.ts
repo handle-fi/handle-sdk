@@ -43,7 +43,7 @@ export default class Collaterals {
       protocolAddresses: sdkConfig.protocol.arbitrum.protocol,
       collaterals: sdkConfig.protocol.arbitrum.collaterals,
       chainId: NETWORK_NAME_TO_CHAIN_ID.arbitrum,
-      graphEndpoint: sdkConfig.theGraphEndpoints.arbitrum.handle
+      graphEndpoint: sdkConfig.theGraphEndpoints.arbitrum.fx
     };
     this.tokens = getTokensFromConfig(
       Object.values(this.config.collaterals).map(({ address }) => address)

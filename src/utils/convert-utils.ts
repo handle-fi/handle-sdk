@@ -41,6 +41,7 @@ export const isTokenPegged = async (
         peg.peggedToken.toLowerCase() == peggedToken.toLowerCase()
     );
   } catch (e) {
+    console.error(e);
     return false;
   }
 };

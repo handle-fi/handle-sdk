@@ -54,7 +54,7 @@ export type Config = {
   };
   theGraphEndpoints: {
     arbitrum: {
-      handle: string;
+      fx: string;
       hpsm: string;
     };
   };
@@ -162,7 +162,7 @@ const config: Config = {
   },
   theGraphEndpoints: {
     arbitrum: {
-      handle: "https://api.thegraph.com/subgraphs/name/handle-fi/handle",
+      fx: "https://api.thegraph.com/subgraphs/name/handle-fi/handle",
       hpsm: "https://api.thegraph.com/subgraphs/name/handle-fi/handle-psm"
     }
   },
