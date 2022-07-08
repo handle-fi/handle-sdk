@@ -1,54 +1,33 @@
 import { BigNumber, ethers } from "ethers";
-import { getTokenPegs, isValidCurvePoolSwap } from "../../../utils/convert-utils";
+import { getPsmToHlpToCurvePath, getTokenPegs, Path } from "../../../utils/convert-utils";
 import { ConvertQuoteRouteArgs, ConvertTransactionRouteArgs, Quote } from "../Convert";
 import { PSM_TO_HLP_TO_CURVE, WeightInput } from "./weights";
 import psmToHlp from "./psmToHlp";
 import HandleTokenManager from "../../TokenManager/HandleTokenManager";
 import config from "../../../config";
-import { HlpConfig, Network, TokenInfo } from "../../..";
+import { HlpConfig, Network } from "../../..";
 import { RouterHpsmHlp__factory } from "../../../contracts";
 import { fetchEncodedSignedQuotes } from "../../../utils/h2so-utils";
 import { Pair } from "../../../types/trade";
+import { CurveMetapoolFactory__factory } from "../../../contracts/factories/CurveMetapoolFactory__factory";
+import { CurveMetapool__factory } from "../../../contracts/factories/CurveMetapool__factory";
 
-const getPsmToHlpToCurvePath = async (
+const cache: Record<string, Path> = {};
+
+const getPsmToHlpToCurvePathFromCache = async (
   from: string,
   to: string,
   network: Network,
   signerOrProvider: ethers.Signer | ethers.providers.Provider
-): Promise<[string, string, string, string] | null> => {
-  const pegs = await getTokenPegs(network);
-  const validPeg = pegs.find((peg) => peg.peggedToken.toLowerCase() === from.toLowerCase());
-  if (!validPeg) return null;
-
-  const curvePool = Object.values(config.lpStaking.arbitrum).find((pool) => {
-    return !!pool.factoryAddress && pool.platform === "curve";
-  });
-  if (!curvePool) return null;
-
-  const metaToken = curvePool.tokensInLp.find(
-    (token) => token.address.toLowerCase() !== validPeg.fxToken.toLowerCase()
-  );
-  const hlpToken = curvePool.tokensInLp.find(
-    (token) => token.address.toLowerCase() === validPeg.fxToken.toLowerCase()
-  );
-  if (!metaToken || !hlpToken) return null; // this probably shouldn't happen
-
-  const isValid = await isValidCurvePoolSwap(
-    curvePool.lpToken.address,
-    curvePool.factoryAddress!,
-    network,
-    hlpToken.address,
-    to,
-    signerOrProvider
-  );
-
-  return isValid ? [from, validPeg.fxToken, hlpToken.address, to] : null;
+): Promise<Path> => {
+  if (cache[from + to + network]) return cache[from + to + network];
+  return getPsmToHlpToCurvePath(from, to, network, signerOrProvider);
 };
 
 const psmToHlpToCurveWeight = async (input: WeightInput): Promise<number> => {
   if (!input.signerOrProvider) return 0; // must have signer to check curve pool
 
-  const path = getPsmToHlpToCurvePath(
+  const path = getPsmToHlpToCurvePathFromCache(
     input.fromToken.address,
     input.toToken.address,
     input.network,
@@ -60,14 +39,45 @@ const psmToHlpToCurveWeight = async (input: WeightInput): Promise<number> => {
 
 const psmToHlpToCurveQuoteHandler = async (input: ConvertQuoteRouteArgs): Promise<Quote> => {
   if (!input.signerOrProvider) throw new Error("signer / provider required for quote");
-  const path = getPsmToHlpToCurvePath(
+  const tokenManager = new HandleTokenManager();
+  const path = await getPsmToHlpToCurvePathFromCache(
     input.fromToken.address,
     input.toToken.address,
     input.network,
     input.signerOrProvider
   );
-
   if (!path) throw new Error("No path available");
+
+  const intermediateToken = tokenManager.getTokenByAddress(path.hlpToken, input.network);
+  if (!intermediateToken) throw new Error("No intermediate token");
+
+  const psmToHlpQuote = await psmToHlp.quote({
+    ...input,
+    toToken: intermediateToken
+  });
+
+  const metapoolFactory = CurveMetapoolFactory__factory.connect(
+    path.factory,
+    input.signerOrProvider
+  );
+
+  const [fromIndex, toIndex, useUnderlying] = await metapoolFactory.get_coin_indices(
+    path.pool,
+    path.hlpToken,
+    path.curveToken
+  );
+
+  let amountOutPromise: Promise<BigNumber>;
+  const pool = CurveMetapool__factory.connect(path.pool, input.signerOrProvider);
+  if (useUnderlying) {
+    amountOutPromise = pool.get_dy_underlying(fromIndex, toIndex, psmToHlpQuote.buyAmount);
+  } else {
+    amountOutPromise = pool.get_dy(fromIndex, toIndex, psmToHlpQuote.buyAmount);
+  }
+
+  const feesPromise = pool.fee();
+
+  const [amountOut, fees] = await Promise.all([amountOutPromise, feesPromise]);
 };
 
 const psmToHlpToCurveTransactionHandler = async (

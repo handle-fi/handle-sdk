@@ -66,3 +66,52 @@ export const isValidCurvePoolSwap = async (
     return false;
   }
 };
+
+export type Path = {
+  peggedToken: string;
+  fxToken: string;
+  hlpToken: string;
+  curveToken: string;
+  pool: string;
+  factory: string;
+} | null;
+
+export const getPsmToHlpToCurvePath = async (
+  from: string,
+  to: string,
+  network: Network,
+  signerOrProvider: ethers.Signer | ethers.providers.Provider
+): Promise<Path> => {
+  const pegs = await getTokenPegs(network);
+  const validPeg = pegs.find((peg) => peg.peggedToken.toLowerCase() === from.toLowerCase());
+  if (!validPeg) return null;
+
+  const curvePool = Object.values(config.lpStaking.arbitrum).find((pool) => {
+    return !!pool.factoryAddress && pool.platform === "curve";
+  });
+  if (!curvePool) return null;
+
+  const metaToken = curvePool.tokensInLp.find((token) => !token.extensions?.isFxToken);
+  const hlpToken = curvePool.tokensInLp.find((token) => token.extensions?.isFxToken);
+  if (!metaToken || !hlpToken) return null; // this probably shouldn't happen
+
+  const isValid = await isValidCurvePoolSwap(
+    curvePool.lpToken.address,
+    curvePool.factoryAddress!,
+    network,
+    hlpToken.address,
+    to,
+    signerOrProvider
+  );
+
+  return isValid
+    ? {
+        peggedToken: from,
+        fxToken: validPeg.fxToken,
+        hlpToken: hlpToken.address,
+        curveToken: to,
+        factory: curvePool.factoryAddress!,
+        pool: curvePool.lpToken.address
+      }
+    : null;
+};

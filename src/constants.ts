@@ -16,3 +16,5 @@ export const CHAIN_ID_TO_NETWORK_NAME: Record<number, Network> = {
 };
 
 export const NETWORK_NAMES = Object.keys(NETWORK_NAME_TO_CHAIN_ID) as Network[];
+
+export const CURVE_FEE_DENOMINATOR = ethers.utils.parseUnits("10", 10);
