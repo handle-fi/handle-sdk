@@ -1,5 +1,7 @@
+import { ethers } from "ethers";
 import { gql, request } from "graphql-request";
 import config from "../config";
+import { CurveMetapoolFactory__factory } from "../contracts/factories/CurveMetapoolFactory__factory";
 import { Network } from "../types/network";
 
 type Peg = {
@@ -42,6 +44,25 @@ export const isTokenPegged = async (
     );
   } catch (e) {
     console.error(e);
+    return false;
+  }
+};
+
+export const isValidCurvePoolSwap = async (
+  poolAddress: string,
+  factoryAddress: string,
+  network: Network,
+  tokenIn: string,
+  tokenOut: string,
+  signerOrProvider: ethers.Signer | ethers.providers.Provider
+): Promise<boolean> => {
+  if (network !== "arbitrum") return false;
+  try {
+    const factory = CurveMetapoolFactory__factory.connect(factoryAddress, signerOrProvider);
+    // This will throw if they are not valid tokens
+    await factory.get_coin_indices(poolAddress, tokenIn, tokenOut);
+    return true;
+  } catch (e) {
     return false;
   }
 };

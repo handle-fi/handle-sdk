@@ -18,6 +18,7 @@ export type LPStakingPoolDetails = {
   platform: LPStakingPlatformName;
   title: string;
   stakingContractAddress: string;
+  factoryAddress?: string;
   lpToken: {
     symbol: string;
     address: string;
@@ -180,6 +181,7 @@ const config: Config = {
         title: "sushiswap WETH-FOREX",
         platform: "sushi",
         stakingContractAddress: "0x5cdEb8ff5FD3a3361E27e491696515F1D119537a",
+        factoryAddress: "0xc35DADB65012eC5796536bD9864eD8773aBc74C4",
         lpToken: {
           address: "0x9745e5CC0522827958eE3Fc2C03247276D359186",
           symbol: "SP-WETH-FOREX"
@@ -193,6 +195,7 @@ const config: Config = {
       curveEursFxEUR: {
         title: "curve fxEUR-EURS",
         platform: "curve",
+        factoryAddress: "0xb17b674D9c5CB2e441F8e196a2f048A81355d031",
         stakingContractAddress: "0x140b808C0b7e0d24fee45155473042A6f6F841Aa",
         lpToken: {
           address: "0xb0D2EB3C2cA3c6916FAb8DCbf9d9c165649231AE",
@@ -208,6 +211,7 @@ const config: Config = {
         title: "curve fxUSD-USDC-USDT",
         platform: "curve",
         stakingContractAddress: "0x68F03C9DB2611C79AAa21b6dFcdF6baC0cd191f6",
+        factoryAddress: "0xb17b674D9c5CB2e441F8e196a2f048A81355d031",
         lpToken: {
           address: "0xd0dd5d76cf0fc06dabc48632735566dca241a35e",
           symbol: "CRV-handle3"

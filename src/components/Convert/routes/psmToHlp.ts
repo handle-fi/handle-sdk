@@ -16,7 +16,7 @@ const psmToHlpWeight = async (input: WeightInput): Promise<number> => {
   const validPeg = pegs.find(
     (peg) => peg.peggedToken.toLowerCase() === input.fromToken.address.toLowerCase()
   );
-  if (!validPeg || !input.signerOrProvider) return 0; // signerOrProvider needed for psm quote
+  if (!validPeg) return 0;
   return PSM_TO_HLP;
 };
 
