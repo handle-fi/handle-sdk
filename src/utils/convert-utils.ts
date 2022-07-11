@@ -107,6 +107,8 @@ const findCurvePoolForHlpTokenSwap = async (
   return;
 };
 
+// Lots of tests failing. look at line 95 cuz things are reverting without a reason string (probs the wrong contract / abi)
+
 export const findCurvePoolForHlpTokenSwapFromCache = async (
   to: string,
   signerOrProvider: ethers.Signer | ethers.providers.Provider,
