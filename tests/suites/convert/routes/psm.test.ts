@@ -7,8 +7,6 @@ import { config } from "../../../../src";
 import { testTokenList } from "../../../mock-data/token-list";
 import { TokenInfo } from "@uniswap/token-lists";
 
-const arbitrumProvider = new ethers.providers.JsonRpcProvider(process.env.ARBITRUM_URL);
-
 let usdt: TokenInfo;
 
 const signer = ethers.provider.getSigner(0);
@@ -30,7 +28,7 @@ describe("psm", () => {
         receivingAccount: ethers.constants.AddressZero,
         sellAmount: ethers.utils.parseEther("5"),
         gasPrice: ethers.constants.One,
-        signerOrProvider: arbitrumProvider,
+        signerOrProvider: signer,
         hlpMethods: sampleHlpTokenMethods
       });
       expect(quote.sellAmount).to.eq(ethers.utils.parseEther("5").toString());
@@ -46,12 +44,12 @@ describe("psm", () => {
         receivingAccount: ethers.constants.AddressZero,
         sellAmount: ethers.utils.parseUnits("5", usdt.decimals),
         gasPrice: ethers.constants.One,
-        signerOrProvider: arbitrumProvider,
+        signerOrProvider: signer,
         hlpMethods: sampleHlpTokenMethods
       });
       expect(quote.sellAmount).to.eq(ethers.utils.parseUnits("5", usdt.decimals).toString());
       expect(quote.buyAmount).to.eq(ethers.utils.parseEther("5").toString());
-      expect(quote.allowanceTarget).to.eq(config.protocol.arbitrum?.protocol.hPsm);
+      expect(quote.allowanceTarget).to.eq(config.protocol.arbitrum?.protocol.hpsm);
       expect(quote.feeChargedBeforeConvert).to.be.false;
     });
   });
@@ -68,7 +66,7 @@ describe("psm", () => {
         slippage: 0.05
       });
       expect(tx).to.be.an("object");
-      expect(tx.to).to.eq(config.protocol.arbitrum?.protocol.hPsm);
+      expect(tx.to).to.eq(config.protocol.arbitrum?.protocol.hpsm);
     });
     it("should return a swap from pegged tokens", async () => {
       const usdt = testTokenList.getTokenBySymbol("USDT", "arbitrum");
@@ -86,7 +84,7 @@ describe("psm", () => {
         slippage: 0.05
       });
       expect(tx).to.be.an("object");
-      expect(tx.to).to.eq(config.protocol.arbitrum?.protocol.hPsm);
+      expect(tx.to).to.eq(config.protocol.arbitrum?.protocol.hpsm);
     });
   });
 });
