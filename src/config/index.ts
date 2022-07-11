@@ -82,6 +82,7 @@ export type Config = {
       hpsmToHlp: number;
       hlp: number;
       weth: number;
+      hpsmToHlpToCurve: number;
     };
   };
 };
@@ -96,6 +97,7 @@ export type ProtocolAddresses = {
   rewardPool: string;
   hpsm: string;
   routerHpsmHlp: string;
+  routerHpsmHlpCurve: string;
 };
 
 export type ChainlinkFeeds = {
@@ -136,7 +138,8 @@ const config: Config = {
         governanceLock: "0xC6008E6baD8c2c0814A32f6F494fa419E95593b6",
         rewardPool: "0xDE17Af0E4A6c870762508DcB7dCc20719584CBd0",
         hpsm: "0xa2b81201F92b2F3081e9e2900Cf01942e0BCCeD3",
-        routerHpsmHlp: "0x69328f23A090e57378e3120f622ed0697f0E7ECF"
+        routerHpsmHlp: "0x69328f23A090e57378e3120f622ed0697f0E7ECF",
+        routerHpsmHlpCurve: "NOT_DEPLOYED"
       },
       chainlinkFeeds: {
         eth_usd: "0x639Fe6ab55C921f74e7fac1ee960C0B6293ba612",
@@ -279,6 +282,7 @@ const config: Config = {
       hlp: 800_000,
       hpsm: 800_000,
       hpsmToHlp: 1_600_000,
+      hpsmToHlpToCurve: 2_000_000,
       weth: 500_000
     }
   }

@@ -1,16 +1,13 @@
 import { BigNumber, ethers } from "ethers";
-import { getPsmToHlpToCurvePath, getTokenPegs, Path } from "../../../utils/convert-utils";
+import { combineFees, getPsmToHlpToCurvePath, Path } from "../../../utils/convert-utils";
 import { ConvertQuoteRouteArgs, ConvertTransactionRouteArgs, Quote } from "../Convert";
 import { PSM_TO_HLP_TO_CURVE, WeightInput } from "./weights";
 import psmToHlp from "./psmToHlp";
 import HandleTokenManager from "../../TokenManager/HandleTokenManager";
-import config from "../../../config";
-import { HlpConfig, Network } from "../../..";
-import { RouterHpsmHlp__factory } from "../../../contracts";
-import { fetchEncodedSignedQuotes } from "../../../utils/h2so-utils";
-import { Pair } from "../../../types/trade";
+import { config, HlpConfig, Network } from "../../..";
 import { CurveMetapoolFactory__factory } from "../../../contracts/factories/CurveMetapoolFactory__factory";
 import { CurveMetapool__factory } from "../../../contracts/factories/CurveMetapool__factory";
+import { CURVE_FEE_BASIS_POINTS } from "../../../constants";
 
 const cache: Record<string, Path> = {};
 
@@ -78,61 +75,31 @@ const psmToHlpToCurveQuoteHandler = async (input: ConvertQuoteRouteArgs): Promis
   const feesPromise = pool.fee();
 
   const [amountOut, fees] = await Promise.all([amountOutPromise, feesPromise]);
+
+  // multiply amount out (which includes fees) by the reciprocal of fees
+  const amountOutWithoutFees = amountOut.mul(CURVE_FEE_BASIS_POINTS).div(fees);
+
+  const combinedFees = combineFees(
+    psmToHlpQuote.feeBasisPoints,
+    fees.toNumber(), // safely can be cast to number as it is always under 1e8
+    HlpConfig.BASIS_POINTS_DIVISOR,
+    CURVE_FEE_BASIS_POINTS
+  );
+
+  return {
+    feeBasisPoints: combinedFees,
+    allowanceTarget: config.protocol.arbitrum.protocol.routerHpsmHlpCurve,
+    sellAmount: psmToHlpQuote.sellAmount,
+    buyAmount: amountOutWithoutFees.toString(),
+    feeChargedBeforeConvert: false,
+    gas: config.convert.gasEstimates.hpsmToHlpToCurve
+  };
 };
 
 const psmToHlpToCurveTransactionHandler = async (
-  input: ConvertTransactionRouteArgs
+  _input: ConvertTransactionRouteArgs
 ): Promise<ethers.PopulatedTransaction> => {
-  const address = config.protocol.arbitrum.protocol.routerHpsmHlp;
-  const routerHpsmHlp = RouterHpsmHlp__factory.connect(address, input.signer);
-
-  const pegs = await getTokenPegs(input.network);
-  const validPeg = pegs.find(
-    (peg) => peg.peggedToken.toLowerCase() === input.fromToken.address.toLowerCase()
-  );
-  if (!validPeg) throw new Error("No Valid Peg");
-
-  const minOut = input.sellAmount
-    .mul(input.slippage * HlpConfig.BASIS_POINTS_DIVISOR)
-    .div(HlpConfig.BASIS_POINTS_DIVISOR);
-
-  const TokenManager = new HandleTokenManager();
-  const fxToken = TokenManager.getTokenByAddress(validPeg.fxToken, input.network);
-  if (!fxToken) throw new Error("Could not find fxToken");
-
-  const pairs: Pair[] = [
-    {
-      baseSymbol: fxToken.symbol,
-      quoteSymbol: "USD"
-    },
-    {
-      baseSymbol: input.toToken.symbol,
-      quoteSymbol: "USD"
-    }
-  ];
-
-  const { encoded } = await fetchEncodedSignedQuotes(pairs);
-
-  if (input.toToken.extensions?.isNative) {
-    return routerHpsmHlp.populateTransaction.swapPeggedTokenToEth(
-      input.fromToken.address,
-      validPeg.fxToken,
-      input.sellAmount,
-      minOut,
-      input.receivingAccount,
-      encoded
-    );
-  }
-
-  return routerHpsmHlp.populateTransaction.swapPeggedTokenToHlpToken(
-    input.fromToken.address,
-    validPeg.fxToken,
-    input.toToken.address,
-    input.sellAmount,
-    minOut,
-    input.receivingAccount,
-    encoded
-  );
+  return null as any;
 };
 
 export default {

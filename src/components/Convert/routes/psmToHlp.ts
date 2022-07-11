@@ -1,5 +1,5 @@
 import { BigNumber, ethers } from "ethers";
-import { getTokenPegs } from "../../../utils/convert-utils";
+import { combineFees, getTokenPegs } from "../../../utils/convert-utils";
 import { ConvertQuoteRouteArgs, ConvertTransactionRouteArgs, Quote } from "../Convert";
 import { PSM_TO_HLP, WeightInput } from "./weights";
 import psm from "./psm";
@@ -41,20 +41,13 @@ const psmToHlpQuoteHandler = async (input: ConvertQuoteRouteArgs): Promise<Quote
     fromToken: fxToken
   });
 
-  const normalize = (n: number) => n / HlpConfig.BASIS_POINTS_DIVISOR;
-
-  const factorAfterFee =
-    (1 - normalize(psmQuote.feeBasisPoints)) * (1 - normalize(hlpSwapQuote.feeBasisPoints));
-
-  // To get fee factor, take 1-factorAfterFee.
-  // basis points is this value * BASIS_POINTS_DIVISOR
-  const adjustedFeeBasisPoints = Math.round((1 - factorAfterFee) * HlpConfig.BASIS_POINTS_DIVISOR);
+  const newFee = combineFees(psmQuote.feeBasisPoints, hlpSwapQuote.feeBasisPoints);
 
   return {
     sellAmount: psmQuote.sellAmount,
     buyAmount: hlpSwapQuote.buyAmount,
     allowanceTarget: config.protocol.arbitrum.protocol.routerHpsmHlp,
-    feeBasisPoints: adjustedFeeBasisPoints,
+    feeBasisPoints: newFee,
     feeChargedBeforeConvert: false,
     gas: config.convert.gasEstimates.hpsmToHlp
   };

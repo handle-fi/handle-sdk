@@ -1,5 +1,6 @@
-import { ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import { gql, request } from "graphql-request";
+import { HlpConfig } from "..";
 import config from "../config";
 import { CurveMetapoolFactory__factory } from "../contracts/factories/CurveMetapoolFactory__factory";
 import { Network } from "../types/network";
@@ -114,4 +115,21 @@ export const getPsmToHlpToCurvePath = async (
         pool: curvePool.lpToken.address
       }
     : null;
+};
+
+/**
+ * Combines fees and returns the total fee in basis points
+ */
+export const combineFees = (
+  fee1: number,
+  fee2: number,
+  fee1Divisor = HlpConfig.BASIS_POINTS_DIVISOR,
+  fee2Divisor = HlpConfig.BASIS_POINTS_DIVISOR
+): number => {
+  return BigNumber.from(HlpConfig.BASIS_POINTS_DIVISOR)
+    .mul(fee1Divisor - fee1)
+    .mul(fee2Divisor - fee2)
+    .div(fee1Divisor)
+    .div(fee2Divisor)
+    .toNumber();
 };
