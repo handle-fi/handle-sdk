@@ -30,6 +30,7 @@ const psmToHlpToCurveWeight = async (input: WeightInput): Promise<number> => {
     input.network,
     input.signerOrProvider
   );
+  console.log(path);
   if (!path) return 0;
   return PSM_TO_HLP_TO_CURVE;
 };

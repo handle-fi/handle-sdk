@@ -1,7 +1,7 @@
 import { BigNumber, ethers } from "ethers";
 import { gql, request } from "graphql-request";
 import { HlpConfig } from "..";
-import config from "../config";
+import config, { LPStakingPoolDetails } from "../config";
 import { CurveMetapoolFactory__factory } from "../contracts/factories/CurveMetapoolFactory__factory";
 import { Network } from "../types/network";
 
@@ -68,6 +68,56 @@ export const isValidCurvePoolSwap = async (
   }
 };
 
+const curvePoolCache: Record<string, LPStakingPoolDetails | null> = {};
+
+/**
+ * @returns a curve lp with this address as one of the tokens, or underlying tokens
+ */
+const findCurvePoolForHlpTokenSwap = async (
+  to: string,
+  signerOrProvider: ethers.Signer | ethers.providers.Provider,
+  network: string
+): Promise<LPStakingPoolDetails | undefined> => {
+  if (network !== "arbitrum") return;
+
+  const curvePools = Object.values(config.lpStaking[network]).filter(
+    (pool) => pool.platform === "curve"
+  );
+  for (let pool of curvePools) {
+    if (!pool.factoryAddress) {
+      // this should not happen
+      console.error("No factory for curve pool");
+      continue;
+    }
+    if (!pool.tokensInLp.some((token) => token.extensions?.isFxToken)) {
+      continue; // this also should not happen, as curve pools should have at least one fxtoken
+    }
+    const factory = CurveMetapoolFactory__factory.connect(pool.factoryAddress, signerOrProvider);
+    const tokens = (
+      await Promise.all([
+        factory.get_coins(pool.lpToken.address),
+        factory.get_underlying_coins(pool.lpToken.address)
+      ])
+    ).flat();
+    if (tokens.some((token) => token.toLowerCase() === to.toLowerCase())) {
+      return pool;
+    }
+  }
+
+  return;
+};
+
+export const findCurvePoolForHlpTokenSwapFromCache = async (
+  to: string,
+  signerOrProvider: ethers.Signer | ethers.providers.Provider,
+  network: string
+) => {
+  const key = to.toLowerCase() + network;
+  if (curvePoolCache[key] !== undefined) return curvePoolCache[key];
+  curvePoolCache[key] = (await findCurvePoolForHlpTokenSwap(to, signerOrProvider, network)) ?? null;
+  return curvePoolCache[key];
+};
+
 export type Path = {
   peggedToken: string;
   fxToken: string;
@@ -87,20 +137,11 @@ export const getPsmToHlpToCurvePath = async (
   const validPeg = pegs.find((peg) => peg.peggedToken.toLowerCase() === from.toLowerCase());
   if (!validPeg) return null;
 
-  const curvePool = Object.values(config.lpStaking.arbitrum).find((pool) => {
-    return (
-      !!pool.factoryAddress &&
-      pool.platform === "curve" &&
-      pool.tokensInLp.find(
-        (token) => token.address.toLowerCase() === validPeg.fxToken.toLowerCase()
-      )
-    );
-  });
+  const curvePool = await findCurvePoolForHlpTokenSwapFromCache(to, signerOrProvider, network);
   if (!curvePool) return null;
 
-  const metaToken = curvePool.tokensInLp.find((token) => !token.extensions?.isFxToken);
   const hlpToken = curvePool.tokensInLp.find((token) => token.extensions?.isFxToken);
-  if (!metaToken || !hlpToken) return null; // this probably shouldn't happen
+  if (!hlpToken) return null; // this won't happen, so long as the curve pool has a fxToken
 
   const isValid = await isValidCurvePoolSwap(
     curvePool.lpToken.address,
