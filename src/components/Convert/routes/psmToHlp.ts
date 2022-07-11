@@ -12,6 +12,7 @@ import { fetchEncodedSignedQuotes } from "../../../utils/h2so-utils";
 import { Pair } from "../../../types/trade";
 
 const psmToHlpWeight = async (input: WeightInput): Promise<number> => {
+  if (!input.toToken.extensions?.isFxToken && !input.toToken.extensions?.isNative) return 0;
   const pegs = await getTokenPegs(input.network);
   const validPeg = pegs.find(
     (peg) => peg.peggedToken.toLowerCase() === input.fromToken.address.toLowerCase()

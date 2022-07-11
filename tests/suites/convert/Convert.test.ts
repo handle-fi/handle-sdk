@@ -1,6 +1,7 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
 import Convert from "../../../src/components/Convert";
+import { sampleHlpTokenMethods } from "./sampleHlpTokenMethods";
 import { fxAud, fxUsd } from "./test-tokens";
 
 const signer = ethers.provider.getSigner(0);
@@ -15,6 +16,7 @@ describe("Convert class", () => {
           receivingAccount: await signer.getAddress(),
           gasPrice: ethers.utils.parseUnits("1", "gwei"),
           sellAmount: ethers.utils.parseUnits("1", fxAud.decimals),
+          hlpMethods: sampleHlpTokenMethods,
           signerOrProvider: signer
         });
         fail("Should throw");

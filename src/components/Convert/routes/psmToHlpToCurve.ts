@@ -24,7 +24,7 @@ const getPsmToHlpToCurvePathFromCache = async (
 const psmToHlpToCurveWeight = async (input: WeightInput): Promise<number> => {
   if (!input.signerOrProvider) return 0; // must have signer to check curve pool
 
-  const path = getPsmToHlpToCurvePathFromCache(
+  const path = await getPsmToHlpToCurvePathFromCache(
     input.fromToken.address,
     input.toToken.address,
     input.network,
@@ -77,7 +77,9 @@ const psmToHlpToCurveQuoteHandler = async (input: ConvertQuoteRouteArgs): Promis
   const [amountOut, fees] = await Promise.all([amountOutPromise, feesPromise]);
 
   // multiply amount out (which includes fees) by the reciprocal of fees
-  const amountOutWithoutFees = amountOut.mul(CURVE_FEE_BASIS_POINTS).div(fees);
+  const amountOutWithoutFees = amountOut
+    .mul(CURVE_FEE_BASIS_POINTS)
+    .div(BigNumber.from(CURVE_FEE_BASIS_POINTS).sub(fees));
 
   const combinedFees = combineFees(
     psmToHlpQuote.feeBasisPoints,

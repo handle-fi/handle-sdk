@@ -88,7 +88,13 @@ export const getPsmToHlpToCurvePath = async (
   if (!validPeg) return null;
 
   const curvePool = Object.values(config.lpStaking.arbitrum).find((pool) => {
-    return !!pool.factoryAddress && pool.platform === "curve";
+    return (
+      !!pool.factoryAddress &&
+      pool.platform === "curve" &&
+      pool.tokensInLp.find(
+        (token) => token.address.toLowerCase() === validPeg.fxToken.toLowerCase()
+      )
+    );
   });
   if (!curvePool) return null;
 
