@@ -273,8 +273,7 @@
         "type": "uint256"
       }
     ],
-    "outputs": [],
-    "gas": 471502
+    "outputs": []
   },
   {
     "stateMutability": "view",
@@ -286,8 +285,7 @@
         "name": "",
         "type": "uint256"
       }
-    ],
-    "gas": 318
+    ]
   },
   {
     "stateMutability": "nonpayable",
@@ -308,8 +306,7 @@
         "name": "",
         "type": "bool"
       }
-    ],
-    "gas": 77977
+    ]
   },
   {
     "stateMutability": "nonpayable",
@@ -334,8 +331,7 @@
         "name": "",
         "type": "bool"
       }
-    ],
-    "gas": 115912
+    ]
   },
   {
     "stateMutability": "nonpayable",
@@ -356,8 +352,7 @@
         "name": "",
         "type": "bool"
       }
-    ],
-    "gas": 37851
+    ]
   },
   {
     "stateMutability": "view",
@@ -369,8 +364,7 @@
         "name": "",
         "type": "uint256[2]"
       }
-    ],
-    "gas": 4707
+    ]
   },
   {
     "stateMutability": "view",
@@ -382,8 +376,7 @@
         "name": "",
         "type": "uint256"
       }
-    ],
-    "gas": 468
+    ]
   },
   {
     "stateMutability": "view",
@@ -395,8 +388,7 @@
         "name": "",
         "type": "uint256"
       }
-    ],
-    "gas": 10764
+    ]
   },
   {
     "stateMutability": "view",
@@ -408,8 +400,7 @@
         "name": "",
         "type": "uint256"
       }
-    ],
-    "gas": 10726
+    ]
   },
   {
     "stateMutability": "view",
@@ -421,8 +412,7 @@
         "name": "",
         "type": "uint256"
       }
-    ],
-    "gas": 848656
+    ]
   },
   {
     "stateMutability": "view",
@@ -443,8 +433,7 @@
         "name": "",
         "type": "uint256"
       }
-    ],
-    "gas": 3336308
+    ]
   },
   {
     "stateMutability": "nonpayable",
@@ -515,8 +504,7 @@
         "name": "",
         "type": "uint256"
       }
-    ],
-    "gas": 2117591
+    ]
   },
   {
     "stateMutability": "nonpayable",
@@ -691,8 +679,7 @@
         "name": "",
         "type": "uint256"
       }
-    ],
-    "gas": 1100
+    ]
   },
   {
     "stateMutability": "nonpayable",
@@ -762,16 +749,14 @@
         "type": "uint256"
       }
     ],
-    "outputs": [],
-    "gas": 162101
+    "outputs": []
   },
   {
     "stateMutability": "nonpayable",
     "type": "function",
     "name": "stop_ramp_A",
     "inputs": [],
-    "outputs": [],
-    "gas": 157565
+    "outputs": []
   },
   {
     "stateMutability": "view",
@@ -788,16 +773,14 @@
         "name": "",
         "type": "uint256"
       }
-    ],
-    "gas": 7740
+    ]
   },
   {
     "stateMutability": "nonpayable",
     "type": "function",
     "name": "withdraw_admin_fees",
     "inputs": [],
-    "outputs": [],
-    "gas": 33182
+    "outputs": []
   },
   {
     "stateMutability": "view",
@@ -814,8 +797,7 @@
         "name": "",
         "type": "address"
       }
-    ],
-    "gas": 3093
+    ]
   },
   {
     "stateMutability": "view",
@@ -832,8 +814,7 @@
         "name": "",
         "type": "uint256"
       }
-    ],
-    "gas": 3123
+    ]
   },
   {
     "stateMutability": "view",
@@ -845,8 +826,7 @@
         "name": "",
         "type": "uint256"
       }
-    ],
-    "gas": 3108
+    ]
   },
   {
     "stateMutability": "view",
@@ -858,8 +838,7 @@
         "name": "",
         "type": "uint256"
       }
-    ],
-    "gas": 3138
+    ]
   },
   {
     "stateMutability": "view",
@@ -871,8 +850,7 @@
         "name": "",
         "type": "uint256"
       }
-    ],
-    "gas": 3168
+    ]
   },
   {
     "stateMutability": "view",
@@ -884,8 +862,7 @@
         "name": "",
         "type": "uint256"
       }
-    ],
-    "gas": 3198
+    ]
   },
   {
     "stateMutability": "view",
@@ -897,8 +874,7 @@
         "name": "",
         "type": "uint256"
       }
-    ],
-    "gas": 3228
+    ]
   },
   {
     "stateMutability": "view",
@@ -910,8 +886,7 @@
         "name": "",
         "type": "string"
       }
-    ],
-    "gas": 13488
+    ]
   },
   {
     "stateMutability": "view",
@@ -923,8 +898,7 @@
         "name": "",
         "type": "string"
       }
-    ],
-    "gas": 11241
+    ]
   },
   {
     "stateMutability": "view",
@@ -941,8 +915,7 @@
         "name": "",
         "type": "uint256"
       }
-    ],
-    "gas": 3533
+    ]
   },
   {
     "stateMutability": "view",
@@ -963,8 +936,7 @@
         "name": "",
         "type": "uint256"
       }
-    ],
-    "gas": 3778
+    ]
   },
   {
     "stateMutability": "view",
@@ -976,7 +948,6 @@
         "name": "",
         "type": "uint256"
       }
-    ],
-    "gas": 3378
+    ]
   }
 ]
