@@ -1,5 +1,10 @@
 import { BigNumber, ethers } from "ethers";
-import { combineFees, getPsmToHlpToCurvePath, Path } from "../../../utils/convert-utils";
+import {
+  combineFees,
+  curveFeeToBasisPoints,
+  getPsmToHlpToCurvePath,
+  Path
+} from "../../../utils/convert-utils";
 import { ConvertQuoteRouteArgs, ConvertTransactionRouteArgs, Quote } from "../Convert";
 import { PSM_TO_HLP_TO_CURVE, WeightInput } from "./weights";
 import psmToHlp from "./psmToHlp";
@@ -7,7 +12,9 @@ import HandleTokenManager from "../../TokenManager/HandleTokenManager";
 import { config, HlpConfig, Network } from "../../..";
 import { CurveMetapoolFactory__factory } from "../../../contracts/factories/CurveMetapoolFactory__factory";
 import { CurveMetapool__factory } from "../../../contracts/factories/CurveMetapool__factory";
-import { CURVE_FEE_BASIS_POINTS } from "../../../constants";
+import { RouterHpsmHlpCurve__factory } from "../../../contracts";
+import { Pair } from "../../../types/trade";
+import { fetchEncodedSignedQuotes } from "../../../utils/h2so-utils";
 
 const cache: Record<string, Path> = {};
 
@@ -30,7 +37,6 @@ const psmToHlpToCurveWeight = async (input: WeightInput): Promise<number> => {
     input.network,
     input.signerOrProvider
   );
-  console.log(path);
   if (!path) return 0;
   return PSM_TO_HLP_TO_CURVE;
 };
@@ -77,16 +83,16 @@ const psmToHlpToCurveQuoteHandler = async (input: ConvertQuoteRouteArgs): Promis
 
   const [amountOut, fees] = await Promise.all([amountOutPromise, feesPromise]);
 
+  const curveFeeBasisPoints = curveFeeToBasisPoints(fees.toNumber());
+
   // multiply amount out (which includes fees) by the reciprocal of fees
   const amountOutWithoutFees = amountOut
-    .mul(CURVE_FEE_BASIS_POINTS)
-    .div(BigNumber.from(CURVE_FEE_BASIS_POINTS).sub(fees));
+    .mul(HlpConfig.BASIS_POINTS_DIVISOR)
+    .div(HlpConfig.BASIS_POINTS_DIVISOR - curveFeeBasisPoints);
 
   const combinedFees = combineFees(
     psmToHlpQuote.feeBasisPoints,
-    fees.toNumber(), // safely can be cast to number as it is always under 1e8
-    HlpConfig.BASIS_POINTS_DIVISOR,
-    CURVE_FEE_BASIS_POINTS
+    curveFeeBasisPoints // safely can be cast to number as it is always under 1e8
   );
 
   return {
@@ -100,9 +106,59 @@ const psmToHlpToCurveQuoteHandler = async (input: ConvertQuoteRouteArgs): Promis
 };
 
 const psmToHlpToCurveTransactionHandler = async (
-  _input: ConvertTransactionRouteArgs
+  input: ConvertTransactionRouteArgs
 ): Promise<ethers.PopulatedTransaction> => {
-  return null as any;
+  const path = await getPsmToHlpToCurvePathFromCache(
+    input.fromToken.address,
+    input.toToken.address,
+    input.network,
+    input.signer
+  );
+  if (!path) throw new Error("No path found for psmToHlpToCurve swap");
+  const router = RouterHpsmHlpCurve__factory.connect(
+    config.protocol.arbitrum.protocol.routerHpsmHlpCurve,
+    input.signer
+  );
+
+  const minOut = input.buyAmount
+    .mul(input.slippage * HlpConfig.BASIS_POINTS_DIVISOR)
+    .div(HlpConfig.BASIS_POINTS_DIVISOR);
+
+  const TokenManager = new HandleTokenManager();
+
+  const fxToken = TokenManager.getTokenByAddress(path.fxToken, input.network);
+  const hlpToken = TokenManager.getTokenByAddress(path.hlpToken, input.network);
+
+  if (!fxToken || !hlpToken) throw new Error("Could not find token");
+
+  const pairs: Pair[] = [
+    {
+      baseSymbol: fxToken.symbol,
+      quoteSymbol: "USD"
+    }
+  ];
+
+  if (fxToken.symbol !== hlpToken.symbol) {
+    pairs.push({
+      baseSymbol: hlpToken.symbol,
+      quoteSymbol: "USD"
+    });
+  }
+
+  const { encoded } = await fetchEncodedSignedQuotes(pairs);
+
+  return router.populateTransaction.swapPeggedTokenToCurveToken(
+    path.peggedToken,
+    path.fxToken,
+    path.hlpToken,
+    path.curveToken,
+    input.sellAmount,
+    input.receivingAccount,
+    minOut,
+    path.factory,
+    path.pool,
+    encoded
+  );
 };
 
 export default {

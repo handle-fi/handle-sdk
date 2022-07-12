@@ -1,7 +1,8 @@
-import { BigNumber, ethers } from "ethers";
+import { ethers } from "ethers";
 import { gql, request } from "graphql-request";
 import { HlpConfig } from "..";
 import config, { LPStakingPoolDetails } from "../config";
+import { CURVE_FEE_DENOMINATOR } from "../constants";
 import { CurveMetapoolFactory__factory } from "../contracts/factories/CurveMetapoolFactory__factory";
 import { Network } from "../types/network";
 
@@ -90,15 +91,21 @@ const findCurvePoolForHlpTokenSwap = async (
       continue;
     }
     if (!pool.tokensInLp.some((token) => token.extensions?.isFxToken)) {
-      continue; // this also should not happen, as curve pools should have at least one fxtoken
+      // this also should not happen, as curve pools should have at least one fxtoken
+      continue;
     }
     const factory = CurveMetapoolFactory__factory.connect(pool.factoryAddress, signerOrProvider);
-    const tokens = (
-      await Promise.all([
-        factory.get_coins(pool.lpToken.address),
-        factory.get_underlying_coins(pool.lpToken.address)
-      ])
-    ).flat();
+    const baseTokens = factory.get_coins(pool.lpToken.address);
+    const underlyingTokens = new Promise<string[]>(async (resolve) => {
+      try {
+        resolve(await factory.get_underlying_coins(pool.lpToken.address));
+      } catch {
+        // underlying coins reverts if token is not a metapool, meaning there are
+        // no underlying tokens
+        resolve([]);
+      }
+    });
+    const tokens = (await Promise.all([baseTokens, underlyingTokens])).flat();
     if (tokens.some((token) => token.toLowerCase() === to.toLowerCase())) {
       return pool;
     }
@@ -107,8 +114,7 @@ const findCurvePoolForHlpTokenSwap = async (
   return;
 };
 
-// Lots of tests failing. look at line 95 cuz things are reverting without a reason string (probs the wrong contract / abi)
-
+// The same as the findCurvePoolForHlpTokenSwap, but with a cache first approach
 export const findCurvePoolForHlpTokenSwapFromCache = async (
   to: string,
   signerOrProvider: ethers.Signer | ethers.providers.Provider,
@@ -167,7 +173,9 @@ export const getPsmToHlpToCurvePath = async (
 };
 
 /**
- * Combines fees and returns the total fee in basis points
+ * Combines fees and returns the total fee in basis points.
+ * @note this only works if the fees are compounded on the same amount,
+ * e.g amount -> fee collected -> fee collected again.
  */
 export const combineFees = (
   fee1: number,
@@ -175,10 +183,10 @@ export const combineFees = (
   fee1Divisor = HlpConfig.BASIS_POINTS_DIVISOR,
   fee2Divisor = HlpConfig.BASIS_POINTS_DIVISOR
 ): number => {
-  return BigNumber.from(HlpConfig.BASIS_POINTS_DIVISOR)
-    .mul(fee1Divisor - fee1)
-    .mul(fee2Divisor - fee2)
-    .div(fee1Divisor)
-    .div(fee2Divisor)
-    .toNumber();
+  const decimalFee = 1 - (1 - fee1 / fee1Divisor) * (1 - fee2 / fee2Divisor);
+  return Math.floor(decimalFee * HlpConfig.BASIS_POINTS_DIVISOR);
+};
+
+export const curveFeeToBasisPoints = (num: number) => {
+  return (num / CURVE_FEE_DENOMINATOR) * HlpConfig.BASIS_POINTS_DIVISOR;
 };
