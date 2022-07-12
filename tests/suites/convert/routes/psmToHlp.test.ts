@@ -70,7 +70,7 @@ describe("psmToHlp", () => {
         signer,
         hlpMethods: sampleHlpTokenMethods,
         buyAmount: expectedBuyAmount,
-        slippage: 0.05
+        slippage: 0.5
       });
       expect(tx.to).to.eq(config.protocol.arbitrum.protocol.routerHpsmHlp);
     });

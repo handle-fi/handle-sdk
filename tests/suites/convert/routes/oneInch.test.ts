@@ -43,7 +43,7 @@ describe("oneInch route", () => {
         sellAmount: ethers.utils.parseUnits("1", eth.decimals),
         buyAmount: ethers.utils.parseUnits("1", wbtc.decimals),
         signer,
-        slippage: 0.05
+        slippage: 0.5
       });
       expect(tx).to.be.an("object");
     });

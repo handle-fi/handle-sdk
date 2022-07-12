@@ -1,12 +1,11 @@
 import { BigNumber, ethers } from "ethers";
-import { combineFees, getTokenPegs } from "../../../utils/convert-utils";
+import { combineFees, getMinOut, getTokenPegs } from "../../../utils/convert-utils";
 import { ConvertQuoteRouteArgs, ConvertTransactionRouteArgs, Quote } from "../Convert";
 import { PSM_TO_HLP, WeightInput } from "./weights";
 import psm from "./psm";
 import hlpSwap from "./hlpSwap";
 import HandleTokenManager from "../../TokenManager/HandleTokenManager";
 import config from "../../../config";
-import { HlpConfig } from "../../..";
 import { RouterHpsmHlp__factory } from "../../../contracts";
 import { fetchEncodedSignedQuotes } from "../../../utils/h2so-utils";
 import { Pair } from "../../../types/trade";
@@ -66,9 +65,7 @@ const psmToHlpTransactionHandler = async (
   );
   if (!validPeg) throw new Error("No Valid Peg");
 
-  const minOut = input.sellAmount
-    .mul(input.slippage * HlpConfig.BASIS_POINTS_DIVISOR)
-    .div(HlpConfig.BASIS_POINTS_DIVISOR);
+  const minOut = getMinOut(input.buyAmount, input.slippage);
 
   const TokenManager = new HandleTokenManager();
   const fxToken = TokenManager.getTokenByAddress(validPeg.fxToken, input.network);

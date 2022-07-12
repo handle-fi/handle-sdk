@@ -1,7 +1,7 @@
 import { ethers } from "hardhat";
 import { expect } from "chai";
 import { sampleHlpTokenMethods } from "../sampleHlpTokenMethods";
-import { eurs, fxAud } from "../test-tokens";
+import { eurs } from "../test-tokens";
 import { config, ConvertSDK, TokenInfo } from "../../../../src";
 import { testTokenList } from "../../../mock-data/token-list";
 
@@ -59,23 +59,41 @@ describe("psmToHlpToCurve", () => {
       expect(typeof quote.buyAmount).to.eq("string");
     });
   });
-  xdescribe("swap", () => {
-    it("should get a transaction from a pegged token to a hlp token", async () => {
+  describe("swap", () => {
+    it("should get a transaction from a pegged token to a curve token", async () => {
       // usdt has 6 decimals
       const sellAmount = ethers.utils.parseUnits("5", 6);
       // sample hlp methods havea 1:1 ratio of token prices
       const expectedBuyAmount = ethers.utils.parseUnits("5", 18);
       const tx = await ConvertSDK.getSwap({
         fromToken: usdt,
-        toToken: fxAud,
+        toToken: usdc,
         sellAmount,
         gasPrice: ethers.constants.One,
         signer,
         hlpMethods: sampleHlpTokenMethods,
         buyAmount: expectedBuyAmount,
-        slippage: 0.05
+        slippage: 0.5
       });
-      expect(tx.to).to.eq(config.protocol.arbitrum.protocol.routerHpsmHlp);
+      expect(tx.to).to.eq(config.protocol.arbitrum.protocol.routerHpsmHlpCurve);
+      await ethers.provider.estimateGas(tx); // if this throws, the test fails
+    });
+    it("should get a transaction from a pegged token to a different currency curve token", async () => {
+      // usdt has 6 decimals
+      const sellAmount = ethers.utils.parseUnits("5", 6);
+      // sample hlp methods havea 1:1 ratio of token prices
+      const expectedBuyAmount = ethers.utils.parseUnits("5", 18);
+      const tx = await ConvertSDK.getSwap({
+        fromToken: usdt,
+        toToken: eurs,
+        sellAmount,
+        gasPrice: ethers.constants.One,
+        signer,
+        hlpMethods: sampleHlpTokenMethods,
+        buyAmount: expectedBuyAmount,
+        slippage: 0.5
+      });
+      expect(tx.to).to.eq(config.protocol.arbitrum.protocol.routerHpsmHlpCurve);
     });
   });
 });

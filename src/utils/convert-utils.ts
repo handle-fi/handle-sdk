@@ -1,4 +1,4 @@
-import { ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import { gql, request } from "graphql-request";
 import { HlpConfig } from "..";
 import config, { LPStakingPoolDetails } from "../config";
@@ -189,4 +189,13 @@ export const combineFees = (
 
 export const curveFeeToBasisPoints = (num: number) => {
   return (num / CURVE_FEE_DENOMINATOR) * HlpConfig.BASIS_POINTS_DIVISOR;
+};
+
+/**
+ * @param slippage refers to the percentage (e.g. 0.5 is 0.5% slippage)
+ */
+export const getMinOut = (amount: BigNumber, slippage: number) => {
+  return amount
+    .mul((1 - slippage / 100) * HlpConfig.BASIS_POINTS_DIVISOR)
+    .div(HlpConfig.BASIS_POINTS_DIVISOR);
 };

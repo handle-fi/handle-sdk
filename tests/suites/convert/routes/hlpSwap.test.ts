@@ -73,7 +73,7 @@ describe("hlpSwap", () => {
         // price of fxUsd / fxAud fluctuates, so set buy amount to zero
         buyAmount: ethers.utils.parseUnits("0", fxAud.decimals),
         signer: signer,
-        slippage: 0.05
+        slippage: 0.5
       });
       expect(tx).to.be.an("object");
     });
@@ -87,7 +87,7 @@ describe("hlpSwap", () => {
         // price of fxUsd / eth fluctuates, so set buy amount to zero
         buyAmount: ethers.utils.parseUnits("0", eth.decimals),
         signer: signer,
-        slippage: 0.05
+        slippage: 0.5
       });
       expect(tx).to.be.an("object");
     });

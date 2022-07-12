@@ -2,6 +2,7 @@ import { BigNumber, ethers } from "ethers";
 import {
   combineFees,
   curveFeeToBasisPoints,
+  getMinOut,
   getPsmToHlpToCurvePath,
   Path
 } from "../../../utils/convert-utils";
@@ -120,9 +121,7 @@ const psmToHlpToCurveTransactionHandler = async (
     input.signer
   );
 
-  const minOut = input.buyAmount
-    .mul(input.slippage * HlpConfig.BASIS_POINTS_DIVISOR)
-    .div(HlpConfig.BASIS_POINTS_DIVISOR);
+  const minOut = getMinOut(input.buyAmount, input.slippage);
 
   const TokenManager = new HandleTokenManager();
 

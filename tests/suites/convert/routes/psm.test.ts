@@ -63,7 +63,7 @@ describe("psm", () => {
         sellAmount: ethers.utils.parseUnits("1", usdt.decimals),
         buyAmount: ethers.utils.parseUnits("1", fxUsd.decimals),
         signer: signer,
-        slippage: 0.05
+        slippage: 0.5
       });
       expect(tx).to.be.an("object");
       expect(tx.to).to.eq(config.protocol.arbitrum?.protocol.hpsm);
@@ -81,7 +81,7 @@ describe("psm", () => {
         sellAmount: ethers.utils.parseUnits("1", usdt.decimals),
         buyAmount: ethers.utils.parseUnits("1", fxUsd.decimals),
         signer: signer,
-        slippage: 0.05
+        slippage: 0.5
       });
       expect(tx).to.be.an("object");
       expect(tx.to).to.eq(config.protocol.arbitrum?.protocol.hpsm);

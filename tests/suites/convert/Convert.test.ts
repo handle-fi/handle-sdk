@@ -50,7 +50,7 @@ describe("Convert class", () => {
           sellAmount: ethers.utils.parseUnits("1", fxAud.decimals),
           buyAmount: ethers.utils.parseUnits("1", fxUsd.decimals),
           signer: signer,
-          slippage: 0.05
+          slippage: 0.5
         });
         fail("Should throw");
       } catch (e: any) {
@@ -66,7 +66,7 @@ describe("Convert class", () => {
           sellAmount: ethers.utils.parseUnits("1", fxAud.decimals),
           buyAmount: ethers.utils.parseUnits("1", fxUsd.decimals),
           signer: signer,
-          slippage: 0.05
+          slippage: 0.5
         });
         fail("Should throw");
       } catch (e: any) {
