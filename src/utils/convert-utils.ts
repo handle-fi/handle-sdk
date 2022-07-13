@@ -141,7 +141,10 @@ const findCurvePoolForHlpTokenSwap = async (
           }
         });
         const tokens = (await Promise.all([baseTokens, underlyingTokens])).flat();
-        if (tokens.some((token) => token.toLowerCase() === to.toLowerCase())) resolve(pool);
+        if (tokens.some((token) => token.toLowerCase() === to.toLowerCase())) {
+          return resolve(pool);
+        }
+        return resolve(null);
       })
   );
   return (await Promise.all(promises)).find((value) => value !== null) ?? undefined;
