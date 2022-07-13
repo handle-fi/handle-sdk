@@ -13,7 +13,7 @@ let usdt: TokenInfo;
 describe("psmToHlpToCurve", () => {
   before(() => {
     usdt = testTokenList.getTokenBySymbol("USDT", "arbitrum")!;
-    usdc = testTokenList.getTokenBySymbol("USDT", "arbitrum")!;
+    usdc = testTokenList.getTokenBySymbol("USDC", "arbitrum")!;
   });
   describe("quote", () => {
     it("should get a quote from a pegged token to a curve token", async () => {

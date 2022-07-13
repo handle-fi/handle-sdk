@@ -1,4 +1,4 @@
-import { BigNumber, ethers } from "ethers";
+import { ethers } from "ethers";
 import {
   combineFees,
   curveFeeToBasisPoints,
@@ -25,8 +25,10 @@ const getPsmToHlpToCurvePathFromCache = async (
   network: Network,
   signerOrProvider: ethers.Signer | ethers.providers.Provider
 ): Promise<Path> => {
-  if (cache[from + to + network]) return cache[from + to + network];
-  return getPsmToHlpToCurvePath(from, to, network, signerOrProvider);
+  const key = `${from}${to}${network}`;
+  if (cache[key] !== undefined) return cache[key];
+  cache[key] = await getPsmToHlpToCurvePath(from, to, network, signerOrProvider);
+  return cache[key];
 };
 
 const psmToHlpToCurveWeight = async (input: WeightInput): Promise<number> => {
@@ -72,13 +74,10 @@ const psmToHlpToCurveQuoteHandler = async (input: ConvertQuoteRouteArgs): Promis
     path.curveToken
   );
 
-  let amountOutPromise: Promise<BigNumber>;
   const pool = CurveMetapool__factory.connect(path.pool, input.signerOrProvider);
-  if (useUnderlying) {
-    amountOutPromise = pool.get_dy_underlying(fromIndex, toIndex, psmToHlpQuote.buyAmount);
-  } else {
-    amountOutPromise = pool.get_dy(fromIndex, toIndex, psmToHlpQuote.buyAmount);
-  }
+  const amountOutPromise = useUnderlying
+    ? pool.get_dy_underlying(fromIndex, toIndex, psmToHlpQuote.buyAmount)
+    : pool.get_dy(fromIndex, toIndex, psmToHlpQuote.buyAmount);
 
   const feesPromise = pool.fee();
 

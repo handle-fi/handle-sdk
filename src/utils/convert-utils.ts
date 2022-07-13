@@ -64,7 +64,10 @@ export const isValidCurvePoolSwap = async (
     // This will throw if they are not valid tokens
     await factory.get_coin_indices(poolAddress, tokenIn, tokenOut);
     return true;
-  } catch (e) {
+  } catch (e: any) {
+    if (!(typeof e?.message === "string") || !e?.message?.includes("No available market")) {
+      throw e;
+    }
     return false;
   }
 };
@@ -111,16 +114,46 @@ const findCurvePoolForHlpTokenSwap = async (
     }
   }
 
-  return;
+  const promises: Promise<LPStakingPoolDetails | null>[] = curvePools.map(
+    (pool) =>
+      new Promise(async (resolve) => {
+        if (!pool.factoryAddress) {
+          // this should not happen
+          console.error("No factory for curve pool");
+          return resolve(null);
+        }
+        if (!pool.tokensInLp.some((token) => token.extensions?.isFxToken)) {
+          // this also should not happen, as curve pools should have at least one fxtoken
+          return resolve(null);
+        }
+        const factory = CurveMetapoolFactory__factory.connect(
+          pool.factoryAddress,
+          signerOrProvider
+        );
+        const baseTokens = factory.get_coins(pool.lpToken.address);
+        const underlyingTokens = new Promise<string[]>(async (resolveTokens) => {
+          try {
+            resolveTokens(await factory.get_underlying_coins(pool.lpToken.address));
+          } catch {
+            // underlying coins reverts if token is not a metapool, meaning there are
+            // no underlying tokens
+            resolveTokens([]);
+          }
+        });
+        const tokens = (await Promise.all([baseTokens, underlyingTokens])).flat();
+        if (tokens.some((token) => token.toLowerCase() === to.toLowerCase())) resolve(pool);
+      })
+  );
+  return (await Promise.all(promises)).find((value) => value !== null) ?? undefined;
 };
 
 // The same as the findCurvePoolForHlpTokenSwap, but with a cache first approach
-export const findCurvePoolForHlpTokenSwapFromCache = async (
+export const findCachedCurvePoolForHlpTokenSwap = async (
   to: string,
   signerOrProvider: ethers.Signer | ethers.providers.Provider,
   network: string
 ) => {
-  const key = to.toLowerCase() + network;
+  const key = `${to.toLowerCase()}${network}`;
   if (curvePoolCache[key] !== undefined) return curvePoolCache[key];
   curvePoolCache[key] = (await findCurvePoolForHlpTokenSwap(to, signerOrProvider, network)) ?? null;
   return curvePoolCache[key];
@@ -142,11 +175,12 @@ export const getPsmToHlpToCurvePath = async (
   signerOrProvider: ethers.Signer | ethers.providers.Provider
 ): Promise<Path> => {
   const pegs = await getTokenPegs(network);
-  const validPeg = pegs.find((peg) => peg.peggedToken.toLowerCase() === from.toLowerCase());
-  if (!validPeg) return null;
+  const [validPeg, curvePool] = await Promise.all([
+    pegs.find((peg) => peg.peggedToken.toLowerCase() === from.toLowerCase()),
+    findCachedCurvePoolForHlpTokenSwap(to, signerOrProvider, network)
+  ]);
 
-  const curvePool = await findCurvePoolForHlpTokenSwapFromCache(to, signerOrProvider, network);
-  if (!curvePool) return null;
+  if (!validPeg || !curvePool) return null;
 
   const hlpToken = curvePool.tokensInLp.find((token) => token.extensions?.isFxToken);
   if (!hlpToken) return null; // this won't happen, so long as the curve pool has a fxToken
