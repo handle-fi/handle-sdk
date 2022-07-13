@@ -45,7 +45,7 @@ describe("weth route", () => {
         buyAmount: ethers.utils.parseEther("0.01"),
         sellAmount: ethers.utils.parseEther("0.01"),
         signer: signer,
-        slippage: 0.05
+        slippage: 0.5
       });
       expect(tx).to.be.an("object");
     });
@@ -58,7 +58,7 @@ describe("weth route", () => {
         buyAmount: ethers.utils.parseEther("0.01"),
         sellAmount: ethers.utils.parseEther("0.01"),
         signer: signer,
-        slippage: 0.05
+        slippage: 0.5
       });
       expect(tx).to.be.an("object");
     });

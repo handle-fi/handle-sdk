@@ -1,22 +1,22 @@
 import { BigNumber, ethers } from "ethers";
-import { getTokenPegs } from "../../../utils/convert-utils";
+import { combineFees, getMinOut, getTokenPegs } from "../../../utils/convert-utils";
 import { ConvertQuoteRouteArgs, ConvertTransactionRouteArgs, Quote } from "../Convert";
 import { PSM_TO_HLP, WeightInput } from "./weights";
 import psm from "./psm";
 import hlpSwap from "./hlpSwap";
 import HandleTokenManager from "../../TokenManager/HandleTokenManager";
 import config from "../../../config";
-import { HlpConfig } from "../../..";
 import { RouterHpsmHlp__factory } from "../../../contracts";
 import { fetchEncodedSignedQuotes } from "../../../utils/h2so-utils";
 import { Pair } from "../../../types/trade";
 
 const psmToHlpWeight = async (input: WeightInput): Promise<number> => {
+  if (!input.toToken.extensions?.isFxToken && !input.toToken.extensions?.isNative) return 0;
   const pegs = await getTokenPegs(input.network);
   const validPeg = pegs.find(
     (peg) => peg.peggedToken.toLowerCase() === input.fromToken.address.toLowerCase()
   );
-  if (!validPeg || !input.signerOrProvider) return 0; // signerOrProvider needed for psm quote
+  if (!validPeg) return 0;
   return PSM_TO_HLP;
 };
 
@@ -41,20 +41,13 @@ const psmToHlpQuoteHandler = async (input: ConvertQuoteRouteArgs): Promise<Quote
     fromToken: fxToken
   });
 
-  const normalize = (n: number) => n / HlpConfig.BASIS_POINTS_DIVISOR;
-
-  const factorAfterFee =
-    (1 - normalize(psmQuote.feeBasisPoints)) * (1 - normalize(hlpSwapQuote.feeBasisPoints));
-
-  // To get fee factor, take 1-factorAfterFee.
-  // basis points is this value * BASIS_POINTS_DIVISOR
-  const adjustedFeeBasisPoints = Math.round((1 - factorAfterFee) * HlpConfig.BASIS_POINTS_DIVISOR);
+  const newFee = combineFees(psmQuote.feeBasisPoints, hlpSwapQuote.feeBasisPoints);
 
   return {
     sellAmount: psmQuote.sellAmount,
     buyAmount: hlpSwapQuote.buyAmount,
     allowanceTarget: config.protocol.arbitrum.protocol.routerHpsmHlp,
-    feeBasisPoints: adjustedFeeBasisPoints,
+    feeBasisPoints: newFee,
     feeChargedBeforeConvert: false,
     gas: config.convert.gasEstimates.hpsmToHlp
   };
@@ -72,9 +65,7 @@ const psmToHlpTransactionHandler = async (
   );
   if (!validPeg) throw new Error("No Valid Peg");
 
-  const minOut = input.sellAmount
-    .mul(input.slippage * HlpConfig.BASIS_POINTS_DIVISOR)
-    .div(HlpConfig.BASIS_POINTS_DIVISOR);
+  const minOut = getMinOut(input.buyAmount, input.slippage);
 
   const TokenManager = new HandleTokenManager();
   const fxToken = TokenManager.getTokenByAddress(validPeg.fxToken, input.network);

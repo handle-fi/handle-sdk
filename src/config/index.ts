@@ -18,6 +18,7 @@ export type LPStakingPoolDetails = {
   platform: LPStakingPlatformName;
   title: string;
   stakingContractAddress: string;
+  factoryAddress?: string;
   lpToken: {
     symbol: string;
     address: string;
@@ -81,6 +82,7 @@ export type Config = {
       hpsmToHlp: number;
       hlp: number;
       weth: number;
+      hpsmToHlpToCurve: number;
     };
   };
 };
@@ -95,6 +97,7 @@ export type ProtocolAddresses = {
   rewardPool: string;
   hpsm: string;
   routerHpsmHlp: string;
+  routerHpsmHlpCurve: string;
 };
 
 export type ChainlinkFeeds = {
@@ -135,7 +138,8 @@ const config: Config = {
         governanceLock: "0xC6008E6baD8c2c0814A32f6F494fa419E95593b6",
         rewardPool: "0xDE17Af0E4A6c870762508DcB7dCc20719584CBd0",
         hpsm: "0xa2b81201F92b2F3081e9e2900Cf01942e0BCCeD3",
-        routerHpsmHlp: "0x69328f23A090e57378e3120f622ed0697f0E7ECF"
+        routerHpsmHlp: "0x69328f23A090e57378e3120f622ed0697f0E7ECF",
+        routerHpsmHlpCurve: "0xaCb14b0e3a798992f809e9c46ED10e1111B64994"
       },
       chainlinkFeeds: {
         eth_usd: "0x639Fe6ab55C921f74e7fac1ee960C0B6293ba612",
@@ -180,6 +184,7 @@ const config: Config = {
         title: "sushiswap WETH-FOREX",
         platform: "sushi",
         stakingContractAddress: "0x5cdEb8ff5FD3a3361E27e491696515F1D119537a",
+        factoryAddress: "0xc35DADB65012eC5796536bD9864eD8773aBc74C4",
         lpToken: {
           address: "0x9745e5CC0522827958eE3Fc2C03247276D359186",
           symbol: "SP-WETH-FOREX"
@@ -193,6 +198,7 @@ const config: Config = {
       curveEursFxEUR: {
         title: "curve fxEUR-EURS",
         platform: "curve",
+        factoryAddress: "0xb17b674D9c5CB2e441F8e196a2f048A81355d031",
         stakingContractAddress: "0x140b808C0b7e0d24fee45155473042A6f6F841Aa",
         lpToken: {
           address: "0xb0D2EB3C2cA3c6916FAb8DCbf9d9c165649231AE",
@@ -208,6 +214,7 @@ const config: Config = {
         title: "curve fxUSD-USDC-USDT",
         platform: "curve",
         stakingContractAddress: "0x68F03C9DB2611C79AAa21b6dFcdF6baC0cd191f6",
+        factoryAddress: "0xb17b674D9c5CB2e441F8e196a2f048A81355d031",
         lpToken: {
           address: "0xd0dd5d76cf0fc06dabc48632735566dca241a35e",
           symbol: "CRV-handle3"
@@ -275,6 +282,7 @@ const config: Config = {
       hlp: 800_000,
       hpsm: 800_000,
       hpsmToHlp: 1_600_000,
+      hpsmToHlpToCurve: 2_000_000,
       weth: 500_000
     }
   }

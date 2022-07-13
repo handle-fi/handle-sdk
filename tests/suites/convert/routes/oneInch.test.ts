@@ -7,18 +7,18 @@ import { sampleHlpTokenMethods } from "../sampleHlpTokenMethods";
 import { eth } from "../test-tokens";
 
 let usdc: TokenInfo;
-let usdt: TokenInfo;
+let wbtc: TokenInfo;
 
 describe("oneInch route", () => {
   before(() => {
     usdc = testTokenList.getTokenBySymbol("USDC", "arbitrum")!;
-    usdt = testTokenList.getTokenBySymbol("USDT", "arbitrum")!;
+    wbtc = testTokenList.getTokenBySymbol("WBTC", "arbitrum")!;
   });
   describe("quote", () => {
     it(`should return an api quote for arbitrum`, async () => {
       const quote = await Convert.getQuote({
         fromToken: usdc,
-        toToken: usdt,
+        toToken: wbtc,
         receivingAccount: ethers.constants.AddressZero,
         sellAmount: ethers.utils.parseEther("1"),
         gasPrice: ethers.constants.One,
@@ -37,13 +37,13 @@ describe("oneInch route", () => {
       );
       const tx = await Convert.getSwap({
         fromToken: eth,
-        toToken: usdt,
+        toToken: wbtc,
         gasPrice: ethers.utils.parseUnits("100", "gwei"), // very high gas price
         hlpMethods: sampleHlpTokenMethods,
         sellAmount: ethers.utils.parseUnits("1", eth.decimals),
-        buyAmount: ethers.utils.parseUnits("1", usdt.decimals),
+        buyAmount: ethers.utils.parseUnits("1", wbtc.decimals),
         signer,
-        slippage: 0.05
+        slippage: 0.5
       });
       expect(tx).to.be.an("object");
     });

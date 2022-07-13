@@ -16,3 +16,6 @@ export const CHAIN_ID_TO_NETWORK_NAME: Record<number, Network> = {
 };
 
 export const NETWORK_NAMES = Object.keys(NETWORK_NAME_TO_CHAIN_ID) as Network[];
+
+// This is hard coded in the curve deployer. 1e10 is equal to 1%.
+export const CURVE_FEE_DENOMINATOR = 1e10;

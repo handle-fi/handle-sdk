@@ -9,6 +9,7 @@ import { WeightInput } from "./weights";
 import weth from "./weth";
 import zeroX from "./zeroX";
 import psmToHlp from "./psmToHlp";
+import psmToHlpToCurve from "./psmToHlpToCurve";
 
 export type Route = {
   weight: (input: WeightInput) => Promise<number>;
@@ -16,6 +17,15 @@ export type Route = {
   transaction: (input: ConvertTransactionRouteArgs) => Promise<ethers.PopulatedTransaction>;
 };
 
-const routes: Route[] = [psm, hlpBuyRemove, hlpSwap, oneInch, zeroX, weth, psmToHlp];
+const routes: Route[] = [
+  psm,
+  hlpBuyRemove,
+  hlpSwap,
+  oneInch,
+  zeroX,
+  weth,
+  psmToHlp,
+  psmToHlpToCurve
+];
 
 export default routes;

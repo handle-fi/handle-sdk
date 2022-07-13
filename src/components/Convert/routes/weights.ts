@@ -8,6 +8,7 @@ export const HLP_ADD_REMOVE_WEIGHT = 100;
 export const HLP_SWAP_WEIGHT = 110;
 export const WETH_WEIGHT = 200;
 export const PSM_TO_HLP = 100;
+export const PSM_TO_HLP_TO_CURVE = 100;
 
 export type WeightInput = {
   fromToken: TokenInfo;
