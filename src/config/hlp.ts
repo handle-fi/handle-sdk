@@ -1,4 +1,5 @@
-import { ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
+import { Vault__factory } from "../contracts";
 import { Network, NetworkMap } from "../types/network";
 
 /** Currently the only avaliable handle liquidity pool network */
@@ -14,16 +15,9 @@ export const MARGIN_FEE_BASIS_POINTS = 10;
 export const SWAP_FEE_BASIS_POINTS = 20;
 export const STABLE_SWAP_FEE_BASIS_POINTS = 1;
 export const PRICE_DECIMALS = 30;
-export const LIQUIDATION_FEE = ethers.utils.parseUnits("2", PRICE_DECIMALS);
-export const MAX_LEVERAGE = 30 * BASIS_POINTS_DIVISOR;
 export const MIN_LEVERAGE = 1 * BASIS_POINTS_DIVISOR;
 export const FUNDING_FEE_DIVISOR = BASIS_POINTS_DIVISOR;
 export const FUNDING_RATE_PRECISION = 1_000_000;
-export const MINT_BURN_FEE_BASIS_POINTS = 20;
-export const TAX_BASIS_POINTS = 10;
-export const STABLE_TAX_BASIS_POINTS = 5;
-export const MIN_PROFIT_TIME = 60;
-export const MIN_PROFIT_BASIS_POINTS = 10;
 
 /** Symbols that can be used in the hlp price chart against USD. */
 export const UsdHlpChartSymbols = ["AUD", "JPY", "CNY", "EUR", "KRW", "BTC", "BNB", "ETH"] as const;
@@ -70,4 +64,59 @@ export const HLP_CONTRACTS: NetworkMap<HlpContracts | undefined> = {
   },
   ethereum: undefined,
   polygon: undefined
+};
+
+/** hLP dynamic config */
+type HlpDynamicConfig = {
+  MAX_LEVERAGE: number;
+  MINT_BURN_FEE_BASIS_POINTS: number;
+  TAX_BASIS_POINTS: number;
+  STABLE_TAX_BASIS_POINTS: number;
+  MIN_PROFIT_TIME: number;
+  MARGIN_FEE_BASIS_POINTS: number;
+  SWAP_FEE_BASIS_POINTS: number;
+  STABLE_SWAP_FEE_BASIS_POINTS: number;
+  LIQUIDATION_FEE: BigNumber;
+};
+
+export const loadHlpDynamicConfig = async (
+  provider: ethers.providers.Provider,
+  network: Network
+): Promise<HlpDynamicConfig> => {
+  const contracts = HLP_CONTRACTS[network];
+  if (!contracts) throw new Error("No hLP on this network");
+
+  const vault = Vault__factory.connect(contracts.Vault, provider);
+  const [
+    MAX_LEVERAGE,
+    MINT_BURN_FEE_BASIS_POINTS,
+    TAX_BASIS_POINTS,
+    STABLE_TAX_BASIS_POINTS,
+    MIN_PROFIT_TIME,
+    MARGIN_FEE_BASIS_POINTS,
+    SWAP_FEE_BASIS_POINTS,
+    STABLE_SWAP_FEE_BASIS_POINTS,
+    LIQUIDATION_FEE
+  ] = await Promise.all([
+    vault.maxLeverage(),
+    vault.mintBurnFeeBasisPoints(),
+    vault.taxBasisPoints(),
+    vault.stableTaxBasisPoints(),
+    vault.minProfitTime(),
+    vault.marginFeeBasisPoints(),
+    vault.swapFeeBasisPoints(),
+    vault.stableSwapFeeBasisPoints(),
+    vault.liquidationFeeUsd()
+  ]);
+  return {
+    MAX_LEVERAGE: MAX_LEVERAGE.toNumber(),
+    MINT_BURN_FEE_BASIS_POINTS: MINT_BURN_FEE_BASIS_POINTS.toNumber(),
+    TAX_BASIS_POINTS: TAX_BASIS_POINTS.toNumber(),
+    STABLE_TAX_BASIS_POINTS: STABLE_TAX_BASIS_POINTS.toNumber(),
+    MIN_PROFIT_TIME: MIN_PROFIT_TIME.toNumber(),
+    MARGIN_FEE_BASIS_POINTS: MARGIN_FEE_BASIS_POINTS.toNumber(),
+    SWAP_FEE_BASIS_POINTS: SWAP_FEE_BASIS_POINTS.toNumber(),
+    STABLE_SWAP_FEE_BASIS_POINTS: STABLE_SWAP_FEE_BASIS_POINTS.toNumber(),
+    LIQUIDATION_FEE
+  };
 };
