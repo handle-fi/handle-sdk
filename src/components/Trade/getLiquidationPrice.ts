@@ -1,5 +1,5 @@
 import { BigNumber, ethers } from "ethers";
-import { BASIS_POINTS_DIVISOR, FUNDING_RATE_PRECISION, HlpDynamicConfig } from "../../config/hlp";
+import { BASIS_POINTS_DIVISOR, FUNDING_RATE_PRECISION, HlpConfig } from "../../config/hlp";
 import { getLiquidationPriceFromDelta } from "./getLiquidationPriceFromDelta";
 import { getMarginFee } from "./getMarginFee";
 import { Position } from "./position";
@@ -16,7 +16,7 @@ type RequriedConfig = "LIQUIDATION_FEE" | "MAX_LEVERAGE" | "MARGIN_FEE_BASIS_POI
 export const getLiquidationPrice = (
   position: Required<Position>,
   indexTokenCumulativeFundingRate: BigNumber,
-  config: Pick<HlpDynamicConfig, RequriedConfig>,
+  config: Pick<HlpConfig, RequriedConfig>,
   deltaInfo?: LiquidationDelta
 ): BigNumber => {
   let { isLong, size, collateral, averagePrice, entryFundingRate, delta, hasProfit } = position;

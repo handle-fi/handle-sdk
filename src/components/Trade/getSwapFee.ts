@@ -1,5 +1,5 @@
 import { BigNumber } from "ethers";
-import { BASIS_POINTS_DIVISOR, HlpDynamicConfig } from "../../config/hlp";
+import { BASIS_POINTS_DIVISOR, HlpConfig } from "../../config/hlp";
 import { VaultTokenInfo } from "../../types/trade";
 import { getSwapFeeBasisPoints, RequiredConfig } from "./getSwapFeeBasisPoints";
 
@@ -11,7 +11,7 @@ export const getSwapFee = (args: {
   totalTokenWeights: BigNumber;
   targetUsdHlpAmount: BigNumber;
   getTokenInfo: (token: string) => VaultTokenInfo | undefined;
-  config: Pick<HlpDynamicConfig, RequiredConfig>;
+  config: Pick<HlpConfig, RequiredConfig>;
 }) => {
   const swapBasisPoints = getSwapFeeBasisPoints({
     ...args,

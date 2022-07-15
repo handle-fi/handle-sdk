@@ -63,8 +63,14 @@ export const HLP_CONTRACTS: NetworkMap<HlpContracts | undefined> = {
   polygon: undefined
 };
 
+let loadedConfig: Record<Network, HlpConfig | undefined> = {
+  arbitrum: undefined,
+  ethereum: undefined,
+  polygon: undefined
+};
+
 /** hLP dynamic config */
-export type HlpDynamicConfig = {
+export type HlpConfig = {
   MAX_LEVERAGE: number;
   MINT_BURN_FEE_BASIS_POINTS: number;
   TAX_BASIS_POINTS: number;
@@ -76,44 +82,48 @@ export type HlpDynamicConfig = {
   LIQUIDATION_FEE: BigNumber;
 };
 
-export const loadHlpDynamicConfig = async (
-  signerOrProvider: ethers.providers.Provider | ethers.Signer,
-  network: Network
-): Promise<HlpDynamicConfig> => {
+export const getLoadedConfig = async (
+  network: Network,
+  forceReload = false
+): Promise<HlpConfig> => {
+  if (!forceReload && loadedConfig[network]) return loadedConfig[network]!;
+
   const contracts = HLP_CONTRACTS[network];
   if (!contracts) throw new Error("No hLP on this network");
 
-  const vault = Vault__factory.connect(contracts.Vault, signerOrProvider);
-  const [
-    MAX_LEVERAGE,
-    MINT_BURN_FEE_BASIS_POINTS,
-    TAX_BASIS_POINTS,
-    STABLE_TAX_BASIS_POINTS,
-    MIN_PROFIT_TIME,
-    MARGIN_FEE_BASIS_POINTS,
-    SWAP_FEE_BASIS_POINTS,
-    STABLE_SWAP_FEE_BASIS_POINTS,
-    LIQUIDATION_FEE
-  ] = await Promise.all([
-    vault.maxLeverage(),
-    vault.mintBurnFeeBasisPoints(),
-    vault.taxBasisPoints(),
-    vault.stableTaxBasisPoints(),
-    vault.minProfitTime(),
-    vault.marginFeeBasisPoints(),
-    vault.swapFeeBasisPoints(),
-    vault.stableSwapFeeBasisPoints(),
-    vault.liquidationFeeUsd()
-  ]);
-  return {
-    MAX_LEVERAGE: MAX_LEVERAGE.toNumber(),
-    MINT_BURN_FEE_BASIS_POINTS: MINT_BURN_FEE_BASIS_POINTS.toNumber(),
-    TAX_BASIS_POINTS: TAX_BASIS_POINTS.toNumber(),
-    STABLE_TAX_BASIS_POINTS: STABLE_TAX_BASIS_POINTS.toNumber(),
-    MIN_PROFIT_TIME: MIN_PROFIT_TIME.toNumber(),
-    MARGIN_FEE_BASIS_POINTS: MARGIN_FEE_BASIS_POINTS.toNumber(),
-    SWAP_FEE_BASIS_POINTS: SWAP_FEE_BASIS_POINTS.toNumber(),
-    STABLE_SWAP_FEE_BASIS_POINTS: STABLE_SWAP_FEE_BASIS_POINTS.toNumber(),
-    LIQUIDATION_FEE
-  };
+  // const vault = Vault__factory.connect(contracts.Vault, signerOrProvider);
+  // const [
+  //   MAX_LEVERAGE,
+  //   MINT_BURN_FEE_BASIS_POINTS,
+  //   TAX_BASIS_POINTS,
+  //   STABLE_TAX_BASIS_POINTS,
+  //   MIN_PROFIT_TIME,
+  //   MARGIN_FEE_BASIS_POINTS,
+  //   SWAP_FEE_BASIS_POINTS,
+  //   STABLE_SWAP_FEE_BASIS_POINTS,
+  //   LIQUIDATION_FEE
+  // ] = await Promise.all([
+  //   vault.maxLeverage(),
+  //   vault.mintBurnFeeBasisPoints(),
+  //   vault.taxBasisPoints(),
+  //   vault.stableTaxBasisPoints(),
+  //   vault.minProfitTime(),
+  //   vault.marginFeeBasisPoints(),
+  //   vault.swapFeeBasisPoints(),
+  //   vault.stableSwapFeeBasisPoints(),
+  //   vault.liquidationFeeUsd()
+  // ]);
+
+  // loadedConfig[network] = {
+  //   MAX_LEVERAGE: MAX_LEVERAGE.toNumber(),
+  //   MINT_BURN_FEE_BASIS_POINTS: MINT_BURN_FEE_BASIS_POINTS.toNumber(),
+  //   TAX_BASIS_POINTS: TAX_BASIS_POINTS.toNumber(),
+  //   STABLE_TAX_BASIS_POINTS: STABLE_TAX_BASIS_POINTS.toNumber(),
+  //   MIN_PROFIT_TIME: MIN_PROFIT_TIME.toNumber(),
+  //   MARGIN_FEE_BASIS_POINTS: MARGIN_FEE_BASIS_POINTS.toNumber(),
+  //   SWAP_FEE_BASIS_POINTS: SWAP_FEE_BASIS_POINTS.toNumber(),
+  //   STABLE_SWAP_FEE_BASIS_POINTS: STABLE_SWAP_FEE_BASIS_POINTS.toNumber(),
+  //   LIQUIDATION_FEE
+  // }
+  return loadedConfig[network]!;
 };

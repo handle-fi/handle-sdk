@@ -7,7 +7,7 @@ import { TokenInfo } from "@uniswap/token-lists";
 import { CHAIN_ID_TO_NETWORK_NAME } from "../../constants";
 import TokenManager from "../TokenManager";
 import { getNetworkFromSignerOrProvider } from "../../utils/general-utils";
-import { HlpDynamicConfig, loadHlpDynamicConfig } from "../../config/hlp";
+import { getLoadedConfig, HlpConfig } from "../../config/hlp";
 
 type ConvertRouteArgs = {
   fromToken: TokenInfo;
@@ -21,7 +21,7 @@ type ConvertRouteArgs = {
 export type ConvertQuoteRouteArgs = ConvertRouteArgs & {
   signerOrProvider?: ethers.providers.Provider | Signer;
   receivingAccount?: string;
-  config: HlpDynamicConfig;
+  config: HlpConfig;
 };
 
 export type ConvertTransactionRouteArgs = ConvertRouteArgs & {
@@ -55,7 +55,6 @@ export type Quote = {
 
 export default class Convert {
   protected static tokenList: TokenInfo[] | undefined = undefined;
-  protected static config: HlpDynamicConfig | undefined = undefined;
 
   public static loadTokens = async () => {
     const tokenManager = new TokenManager();
@@ -130,16 +129,9 @@ export default class Convert {
       hasHlpMethods: !!input.hlpMethods
     });
 
-    // Add config from cache if necessary
-    if (!Convert.config) {
-      if (!input.signerOrProvider) throw new Error("No config in cache and no signer/provider");
-      Convert.config = await loadHlpDynamicConfig(input.signerOrProvider, network);
-    }
-
     return route.quote({
       ...input,
-      // this fixes typescript error, even though it technically should be included in ...input
-      config: Convert.config,
+      config: await getLoadedConfig(network),
       network
     });
   };
@@ -166,16 +158,5 @@ export default class Convert {
       network,
       receivingAccount
     });
-  };
-
-  public static refreshConfig = async (
-    signerOrProvider: ethers.Signer | ethers.providers.Provider,
-    network: Network
-  ) => {
-    Convert.config = await loadHlpDynamicConfig(signerOrProvider, network);
-  };
-
-  public static setConfig = async (config: HlpDynamicConfig) => {
-    Convert.config = config;
   };
 }

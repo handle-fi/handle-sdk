@@ -2,7 +2,7 @@ import { BigNumber } from "ethers";
 import { getFeeBasisPoints } from "./getFeeBasisPoints";
 import { Network } from "../../types/network";
 import HandleTokenManager from "../TokenManager/HandleTokenManager";
-import { HlpDynamicConfig } from "../../config/hlp";
+import { HlpConfig } from "../../config/hlp";
 
 export type RequiredConfig =
   | "STABLE_SWAP_FEE_BASIS_POINTS"
@@ -18,7 +18,7 @@ export const getSwapFeeBasisPoints = (
     usdHlpSupply: BigNumber;
     totalTokenWeights: BigNumber;
     targetUsdHlpAmount: BigNumber;
-    config: Pick<HlpDynamicConfig, RequiredConfig>;
+    config: Pick<HlpConfig, RequiredConfig>;
   },
   network: Network = "arbitrum"
 ) => {

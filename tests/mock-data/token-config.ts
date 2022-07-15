@@ -3,12 +3,12 @@ import { exit } from "process";
 import { ConvertSDK } from "../../src";
 import { DEFAULT_TOKEN_LIST_URLS } from "../../src/components/TokenManager";
 import HandleTokenManager from "../../src/components/TokenManager/HandleTokenManager";
-import { BASIS_POINTS_DIVISOR, HlpDynamicConfig, PRICE_DECIMALS } from "../../src/config/hlp";
+import { BASIS_POINTS_DIVISOR, HlpConfig, PRICE_DECIMALS } from "../../src/config/hlp";
 import { loadTokens } from "../suites/convert/test-tokens";
 
 export const testTokenList = new HandleTokenManager(DEFAULT_TOKEN_LIST_URLS);
 
-export const TEST_CONFIG: HlpDynamicConfig = {
+export const TEST_CONFIG: HlpConfig = {
   MARGIN_FEE_BASIS_POINTS: 10,
   SWAP_FEE_BASIS_POINTS: 20,
   STABLE_SWAP_FEE_BASIS_POINTS: 1,

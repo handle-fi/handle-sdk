@@ -1,5 +1,5 @@
 import { BigNumber, ethers } from "ethers";
-import { BASIS_POINTS_DIVISOR, HlpDynamicConfig } from "../../../config/hlp";
+import { BASIS_POINTS_DIVISOR, HlpConfig } from "../../../config/hlp";
 import { Position } from ".";
 
 /**
@@ -17,7 +17,7 @@ import { Position } from ".";
 export const getPositionDelta = (
   indexPrice: BigNumber,
   { size, collateral, isLong, averagePrice, lastIncreasedTime }: Position,
-  config: Pick<HlpDynamicConfig, "MIN_PROFIT_TIME">,
+  config: Pick<HlpConfig, "MIN_PROFIT_TIME">,
   minProfitBasisPoints: number
 ) => {
   const priceDelta = averagePrice.gt(indexPrice)

@@ -1,5 +1,5 @@
 import { BigNumber } from "ethers";
-import { BASIS_POINTS_DIVISOR, HlpDynamicConfig } from "../../config/hlp";
+import { BASIS_POINTS_DIVISOR, HlpConfig } from "../../config/hlp";
 
 type RequiredConfig =
   | "MARGIN_FEE_BASIS_POINTS"
@@ -11,7 +11,7 @@ export const getTradeFee = (
   isStableSwap: boolean,
   collateralSize: BigNumber,
   positionSize: BigNumber,
-  config: Pick<HlpDynamicConfig, RequiredConfig>
+  config: Pick<HlpConfig, RequiredConfig>
 ) => {
   const marginFee = positionSize.mul(config.MARGIN_FEE_BASIS_POINTS).div(BASIS_POINTS_DIVISOR);
   if (isStableSwap) {

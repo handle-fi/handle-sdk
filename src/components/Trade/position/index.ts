@@ -1,5 +1,5 @@
 import { BigNumber } from "ethers";
-import { HlpDynamicConfig } from "../../../config/hlp";
+import { HlpConfig } from "../../../config/hlp";
 import { getMarginFee } from "../getMarginFee";
 
 export type Position = {
@@ -24,7 +24,7 @@ export const contractPositionToPosition = (
   collateralToken: string,
   indexToken: string,
   isLong: boolean,
-  config: Pick<HlpDynamicConfig, "MARGIN_FEE_BASIS_POINTS">
+  config: Pick<HlpConfig, "MARGIN_FEE_BASIS_POINTS">
 ): Position => {
   const [
     size,
