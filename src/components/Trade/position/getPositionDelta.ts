@@ -17,7 +17,7 @@ import { Position } from ".";
 export const getPositionDelta = (
   indexPrice: BigNumber,
   { size, collateral, isLong, averagePrice, lastIncreasedTime }: Position,
-  config: Pick<HlpConfig, "MIN_PROFIT_TIME">,
+  config: Pick<HlpConfig, "minProfitTime">,
   minProfitBasisPoints: number
 ) => {
   const priceDelta = averagePrice.gt(indexPrice)
@@ -27,7 +27,7 @@ export const getPositionDelta = (
   const pendingDelta = delta;
 
   const minProfitExpired = lastIncreasedTime
-    .add(config.MIN_PROFIT_TIME)
+    .add(config.minProfitTime)
     .lt(Math.floor(Date.now() / 1000));
   const hasProfit = isLong ? indexPrice.gt(averagePrice) : indexPrice.lt(averagePrice);
   const isDeltaTooLow = delta.mul(BASIS_POINTS_DIVISOR).lte(size.mul(minProfitBasisPoints));

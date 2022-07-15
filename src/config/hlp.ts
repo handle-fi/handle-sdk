@@ -71,15 +71,15 @@ let loadedConfig: Record<Network, HlpConfig | undefined> = {
 
 /** hLP dynamic config */
 export type HlpConfig = {
-  MAX_LEVERAGE: number;
-  MINT_BURN_FEE_BASIS_POINTS: number;
-  TAX_BASIS_POINTS: number;
-  STABLE_TAX_BASIS_POINTS: number;
-  MIN_PROFIT_TIME: number;
-  MARGIN_FEE_BASIS_POINTS: number;
-  SWAP_FEE_BASIS_POINTS: number;
-  STABLE_SWAP_FEE_BASIS_POINTS: number;
-  LIQUIDATION_FEE: BigNumber;
+  maxLeverage: number;
+  mintBurnFeeBasisPoints: number;
+  taxBasisPoints: number;
+  stableTaxBasisPoints: number;
+  minProfitTime: number;
+  marginFeeBasisPoints: number;
+  swapFeeBasisPoints: number;
+  stableSwapFeeBasisPoints: number;
+  liquidationFee: BigNumber;
 };
 
 export const getLoadedConfig = async (

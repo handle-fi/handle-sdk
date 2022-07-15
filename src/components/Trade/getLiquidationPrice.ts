@@ -11,7 +11,7 @@ type LiquidationDelta = {
   increaseSize: boolean;
 };
 
-type RequriedConfig = "LIQUIDATION_FEE" | "MAX_LEVERAGE" | "MARGIN_FEE_BASIS_POINTS";
+type RequriedConfig = "liquidationFee" | "maxLeverage" | "marginFeeBasisPoints";
 
 export const getLiquidationPrice = (
   position: Required<Position>,
@@ -48,7 +48,7 @@ export const getLiquidationPrice = (
     }
   }
 
-  let positionFee = getMarginFee(size, config).add(config.LIQUIDATION_FEE);
+  let positionFee = getMarginFee(size, config).add(config.liquidationFee);
   if (entryFundingRate && indexTokenCumulativeFundingRate) {
     const fundingFee = size
       .mul(indexTokenCumulativeFundingRate.sub(entryFundingRate))
@@ -65,7 +65,7 @@ export const getLiquidationPrice = (
   });
 
   const liquidationPriceForMaxLeverage = getLiquidationPriceFromDelta({
-    liquidationAmount: nextSize.mul(BASIS_POINTS_DIVISOR).div(config.MAX_LEVERAGE),
+    liquidationAmount: nextSize.mul(BASIS_POINTS_DIVISOR).div(config.maxLeverage),
     size: nextSize,
     collateral: remainingCollateral,
     averagePrice,

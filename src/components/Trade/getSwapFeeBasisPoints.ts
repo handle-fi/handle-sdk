@@ -5,10 +5,10 @@ import HandleTokenManager from "../TokenManager/HandleTokenManager";
 import { HlpConfig } from "../../config/hlp";
 
 export type RequiredConfig =
-  | "STABLE_SWAP_FEE_BASIS_POINTS"
-  | "SWAP_FEE_BASIS_POINTS"
-  | "STABLE_TAX_BASIS_POINTS"
-  | "TAX_BASIS_POINTS";
+  | "stableSwapFeeBasisPoints"
+  | "swapFeeBasisPoints"
+  | "stableTaxBasisPoints"
+  | "taxBasisPoints";
 
 export const getSwapFeeBasisPoints = (
   args: {
@@ -27,11 +27,11 @@ export const getSwapFeeBasisPoints = (
     tokenManager.isHlpStableTokenByAddress(args.tokenIn, network) &&
     tokenManager.isHlpStableTokenByAddress(args.tokenOut, network);
   const swapBasisPoints = isStableSwap
-    ? args.config.STABLE_SWAP_FEE_BASIS_POINTS
-    : args.config.SWAP_FEE_BASIS_POINTS;
+    ? args.config.stableSwapFeeBasisPoints
+    : args.config.swapFeeBasisPoints;
   const taxBasisPoints = isStableSwap
-    ? args.config.STABLE_TAX_BASIS_POINTS
-    : args.config.TAX_BASIS_POINTS;
+    ? args.config.stableTaxBasisPoints
+    : args.config.taxBasisPoints;
 
   const feeBasisPoints1 = getFeeBasisPoints({
     ...args,
