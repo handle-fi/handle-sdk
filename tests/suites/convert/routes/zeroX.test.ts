@@ -2,7 +2,7 @@ import { expect } from "chai";
 import { ethers } from "ethers";
 import { Network } from "../../../../src";
 import Convert from "../../../../src/components/Convert";
-import { testTokenList } from "../../../mock-data/token-list";
+import { testTokenList } from "../../../mock-data/token-config";
 import { sampleHlpTokenMethods } from "../sampleHlpTokenMethods";
 
 describe("zeroX route", () => {

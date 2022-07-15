@@ -1,9 +1,5 @@
 import { BigNumber, ethers } from "ethers";
-import {
-  BASIS_POINTS_DIVISOR,
-  FUNDING_RATE_PRECISION,
-  MARGIN_FEE_BASIS_POINTS
-} from "../../../config/hlp";
+import { BASIS_POINTS_DIVISOR, FUNDING_RATE_PRECISION } from "../../../config/hlp";
 import { Position } from ".";
 
 type GetLeverageArgs = {
@@ -37,6 +33,7 @@ const DEFAULT_POSITION_DELTA: PositionDelta = {
  */
 export const getLeverage = (
   { size, collateral, entryFundingRate, cumulativeFundingRate, hasProfit, delta }: GetLeverageArgs,
+  marginFeeBasisPoints: number,
   {
     sizeDelta,
     collateralDelta,
@@ -67,9 +64,7 @@ export const getLeverage = (
   }
 
   remainingCollateral = !sizeDelta.isZero()
-    ? remainingCollateral
-        .mul(BASIS_POINTS_DIVISOR - MARGIN_FEE_BASIS_POINTS)
-        .div(BASIS_POINTS_DIVISOR)
+    ? remainingCollateral.mul(BASIS_POINTS_DIVISOR - marginFeeBasisPoints).div(BASIS_POINTS_DIVISOR)
     : remainingCollateral;
 
   if (entryFundingRate && cumulativeFundingRate) {
@@ -91,16 +86,20 @@ export const getLeverage = (
  */
 export const getLeverageFromPosition = (
   position: Required<Position>,
+  marginFeeBasisPoints: number,
   positionDelta: PositionDelta = DEFAULT_POSITION_DELTA,
   cumulativeFundingRate?: BigNumber
 ) => {
-  return getLeverage({
-    size: position.size,
-    ...positionDelta,
-    collateral: position.collateral,
-    hasProfit: position.hasProfit,
-    entryFundingRate: position.entryFundingRate,
-    cumulativeFundingRate,
-    delta: position.delta
-  });
+  return getLeverage(
+    {
+      size: position.size,
+      ...positionDelta,
+      collateral: position.collateral,
+      hasProfit: position.hasProfit,
+      entryFundingRate: position.entryFundingRate,
+      cumulativeFundingRate,
+      delta: position.delta
+    },
+    marginFeeBasisPoints
+  );
 };

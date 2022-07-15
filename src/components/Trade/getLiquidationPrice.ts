@@ -1,10 +1,5 @@
 import { BigNumber, ethers } from "ethers";
-import {
-  BASIS_POINTS_DIVISOR,
-  FUNDING_RATE_PRECISION,
-  LIQUIDATION_FEE,
-  MAX_LEVERAGE
-} from "../../config/hlp";
+import { BASIS_POINTS_DIVISOR, FUNDING_RATE_PRECISION, HlpDynamicConfig } from "../../config/hlp";
 import { getLiquidationPriceFromDelta } from "./getLiquidationPriceFromDelta";
 import { getMarginFee } from "./getMarginFee";
 import { Position } from "./position";
@@ -16,9 +11,12 @@ type LiquidationDelta = {
   increaseSize: boolean;
 };
 
+type RequriedConfig = "LIQUIDATION_FEE" | "MAX_LEVERAGE" | "MARGIN_FEE_BASIS_POINTS";
+
 export const getLiquidationPrice = (
   position: Required<Position>,
   indexTokenCumulativeFundingRate: BigNumber,
+  config: Pick<HlpDynamicConfig, RequriedConfig>,
   deltaInfo?: LiquidationDelta
 ): BigNumber => {
   let { isLong, size, collateral, averagePrice, entryFundingRate, delta, hasProfit } = position;
@@ -50,7 +48,7 @@ export const getLiquidationPrice = (
     }
   }
 
-  let positionFee = getMarginFee(size).add(LIQUIDATION_FEE);
+  let positionFee = getMarginFee(size, config).add(config.LIQUIDATION_FEE);
   if (entryFundingRate && indexTokenCumulativeFundingRate) {
     const fundingFee = size
       .mul(indexTokenCumulativeFundingRate.sub(entryFundingRate))
@@ -67,7 +65,7 @@ export const getLiquidationPrice = (
   });
 
   const liquidationPriceForMaxLeverage = getLiquidationPriceFromDelta({
-    liquidationAmount: nextSize.mul(BASIS_POINTS_DIVISOR).div(MAX_LEVERAGE),
+    liquidationAmount: nextSize.mul(BASIS_POINTS_DIVISOR).div(config.MAX_LEVERAGE),
     size: nextSize,
     collateral: remainingCollateral,
     averagePrice,

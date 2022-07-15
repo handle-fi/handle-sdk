@@ -49,7 +49,8 @@ const hlpSwapQuoteHandler = async (input: ConvertQuoteRouteArgs): Promise<Quote>
       .div(ethers.utils.parseUnits("1", fromToken.decimals)),
     usdHlpSupply: hlpMethods.getUsdHlpSupply(),
     totalTokenWeights: hlpMethods.getTotalTokenWeights(),
-    targetUsdHlpAmount: hlpMethods.getTargetUsdHlpAmount(parsedFromTokenAddress)
+    targetUsdHlpAmount: hlpMethods.getTargetUsdHlpAmount(parsedFromTokenAddress),
+    config: input.config
   });
 
   return {

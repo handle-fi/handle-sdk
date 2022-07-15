@@ -2,7 +2,7 @@ import { TokenInfo } from "@uniswap/token-lists";
 import { expect } from "chai";
 import { ethers } from "hardhat";
 import Convert from "../../../../src/components/Convert";
-import { testTokenList } from "../../../mock-data/token-list";
+import { testTokenList } from "../../../mock-data/token-config";
 import { sampleHlpTokenMethods } from "../sampleHlpTokenMethods";
 import { eth } from "../test-tokens";
 

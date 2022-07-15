@@ -11,9 +11,6 @@ export const HANDLE_WEBSOCKET_URL = "wss://oracle.handle.fi/quotes";
 /** hlp constants */
 export const BASIS_POINTS_DIVISOR = 10_000;
 export const USD_DISPLAY_DECIMALS = 2;
-export const MARGIN_FEE_BASIS_POINTS = 10;
-export const SWAP_FEE_BASIS_POINTS = 20;
-export const STABLE_SWAP_FEE_BASIS_POINTS = 1;
 export const PRICE_DECIMALS = 30;
 export const MIN_LEVERAGE = 1 * BASIS_POINTS_DIVISOR;
 export const FUNDING_FEE_DIVISOR = BASIS_POINTS_DIVISOR;
@@ -67,7 +64,7 @@ export const HLP_CONTRACTS: NetworkMap<HlpContracts | undefined> = {
 };
 
 /** hLP dynamic config */
-type HlpDynamicConfig = {
+export type HlpDynamicConfig = {
   MAX_LEVERAGE: number;
   MINT_BURN_FEE_BASIS_POINTS: number;
   TAX_BASIS_POINTS: number;
@@ -80,13 +77,13 @@ type HlpDynamicConfig = {
 };
 
 export const loadHlpDynamicConfig = async (
-  provider: ethers.providers.Provider,
+  signerOrProvider: ethers.providers.Provider | ethers.Signer,
   network: Network
 ): Promise<HlpDynamicConfig> => {
   const contracts = HLP_CONTRACTS[network];
   if (!contracts) throw new Error("No hLP on this network");
 
-  const vault = Vault__factory.connect(contracts.Vault, provider);
+  const vault = Vault__factory.connect(contracts.Vault, signerOrProvider);
   const [
     MAX_LEVERAGE,
     MINT_BURN_FEE_BASIS_POINTS,
