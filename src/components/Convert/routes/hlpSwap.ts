@@ -6,8 +6,10 @@ import { ConvertQuoteRouteArgs, ConvertTransactionRouteArgs, Quote } from "../Co
 import { HLP_SWAP_WEIGHT, WeightInput } from "./weights";
 import { fetchEncodedSignedQuotes } from "../../../utils/h2so-utils";
 import { pairFromString } from "../../../utils/general-utils";
+import { isTradeWeekend } from "../../../utils/trade-utils";
 
 const hlpSwapWeight = async (input: WeightInput): Promise<number> => {
+  if (isTradeWeekend()) return 0;
   const routerAddress = HlpConfig.HLP_CONTRACTS[input.network]?.Router;
   const tokenManager = new HandleTokenManager();
   const isToTokenValid =

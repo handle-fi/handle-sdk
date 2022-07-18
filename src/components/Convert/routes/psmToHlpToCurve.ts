@@ -16,6 +16,7 @@ import { CurveMetapool__factory } from "../../../contracts/factories/CurveMetapo
 import { RouterHpsmHlpCurve__factory } from "../../../contracts";
 import { Pair } from "../../../types/trade";
 import { fetchEncodedSignedQuotes } from "../../../utils/h2so-utils";
+import { isTradeWeekend } from "../../../utils/trade-utils";
 
 const cache: Record<string, Path> = {};
 
@@ -32,6 +33,7 @@ const getPsmToHlpToCurvePathFromCache = async (
 };
 
 const psmToHlpToCurveWeight = async (input: WeightInput): Promise<number> => {
+  if (isTradeWeekend()) return 0;
   if (!input.signerOrProvider) return 0; // must have signer to check curve pool
 
   const path = await getPsmToHlpToCurvePathFromCache(

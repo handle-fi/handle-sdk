@@ -5,13 +5,16 @@ import { HlpManagerRouter__factory, HlpManager__factory } from "../../../contrac
 import { getHlpFeeBasisPoints } from "../../Trade";
 import { ConvertQuoteRouteArgs, ConvertTransactionRouteArgs, Quote } from "../Convert";
 import { HLP_ADD_REMOVE_WEIGHT, WeightInput } from "./weights";
-import {fetchEncodedSignedQuotes} from "../../../utils/h2so-utils";
-import {pairFromString} from "../../../utils/general-utils";
+import { fetchEncodedSignedQuotes } from "../../../utils/h2so-utils";
+import { pairFromString } from "../../../utils/general-utils";
+import { isTradeWeekend } from "../../../utils/trade-utils";
 
 const hlpAddRemoveWeight = async (input: WeightInput) => {
   if (!HlpConfig.HLP_CONTRACTS[input.network]?.HlpManager) {
     return 0;
   }
+  if (isTradeWeekend()) return 0;
+
   const tokenManager = new HandleTokenManager();
 
   const isToValidHlp =
@@ -131,7 +134,7 @@ const hlpAddRemoveTransactionHandler = async (
 
   const { hlpAddress: fromAddress } = tokenManager.checkForHlpNativeToken(fromToken);
   const { hlpAddress: toAddress } = tokenManager.checkForHlpNativeToken(toToken);
-  
+
   const { encoded: encodedSignedQuotes } = await fetchEncodedSignedQuotes(
     new HandleTokenManager()
       .getHlpTokens(network)
