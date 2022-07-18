@@ -16,7 +16,6 @@ import { CurveMetapool__factory } from "../../../contracts/factories/CurveMetapo
 import { RouterHpsmHlpCurve__factory } from "../../../contracts";
 import { Pair } from "../../../types/trade";
 import { fetchEncodedSignedQuotes } from "../../../utils/h2so-utils";
-import { isTradeWeekend } from "../../../utils/trade-utils";
 
 const cache: Record<string, Path> = {};
 
@@ -33,7 +32,6 @@ const getPsmToHlpToCurvePathFromCache = async (
 };
 
 const psmToHlpToCurveWeight = async (input: WeightInput): Promise<number> => {
-  if (isTradeWeekend()) return 0;
   if (!input.signerOrProvider) return 0; // must have signer to check curve pool
 
   const path = await getPsmToHlpToCurvePathFromCache(
@@ -43,6 +41,14 @@ const psmToHlpToCurveWeight = async (input: WeightInput): Promise<number> => {
     input.signerOrProvider
   );
   if (!path) return 0;
+  const hlpToken = new HandleTokenManager().getTokenByAddress(path.hlpToken, input.network);
+  if (!hlpToken) return 0;
+
+  // to go from psm to hlp to curve, one must first go from psm to hlp - Confucious
+  if ((await psmToHlp.weight({ ...input, toToken: hlpToken })) === 0) {
+    return 0;
+  }
+
   return PSM_TO_HLP_TO_CURVE;
 };
 

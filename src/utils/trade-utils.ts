@@ -1,3 +1,5 @@
+import { TokenInfo } from "@uniswap/token-lists";
+
 export const isTradeWeekend = () => {
   // convert current date to est (Eastern Time)
   const estDateString = new Date().toLocaleString("en-US", {
@@ -22,4 +24,8 @@ export const isTradeWeekend = () => {
   // if the day is saturday, then it is the trade weekend,
   // otherwise, it must be in the trade week
   return day === 6;
+};
+
+export const isDisabledOnWeekends = (...tokens: TokenInfo[]) => {
+  return tokens.some((token) => token.extensions?.isFxToken && !token.extensions?.isStable);
 };

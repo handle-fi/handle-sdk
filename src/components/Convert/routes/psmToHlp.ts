@@ -9,16 +9,22 @@ import config from "../../../config";
 import { RouterHpsmHlp__factory } from "../../../contracts";
 import { fetchEncodedSignedQuotes } from "../../../utils/h2so-utils";
 import { Pair } from "../../../types/trade";
-import { isTradeWeekend } from "../../../utils/trade-utils";
+import { isDisabledOnWeekends, isTradeWeekend } from "../../../utils/trade-utils";
 
 const psmToHlpWeight = async (input: WeightInput): Promise<number> => {
-  if (isTradeWeekend()) return 0;
-  if (!input.toToken.extensions?.isFxToken && !input.toToken.extensions?.isNative) return 0;
+  if (!input.toToken.extensions?.isHlpToken && !input.toToken.extensions?.isNative) return 0;
+
   const pegs = await getTokenPegs(input.network);
   const validPeg = pegs.find(
     (peg) => peg.peggedToken.toLowerCase() === input.fromToken.address.toLowerCase()
   );
   if (!validPeg) return 0;
+
+  const fxToken = new HandleTokenManager().getTokenByAddress(validPeg.fxToken, input.network);
+  if (!fxToken) return 0;
+
+  if (isTradeWeekend() && isDisabledOnWeekends(fxToken, input.toToken)) return 0;
+
   return PSM_TO_HLP;
 };
 
