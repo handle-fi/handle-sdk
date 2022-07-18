@@ -5,7 +5,6 @@ import routes from "./routes";
 import { WeightInput } from "./routes/weights";
 import { TokenInfo } from "@uniswap/token-lists";
 import { CHAIN_ID_TO_NETWORK_NAME } from "../../constants";
-import TokenManager from "../TokenManager";
 import { getNetworkFromSignerOrProvider } from "../../utils/general-utils";
 
 type ConvertRouteArgs = {
@@ -52,23 +51,6 @@ export type Quote = {
 };
 
 export default class Convert {
-  protected static tokenList: TokenInfo[] | undefined = undefined;
-
-  public static loadTokens = async () => {
-    const tokenManager = new TokenManager();
-    await tokenManager.initialLoad;
-    Convert.tokenList = tokenManager.getLoadedTokens();
-  };
-
-  public static getTokenList = async (): Promise<TokenInfo[]> => {
-    if (!Convert.tokenList) {
-      await Convert.loadTokens();
-    }
-
-    // token list will be loaded by now, so it is not undefined
-    return Convert.tokenList!;
-  };
-
   private static getHighestWeightRoute = async (weightInfo: WeightInput) => {
     const weightedRoutes = await Promise.all(
       routes.map((route) =>
@@ -111,8 +93,6 @@ export default class Convert {
   };
 
   public static getQuote = async (input: ConvertQuoteInput): Promise<Quote> => {
-    if (!this.tokenList) await this.loadTokens();
-
     const network = await Convert.getValidatedNetwork(
       input.fromToken,
       input.toToken,
@@ -136,8 +116,6 @@ export default class Convert {
   public static getSwap = async (
     input: ConvertTransactionInput
   ): Promise<ethers.PopulatedTransaction> => {
-    if (!this.tokenList) await this.loadTokens();
-
     const network = await Convert.getValidatedNetwork(input.fromToken, input.toToken, input.signer);
 
     const route = await this.getHighestWeightRoute({
