@@ -19,9 +19,9 @@ const HandleStakingTokenList = validateTokenList(handleStakingTokenList);
  * - isStable: true if the token is a USD stablecoin, false otherwise,
  * - isShortable: true if the token is shortable, false otherwise
  * - isFxToken: true if token is a fx token, false otherwise
- * - isLiquidityToken: true if token is the Handle Liquidity Token (symbol hLP), false otherwise
- * @note the Handle Liquidity Token (symbol hLP) has isHlpToken set to false, as it is not technically in the liquidity pool.
- * Instead, it has isLiquidityToken set to true
+ * - isLiquidityToken: true if token is the Handle Liquidity Pool token (symbol hLP), false otherwise
+ * @note the Handle Liquidity Pool token (symbol hLP) has isHlpToken set to false,
+ * as it is not technically in the liquidity pool. Instead, it has isLiquidityToken set to true
  */
 class HandleTokenManager extends TokenManager {
   constructor(tokenListUrls: string[] = []) {
