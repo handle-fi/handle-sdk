@@ -14,6 +14,7 @@ import { getMarginFee } from "./getMarginFee";
 import { getLeverage } from "./position/getLeverage";
 import { getPositionDelta } from "./position/getPositionDelta";
 import { getAum } from "./getAum";
+import { isTradeWeekend } from "../../utils/trade-utils";
 
 export {
   contractPositionToPosition,
@@ -31,6 +32,7 @@ export {
   getSwapFee,
   getSwapFeeBasisPoints,
   getTradeFee,
+  isTradeWeekend,
   Position,
   splitPositionArray
 };

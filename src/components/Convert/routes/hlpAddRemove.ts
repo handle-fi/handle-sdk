@@ -7,11 +7,14 @@ import { ConvertQuoteRouteArgs, ConvertTransactionRouteArgs, Quote } from "../Co
 import { HLP_ADD_REMOVE_WEIGHT, WeightInput } from "./weights";
 import { fetchEncodedSignedQuotes } from "../../../utils/h2so-utils";
 import { pairFromString } from "../../../utils/general-utils";
+import { isTradeWeekend } from "../../../utils/trade-utils";
 
 const hlpAddRemoveWeight = async (input: WeightInput) => {
   if (!HlpConfig.HLP_CONTRACTS[input.network]?.HlpManager) {
     return 0;
   }
+  if (isTradeWeekend()) return 0;
+
   const tokenManager = new HandleTokenManager();
 
   const isToValidHlp =

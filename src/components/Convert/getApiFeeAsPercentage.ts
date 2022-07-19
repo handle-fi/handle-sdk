@@ -1,5 +1,5 @@
 import config from "../../config";
-import Convert from "./Convert";
+import TokenManager from "../TokenManager";
 
 export const getApiFeeAsPercentage = async (
   sellTokenAddress: string,
@@ -9,15 +9,15 @@ export const getApiFeeAsPercentage = async (
   const STABLE_TO_STABLE_FEE = 0.1;
   const NON_STABLE_FEE = 0.3;
 
-  const tokenList = await Convert.getTokenList();
+  const tokenList = new TokenManager();
+  await tokenList.initialLoad;
 
-  const sellToken = tokenList.find(
-    (token) => token.address.toLowerCase() === sellTokenAddress.toLowerCase()
-  );
-
-  const buyToken = tokenList.find(
-    (token) => token.address.toLowerCase() === buyTokenAddress.toLowerCase()
-  );
+  const sellToken = tokenList
+    .getLoadedTokens()
+    .find((token) => token.address.toLowerCase() === sellTokenAddress.toLowerCase());
+  const buyToken = tokenList
+    .getLoadedTokens()
+    .find((token) => token.address.toLowerCase() === buyTokenAddress.toLowerCase());
 
   if (buyToken?.address === config.forexAddress) {
     return 0;
