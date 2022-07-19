@@ -24,7 +24,7 @@ export const contractPositionToPosition = (
   collateralToken: string,
   indexToken: string,
   isLong: boolean,
-  config: Pick<HlpConfig, "MARGIN_FEE_BASIS_POINTS">
+  config: Pick<HlpConfig, "marginFeeBasisPoints">
 ): Position => {
   const [
     size,

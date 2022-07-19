@@ -40,6 +40,7 @@ const hlpAddRemoveQuoteHandler = async (input: ConvertQuoteRouteArgs): Promise<Q
 
   if (!hlpManagerAddress) throw new Error(`Network ${network} does not have a HlpManager contract`);
   if (!hlpMethods) throw new Error("hlpMethods is required for a hlpToken quote");
+  if (!input.hlpCconfig) throw new Error("hLP config is required for this route");
 
   // Parse ETH address into WETH address.
   const { hlpAddress: parsedFromTokenAddress } = tokenManager.checkForHlpNativeToken(fromToken);
@@ -67,7 +68,7 @@ const hlpAddRemoveQuoteHandler = async (input: ConvertQuoteRouteArgs): Promise<Q
       isBuyingHlp ? parsedFromTokenAddress : parsedToTokenAddress
     ),
     usdHlpSupply: hlpMethods.getUsdHlpSupply(),
-    config: input.config
+    config: input.hlpCconfig
   });
 
   if (isBuyingHlp) {

@@ -20,7 +20,7 @@ type ConvertRouteArgs = {
 export type ConvertQuoteRouteArgs = ConvertRouteArgs & {
   signerOrProvider?: ethers.providers.Provider | Signer;
   receivingAccount?: string;
-  config: HlpConfig;
+  hlpCconfig: HlpConfig | undefined;
 };
 
 export type ConvertTransactionRouteArgs = ConvertRouteArgs & {
@@ -111,7 +111,7 @@ export default class Convert {
 
     return route.quote({
       ...input,
-      config: await getLoadedConfig(network),
+      hlpCconfig: await getLoadedConfig(network),
       network
     });
   };

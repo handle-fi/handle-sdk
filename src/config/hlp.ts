@@ -1,5 +1,6 @@
-import { BigNumber, ethers } from "ethers";
-import { Vault__factory } from "../contracts";
+import { BigNumber } from "ethers";
+import { gql, request } from "graphql-request";
+import config from ".";
 import { Network, NetworkMap } from "../types/network";
 
 /** Currently the only avaliable handle liquidity pool network */
@@ -85,45 +86,57 @@ export type HlpConfig = {
 export const getLoadedConfig = async (
   network: Network,
   forceReload = false
-): Promise<HlpConfig> => {
+): Promise<HlpConfig | undefined> => {
   if (!forceReload && loadedConfig[network]) return loadedConfig[network]!;
+  if (network !== "arbitrum") return; // only supported on arbitrum
 
-  const contracts = HLP_CONTRACTS[network];
-  if (!contracts) throw new Error("No hLP on this network");
+  type GraphResponse = {
+    vaultFees: [
+      {
+        mintBurnFeeBasisPoints: string;
+        taxBasisPoints: string;
+        stableTaxBasisPoints: string;
+        minProfitTime: string;
+        marginFeeBasisPoints: string;
+        swapFeeBasisPoints: string;
+        stableSwapFeeBasisPoints: string;
+        liquidationFee: string;
+      }
+    ];
+    vaultMaxLeverages: [{ maxLeverage: string }];
+  };
 
-  // const vault = Vault__factory.connect(contracts.Vault, signerOrProvider);
-  // const [
-  //   MAX_LEVERAGE,
-  //   MINT_BURN_FEE_BASIS_POINTS,
-  //   TAX_BASIS_POINTS,
-  //   STABLE_TAX_BASIS_POINTS,
-  //   MIN_PROFIT_TIME,
-  //   MARGIN_FEE_BASIS_POINTS,
-  //   SWAP_FEE_BASIS_POINTS,
-  //   STABLE_SWAP_FEE_BASIS_POINTS,
-  //   LIQUIDATION_FEE
-  // ] = await Promise.all([
-  //   vault.maxLeverage(),
-  //   vault.mintBurnFeeBasisPoints(),
-  //   vault.taxBasisPoints(),
-  //   vault.stableTaxBasisPoints(),
-  //   vault.minProfitTime(),
-  //   vault.marginFeeBasisPoints(),
-  //   vault.swapFeeBasisPoints(),
-  //   vault.stableSwapFeeBasisPoints(),
-  //   vault.liquidationFeeUsd()
-  // ]);
+  const response: GraphResponse = await request(
+    config.theGraphEndpoints.arbitrum.trade,
+    gql`
+      query {
+        vaultFees(first: 1) {
+          mintBurnFeeBasisPoints
+          taxBasisPoints
+          stableTaxBasisPoints
+          minProfitTime
+          marginFeeBasisPoints
+          swapFeeBasisPoints
+          stableSwapFeeBasisPoints
+          liquidationFee
+        }
+        vaultMaxLeverages(first: 1) {
+          maxLeverage
+        }
+      }
+    `
+  );
 
-  // loadedConfig[network] = {
-  //   MAX_LEVERAGE: MAX_LEVERAGE.toNumber(),
-  //   MINT_BURN_FEE_BASIS_POINTS: MINT_BURN_FEE_BASIS_POINTS.toNumber(),
-  //   TAX_BASIS_POINTS: TAX_BASIS_POINTS.toNumber(),
-  //   STABLE_TAX_BASIS_POINTS: STABLE_TAX_BASIS_POINTS.toNumber(),
-  //   MIN_PROFIT_TIME: MIN_PROFIT_TIME.toNumber(),
-  //   MARGIN_FEE_BASIS_POINTS: MARGIN_FEE_BASIS_POINTS.toNumber(),
-  //   SWAP_FEE_BASIS_POINTS: SWAP_FEE_BASIS_POINTS.toNumber(),
-  //   STABLE_SWAP_FEE_BASIS_POINTS: STABLE_SWAP_FEE_BASIS_POINTS.toNumber(),
-  //   LIQUIDATION_FEE
-  // }
+  loadedConfig[network] = {
+    mintBurnFeeBasisPoints: +response.vaultFees[0].mintBurnFeeBasisPoints,
+    taxBasisPoints: +response.vaultFees[0].taxBasisPoints,
+    stableTaxBasisPoints: +response.vaultFees[0].stableTaxBasisPoints,
+    minProfitTime: +response.vaultFees[0].minProfitTime,
+    marginFeeBasisPoints: +response.vaultFees[0].marginFeeBasisPoints,
+    swapFeeBasisPoints: +response.vaultFees[0].swapFeeBasisPoints,
+    stableSwapFeeBasisPoints: +response.vaultFees[0].stableSwapFeeBasisPoints,
+    liquidationFee: BigNumber.from(response.vaultFees[0].liquidationFee),
+    maxLeverage: +response.vaultMaxLeverages[0].maxLeverage
+  };
   return loadedConfig[network]!;
 };
