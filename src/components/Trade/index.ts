@@ -15,6 +15,7 @@ import { getLeverage } from "./position/getLeverage";
 import { getPositionDelta } from "./position/getPositionDelta";
 import { getAum } from "./getAum";
 import { isTradeWeekend } from "../../utils/trade-utils";
+import { isDisabledOnWeekends } from "../../utils/trade-utils";
 
 export {
   contractPositionToPosition,
@@ -32,6 +33,7 @@ export {
   getSwapFee,
   getSwapFeeBasisPoints,
   getTradeFee,
+  isDisabledOnWeekends,
   isTradeWeekend,
   Position,
   splitPositionArray
