@@ -290,7 +290,7 @@
       }
     },
     {
-      "name": "Handle Liquidity Token",
+      "name": "Handle Liquidity Pool",
       "symbol": "hLP",
       "decimals": 18,
       "address": "0xB666b08609b2E69A8ba51AA720770053AeC0d2d3",
