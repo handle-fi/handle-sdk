@@ -1,7 +1,7 @@
 import { HandleTokenManager, Network } from "../../..";
 
 /**
- * Gets all viable combinatins of collateral tokens, index tokens
+ * Gets all viable combinations of collateral tokens, index tokens
  * and whether the position is long or short
  * @param network the network from which to fetch the list
  * @returns an object with the list of collateral tokens, index tokens,
