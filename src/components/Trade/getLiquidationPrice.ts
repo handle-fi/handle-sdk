@@ -11,12 +11,12 @@ type LiquidationDelta = {
   increaseSize: boolean;
 };
 
-type RequriedConfig = "liquidationFee" | "maxLeverage" | "marginFeeBasisPoints";
+type RequiredConfig = "liquidationFee" | "maxLeverage" | "marginFeeBasisPoints";
 
 export const getLiquidationPrice = (
   position: Required<Position>,
   indexTokenCumulativeFundingRate: BigNumber,
-  config: Pick<HlpConfig, RequriedConfig>,
+  config: Pick<HlpConfig, RequiredConfig>,
   deltaInfo?: LiquidationDelta
 ): BigNumber => {
   let { isLong, size, collateral, averagePrice, entryFundingRate, delta, hasProfit } = position;
