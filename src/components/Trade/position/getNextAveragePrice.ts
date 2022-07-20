@@ -7,7 +7,7 @@ export const getNextAveragePrice = (
   hasProfit: boolean,
   isLong: boolean,
   markPrice: BigNumber
-): BigNumber | null => {
+): BigNumber => {
   const nextSize = size.add(sizeDelta);
   let divisor;
   if (isLong) {
@@ -15,9 +15,7 @@ export const getNextAveragePrice = (
   } else {
     divisor = hasProfit ? nextSize.sub(existingDelta) : nextSize.add(existingDelta);
   }
-  if (divisor.eq(0)) {
-    return null;
-  }
-  const nextAveragePrice = markPrice.mul(nextSize).div(divisor);
-  return nextAveragePrice;
+  if (divisor.eq(0))
+    throw new Error("Division by zero");
+  return markPrice.mul(nextSize).div(divisor);
 };
