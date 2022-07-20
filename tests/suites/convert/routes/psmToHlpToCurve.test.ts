@@ -3,7 +3,7 @@ import { expect } from "chai";
 import { sampleHlpTokenMethods } from "../sampleHlpTokenMethods";
 import { eurs } from "../test-tokens";
 import { config, ConvertSDK, TokenInfo } from "../../../../src";
-import { testTokenList } from "../../../mock-data/token-list";
+import { testTokenList } from "../../../mock-data/token-config";
 
 const signer = ethers.provider.getSigner(0);
 

@@ -1,13 +1,14 @@
 import { BigNumber } from "ethers";
-import {
-  STABLE_SWAP_FEE_BASIS_POINTS,
-  STABLE_TAX_BASIS_POINTS,
-  SWAP_FEE_BASIS_POINTS,
-  TAX_BASIS_POINTS
-} from "../../config/hlp";
 import { getFeeBasisPoints } from "./getFeeBasisPoints";
 import { Network } from "../../types/network";
 import HandleTokenManager from "../TokenManager/HandleTokenManager";
+import { HlpConfig } from "../../config/hlp";
+
+export type RequiredConfig =
+  | "stableSwapFeeBasisPoints"
+  | "swapFeeBasisPoints"
+  | "stableTaxBasisPoints"
+  | "taxBasisPoints";
 
 export const getSwapFeeBasisPoints = (
   args: {
@@ -17,6 +18,7 @@ export const getSwapFeeBasisPoints = (
     usdHlpSupply: BigNumber;
     totalTokenWeights: BigNumber;
     targetUsdHlpAmount: BigNumber;
+    config: Pick<HlpConfig, RequiredConfig>;
   },
   network: Network = "arbitrum"
 ) => {
@@ -24,8 +26,12 @@ export const getSwapFeeBasisPoints = (
   const isStableSwap =
     tokenManager.isHlpStableTokenByAddress(args.tokenIn, network) &&
     tokenManager.isHlpStableTokenByAddress(args.tokenOut, network);
-  const swapBasisPoints = isStableSwap ? STABLE_SWAP_FEE_BASIS_POINTS : SWAP_FEE_BASIS_POINTS;
-  const taxBasisPoints = isStableSwap ? STABLE_TAX_BASIS_POINTS : TAX_BASIS_POINTS;
+  const swapBasisPoints = isStableSwap
+    ? args.config.stableSwapFeeBasisPoints
+    : args.config.swapFeeBasisPoints;
+  const taxBasisPoints = isStableSwap
+    ? args.config.stableTaxBasisPoints
+    : args.config.taxBasisPoints;
 
   const feeBasisPoints1 = getFeeBasisPoints({
     ...args,

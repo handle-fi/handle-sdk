@@ -6,6 +6,7 @@ import { WeightInput } from "./routes/weights";
 import { TokenInfo } from "@uniswap/token-lists";
 import { CHAIN_ID_TO_NETWORK_NAME } from "../../constants";
 import { getNetworkFromSignerOrProvider } from "../../utils/general-utils";
+import { getLoadedConfig, HlpConfig } from "../../config/hlp";
 
 type ConvertRouteArgs = {
   fromToken: TokenInfo;
@@ -19,6 +20,7 @@ type ConvertRouteArgs = {
 export type ConvertQuoteRouteArgs = ConvertRouteArgs & {
   signerOrProvider?: ethers.providers.Provider | Signer;
   receivingAccount?: string;
+  hlpCconfig: HlpConfig | undefined;
 };
 
 export type ConvertTransactionRouteArgs = ConvertRouteArgs & {
@@ -109,6 +111,7 @@ export default class Convert {
 
     return route.quote({
       ...input,
+      hlpCconfig: await getLoadedConfig(network),
       network
     });
   };

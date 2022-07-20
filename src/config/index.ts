@@ -57,6 +57,7 @@ export type Config = {
     arbitrum: {
       fx: string;
       hpsm: string;
+      trade: string;
     };
   };
   bridge: {
@@ -167,7 +168,8 @@ const config: Config = {
   theGraphEndpoints: {
     arbitrum: {
       fx: "https://api.thegraph.com/subgraphs/name/handle-fi/handle",
-      hpsm: "https://api.thegraph.com/subgraphs/name/handle-fi/handle-psm"
+      hpsm: "https://api.thegraph.com/subgraphs/name/handle-fi/handle-psm",
+      trade: "https://api.thegraph.com/subgraphs/name/handle-fi/handle-trade"
     }
   },
   bridge: {

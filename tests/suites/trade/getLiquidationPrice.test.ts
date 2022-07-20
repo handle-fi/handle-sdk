@@ -2,6 +2,7 @@ import { expect } from "chai";
 import { getLiquidationPrice, Position } from "../../../src/components/Trade";
 import { TradeUtils } from "../../../src";
 import { BigNumber, ethers } from "ethers";
+import { TEST_CONFIG } from "../../mock-data/token-config";
 
 const ZERO_POSITION = (
   indexToken = ethers.constants.AddressZero,
@@ -53,6 +54,7 @@ describe("getLiquidationPrice", () => {
           hasProfit: false
         },
         ethers.constants.Zero,
+        TEST_CONFIG,
         delta
       );
       expect(ethers.utils.formatUnits(price, 30)).to.equal("1712.433666666666666382475964222223");
@@ -75,6 +77,7 @@ describe("getLiquidationPrice", () => {
           hasProfit: false
         },
         ethers.constants.Zero,
+        TEST_CONFIG,
         delta
       );
       expect(ethers.utils.formatUnits(price, 30)).to.equal("3968.115433333333340091773551376522");
@@ -90,7 +93,8 @@ describe("getLiquidationPrice", () => {
           delta: ethers.constants.Zero,
           hasProfit: false
         },
-        bn(100)
+        bn(100),
+        TEST_CONFIG
       );
       expect(ethers.utils.formatUnits(price, 30)).to.equal("0.541");
     });
@@ -102,7 +106,8 @@ describe("getLiquidationPrice", () => {
           delta: ethers.constants.Zero,
           hasProfit: false
         },
-        bn(100)
+        bn(100),
+        TEST_CONFIG
       );
       expect(ethers.utils.formatUnits(price, 30)).to.equal("1.459");
     });
@@ -127,6 +132,7 @@ describe("getLiquidationPrice", () => {
             hasProfit: false
           },
           bn(100),
+          TEST_CONFIG,
           delta
         );
         expect(ethers.utils.formatUnits(price, 30)).to.equal("0.482");
@@ -149,6 +155,7 @@ describe("getLiquidationPrice", () => {
             hasProfit: false
           },
           bn(100),
+          TEST_CONFIG,
           delta
         );
         expect(ethers.utils.formatUnits(price, 30)).to.equal("0.560666666666666666666666666667");
@@ -172,6 +179,7 @@ describe("getLiquidationPrice", () => {
             hasProfit: false
           },
           bn(100),
+          TEST_CONFIG,
           delta
         );
         expect(ethers.utils.formatUnits(price, 30)).to.equal("1.518");
@@ -193,6 +201,7 @@ describe("getLiquidationPrice", () => {
             hasProfit: false
           },
           bn(100),
+          TEST_CONFIG,
           delta
         );
         expect(ethers.utils.formatUnits(price, 30)).to.equal("1.439333333333333333333333333333");

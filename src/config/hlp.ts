@@ -1,4 +1,6 @@
-import { ethers } from "ethers";
+import { BigNumber } from "ethers";
+import { gql, request } from "graphql-request";
+import config from ".";
 import { Network, NetworkMap } from "../types/network";
 
 /** Currently the only avaliable handle liquidity pool network */
@@ -10,20 +12,10 @@ export const HANDLE_WEBSOCKET_URL = "wss://oracle.handle.fi/quotes";
 /** hlp constants */
 export const BASIS_POINTS_DIVISOR = 10_000;
 export const USD_DISPLAY_DECIMALS = 2;
-export const MARGIN_FEE_BASIS_POINTS = 10;
-export const SWAP_FEE_BASIS_POINTS = 20;
-export const STABLE_SWAP_FEE_BASIS_POINTS = 1;
 export const PRICE_DECIMALS = 30;
-export const LIQUIDATION_FEE = ethers.utils.parseUnits("2", PRICE_DECIMALS);
-export const MAX_LEVERAGE = 50 * BASIS_POINTS_DIVISOR;
 export const MIN_LEVERAGE = 1 * BASIS_POINTS_DIVISOR;
 export const FUNDING_FEE_DIVISOR = BASIS_POINTS_DIVISOR;
 export const FUNDING_RATE_PRECISION = 1_000_000;
-export const MINT_BURN_FEE_BASIS_POINTS = 20;
-export const TAX_BASIS_POINTS = 10;
-export const STABLE_TAX_BASIS_POINTS = 5;
-export const MIN_PROFIT_TIME = 60;
-export const MIN_PROFIT_BASIS_POINTS = 10;
 
 /** Symbols that can be used in the hlp price chart against USD. */
 export const UsdHlpChartSymbols = ["AUD", "JPY", "CNY", "EUR", "KRW", "BTC", "BNB", "ETH"] as const;
@@ -70,4 +62,85 @@ export const HLP_CONTRACTS: NetworkMap<HlpContracts | undefined> = {
   },
   ethereum: undefined,
   polygon: undefined
+};
+
+const loadedConfig: Record<Network, HlpConfig | undefined> = {
+  arbitrum: undefined,
+  ethereum: undefined,
+  polygon: undefined
+};
+
+/** hLP dynamic config */
+export type HlpConfig = {
+  maxLeverage: number;
+  mintBurnFeeBasisPoints: number;
+  taxBasisPoints: number;
+  stableTaxBasisPoints: number;
+  minProfitTime: number;
+  marginFeeBasisPoints: number;
+  swapFeeBasisPoints: number;
+  stableSwapFeeBasisPoints: number;
+  liquidationFee: BigNumber;
+};
+
+export const getLoadedConfig = async (
+  network: Network,
+  forceReload = false
+): Promise<HlpConfig | undefined> => {
+  if (!forceReload && loadedConfig[network]) return loadedConfig[network]!;
+  if (network !== "arbitrum") return; // only supported on arbitrum
+
+  type GraphResponse = {
+    vaultFees: [
+      {
+        mintBurnFeeBasisPoints: string;
+        taxBasisPoints: string;
+        stableTaxBasisPoints: string;
+        minProfitTime: string;
+        marginFeeBasisPoints: string;
+        swapFeeBasisPoints: string;
+        stableSwapFeeBasisPoints: string;
+        liquidationFee: string;
+      }
+    ];
+    vaultMaxLeverages: [{ maxLeverage: string }];
+  };
+
+  const response: GraphResponse = await request(
+    config.theGraphEndpoints.arbitrum.trade,
+    gql`
+      query {
+        vaultFees(first: 1) {
+          mintBurnFeeBasisPoints
+          taxBasisPoints
+          stableTaxBasisPoints
+          minProfitTime
+          marginFeeBasisPoints
+          swapFeeBasisPoints
+          stableSwapFeeBasisPoints
+          liquidationFee
+        }
+        vaultMaxLeverages(first: 1) {
+          maxLeverage
+        }
+      }
+    `
+  );
+
+  if (!response) throw new Error("Config not found");
+  if (!Array.isArray(response.vaultFees)) throw new Error("Vault fees not found");
+  if (!Array.isArray(response.vaultMaxLeverages)) throw new Error("Vault max leverage not found");
+
+  loadedConfig[network] = {
+    mintBurnFeeBasisPoints: +response.vaultFees[0].mintBurnFeeBasisPoints,
+    taxBasisPoints: +response.vaultFees[0].taxBasisPoints,
+    stableTaxBasisPoints: +response.vaultFees[0].stableTaxBasisPoints,
+    minProfitTime: +response.vaultFees[0].minProfitTime,
+    marginFeeBasisPoints: +response.vaultFees[0].marginFeeBasisPoints,
+    swapFeeBasisPoints: +response.vaultFees[0].swapFeeBasisPoints,
+    stableSwapFeeBasisPoints: +response.vaultFees[0].stableSwapFeeBasisPoints,
+    liquidationFee: BigNumber.from(response.vaultFees[0].liquidationFee),
+    maxLeverage: +response.vaultMaxLeverages[0].maxLeverage
+  };
+  return loadedConfig[network]!;
 };

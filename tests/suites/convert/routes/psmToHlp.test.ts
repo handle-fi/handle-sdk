@@ -3,7 +3,7 @@ import { expect } from "chai";
 import { sampleHlpTokenMethods } from "../sampleHlpTokenMethods";
 import { eth, fxAud } from "../test-tokens";
 import { config, ConvertSDK } from "../../../../src";
-import { testTokenList } from "../../../mock-data/token-list";
+import { testTokenList } from "../../../mock-data/token-config";
 import { TokenInfo } from "@uniswap/token-lists";
 
 let usdt: TokenInfo;

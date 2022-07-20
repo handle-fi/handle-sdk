@@ -4,7 +4,7 @@ import Convert from "../../../../src/components/Convert";
 import { sampleHlpTokenMethods } from "../sampleHlpTokenMethods";
 import { fxUsd } from "../test-tokens";
 import { config } from "../../../../src";
-import { testTokenList } from "../../../mock-data/token-list";
+import { testTokenList } from "../../../mock-data/token-config";
 import { TokenInfo } from "@uniswap/token-lists";
 
 let usdt: TokenInfo;

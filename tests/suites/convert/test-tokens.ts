@@ -1,7 +1,7 @@
 import { TokenInfo } from "@uniswap/token-lists";
 import { exit } from "process";
 import { mustExist } from "../../../src/utils/general-utils";
-import { testTokenList } from "../../mock-data/token-list";
+import { testTokenList } from "../../mock-data/token-config";
 
 export let weth: TokenInfo;
 export let eth: TokenInfo;
