@@ -3,7 +3,7 @@ import { gql, request } from "graphql-request";
 import config from ".";
 import { Network, NetworkMap } from "../types/network";
 
-/** Currently the only avaliable handle liquidity pool network */
+/** Currently the only available handle liquidity pool network */
 export const DEFAULT_HLP_NETWORK: Network = "arbitrum";
 
 export const HLP_IMAGE_URL = "https://app.handle.fi/assets/images/handle.fiLogoLightNewCut.png";
@@ -83,28 +83,29 @@ export type HlpConfig = {
   liquidationFee: BigNumber;
 };
 
+type GraphResponse = {
+  vaultFees: [
+    {
+      mintBurnFeeBasisPoints: string;
+      taxBasisPoints: string;
+      stableTaxBasisPoints: string;
+      minProfitTime: string;
+      marginFeeBasisPoints: string;
+      swapFeeBasisPoints: string;
+      stableSwapFeeBasisPoints: string;
+      liquidationFee: string;
+    }
+  ];
+  vaultMaxLeverages: [{ maxLeverage: string }];
+};
+
 export const getLoadedConfig = async (
   network: Network,
   forceReload = false
-): Promise<HlpConfig | undefined> => {
+): Promise<HlpConfig> => {
   if (!forceReload && loadedConfig[network]) return loadedConfig[network]!;
-  if (network !== "arbitrum") return; // only supported on arbitrum
-
-  type GraphResponse = {
-    vaultFees: [
-      {
-        mintBurnFeeBasisPoints: string;
-        taxBasisPoints: string;
-        stableTaxBasisPoints: string;
-        minProfitTime: string;
-        marginFeeBasisPoints: string;
-        swapFeeBasisPoints: string;
-        stableSwapFeeBasisPoints: string;
-        liquidationFee: string;
-      }
-    ];
-    vaultMaxLeverages: [{ maxLeverage: string }];
-  };
+  if (network !== DEFAULT_HLP_NETWORK) 
+    throw new Error("hLP not available on this network");
 
   const response: GraphResponse = await request(
     config.theGraphEndpoints.arbitrum.trade,
@@ -127,11 +128,14 @@ export const getLoadedConfig = async (
     `
   );
 
-  if (!response) throw new Error("Config not found");
-  if (!Array.isArray(response.vaultFees)) throw new Error("Vault fees not found");
-  if (!Array.isArray(response.vaultMaxLeverages)) throw new Error("Vault max leverage not found");
+  if (!response)
+    throw new Error("Config not found");
+  if (!Array.isArray(response.vaultFees))
+    throw new Error("Vault fees not found");
+  if (!Array.isArray(response.vaultMaxLeverages))
+    throw new Error("Vault max leverage not found");
 
-  loadedConfig[network] = {
+  const hlpConfig = {
     mintBurnFeeBasisPoints: +response.vaultFees[0].mintBurnFeeBasisPoints,
     taxBasisPoints: +response.vaultFees[0].taxBasisPoints,
     stableTaxBasisPoints: +response.vaultFees[0].stableTaxBasisPoints,
@@ -142,5 +146,6 @@ export const getLoadedConfig = async (
     liquidationFee: BigNumber.from(response.vaultFees[0].liquidationFee),
     maxLeverage: +response.vaultMaxLeverages[0].maxLeverage
   };
-  return loadedConfig[network]!;
+  loadedConfig[network] = hlpConfig; 
+  return hlpConfig;
 };
