@@ -20,7 +20,7 @@ export const TEST_CONFIG: HlpConfig = {
 };
 
 testTokenList.initialLoad
-  .then(async () => {
+  .then(() => {
     loadTokens();
     run();
   })

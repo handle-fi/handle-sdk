@@ -64,7 +64,7 @@ export const HLP_CONTRACTS: NetworkMap<HlpContracts | undefined> = {
   polygon: undefined
 };
 
-let loadedConfig: Record<Network, HlpConfig | undefined> = {
+const loadedConfig: Record<Network, HlpConfig | undefined> = {
   arbitrum: undefined,
   ethereum: undefined,
   polygon: undefined
@@ -126,6 +126,10 @@ export const getLoadedConfig = async (
       }
     `
   );
+
+  if (!response) throw new Error("Config not found");
+  if (!Array.isArray(response.vaultFees)) throw new Error("Vault fees not found");
+  if (!Array.isArray(response.vaultMaxLeverages)) throw new Error("Vault max leverage not found");
 
   loadedConfig[network] = {
     mintBurnFeeBasisPoints: +response.vaultFees[0].mintBurnFeeBasisPoints,
