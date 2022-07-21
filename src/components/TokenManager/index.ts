@@ -8,9 +8,9 @@ type TokenListCache = {
 };
 
 export const DEFAULT_TOKEN_LIST_URLS: string[] = [
-  "https://api-polygon-tokens.polygon.technology/tokenlists/default.tokenlist.json", // polygon
   "https://bridge.arbitrum.io/token-list-42161.json", // arbitrum
-  "https://wispy-bird-88a7.uniswap.workers.dev/?url=http://tokens.1inch.eth.link" // ethereum
+  "https://wispy-bird-88a7.uniswap.workers.dev/?url=http://tokens.1inch.eth.link", // ethereum
+  "https://tokens.uniswap.org/", // polygon, ethereum & arbitrum
 ];
 
 type SearchTokenAddress = {
