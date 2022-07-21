@@ -28,6 +28,7 @@ const DEFAULT_POSITION_DELTA: PositionDelta = {
 /**
  * Gets the leverage of a position, including possible deltas.
  * @param leverageArgs the arguments necessary for calculating the leverage
+ * @param marginFeeBasisPoints the margin fee as basis points
  * @param deltas the position deltas
  * @returns the leverage in basis points
  */
@@ -80,6 +81,7 @@ export const getLeverage = (
 /**
  * Gets the current leverage for a positon, including potential changes.
  * @param position The position from which to get the leverage
+ * @param marginFeeBasisPoints the margin fee as basis points
  * @param positionDelta Any changes to the position size or collateral
  * @param cumulativeFundingRate The cumulative funding rate of the position index token
  * @returns the new leverage in basis points
@@ -89,8 +91,8 @@ export const getLeverageFromPosition = (
   marginFeeBasisPoints: number,
   positionDelta: PositionDelta = DEFAULT_POSITION_DELTA,
   cumulativeFundingRate?: BigNumber
-) => {
-  return getLeverage(
+) => 
+  getLeverage(
     {
       size: position.size,
       ...positionDelta,
@@ -102,4 +104,3 @@ export const getLeverageFromPosition = (
     },
     marginFeeBasisPoints
   );
-};
