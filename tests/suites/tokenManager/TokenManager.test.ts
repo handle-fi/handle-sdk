@@ -3,7 +3,8 @@ import { HandleTokenManager, TokenManager } from "../../../src";
 import { DEFAULT_TOKEN_LIST_URLS } from "../../../src/components/TokenManager";
 
 describe("TokenManager", () => {
-  it("Should load tokenLists from an external source", async () => {
+  xit("Should load tokenLists from an external source", async () => {
+    // TODO: mock this test so it does not rely on external web servers.
     const tokenManager = new TokenManager([]);
     expect(tokenManager.getLoadedTokens().length).to.eq(0);
     await tokenManager.fetchTokenLists(DEFAULT_TOKEN_LIST_URLS);
