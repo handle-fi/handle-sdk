@@ -20,7 +20,7 @@ type ConvertRouteArgs = {
 export type ConvertQuoteRouteArgs = ConvertRouteArgs & {
   signerOrProvider?: ethers.providers.Provider | Signer;
   receivingAccount?: string;
-  hlpCconfig: HlpConfig | undefined;
+  hlpConfig?: HlpConfig;
 };
 
 export type ConvertTransactionRouteArgs = ConvertRouteArgs & {
@@ -100,7 +100,6 @@ export default class Convert {
       input.toToken,
       input.signerOrProvider
     );
-
     const route = await this.getHighestWeightRoute({
       fromToken: input.fromToken,
       toToken: input.toToken,
@@ -108,12 +107,16 @@ export default class Convert {
       network: network,
       hasHlpMethods: !!input.hlpMethods
     });
-
-    return route.quote({
+    const quoteInput: ConvertQuoteRouteArgs = {
       ...input,
-      hlpCconfig: await getLoadedConfig(network),
       network
-    });
+    };
+    try {
+      quoteInput.hlpConfig = await getLoadedConfig(network);
+    } catch (error) {
+      console.error(error);
+    }
+    return route.quote(quoteInput);
   };
 
   public static getSwap = async (
