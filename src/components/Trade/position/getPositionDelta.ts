@@ -7,7 +7,7 @@ import { Position } from ".";
  * @param indexPrice the price of the index token (in price decimals)
  * @param position the position from which to calculate the delta
  * @param config object, including
- *   minProfitTime: the number of seconds until the position can take profit.
+ * minProfitTime: the number of seconds until the position can take profit.
  * @param minProfitBasisPoints the profit percentage a position has to reach to
  * take profit before {minProfitTime}
  * @returns the current delta, and delta percentage, and pending delta of
