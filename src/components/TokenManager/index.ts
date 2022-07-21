@@ -27,7 +27,7 @@ type SearchTokenSymbols = {
  * The TokenList class is used to fetch and validate token lists.
  */
 class TokenManager {
-  /** Caches fetched results indefinetely */
+  /** Caches fetched results indefinitely */
   protected cache: TokenListCache;
   protected customTokens: TokenInfo[];
 
