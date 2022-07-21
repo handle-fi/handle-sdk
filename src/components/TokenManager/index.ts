@@ -199,12 +199,7 @@ class TokenManager {
       return this.cache[url];
     }
 
-    const { data } = await axios.get(url, {
-      headers: {
-        "User-Agent":
-          "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
-      }
-    });
+    const { data } = await axios.get(url);
     const tokenList = validateTokenList(data);
     this.cache[url] = tokenList;
     this.onTokensChange();
