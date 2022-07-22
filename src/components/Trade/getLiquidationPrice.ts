@@ -19,8 +19,8 @@ export const getLiquidationPrice = (
   config: Pick<HlpConfig, RequiredConfig>,
   deltaInfo?: LiquidationDelta
 ): BigNumber => {
-  let { isLong, size, collateral, averagePrice, entryFundingRate, delta, hasProfit } = position;
-  let { sizeDelta, collateralDelta, increaseCollateral, increaseSize } = deltaInfo ?? {};
+  const { isLong, size, collateral, averagePrice, entryFundingRate, delta, hasProfit } = position;
+  const { sizeDelta, collateralDelta, increaseCollateral, increaseSize } = deltaInfo ?? {};
   let nextSize = size;
   let remainingCollateral = collateral;
 

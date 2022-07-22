@@ -9,13 +9,13 @@ export const getApiFeeAsPercentage = async (
   const STABLE_TO_STABLE_FEE = 0.1;
   const NON_STABLE_FEE = 0.3;
 
-  const tokenList = new TokenManager();
-  await tokenList.initialLoad;
+  const tokenManager = new TokenManager();
+  await tokenManager.initialLoad;
 
-  const sellToken = tokenList
+  const sellToken = tokenManager
     .getLoadedTokens()
     .find((token) => token.address.toLowerCase() === sellTokenAddress.toLowerCase());
-  const buyToken = tokenList
+  const buyToken = tokenManager
     .getLoadedTokens()
     .find((token) => token.address.toLowerCase() === buyTokenAddress.toLowerCase());
 

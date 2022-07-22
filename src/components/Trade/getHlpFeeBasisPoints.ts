@@ -10,11 +10,10 @@ export const getHlpFeeBasisPoints = (args: {
   totalTokenWeights: BigNumber;
   targetUsdHlpAmount: BigNumber;
   config: Pick<HlpConfig, "mintBurnFeeBasisPoints" | "taxBasisPoints">;
-}) => {
-  return getFeeBasisPoints({
+}) =>
+  getFeeBasisPoints({
     ...args,
     feeBasisPoints: BigNumber.from(args.config.mintBurnFeeBasisPoints),
     taxBasisPoints: BigNumber.from(args.config.taxBasisPoints),
     increment: args.isBuy
   });
-};

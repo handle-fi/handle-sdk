@@ -33,7 +33,7 @@ const hlpSwapQuoteHandler = async (input: ConvertQuoteRouteArgs): Promise<Quote>
 
   if (!routerAddress) throw new Error(`Network ${network} does not have a Router contract`);
   if (!hlpMethods) throw new Error("hlpMethods is required for a hlpSwap quote");
-  if (!input.hlpCconfig) throw new Error("hLP config is required for this route");
+  if (!input.hlpConfig) throw new Error("hLP config is required for this route");
 
   const tokenManager = new HandleTokenManager();
 
@@ -57,7 +57,7 @@ const hlpSwapQuoteHandler = async (input: ConvertQuoteRouteArgs): Promise<Quote>
     usdHlpSupply: hlpMethods.getUsdHlpSupply(),
     totalTokenWeights: hlpMethods.getTotalTokenWeights(),
     targetUsdHlpAmount: hlpMethods.getTargetUsdHlpAmount(parsedFromTokenAddress),
-    config: input.hlpCconfig
+    config: input.hlpConfig
   });
 
   return {
