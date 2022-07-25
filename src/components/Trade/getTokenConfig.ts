@@ -25,31 +25,37 @@ export type TokenConfig = {
 };
 
 export const getTokenConfig = async (): Promise<TokenConfig[]> => {
-  const response = await request<TokenConfigResponse[]>(
-    config.theGraphEndpoints.arbitrum.trade,
-    gql`
-      query {
-        tokenConfigs(first: 1000) {
-          token
-          isWhitelisted
-          tokenDecimals
-          tokenWeight
-          minProfitBasisPoints
-          maxUsdgAmount
-          isStable
-          isShortable
+  try {
+    const response = await request<TokenConfigResponse[]>(
+      config.theGraphEndpoints.arbitrum.trade,
+      gql`
+        query {
+          tokenConfigs(first: 1000) {
+            token
+            isWhitelisted
+            tokenDecimals
+            tokenWeight
+            minProfitBasisPoints
+            maxUsdgAmount
+            isStable
+            isShortable
+          }
         }
-      }
-    `
-  );
-  return response.map((raw) => ({
-    token: raw.token,
-    isWhitelisted: raw.isWhitelisted,
-    tokenDecimals: +raw.tokenDecimals,
-    tokenWeight: +raw.tokenWeight,
-    minProfitBasisPoints: +raw.minProfitBasisPoints,
-    maxUsdHlpAmount: BigNumber.from(raw.maxUsdgAmount),
-    isStable: raw.isStable,
-    isShortable: raw.isShortable
-  }));
+      `
+    );
+    if (!Array.isArray(response)) throw new Error("Response is not an array");
+    return response.map((raw) => ({
+      token: raw.token,
+      isWhitelisted: raw.isWhitelisted,
+      tokenDecimals: +raw.tokenDecimals,
+      tokenWeight: +raw.tokenWeight,
+      minProfitBasisPoints: +raw.minProfitBasisPoints,
+      maxUsdHlpAmount: BigNumber.from(raw.maxUsdgAmount),
+      isStable: raw.isStable,
+      isShortable: raw.isShortable
+    }));
+  } catch (e) {
+    console.error(e);
+    throw new Error("Failed to fetch token config");
+  }
 };
