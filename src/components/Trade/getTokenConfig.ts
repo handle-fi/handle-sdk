@@ -43,7 +43,6 @@ export const getTokenConfig = async (): Promise<TokenConfig[]> => {
         }
       `
     );
-    console.log(response);
     if (!Array.isArray(response.tokenConfigs)) throw new Error("Response is not an array");
     return response.tokenConfigs.map((raw) => ({
       token: raw.token,
