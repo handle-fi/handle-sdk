@@ -26,7 +26,7 @@ export type TokenConfig = {
 
 export const getTokenConfig = async (): Promise<TokenConfig[]> => {
   try {
-    const response = await request<TokenConfigResponse[]>(
+    const response = await request<{ tokenConfigs: TokenConfigResponse[] }>(
       config.theGraphEndpoints.arbitrum.trade,
       gql`
         query {
@@ -43,8 +43,9 @@ export const getTokenConfig = async (): Promise<TokenConfig[]> => {
         }
       `
     );
-    if (!Array.isArray(response)) throw new Error("Response is not an array");
-    return response.map((raw) => ({
+    console.log(response);
+    if (!Array.isArray(response.tokenConfigs)) throw new Error("Response is not an array");
+    return response.tokenConfigs.map((raw) => ({
       token: raw.token,
       isWhitelisted: raw.isWhitelisted,
       tokenDecimals: +raw.tokenDecimals,
