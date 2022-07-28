@@ -22,3 +22,5 @@ coverage/
 cache/
 # Build
 /src/contracts
+# Typedoc
+docs/
