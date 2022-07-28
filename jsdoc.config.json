@@ -4,8 +4,8 @@
     ],
     "recurseDepth": 10,
     "source": {
-        "includePattern": ".+\\.ts(doc|x)?$",
-        "excludePattern": "(^|\\/|\\\\)_"
+        "include": ["."],
+        "includePattern": ".(jsx|js|ts|tsx)$"
     },
     "sourceType": "module",
     "tags": {
