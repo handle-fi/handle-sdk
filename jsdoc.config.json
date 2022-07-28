@@ -1,7 +1,4 @@
 {
-    "plugins": [
-      "jsdoc-plugin-typescript"
-    ],
     "recurseDepth": 10,
     "source": {
         "include": ["."],
@@ -11,9 +8,6 @@
     "tags": {
         "allowUnknownTags": true,
         "dictionaries": ["jsdoc","closure"]
-    },
-    "typescript": {
-      "moduleRoot": "src"
     },
     "templates": {
         "cleverLinks": false,
