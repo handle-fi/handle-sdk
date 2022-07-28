@@ -21,19 +21,17 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
   publish-docs:
+    publish-docs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Build
-        uses: andstor/jsdoc-action@v1
-        with:
-          source_dir: ./src
-          output_dir: ./out
-          config_file: conf.json
-          template: docdash
-          front_page: README.md
+      - name: Generate ./docs
+        run: |
+          export ARBITRUM_URL=${{ secrets.ARBITRUM_URL }}
+          yarn
+          npx typedoc src/index.ts
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
-          deploy_key: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./out
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs
