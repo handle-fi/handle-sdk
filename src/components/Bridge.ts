@@ -98,6 +98,15 @@ export default class Bridge {
     );
   };
 
+  public requestAutomaticWithdraw = async (network: Network, txHash: string) => {
+    const endpoint = `${this.config.apiBaseUrl}/withdraw`;
+    const queryString = `network=${network}&transactionHash=${txHash}`; 
+    const response = await axios.put(`${endpoint}?${queryString}`);
+    if (!response.data || !response.data.withdrawalTransactionHash)
+      throw new Error("Automatic withdrawal request failed");
+    return response.data.withdrawalTransactionHash;
+  };
+
   public getDepositAllowance = (
     account: string,
     token: string,
