@@ -1,4 +1,4 @@
-import { ethers } from "ethers";
+import {ethers, providers} from "ethers";
 import { CollateralSymbolMap } from "./../types/collaterals";
 import { BridgeConfigByNetwork } from "./../components/Bridge";
 import { StableType } from "./../types/tokens";
@@ -8,6 +8,8 @@ import StakingTokens from "./TokenLists/staking-tokens.json";
 import HandleTokens from "./TokenLists/handle-tokens.json";
 import { validateTokenList, getTokenFromTokenList } from "../utils/tokenlist-utils";
 import { mustExist } from "../utils/general-utils";
+import {NetworkMap} from "../types/network";
+import {Provider} from "@ethersproject/providers";
 
 const stakingTokens = validateTokenList(StakingTokens);
 const handleTokens = validateTokenList(HandleTokens);
@@ -41,6 +43,8 @@ export type SingleCollateralVaults = {
 export type Config = {
   forexAddress: string;
   fxTokenAddresses: FxTokenAddresses;
+  /// Public providers.
+  providers: NetworkMap<Provider>;
   protocol: {
     arbitrum: {
       protocol: ProtocolAddresses;
@@ -128,6 +132,14 @@ const config: Config = {
       [token.symbol]: token.address
     };
   }, {}) as FxTokenAddresses,
+  providers: {
+    arbitrum:
+      new providers.JsonRpcProvider("https://arb1.arbitrum.io/rpc"),
+    ethereum:
+      new providers.JsonRpcProvider("https://rpc.ankr.com/eth"),
+    polygon:
+      new providers.JsonRpcProvider("https://rpc-mainnet.maticvigil.com"), 
+  },
   protocol: {
     arbitrum: {
       protocol: {
