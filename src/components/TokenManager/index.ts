@@ -9,7 +9,7 @@ type TokenListCache = {
 
 export const DEFAULT_TOKEN_LIST_URLS: string[] = [
   "https://bridge.arbitrum.io/token-list-42161.json", // arbitrum
-  "https://wispy-bird-88a7.uniswap.workers.dev/?url=http://tokens.1inch.eth.link", // ethereum
+  "https://app.handle.fi/tokenlist/1inch.json", // ethereum
   "https://tokens.uniswap.org/", // polygon, ethereum & arbitrum
 ];
 

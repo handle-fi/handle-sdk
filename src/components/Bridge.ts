@@ -1,5 +1,11 @@
 import axios from "axios";
-import { ethers } from "ethers";
+import {
+  ethers,
+  Signer,
+  providers,
+  BigNumber,
+  ContractTransaction
+} from "ethers";
 import sdkConfig, { FxTokenAddresses } from "../config";
 import { Network, NetworkMap } from "..";
 import { Bridge__factory, ERC20__factory } from "../contracts";
@@ -19,13 +25,13 @@ export type BridgeDepositArguments = {
   fromNetwork: Network;
   toNetwork: Network;
   tokenSymbol: string;
-  amount: ethers.BigNumber;
+  amount: BigNumber;
 };
 
 export type BridgeWithdrawArguments = {
   tokenSymbol: string;
-  amount: ethers.BigNumber;
-  nonce: ethers.BigNumber;
+  amount: BigNumber;
+  nonce: BigNumber;
   fromNetwork: Network;
   toNetwork: Network;
   signature: string;
@@ -45,8 +51,8 @@ type DepositEventData = DepositEvent["args"] & {
 export type PendingWithdrawal = {
   txHash: string;
   tokenSymbol: string;
-  amount: ethers.BigNumber;
-  nonce: ethers.BigNumber;
+  amount: BigNumber;
+  nonce: BigNumber;
   fromNetwork: Network;
   toNetwork: Network;
 };
@@ -63,15 +69,24 @@ export default class Bridge {
     };
   }
 
-  public deposit = (
+  public deposit = async (
     args: BridgeDepositArguments,
-    signer: ethers.Signer,
+    signer: Signer,
     options: ethers.Overrides = {}
-  ): Promise<ethers.ContractTransaction> => {
-    const bridgeContract = this.getBridgeContract(args.fromNetwork, signer);
+  ): Promise<ContractTransaction> => {
+    const depositBridge = this.getBridgeContract(
+      args.fromNetwork,
+      signer
+    );
     const tokenAddress = this.getTokenAddress(args.tokenSymbol);
-
-    return bridgeContract.deposit(
+    const isAmountSufficient = await this.doesDepositMeetMinimumAmount(
+      tokenAddress,
+      args.amount,
+      args.toNetwork
+    );
+    if (!isAmountSufficient)
+      throw new Error("Deposit amount lower than withdrawal fee");
+    return depositBridge.deposit(
       tokenAddress,
       args.amount,
       this.config.byNetwork[args.toNetwork].id,
@@ -79,11 +94,31 @@ export default class Bridge {
     );
   };
 
+  /// A minimum amount must be enforced due to the withdrawal fees.
+  public doesDepositMeetMinimumAmount = async (
+    tokenSymbol: string,
+    amount: BigNumber,
+    withdrawNetwork: Network
+  ): Promise<boolean> => {
+    const tokenFee = await this.getTokenFee(tokenSymbol, withdrawNetwork);
+    return amount.gt(tokenFee);
+  }
+
+  /// Returns the withdraw token fee for the input network.
+  public getTokenFee = async (
+    tokenSymbol: string,
+    withdrawNetwork: Network
+  ): Promise<BigNumber> => 
+    this.getBridgeContract(
+      withdrawNetwork,
+      sdkConfig.providers[withdrawNetwork]!
+    ).tokenFees(this.getTokenAddress(tokenSymbol));
+  
   public withdraw = async (
     args: BridgeWithdrawArguments,
-    signer: ethers.Signer,
+    signer: Signer,
     options: ethers.Overrides = {}
-  ): Promise<ethers.ContractTransaction> => {
+  ): Promise<ContractTransaction> => {
     const bridgeContract = this.getBridgeContract(args.toNetwork, signer);
     const tokenAddress = this.getTokenAddress(args.tokenSymbol);
     const address = args.address ?? (await signer.getAddress());
@@ -111,8 +146,8 @@ export default class Bridge {
     account: string,
     token: string,
     network: Network,
-    signer: ethers.Signer
-  ): Promise<ethers.BigNumber> => {
+    signer: Signer
+  ): Promise<BigNumber> => {
     const tokenAddress = this.getTokenAddress(token);
     const bridgeAddress = this.config.byNetwork[network].address;
     const contract = ERC20__factory.connect(tokenAddress, signer);
@@ -122,10 +157,10 @@ export default class Bridge {
   public setDepositAllowance = (
     token: string,
     network: Network,
-    amount: ethers.BigNumber,
-    signer: ethers.Signer,
+    amount: BigNumber,
+    signer: Signer,
     options: ethers.Overrides = {}
-  ): Promise<ethers.ContractTransaction> => {
+  ): Promise<ContractTransaction> => {
     const tokenAddress = this.getTokenAddress(token);
     const bridgeAddress = this.config.byNetwork[network].address;
     const tokenContract = ERC20__factory.connect(tokenAddress, signer);
@@ -134,7 +169,7 @@ export default class Bridge {
 
   public getPendingWithdrawals = async (
     account: string,
-    signers: NetworkMap<ethers.Signer>
+    signers: NetworkMap<Signer>
   ): Promise<PendingWithdrawal[]> => {
     const depositEventPromises = Object.keys(signers).map((n) => {
       const network = n as Network;
@@ -154,8 +189,8 @@ export default class Bridge {
 
   public getWithdrawNonce = async (
     args: BridgeGetNonceArguments,
-    signer: ethers.Signer
-  ): Promise<ethers.BigNumber> => {
+    signer: Signer
+  ): Promise<BigNumber> => {
     const bridgeContract = this.getBridgeContract(args.toNetwork, signer);
     const account = args.address ?? (await signer.getAddress());
     return bridgeContract.withdrawNonce(account, this.config.byNetwork[args.fromNetwork].id);
@@ -164,7 +199,7 @@ export default class Bridge {
   private getPendingWithdrawsForNetwork = async (
     account: string,
     network: Network,
-    signers: NetworkMap<ethers.Signer>
+    signers: NetworkMap<Signer>
   ): Promise<PendingWithdrawal[]> => {
     const signer = signers[network];
     const bridgeContract = this.getBridgeContract(network, signer);
@@ -249,9 +284,14 @@ export default class Bridge {
     return getFxTokenSymbolFromAddress(tokenAddress, this.config.fxTokenAddresses);
   };
 
-  public getBridgeContract = (network: Network, signer: ethers.Signer) => {
-    return Bridge__factory.connect(this.config.byNetwork[network].address, signer);
-  };
+  public getBridgeContract = (
+    network: Network,
+    signerOrProvider: Signer | providers.Provider
+  ) =>
+    Bridge__factory.connect(
+      this.config.byNetwork[network].address,
+      signerOrProvider
+    );
 
   private bridgeIdToNetwork = (bridgeId: number): Network => {
     const networkNames = Object.keys(this.config.byNetwork);
