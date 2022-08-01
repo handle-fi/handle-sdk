@@ -1,5 +1,5 @@
 import axios from "axios";
-import { ethers } from "ethers";
+import {ethers, Signer, providers, BigNumber} from "ethers";
 import sdkConfig, { FxTokenAddresses } from "../config";
 import { Network, NetworkMap } from "..";
 import { Bridge__factory, ERC20__factory } from "../contracts";
@@ -63,15 +63,24 @@ export default class Bridge {
     };
   }
 
-  public deposit = (
+  public deposit = async (
     args: BridgeDepositArguments,
     signer: ethers.Signer,
     options: ethers.Overrides = {}
   ): Promise<ethers.ContractTransaction> => {
-    const bridgeContract = this.getBridgeContract(args.fromNetwork, signer);
+    const depositBridge = this.getBridgeContract(
+      args.fromNetwork,
+      signer
+    );
     const tokenAddress = this.getTokenAddress(args.tokenSymbol);
-
-    return bridgeContract.deposit(
+    const isAmountSufficient = await this.doesDepositMeetMinimumAmount(
+      tokenAddress,
+      args.amount,
+      args.toNetwork
+    );
+    if (!isAmountSufficient)
+      throw new Error("Deposit amount lower than withdrawal fee");
+    return depositBridge.deposit(
       tokenAddress,
       args.amount,
       this.config.byNetwork[args.toNetwork].id,
@@ -79,6 +88,20 @@ export default class Bridge {
     );
   };
 
+  /// A minimum amount must be enforced due to the withdrawal fees.
+  public doesDepositMeetMinimumAmount = async (
+    tokenAddress: string,
+    amount: BigNumber,
+    withdrawNetwork: Network
+  ): Promise<boolean> => {
+    const withdrawBridge = this.getBridgeContract(
+      withdrawNetwork,
+      sdkConfig.providers[withdrawNetwork]!
+    );
+    const tokenFee = await withdrawBridge.tokenFees(tokenAddress);
+    return amount.gt(tokenFee);
+  }
+  
   public withdraw = async (
     args: BridgeWithdrawArguments,
     signer: ethers.Signer,
@@ -249,9 +272,14 @@ export default class Bridge {
     return getFxTokenSymbolFromAddress(tokenAddress, this.config.fxTokenAddresses);
   };
 
-  public getBridgeContract = (network: Network, signer: ethers.Signer) => {
-    return Bridge__factory.connect(this.config.byNetwork[network].address, signer);
-  };
+  public getBridgeContract = (
+    network: Network,
+    signerOrProvider: Signer | providers.Provider
+  ) =>
+    Bridge__factory.connect(
+      this.config.byNetwork[network].address,
+      signerOrProvider
+    );
 
   private bridgeIdToNetwork = (bridgeId: number): Network => {
     const networkNames = Object.keys(this.config.byNetwork);
