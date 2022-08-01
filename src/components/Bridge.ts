@@ -96,23 +96,23 @@ export default class Bridge {
 
   /// A minimum amount must be enforced due to the withdrawal fees.
   public doesDepositMeetMinimumAmount = async (
-    tokenAddress: string,
+    tokenSymbol: string,
     amount: BigNumber,
     withdrawNetwork: Network
   ): Promise<boolean> => {
-    const tokenFee = await this.getTokenFee(tokenAddress, withdrawNetwork);
+    const tokenFee = await this.getTokenFee(tokenSymbol, withdrawNetwork);
     return amount.gt(tokenFee);
   }
 
   /// Returns the withdraw token fee for the input network.
   public getTokenFee = async (
-    tokenAddress: string,
+    tokenSymbol: string,
     withdrawNetwork: Network
   ): Promise<BigNumber> => 
     this.getBridgeContract(
       withdrawNetwork,
       sdkConfig.providers[withdrawNetwork]!
-    ).tokenFees(tokenAddress);
+    ).tokenFees(this.getTokenAddress(tokenSymbol));
   
   public withdraw = async (
     args: BridgeWithdrawArguments,
