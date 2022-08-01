@@ -100,13 +100,19 @@ export default class Bridge {
     amount: BigNumber,
     withdrawNetwork: Network
   ): Promise<boolean> => {
-    const withdrawBridge = this.getBridgeContract(
-      withdrawNetwork,
-      sdkConfig.providers[withdrawNetwork]!
-    );
-    const tokenFee = await withdrawBridge.tokenFees(tokenAddress);
+    const tokenFee = await this.getTokenFee(tokenAddress, withdrawNetwork);
     return amount.gt(tokenFee);
   }
+
+  /// Returns the withdraw token fee for the input network.
+  public getTokenFee = async (
+    tokenAddress: string,
+    withdrawNetwork: Network
+  ): Promise<BigNumber> => 
+    this.getBridgeContract(
+      withdrawNetwork,
+      sdkConfig.providers[withdrawNetwork]!
+    ).tokenFees(tokenAddress);
   
   public withdraw = async (
     args: BridgeWithdrawArguments,
