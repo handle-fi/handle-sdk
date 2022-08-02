@@ -36,7 +36,8 @@
       "name": "Stasis Euro",
       "decimals": 2,
       "address": "0xD22a58f79e9481D1a88e00c343885A588b34b68B",
-      "chainId": 42161
+      "chainId": 42161,
+      "logoURI": "https://etherscan.io/token/images/statiseuro_28.png"
     },
     {
       "symbol": "2CRV",
