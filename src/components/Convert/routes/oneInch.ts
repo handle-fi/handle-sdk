@@ -64,7 +64,8 @@ const oneInchQuoteHandler = async (input: ConvertQuoteRouteArgs): Promise<Quote>
     gas: Number(data.estimatedGas),
     allowanceTarget,
     feeBasisPoints: BASIS_POINTS_DIVISOR * (feePercentage / 100),
-    feeChargedBeforeConvert: true
+    feeChargedBeforeConvert: true,
+    priceBpsDifference: 0 // we don't currently have a way to calculate this
   };
 };
 

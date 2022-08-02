@@ -50,6 +50,7 @@ export type Quote = {
   allowanceTarget: string | null;
   feeBasisPoints: number;
   feeChargedBeforeConvert: boolean;
+  priceBpsDifference: number;
 };
 
 export default class Convert {

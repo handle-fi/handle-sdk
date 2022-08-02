@@ -8,6 +8,7 @@ import { HLP_ADD_REMOVE_WEIGHT, WeightInput } from "./weights";
 import { fetchEncodedSignedQuotes } from "../../../utils/h2so-utils";
 import { pairFromString } from "../../../utils/general-utils";
 import { isTradeWeekend } from "../../../utils/trade-utils";
+import { getPriceBpsDifference } from "../../../utils/convert-utils";
 
 const hlpAddRemoveWeight = async (input: WeightInput) => {
   if (!HlpConfig.HLP_CONTRACTS[input.network]?.HlpManager) {
@@ -73,6 +74,14 @@ const hlpAddRemoveQuoteHandler = async (input: ConvertQuoteRouteArgs): Promise<Q
 
   if (isBuyingHlp) {
     const hlpAmount = usdHlpDelta.mul(ethers.utils.parseUnits("1", PRICE_DECIMALS)).div(hLPPrice);
+    const priceBpsDifference = getPriceBpsDifference(
+      fromAmount, 
+      hlpMethods.getMinPrice(parsedFromTokenAddress), 
+      fromToken.decimals,
+      hlpAmount, 
+      hLPPrice,
+      toToken.decimals
+    );
 
     return {
       allowanceTarget: hlpManagerAddress,
@@ -80,7 +89,8 @@ const hlpAddRemoveQuoteHandler = async (input: ConvertQuoteRouteArgs): Promise<Q
       buyAmount: hlpAmount.toString(),
       gas: config.convert.gasEstimates.hlp,
       feeBasisPoints: feeBasisPoints.toNumber(),
-      feeChargedBeforeConvert: false
+      feeChargedBeforeConvert: false,
+      priceBpsDifference
     };
   }
   // The buy amount is the usdHlp delta divided by the price of the token (adjusted for decimals)
@@ -92,13 +102,23 @@ const hlpAddRemoveQuoteHandler = async (input: ConvertQuoteRouteArgs): Promise<Q
         : hlpMethods.getMaxPrice(parsedToTokenAddress)
     );
 
+  const priceBpsDifference = getPriceBpsDifference(
+      fromAmount, 
+      hlpMethods.getMinPrice(parsedFromTokenAddress), 
+      fromToken.decimals,
+      buyAmount, 
+      hlpMethods.getMaxPrice(parsedToTokenAddress),
+      toToken.decimals,
+    );
+
   return {
     allowanceTarget: hlpManagerAddress,
     sellAmount: fromAmount.toString(),
     buyAmount: buyAmount.toString(),
     gas: config.convert.gasEstimates.hlp,
     feeBasisPoints: feeBasisPoints.toNumber(),
-    feeChargedBeforeConvert: false
+    feeChargedBeforeConvert: false,
+    priceBpsDifference
   };
 };
 

@@ -50,6 +50,7 @@ const psmToHlpQuoteHandler = async (input: ConvertQuoteRouteArgs): Promise<Quote
   });
 
   const newFee = combineFees(psmQuote.feeBasisPoints, hlpSwapQuote.feeBasisPoints);
+  const newPriceBpsDifference = combineFees(psmQuote.priceBpsDifference, hlpSwapQuote.priceBpsDifference);
 
   return {
     sellAmount: psmQuote.sellAmount,
@@ -57,7 +58,8 @@ const psmToHlpQuoteHandler = async (input: ConvertQuoteRouteArgs): Promise<Quote
     allowanceTarget: config.protocol.arbitrum.protocol.routerHpsmHlp,
     feeBasisPoints: newFee,
     feeChargedBeforeConvert: false,
-    gas: config.convert.gasEstimates.hpsmToHlp
+    gas: config.convert.gasEstimates.hpsmToHlp,
+    priceBpsDifference: newPriceBpsDifference
   };
 };
 

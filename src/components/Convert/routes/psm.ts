@@ -53,7 +53,8 @@ export const psmQuoteHandler = async (input: ConvertQuoteRouteArgs): Promise<Quo
     buyAmount: buyAmount.toString(),
     gas: config.convert.gasEstimates.hpsm,
     feeBasisPoints: +transactionFeeBasisPoints,
-    feeChargedBeforeConvert: false
+    feeChargedBeforeConvert: false,
+    priceBpsDifference: +transactionFeeBasisPoints // psm is always 1-to-1, except for fee
   };
 
   return quote;

@@ -1,10 +1,11 @@
-import { BigNumber, ethers } from "ethers";
+import { BigNumber, BigNumberish, ethers } from "ethers";
 import { gql, request } from "graphql-request";
 import { HlpConfig } from "..";
 import config, { LPStakingPoolDetails } from "../config";
 import { CURVE_FEE_DENOMINATOR } from "../constants";
 import { CurveMetapoolFactory__factory } from "../contracts/factories/CurveMetapoolFactory__factory";
 import { Network } from "../types/network";
+import { transformDecimals } from "./general-utils";
 
 type Peg = {
   fxToken: string;
@@ -236,3 +237,21 @@ export const getMinOut = (amount: BigNumber, slippage: number) => {
     .mul((1 - slippage / 100) * HlpConfig.BASIS_POINTS_DIVISOR)
     .div(HlpConfig.BASIS_POINTS_DIVISOR);
 };
+
+export const getPriceBpsDifference = (
+  amountIn: BigNumberish, 
+  priceIn: BigNumberish, 
+  decimalsIn: number,
+  amountOut: BigNumberish, 
+  priceOut: BigNumberish,
+  decimalsOut: number
+) => {
+  const amountInAdjusted = transformDecimals(BigNumber.from(amountIn), decimalsIn, 30);
+  const amountOutAdjusted = transformDecimals(BigNumber.from(amountOut), decimalsOut, 30);
+  return BigNumber.from(amountOutAdjusted)
+    .mul(priceOut)
+    .mul(HlpConfig.BASIS_POINTS_DIVISOR)
+    .div(amountInAdjusted)
+    .div(priceIn)
+    .toNumber();
+}

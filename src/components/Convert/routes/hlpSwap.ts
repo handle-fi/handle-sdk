@@ -7,6 +7,7 @@ import { HLP_SWAP_WEIGHT, WeightInput } from "./weights";
 import { fetchEncodedSignedQuotes } from "../../../utils/h2so-utils";
 import { pairFromString } from "../../../utils/general-utils";
 import { isDisabledOnWeekends, isTradeWeekend } from "../../../utils/trade-utils";
+import { getPriceBpsDifference } from "../../../utils/convert-utils";
 
 const hlpSwapWeight = async (input: WeightInput): Promise<number> => {
   if (isTradeWeekend() && isDisabledOnWeekends(input.fromToken, input.toToken)) {
@@ -60,13 +61,23 @@ const hlpSwapQuoteHandler = async (input: ConvertQuoteRouteArgs): Promise<Quote>
     config: input.hlpConfig
   });
 
+  const priceBpsDifference = getPriceBpsDifference(
+    fromAmount, 
+    hlpMethods.getMinPrice(parsedFromTokenAddress), 
+    fromToken.decimals,
+    amountOut, 
+    hlpMethods.getMaxPrice(parsedToTokenAddress),
+    toToken.decimals
+  );
+
   return {
     allowanceTarget: routerAddress,
     buyAmount: amountOut.toString(),
     sellAmount: fromAmount.toString(),
     gas: config.convert.gasEstimates.hlp,
     feeBasisPoints: feeBasisPoints.toNumber(),
-    feeChargedBeforeConvert: false
+    feeChargedBeforeConvert: false,
+    priceBpsDifference
   };
 };
 
