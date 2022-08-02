@@ -33,7 +33,7 @@
     },
     {
       "symbol": "EURS",
-      "name": "Stasis Euro",
+      "name": "Stasis EURS",
       "decimals": 2,
       "address": "0xD22a58f79e9481D1a88e00c343885A588b34b68B",
       "chainId": 42161,
