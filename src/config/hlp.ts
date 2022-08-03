@@ -14,7 +14,6 @@ export const BASIS_POINTS_DIVISOR = 10_000;
 export const USD_DISPLAY_DECIMALS = 2;
 export const PRICE_DECIMALS = 30;
 export const MIN_LEVERAGE = 1 * BASIS_POINTS_DIVISOR;
-export const FUNDING_FEE_DIVISOR = BASIS_POINTS_DIVISOR;
 export const FUNDING_RATE_PRECISION = 1_000_000;
 
 /** Symbols that can be used in the hlp price chart against USD. */
